@@ -123,7 +123,7 @@ selectFeatureBestSplit <- function(splitFeature, xSplit, ySplit, minSizeSplit=5,
       splitSampleError <- splitCriteria(splitSampleData$yLeft, 
                                         splitSampleData$yRight)
       # Update the best error and split value if it is better
-      if (splitSampleValue < bestSplitError) {
+      if (splitSampleError < bestSplitError) {
         bestSplitError <- splitSampleError
         bestSplitValue <- splitSampleValue
       }
