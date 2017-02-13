@@ -10,7 +10,7 @@ xTest <- df[val_idx == 2, -14]
 yTest <- df[val_idx == 2, 14]
 
 # Generate splitting dataset v.s. averaging dataset (60:40)
-split_idx <- sample(2, nrow(trainX), replace = TRUE, prob=c(0.6, 0.4))
+split_idx <- sample(2, nrow(xTrain), replace = TRUE, prob=c(0.6, 0.4))
 xSplit <- xTrain[split_idx == 1, ]
 ySplit <- yTrain[split_idx == 1]
 xAverage <- xTrain[split_idx == 2, ]
