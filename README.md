@@ -66,10 +66,12 @@ process but it is more risky.
 
 ## Package Design
 
-### Object: `honestForest`
-`honestForest` object is a modified version of `randomForest`. The major change is that it aggregates a different dataset (called averaging dataset), instead of the dataset that is used for splitting (called splitting dataset). `honestForest` contains `forest` which is a list of all `honestTree` in the forest. 
+### 1. Random forest and its variations
 
-#### Parameters
+#### `RF`
+`RF` object is an object implementing the most basic version of a random forest. 
+
+##### Parameters
 - `x`  
 A reference to data frame or a matrix of all predictors. 
 
@@ -85,37 +87,31 @@ Number of variables randomly sampled as candidates at each split. The default va
 - `replace=TRUE`  
 Indicator of whether sampling of cases be done with or without replacement.
 
-- `sampsize = if (replace) nrow(x) else ceiling(.632*nrow(x))`  
+- `sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x))`  
 Size(s) of sample to draw.
 
-- `splitratio = 1`  
-Proportion of the training data used as the splitting data set. It is a ratio between 0 and 1. If the ratio is 1, then essentially splitting dataset becomes the total entire sampled set and the averagin data set is empty. If the ratio is 0, then the splitting data set is empty and all the data is used for the averaging data set (This is not a good usage however since there will be no data available for splitting). 
-
-- `nodesize = 5`  
+- `nodesize=5`  
 Minimum size of terminal nodes. Setting this number larger causes smaller trees to be grown (and thus take less time). The default value is 5.
-
-- `nodesizeavg = 5`  
-Minimum size of terminal nodes for averaging dataset. The default value is 5.
 
 - `maxnodes=NULL`  
 Maximum number of terminal nodes trees in the forest can have. If not given, trees are grown to the maximum possible (subject to limits by nodesize).
 
-- ?? `splitfunc=minimizeMSE`  
-A splitting function to determine the best split point among the features. The input for the split function should be `x`, `y`, and a set of candidate features and the its output should be the best feature and the best splitting point for that feature. The default is to minimize the overall MSE.
+- `splitrule='variance'`  
+A splitting rule to determine the best split point among the features. There are two possible split rules in the package, `variance` and `maxstats`. The default is `variance` to minimize the overall MSE.
 
 - `avgfunc=avgMean`  
 An averaging function to average all the input data. The input of this function should be a dataframe of predictors `x` and a vector of outcome `y`. The output is a scalar. The default is to take the mean of all the `y`s.
 
-#### Fields (In addition to input parameters)
+##### Fields (In addition to parameters)
 - `forest`  
-A list of `honestTree` in the forest.
+A list of `RFTree` in the forest. If the class is extended, the list may contain the corresponding extended `RFTree` object.
 
-#### Functions
+##### Functions
 - constructor	
-Create a `honestForest` object by calling `grow()`.
+Create a `RF` object by calling `grow()`.
 
 - `addTree()`  
-Create a new `honestTree` and add it to the `forest`.
+Create a new `RFTree` and add it to the `forest`.
 
 - `grow()`  
 Call `addTree()` `ntree` amount of time to construct trees in the forest.
@@ -123,11 +119,32 @@ Call `addTree()` `ntree` amount of time to construct trees in the forest.
 - `predict(x)`  
 Call predict for all trees and average the predictions among all the trees.
 
+----
+ 
+#### `honestRF`
+`honestRF` inherits `RF`, which serves as a modified version of `RF`. The major change is that it aggregates a different dataset (called averaging dataset), instead of the dataset that is used for splitting (called splitting dataset). 
 
-### Object: `honestTree`
-`honestTree` is the unit component in the `honestTree` which composes `honestNode`. The tree uses recursively partitioning to determine the best `splitFeature` and `splitValue` for each level, and recursively partition the dataset until it reaches the limitation of `nodesize` or `maxnodes`.
+##### Parameters (In addition to those inherited from `RF`)
+- `splitratio = 1`  
+Proportion of the training data used as the splitting data set. It is a ratio between 0 and 1. If the ratio is 1, then essentially splitting dataset becomes the total entire sampled set and the averagin data set is empty. If the ratio is 0, then the splitting data set is empty and all the data is used for the averaging data set (This is not a good usage however since there will be no data available for splitting). 
 
-#### Parameters
+- `nodesizeAvg=5`  	
+Minimum size of terminal nodes for averaging dataset. The default value is 5.
+
+##### Functions (Overwritten)
+- constructor	
+Create a `honestRF` object by calling `grow()`.
+
+- `addTree()`  
+Create a new `honestRFTree` and add it to the `forest`.
+
+
+### 2. Tree and its variations
+
+#### `RFTree`
+`RFTree` is the unit component in the `RF` which composes `RFNode`. The tree uses recursively partitioning to determine the best `splitFeature` and `splitValue` for each level, and recursively split the dataset until it reaches the limitation according to `nodesize` or `maxnodes`.
+
+##### Parameters
 - `x`  
 A reference to data frame or a matrix of all predictors. 
 
@@ -135,37 +152,29 @@ A reference to data frame or a matrix of all predictors.
 A reference to a response vector. 
 
 - `splitSampleIndex`   
-A list of index that records observations that are used in splitting dataset.
-The index are directed linked to the original dataset `x` and `y` from forest.
-Essentially, given this list, we can generate the splitting dataset.
-
-- `avgSampleIndex`  
-A list of index that records observations that are used in averaging dataset.
-The index are directed linked to the original dataset `x` and `y` from forest.
-Essentially, given this list, we can generate the averaging dataset. If it is
-not given, it will be the same as `splitSampleIndex`.
+A list of the index of observations that are used in training. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[splitSampleIndex]` generates the whole training dataset.
 
 - `mtry=max(floor(ncol(x)/3), 1)`  
 Number of variables randomly sampled as candidates at each split. The default value is set to be one third of total feature amount.
 
-- `nodesize = 5`  
+- `nodesize=5`  
 Minimum size of terminal nodes. Setting this number larger causes smaller trees to be grown (and thus take less time). The default value is 5.
 
-- `nodesizeavg = 5`  
+- `nodesizeavg=5`  
 Minimum size of terminal nodes for averaging dataset. The default value is 5.
 
 - `maxnodes=NULL`  
 Maximum number of terminal nodes trees in the forest can have. If not given, trees are grown to the maximum possible (subject to limits by nodesize).
 
-- ?? `splitfunc=minimizeMSE`  
-A splitting function to determine the best split point among the features. The input for the split function should be `x`, `y`, and a set of candidate features and the its output should be the best feature and the best splitting point for that feature. The default is to minimize the overall MSE.
+- `splitrule='variance'`  
+A splitting rule to determine the best split point among the features. There are two possible split rules in the package, `variance` and `maxstats`. The default is `variance` to minimize the overall MSE.
 
 - `avgfunc=avgMean`  
 An averaging function to average all the input data. The input of this function should be a dataframe of predictors `x` and a vector of outcome `y`. The output is a scalar. The default is to take the mean of all the `y`s.
 
-#### Fields (In addition to input parameters)
-- `rootNode`  
-A `honestNode` object which is the root of the tree.
+##### Fields (In addition to parameters)
+- `root`  
+A `RFNode` object which is the root of the tree. If the class is extended, the list may contain the corresponding extended `RFNode` object.
 
 - `totalNodes`	
 A counter of total amount of nodes in the tree.
@@ -173,29 +182,54 @@ A counter of total amount of nodes in the tree.
 - `totalTerminalNodes`	
 A counter of total amount of terminal nodes in the tree.
 
-#### Functions
+##### Functions
 - constructor	
-Create a `honestTree` object by calling `grow()`.
+Create a `RFTree` object by calling `recusive_partition()`.
 
-- `grow()`  
-Build a decision tree regressor using `recusive_partition()`.
+- `validSplitTest()`	
+Determine if a split is valid. If a split is valid, it must have at least `minSizeSplit` observations in the training dataset. 
 
-- `recusive_partition()`  
-Grow the decision tree by recursively finding the best split feature and point.
+- `selectBestFeature()`
+Find the best split value for all features. The `splitFeature` and its corresponding `splitValue` minimizes the specified `splitrule`. 
+
+- `recusivePartition()`  
+Grow the decision tree by recursively finding the best split feature and value. 
 
 - `peak(x)`   
-Return the leaf `honestNode` that `x` falls in.
+Return the leaf node that `x` falls in.
 
-- `decision_path(x)`  
+- `decisionPath(x)`  
 Return the decision path in the tree.
 
 - `predict(x)`  
-Predict the regression value for `x` by calling `predict(x)` from the root `honestNode`.
+Predict the regression value for `x` by calling `predict(x)` from the root.
 
-### Object: `honestNode`
-`honestNode` is the basic element inside a `honestTree`. For each node, it contains the splitting and averaging dataset that are assigned to the node. The `honestNode` can be either a leaf and a tree node (non-leaf). If it is a leaf node, `avgfunc` can be called to aggregate all the averaging observations in the node and return a prediction for the node. If it is a tree node, it will contains `leftChild` and `rightChild` which will be another two `honestNode`. The current parent node can be used to track the `splitFeature` and `splitValue`. 
+----
 
-#### Parameters
+#### `honestRFTree`
+`honestRFTree` inherits `RFTree`, which serves as a modified version of `RFTree`. The major change is that when `honestRFTree` determines a valid split point, it looks at whether or not it is valid for both averaging and splitting dataset.
+
+##### Parameters (In addition to those inherited from `RFTree`)
+- `avgSampleIndex=splitSampleIndex`  
+A list of the index of observations that are used as averaging dataset. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[avgSampleIndex]` generates the whole splitting dataset. The default case is `avgSampleIndex=splitSampleIndex` where the `honestRFTree` is essentially a normal `RFTree`.
+
+- `nodesizeAvg=5`  	
+Minimum size of terminal nodes for averaging dataset. The default value is 5.
+
+##### Functions (Overwritten)
+- constructor	
+Create a `honestRFTree` object by calling `recusive_partition()`.
+
+- `validSplitTest()`		
+Determine if a split is valid. If a split is valid, it must have at least both `nodesize` observations in the training (splitting) dataset and `nodesizeAvg` observations in the averaging dataset. 
+
+
+### 3. Node and its variations
+
+#### `RFNode`
+`RFNode` is the basic element inside a `honestRFTree`. For each node, it contains the averaging dataset that are assigned to the node. The `RFNode` can be either a leaf and a tree node (non-leaf). If it is a leaf node, `avgfunc` can be called to aggregate all the observations in the node and return a prediction for the node. If it is a tree node, it will contains `leftChild` and `rightChild` which will be another two `RFNode`. The current parent node can be used to track the `splitFeature` and `splitValue`. 
+
+##### Parameters
 - `x`  
 A reference to data frame or a matrix of all predictors. 
 
@@ -204,9 +238,6 @@ A reference to a response vector.
 
 - `splitSampleIndex`   
 Index of splitting dataset used in this node and its children. `x[splitSampleIndex]` will return a dataframe of predictors in the splitting dataset.
-
-- `avgSampleIndex=splitSampleIndex`  
-Index of averaging dataset used in this node and its children. `x[avgSampleIndex]` will return a dataframe of predictors in the averaging dataset. If the `avgSampleIndex` is `NULL`, it will be set the same as `splitSampleIndex`.
 
 - `avgfunc=avgMean`  
 An averaging function to average all the input data. The input of this function should be a dataframe of predictors `x` and a vector of outcome `y`. The output is a scalar. The default is to take the mean of all the `y`s.
@@ -217,15 +248,15 @@ Name of the feature that is used for splitting in this node.
 - `splitValue`    
 The value that is used for splitting in this node.
 
-#### Fields (In addition to input parameters)
+##### Fields (In addition to input parameters)
 - `isLeaf`  
 An indicator of whether the current node is a leaf or not.
 
 - `leftChild`    
-If the node is not a leaf node, the `leftChild` will point to another `honestNode` object. If it is a leaf node, the `leftChild` will be `NULL`.
+If the node is not a leaf node, the `leftChild` will point to another node object. If it is a leaf node, the `leftChild` will be `NULL`.
 
 - `rightChild`    
-If the node is not a leaf node, the `rightChild` will point to another `honestNode` object. If it is a leaf node, the `rightChild` will be `NULL`.
+If the node is not a leaf node, the `rightChild` will point to another node object. If it is a leaf node, the `rightChild` will be `NULL`.
 
 - `prediction`    
 If the node is a leaf node, the `prediction` will be the predicted value of this node using the passed-in function `avgfunc`. If the node is a not a leaf node, `prediction` will be `NULL`.
@@ -233,15 +264,12 @@ If the node is a leaf node, the `prediction` will be the predicted value of this
 - `splitVariance`    
 To measure the variance of the splitting.
 
-- `nAverage`    
-Number of observations in the averaging dataset in this node.
-
-- `nSplit`    
-Number of observations in the splitting dataset in this node.
+- `n`    
+Number of observations in the dataset in this node.
 
 #### Functions
 - constructor	
-Create a `honestNode` object using the input parameters.
+Create a `RFNode` object using the input parameters.
 
 - `isLeaf()`    
 Test if the current node is a leaf node
@@ -270,8 +298,26 @@ Return `splitFeature`.
 - `getSplitValue()`   
 Return `splitValue`.
 
-- `getSplitData()`    
-Return splitting dataset. It contains both predictors and responses, namely `x[splitSampleIndex]` and `y[splitSampleIndex]`.
-
 - `getAveragingData()`    
 Return averaging dataset. It contains both predictors and responses, namely `x[avgSampleIndex]` and `y[avgSampleIndex]`.
+
+----
+
+
+#### `honestRFNode`
+`honestRFNode` inherits `RFNode`, which serves as a modified version of `RFNode`. The major change is that when `honestRFNode` also stores the splitting dataset in the node in addition to the averaging dataset.
+
+##### Parameters (In addition to those inherited from `RFNode`)
+- `splitSampleIndex=avgSampleIndex`   
+Index of splitting dataset used in this node and its children. `x[splitSampleIndex]` will return a dataframe of predictors in the splitting dataset. The default case is `splitSampleIndex=avgSampleIndex`.
+
+##### Fields (In addition to those inherited from `RFNode`)
+- `nSplit`    
+Number of observations in the splitting dataset in this node.
+
+##### Functions (Overwritten)
+- constructor	
+Create a `honestRFTree` object by calling `recusive_partition()`.
+
+- `getSplitData()`    
+Return splitting dataset. It contains both predictors and responses, namely `x[splitSampleIndex]` and `y[splitSampleIndex]`.
