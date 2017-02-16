@@ -116,7 +116,7 @@ A list of `RFTree` in the forest. If the class is extended, the list may contain
  the corresponding extended `RFTree` object.
 
 ##### Functions
-- constructor
+- constructor	
 Create a `RF` object by calling `grow()`.
 
 - `addTree()`  
@@ -146,7 +146,7 @@ Proportion of the training data used as the splitting data set. It is a ratio be
 Minimum size of terminal nodes for averaging dataset. The default value is 5.
 
 ##### Functions (Overwritten)
-- constructor
+- constructor	
 Create a `honestRF` object by calling `grow()`.
 
 - `addTree()`  
@@ -165,8 +165,8 @@ A reference to data frame or a matrix of all predictors.
 - `y`    
 A reference to a response vector.
 
-- `splitSampleIndex`   
-A list of the index of observations that are used in training. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[splitSampleIndex]` generates the whole training dataset.
+- `avgSampleIndex`  
+A list of the index of observations that are used as averaging dataset. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[avgSampleIndex]` generates the whole splitting dataset. 
 
 - `mtry=max(floor(ncol(x)/3), 1)`  
 Number of variables randomly sampled as candidates at each split. The default value is set to be one third of total feature amount.
@@ -190,21 +190,21 @@ An averaging function to average all the input data. The input of this function 
 - `root`  
 A `RFNode` object which is the root of the tree. If the class is extended, the list may contain the corresponding extended `RFNode` object.
 
-- `totalNodes`
+- `totalNodes`	
 A counter of total amount of nodes in the tree.
 
-- `totalTerminalNodes`
+- `totalTerminalNodes`	
 A counter of total amount of terminal nodes in the tree.
 
 ##### Functions
-- constructor
+- constructor	
 Create a `RFTree` object by calling `recusive_partition()`.
 
-- `validSplitTest()`
-Determine if a split is valid. If a split is valid, it must have at least `minSizeSplit` observations in the training dataset.
+- `validSplitTest()`	
+Determine if a split is valid. If a split is valid, it must have at least `nodesize` observations in the training dataset.
 
-- `selectBestFeature()`
-Find the best split value for all features. The `splitFeature` and its corresponding `splitValue` minimizes the specified `splitrule`.
+- `selectBestFeature(featureList)`	
+Find the best `splitfeature`, `splitValue` pair where `splitfeature` is one of the features specified by `featureList`. The `splitFeature` and its corresponding `splitValue` minimizes the specified `splitrule`.
 
 - `recusivePartition()`  
 Grow the decision tree by recursively finding the best split feature and value.
@@ -224,14 +224,15 @@ Predict the regression value for `x` by calling `predict(x)` from the root.
 `honestRFTree` inherits `RFTree`, which serves as a modified version of `RFTree`. The major change is that when `honestRFTree` determines a valid split point, it looks at whether or not it is valid for both averaging and splitting dataset.
 
 ##### Parameters (In addition to those inherited from `RFTree`)
-- `avgSampleIndex=splitSampleIndex`  
-A list of the index of observations that are used as averaging dataset. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[avgSampleIndex]` generates the whole splitting dataset. The default case is `avgSampleIndex=splitSampleIndex` where the `honestRFTree` is essentially a normal `RFTree`.
+
+- `splitSampleIndex=avgSampleIndex`   
+A list of the index of observations that are used as splitting data instead of provided averaging dataset. The index are based on the original dataset `x` and `y` from forest. Essentially, `x[splitSampleIndex]` generates the whole training dataset. The default case is `splitSampleIndex=avgSampleIndex` where the `honestRFTree` is essentially a normal `RFTree`.
 
 - `nodesizeAvg=5`  	
 Minimum size of terminal nodes for averaging dataset. The default value is 5.
 
 ##### Functions (Overwritten)
-- constructor
+- constructor	
 Create a `honestRFTree` object by calling `recusive_partition()`.
 
 - `validSplitTest()`		
