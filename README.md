@@ -66,6 +66,8 @@ process but it is more risky.
 
 ## Package Design
 
+(Update: The package design is no longer maintained)
+
 ### 1. Random forest and its variations
 
 #### `RF`
@@ -242,7 +244,13 @@ Determine if a split is valid. If a split is valid, it must have at least both `
 ### 3. Node and its variations
 
 #### `RFNode`
-`RFNode` is the basic element inside a `honestRFTree`. For each node, it contains the averaging dataset that are assigned to the node. The `RFNode` can be either a leaf and a tree node (non-leaf). If it is a leaf node, `avgfunc` can be called to aggregate all the observations in the node and return a prediction for the node. If it is a tree node, it will contains `leftChild` and `rightChild` which will be another two `RFNode`. The current parent node can be used to track the `splitFeature` and `splitValue`.
+`RFNode` is the basic element inside a `RFTree`. For each node, it contains the
+averaging dataset that is assigned to the node. The `RFNode` can be either a 
+leaf and a tree node (non-leaf). If it is a leaf node, `avgfunc` can be called 
+to aggregate all the observations in the node and save a prediction for the 
+node. If it is a tree node, it will contains `leftChild` and `rightChild` 
+which will be another two `RFNode`s. The current parent node can be used to 
+track the `splitFeature` and `splitValue`.
 
 ##### Parameters
 - `x`  
@@ -251,11 +259,13 @@ A reference to data frame or a matrix of all predictors.
 - `y`    
 A reference to a response vector.
 
-- `splitSampleIndex`   
-Index of splitting dataset used in this node and its children. `x[splitSampleIndex]` will return a dataframe of predictors in the splitting dataset.
+- `avgSampleIndex`   
+Index of dataset used in this node and its children. `x[avgSampleIndex]` will return a dataframe of predictors.
 
 - `avgfunc=avgMean`  
-An averaging function to average all the input data. The input of this function should be a dataframe of predictors `x` and a vector of outcome `y`. The output is a scalar. The default is to take the mean of all the `y`s.
+An averaging function to average all the input data. The input of this function 
+should be a dataframe of predictors `x` and a vector of outcome `y`. The output 
+is a scalar. The default is to take the mean of all the `y`s.
 
 - `splitFeature`    
 Name of the feature that is used for splitting in this node.
@@ -268,13 +278,17 @@ The value that is used for splitting in this node.
 An indicator of whether the current node is a leaf or not.
 
 - `leftChild`    
-If the node is not a leaf node, the `leftChild` will point to another node object. If it is a leaf node, the `leftChild` will be `NULL`.
+If the node is not a leaf node, the `leftChild` will point to another node 
+object. If it is a leaf node, the `leftChild` will be `NULL`.
 
 - `rightChild`    
-If the node is not a leaf node, the `rightChild` will point to another node object. If it is a leaf node, the `rightChild` will be `NULL`.
+If the node is not a leaf node, the `rightChild` will point to another node 
+object. If it is a leaf node, the `rightChild` will be `NULL`.
 
 - `prediction`    
-If the node is a leaf node, the `prediction` will be the predicted value of this node using the passed-in function `avgfunc`. If the node is a not a leaf node, `prediction` will be `NULL`.
+If the node is a leaf node, the `prediction` will be the predicted value of 
+this node using the passed-in function `avgfunc`. If the node is a not a leaf 
+node, `prediction` will be `NULL`.
 
 - `splitVariance`    
 To measure the variance of the splitting.

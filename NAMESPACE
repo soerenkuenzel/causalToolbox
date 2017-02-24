@@ -1,3 +1,5 @@
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
+import(foreach)
+import(doParallel)
 useDynLib(causalRF)
