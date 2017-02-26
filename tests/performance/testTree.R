@@ -27,8 +27,8 @@ MSE_brei <- rep(NA, nsim)
 MSE_ranger <- rep(NA, nsim)
 MSE_rf <- rep(NA, nsim)
 MSE_hrf <- rep(NA, nsim)
-MSE_soren <- rep(NA, nsim)
-MSE_allen <- rep(NA, nsim)
+# MSE_soren <- rep(NA, nsim)
+# MSE_allen <- rep(NA, nsim)
 
 #### Breiman and ranger implementation:
 for(i in 1:nsim){
@@ -62,7 +62,7 @@ for(i in 1:nsim){
                 replace=FALSE,
                 sampsize=length(iris_train$Sepal.Length),
                  mtry=4, ntree = 1,
-                 nodesize=1, nthread=4)
+                 nodesize=1, nthread=10)
   predict_hrt2 <- predict(t_hrt2, iris_test[ , -1])
   MSE_rf[i] <- mean((iris_test$Sepal.Length - predict_hrt2)^2)
   # print(paste0("Training hRF2, done with simulation: ", i,
@@ -79,7 +79,7 @@ for(i in 1:nsim){
                      sampsize=length(iris_train$Sepal.Length),
                      nodesize=1,
                      nodesizeAvg=1,
-                     nthread=4,
+                     nthread=10,
                      splitratio=1)
   predict_hrt1 <- predict(t_hrt1, iris_test[ , -1])
   MSE_hrf[i] <- mean((iris_test$Sepal.Length - predict_hrt1)^2)
@@ -92,47 +92,47 @@ for(i in 1:nsim){
 
 
 ########## Soren's old implementation
-
-source("legacy/hRF2/hTree.R")
-source("legacy/hRF2/hRandomForest.R")
-
-for(i in 1:nsim){
-  start_time <- Sys.time()
-  t_hrt2 <- htree(iris_train[ , -1], iris_train$Sepal.Length,
-                  iris_train[ , -1], iris_train$Sepal.Length,
-                  mtry = 4,
-                  minleafsize.J = 1,
-                  minleafsize.I = 1)
-  predict_hrt2 <- predict(t_hrt2, iris_test[ , -1])
-  MSE_soren[i] <- mean((iris_test$Sepal.Length - predict_hrt2)^2)
-  # print(paste0("Training hRF2, done with simulation: ", i,
-  #              ", it took ", Sys.time() - start_time, "s"))
-}
+# source("legacy/hRF2/hTree.R")
+# source("legacy/hRF2/hRandomForest.R")
+#
+# for(i in 1:nsim){
+#   start_time <- Sys.time()
+#   t_hrt2 <- htree(iris_train[ , -1], iris_train$Sepal.Length,
+#                   iris_train[ , -1], iris_train$Sepal.Length,
+#                   mtry = 4,
+#                   minleafsize.J = 1,
+#                   minleafsize.I = 1)
+#   predict_hrt2 <- predict(t_hrt2, iris_test[ , -1])
+#   MSE_soren[i] <- mean((iris_test$Sepal.Length - predict_hrt2)^2)
+#   # print(paste0("Training hRF2, done with simulation: ", i,
+#   #              ", it took ", Sys.time() - start_time, "s"))
+# }
 
 
 
 ########## Allen's old implementation
-source("legacy/honestRF.R")
-for(i in 1:nsim){
-  start_time <- Sys.time()
-  t_hrt1 <- buildHonestRF(xSplit=iris_train[ , -1], ySplit=iris_train$Sepal.Length,
-                          minSizeSplit=1,
-                          xAverage=iris_train[ , -1], yAverage=iris_train$Sepal.Length,
-                          minSizeAverage=1, nFeatures=4, maxDepth=NULL,
-                          nTrees=1, replace=FALSE,
-                          sampSizeSplit=length(iris_train$Sepal.Length),
-                          sampSizeAverage=length(iris_train$Sepal.Length)
-                          )
-  predict_hrt1 <- predictHonestRF(t_hrt1, iris_test[ , -1])
-  MSE_allen[i] <- mean((iris_test$Sepal.Length - predict_hrt1)^2)
-  # print(paste0("Training hRF1, done with simulation: ", i,
-  #              ", it took ", Sys.time() - start_time, "s"))
-}
+# source("legacy/honestRF.R")
+# for(i in 1:nsim){
+#   start_time <- Sys.time()
+#   t_hrt1 <- buildHonestRF(xSplit=iris_train[ , -1], ySplit=iris_train$Sepal.Length,
+#                           minSizeSplit=1,
+#                           xAverage=iris_train[ , -1], yAverage=iris_train$Sepal.Length,
+#                           minSizeAverage=1, nFeatures=4, maxDepth=NULL,
+#                           nTrees=1, replace=FALSE,
+#                           sampSizeSplit=length(iris_train$Sepal.Length),
+#                           sampSizeAverage=length(iris_train$Sepal.Length)
+#                           )
+#   predict_hrt1 <- predictHonestRF(t_hrt1, iris_test[ , -1])
+#   MSE_allen[i] <- mean((iris_test$Sepal.Length - predict_hrt1)^2)
+#   # print(paste0("Training hRF1, done with simulation: ", i,
+#   #              ", it took ", Sys.time() - start_time, "s"))
+# }
 
 ########## Plot
 
-data.frame(kind = rep(c('Breiman', 'ranger', 'rf', 'hrf', 'soren', 'allen'), each = nsim),
-           MSE = c(MSE_brei, MSE_ranger, MSE_rf, MSE_hrf, MSE_soren, MSE_allen)) %>%
+
+data.frame(kind = rep(c('Breiman', 'ranger', 'rf', 'hrf'), each = nsim),
+           MSE = c(MSE_brei, MSE_ranger, MSE_rf, MSE_hrf)) %>%
   ggplot() +
   geom_histogram(aes(x = MSE, fill = kind), bins = 10, position = 'dodge',
                  alpha = 1)
@@ -142,8 +142,8 @@ data.frame(kind = rep(c('Breiman', 'ranger', 'rf', 'hrf', 'soren', 'allen'), eac
 
 ggsave("tests/performance/TestTreesEMSE.pdf", width = 13, height = 8)
 
-data.frame(kind = rep(c('Breiman', 'ranger', 'rf', 'hrt', 'soren', 'allen'), each = nsim),
-           MSE = c(MSE_brei, MSE_ranger, MSE_rf, MSE_hrf, MSE_soren, MSE_allen)) %>%
+data.frame(kind = rep(c('Breiman', 'ranger', 'rf', 'hrt'), each = nsim),
+           MSE = c(MSE_brei, MSE_ranger, MSE_rf, MSE_hrf)) %>%
   ggplot() +
   geom_histogram(aes(x = MSE, fill = kind), bins = 20, position = 'dodge',
                  alpha = .5)

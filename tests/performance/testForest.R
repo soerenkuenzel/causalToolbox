@@ -51,7 +51,7 @@ for(i in 1:nsim){
                replace=FALSE,
                sampsize=0.5 * length(iris_train$Sepal.Length),
                mtry=2, ntree = 500,
-               nodesize=1, nthread=4)
+               nodesize=1, nthread=10)
   predict_hrt2 <- predict(t_hrt2, iris_test[ , -1])
   MSE_rf[i] <- mean((iris_test$Sepal.Length - predict_hrt2)^2)
 }
@@ -69,7 +69,7 @@ for(i in 1:nsim){
                      sampsize=0.5*length(iris_train$Sepal.Length),
                      nodesize=1,
                      nodesizeAvg=1,
-                     nthread=4,
+                     nthread=10,
                      splitratio=1)
   predict_hrt1 <- predict(t_hrt1, iris_test[ , -1])
   MSE_hrf[i] <- mean((iris_test$Sepal.Length - predict_hrt1)^2)
@@ -77,20 +77,19 @@ for(i in 1:nsim){
 
 
 ########## Soren's old implementation
-
-source("legacy/hRF2/hTree.R")
-source("legacy/hRF2/hRandomForest.R")
-
-MSE_soren <- numeric()
-for(i in 1:nsim){
-  print(paste(i, " out of ", nsim))
-  rf_my <- myRandomForest(iris_train[ , -1], iris_train$Sepal.Length,
-                          mtry = NULL, ntree = 500, nthreats = 1,
-                          minleafsize = 5, verbose = FALSE)
-
-  predict_my <- predict(rf_my, iris_test[ , -1])
-  MSE_soren[i] <- mean((iris_test$Sepal.Length - predict_my)^2)
-}
+# source("legacy/hRF2/hTree.R")
+# source("legacy/hRF2/hRandomForest.R")
+#
+# MSE_soren <- numeric()
+# for(i in 1:nsim){
+#   print(paste(i, " out of ", nsim))
+#   rf_my <- myRandomForest(iris_train[ , -1], iris_train$Sepal.Length,
+#                           mtry = NULL, ntree = 500, nthreats = 1,
+#                           minleafsize = 5, verbose = FALSE)
+#
+#   predict_my <- predict(rf_my, iris_test[ , -1])
+#   MSE_soren[i] <- mean((iris_test$Sepal.Length - predict_my)^2)
+# }
 
 ########## Plot
 data.frame(kind = rep(c('Breiman', 'ranger' , 'rf', 'hrf'), each = nsim),
@@ -99,7 +98,6 @@ data.frame(kind = rep(c('Breiman', 'ranger' , 'rf', 'hrf'), each = nsim),
   geom_histogram(aes(x = MSE, fill = kind), bins = 100, position = 'identity', alpha = .5) +
   xlim(c(0.085, 0.12)) +
   ggtitle("Ranger and randomForest are not the same")
-
 
 
 ggsave("tests/performance/RangerMyRandomForest.pdf", width = 5, height = 2)

@@ -19,53 +19,38 @@ avgMean <- function(x, y) {
 #' @exportClass RFNode
 #' @description `RFNode` is the basic element inside a `RFTree`. For each node,
 #' it contains the corresponding data that are assigned to the node. The
-#' `RFNode` can be either a leaf and a tree node (non-leaf). If it is a leaf
+#' `RFNode` can be either a leaf or a tree node (non-leaf). If it is a leaf
 #' node, `avgfunc` can be called to aggregate all the observations in the node
 #' and save a prediction for the node. If it is a tree node, it will contains
 #' `leftChild` and `rightChild` which will be another two `RFNode`s. The parent
 #' node can be used to track the `splitFeature` and `splitValue`. Please note
-#' that in the `RFNode`, `sampleIndex` essentially tells which data that reside
+#' that in the `RFNode`, `sampleIndex` essentially tells what data reside
 #' in the node. Every node contains two `sampleIndex`: `averagingSampleIndex`
 #' and `splittingSampleIndex`. `averagingSampleIndex` is used to generate
 #' aggregated prediction for the node. `splittingSampleIndex` is used for
 #' `honestRF` which stores the splitting data when creating the tree. In
 #' default, `RFNode` has the same `averagingSampleIndex` and
 #' `splittingSampleIndex`.
-#' @slot x A data frame or a matrix of all predictors.
-#' @slot y A response vector.
-#' @slot splitFeature Name of the feature that is used for splitting in this
-#' node.
-#' @slot splitValue The value that is used for splitting in this node.
 #' @slot sampleIndex A list of index of dataset used in this node and its
 #' children. `sampleIndex` contains two keys `averagingSampleIndex`
 #' and `splittingSampleIndex`. `averagingSampleIndex` is used to generate
 #' aggregated prediction for the node. `splittingSampleIndex` is used for
 #' `honestRF` which stores the splitting data when creating the tree. In
 #' default, `splittingSampleIndex` is the same as `averagingSampleIndex`.
-#' @slot avgfunc An averaging function to average all the input data. The input
-#' of this function should be a dataframe of predictors `x` and a vector of
-#' outcome `y`. The output is a scalar. The default is to take the mean of all
-#' the `y`s.
-#' @slot isLeaf An indicator of whether the current node is a leaf or not.
-#' @slot leftChild If the node is not a leaf node, the `leftChild` will point
-#' to another node object. If it is a leaf node, the `leftChild` will be `NULL`.
-#' @slot rightChild If the node is not a leaf node, the `rightChild` will point
-#' to another node object. If it is a leaf node, the `rightChild` will be
-#' `NULL`.
+#' @slot splitFeature Name of the feature that is used for splitting in this
+#' node.
+#' @slot splitValue The value that is used for splitting in this node.
+#' @slot child If the node is not a leaf node, the `child` will be a list of two
+#' `RFNode` objects. If it is a leaf node, the `child` will be `NULL`.
 #' @slot nSplit Number of observations in the splitting dataset in this node.
 #' @slot nAverage Number of observations in the averaging dataset in this node.
 setClass(
   Class="RFNode",
   slots=list(
-    x="data.frame",
-    y="vector",
-    splitFeature="numericOrNULL",
-    splitValue="numericOrNULL",
     sampleIndex="list",
-    avgfunc="function",
-    isLeaf="logical",
-    leftChild="RFNodeOrNULL",
-    rightChild="RFNodeOrNULL",
+    splitFeature="numeric",
+    splitValue="numeric",
+    child="list",
     nSplit="numeric",
     nAverage="numeric"
   )
@@ -74,41 +59,49 @@ setClass(
 #' RFNode Constructor
 #' @name RFNode
 #' @rdname RFNode-class
-#' @slot x A data frame or a matrix of all predictors.
-#' @slot y A response vector.
-#' @slot splitFeature Name of the feature that is used for splitting in this
-#' node.
-#' @slot splitValue The value that is used for splitting in this node.
-#' @slot sampleIndex A list of index of dataset used in this node and its
+#' @param sampleIndex A list of index of dataset used in this node and its
 #' children. `sampleIndex` contains two keys `averagingSampleIndex`
 #' and `splittingSampleIndex`. `averagingSampleIndex` is used to generate
 #' aggregated prediction for the node. `splittingSampleIndex` is used for
 #' `honestRF` which stores the splitting data when creating the tree. In
 #' default, `splittingSampleIndex` is the same as `averagingSampleIndex`.
-#' @slot avgfunc An averaging function to average all the input data. The input
-#' of this function should be a dataframe of predictors `x` and a vector of
-#' outcome `y`. The output is a scalar. The default is to take the mean of all
-#' the `y`s.
-RFNode <- function(x, y, splitFeature, splitValue,
-                   sampleIndex=list(
-                     "averagingSampleIndex"=1:length(y),
-                     "splittingSampleIndex"=1:length(y)
-                   ),
-                   avgfunc=avgMean){
-  x <- as.data.frame(x)
-  node <- new("RFNode",
-              x=x,
-              y=y,
-              splitFeature=splitFeature,
-              splitValue=splitValue,
-              sampleIndex=sampleIndex,
-              avgfunc=avgfunc,
-              isLeaf=TRUE,
-              leftChild=NULL,
-              rightChild=NULL,
-              nSplit=length(sampleIndex$splittingSampleIndex),
-              nAverage=length(sampleIndex$averagingSampleIndex)
-              )
+#' @param splitFeature Name of the feature that is used for splitting in this
+#' node.
+#' @param splitValue The value that is used for splitting in this node.
+#' @param child If the node is not a leaf node, the `child` will be a list of
+#' two `RFNode` objects. If it is a leaf node, the `child` will be `NULL`.
+#' @return a `RFNode` object
+RFNode <- function(
+  sampleIndex=list(
+    "averagingSampleIndex"=vector(),
+    "splittingSampleIndex"=vector()
+  ),
+  splitFeature=numeric(),
+  splitValue=numeric(),
+  child=list()
+  ){
+
+  if (length(child) == 0) {
+    # Both children are null, create a leaf node
+    node <- new("RFNode",
+                sampleIndex=sampleIndex,
+                splitFeature=numeric(),
+                splitValue=numeric(),
+                child=list(),
+                nSplit=length(sampleIndex$splittingSampleIndex),
+                nAverage=length(sampleIndex$averagingSampleIndex)
+    )
+  } else {
+    # Create a tree node
+    node <- new("RFNode",
+                sampleIndex=list(),
+                splitFeature=splitFeature,
+                splitValue=splitValue,
+                child=child,
+                nSplit=numeric(),
+                nAverage=numeric()
+    )
+  }
   return(node)
 }
 
@@ -121,48 +114,51 @@ RFNode <- function(x, y, splitFeature, splitValue,
 #' @description Return the prediction from the current node if it is a leaf
 #' node, otherwise it will recursively call its children according to the
 #' `splitFeature` and `splitValue`.
-#' @param theObject RFNode object.
+#' @param object RFNode object.
 #' @param feature.new A data frame or a matrix of all testing predictors.
-#' @exportMethod predict
-if (!isGeneric("predict")) {
-  setGeneric(
-    name="predict",
-    def=function(theObject, feature.new){
-      standardGeneric("predict")
-    }
-  )
-}
-
-#' @rdname predict-RFNode
+#' @param x A data frame or a matrix of all training predictors.
+#' @param y A vector of all training responses.
+#' @param avgfunc An averaging function to average all the input data. The input
+#' of this function should be a dataframe of predictors `x` and a vector of
+#' outcome `y`. The output is a scalar. The default is to take the mean of all
+#' the `y`s.
+#' @return A vector of predicted responses.
 #' @aliases predict, RFNode-method
 setMethod(
   f="predict",
   signature="RFNode",
-  definition=function(theObject, feature.new){
+  definition=function(object, feature.new, x, y, avgfunc){
 
     # If the node is a leaf, aggregate all its averaging data samples
-    if (theObject@isLeaf) {
-      return(theObject@avgfunc(
-        theObject@x[theObject@sampleIndex$averagingSampleIndex, ],
-        theObject@y[theObject@sampleIndex$averagingSampleIndex]))
-    } else {
+    if (length(object@child) == 0) {
+      predicted_value <- avgfunc(
+        x[object@sampleIndex$averagingSampleIndex, ],
+        y[object@sampleIndex$averagingSampleIndex]
+        )
+      prediction <- rep(predicted_value, nrow(feature.new))
+      return(prediction)
 
+    } else {
       # Test if the testing data have smaller feature value or bigger than the
       # current `splitFeature` and `splitValue`.
       leftIndicator <-
-        feature.new[, theObject@splitFeature] < theObject@splitValue
+        feature.new[, object@splitFeature] < object@splitValue
+
+      # Initialize a matrix for predictions
       prediction <- rep(NA, nrow(feature.new))
 
       # Assign predictions from the left child
       if (sum(leftIndicator) > 0) {
-        prediction[leftIndicator] <- predict(theObject@leftChild,
-                                             feature.new[leftIndicator, ])
+        prediction[leftIndicator] <- predict(object@child$leftChild,
+                                             feature.new[leftIndicator, ],
+                                             x, y, avgfunc)
       }
 
       # Assign predictions from the right child
       if (sum(!leftIndicator) > 0) {
-        prediction[!leftIndicator] <- predict(theObject@rightChild,
-                                              feature.new[!leftIndicator, ])
+        prediction[!leftIndicator] <- predict(object@child$rightChild,
+                                              feature.new[!leftIndicator, ],
+                                              x, y, avgfunc)
       }
 
       # Return the prediction
@@ -176,11 +172,13 @@ setMethod(
 #' @rdname printnode-RFNode
 #' @description Print the type of the node and its prediction. If it is a tree
 #' node, it will recursively print all its children.
-#' @param theObject RFNode object
+#' @param object RFNode object
+#' @param indentSpace The indentation space of the current node in the standard
+#' output. The initial value is 0. Once the tree grows, it increments by 2.
 #' @exportMethod printnode
 setGeneric(
   name="printnode",
-  def=function(theObject){
+  def=function(object, indentSpace=0){
     standardGeneric("printnode")
   }
 )
@@ -190,25 +188,33 @@ setGeneric(
 setMethod(
   f="printnode",
   signature="RFNode",
-  definition = function(theObject){
-    if (theObject@isLeaf) {
-      print(paste("This is a leaf with CATE:",
-                  predict(theObject),
-                  ", #Split:",
-                  theObject@nSplit,
-                  ", #Average:",
-                  theObject@nAverage))
+  definition = function(object, indentSpace=0){
+    if (length(object@child) == 0) {
+      # Leaf node
+      print(
+        paste(
+          paste(rep(' ', indentSpace), collapse=''),
+          "Leaf Node:",
+          "# of Split =",
+          object@nSplit,
+          ", # of Average =",
+          object@nAverage
+          )
+        )
     } else {
-      print(paste("This is a regular node with Split feature: ",
-                  theObject@splitFeature,
-                  ", Split Value:",
-                  theObject@splitValue,
-                  ", #Split:",
-                  theObject@nSplit,
-                  ", #Average:",
-                  theObject@nAverage))
-      printnode(theObject@leftChild)
-      printnode(theObject@rightChild)
+      # Tree node
+      print(
+        paste(
+          paste(rep(' ', indentSpace), collapse=''),
+          "Tree Node:",
+          "Split feature =",
+          object@splitFeature,
+          ", Split Value =",
+          object@splitValue
+        )
+      )
+      printnode(object@child$leftChild, indentSpace+2)
+      printnode(object@child$rightChild, indentSpace+2)
     }
   }
 )
