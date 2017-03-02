@@ -7,7 +7,7 @@ y <- iris[, 1]
 set.seed(24750371)
 
 # Test selectBestFeature - one feature
-selectBestFeature(x, y, featureList=c(1),
+rcpp_selectBestFeature(x, y, featureList=c(1),
                   sampleIndex=list(
                     "averagingSampleIndex"=1:length(y),
                     "splittingSampleIndex"=1:length(y)
@@ -24,7 +24,7 @@ selectBestFeature(x, y, featureList=c(1),
 # 3.375623
 
 # Test selectBestFeature - two features
-selectBestFeature(x, y, featureList=c(1, 2),
+rcpp_selectBestFeature(x, y, featureList=c(1, 2),
                   sampleIndex=list(
                     "averagingSampleIndex"=1:length(y),
                     "splittingSampleIndex"=1:length(y)

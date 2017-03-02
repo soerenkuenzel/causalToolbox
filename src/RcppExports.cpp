@@ -5,13 +5,19 @@
 
 using namespace Rcpp;
 
-// rcpp_hello
-List rcpp_hello();
-RcppExport SEXP causalRF_rcpp_hello() {
+// rcpp_selectBestFeature
+List rcpp_selectBestFeature(DataFrame x, NumericVector y, List featureList, List sampleIndex, List nodesize, std::string splitrule);
+RcppExport SEXP causalRF_rcpp_selectBestFeature(SEXP xSEXP, SEXP ySEXP, SEXP featureListSEXP, SEXP sampleIndexSEXP, SEXP nodesizeSEXP, SEXP splitruleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello());
+    Rcpp::traits::input_parameter< DataFrame >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< List >::type featureList(featureListSEXP);
+    Rcpp::traits::input_parameter< List >::type sampleIndex(sampleIndexSEXP);
+    Rcpp::traits::input_parameter< List >::type nodesize(nodesizeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type splitrule(splitruleSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_selectBestFeature(x, y, featureList, sampleIndex, nodesize, splitrule));
     return rcpp_result_gen;
 END_RCPP
 }

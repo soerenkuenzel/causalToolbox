@@ -59,7 +59,13 @@ To integrate with C++, we need to set up Rcpp in the package. The command
 ```
 devtools::use_rcpp()
 ```
-will create a `src/` directory to hold all the .cpp files. Once your code is
-ready to test, you can click `Build & Reload` in the build pane, or press
-`Ctrl/Cmd + Shift + B`. You can also use the standard `devtools::load_all()`
-process but it is more risky.
+will create a `src/` directory to hold all the .cpp files. 
+
+To generate the corresponding R code, use the following command
+```
+Rcpp::compileAttributes()
+```
+
+Once your code is ready to test, you can click `Build & Reload` in the build 
+pane, or press `Ctrl/Cmd + Shift + B`. You can also use the standard 
+`devtools::load_all()` process but it is more risky.
