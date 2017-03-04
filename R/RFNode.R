@@ -16,7 +16,6 @@ avgMean <- function(x, y) {
 ######################################
 #' @name RFNode-class
 #' @rdname RFNode-class
-#' @exportClass RFNode
 #' @description `RFNode` is the basic element inside a `RFTree`. For each node,
 #' it contains the corresponding data that are assigned to the node. The
 #' `RFNode` can be either a leaf or a tree node (non-leaf). If it is a leaf
@@ -44,6 +43,7 @@ avgMean <- function(x, y) {
 #' `RFNode` objects. If it is a leaf node, the `child` will be `NULL`.
 #' @slot nSplit Number of observations in the splitting dataset in this node.
 #' @slot nAverage Number of observations in the averaging dataset in this node.
+#' @exportClass RFNode
 setClass(
   Class="RFNode",
   slots=list(
@@ -54,6 +54,17 @@ setClass(
     nSplit="numeric",
     nAverage="numeric"
   )
+)
+
+#' @export RFNode
+setGeneric(
+  name="RFNode",
+  def=function(sampleIndex,
+               splitFeature,
+               splitValue,
+               child){
+    standardGeneric("RFNode")
+  }
 )
 
 #' RFNode Constructor
@@ -124,6 +135,7 @@ RFNode <- function(
 #' the `y`s.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFNode-method
+#' @exportMethod predict
 setMethod(
   f="predict",
   signature="RFNode",

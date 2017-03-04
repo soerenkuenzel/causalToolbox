@@ -4,14 +4,26 @@
 
 #' @name honestRFTree-class
 #' @rdname honestRFTree-class
-#' @exportClass honestRFTree
 #' @description `honestRFTree` inherits `RFTree`, which serves as a modified
 #' version of `RFTree`. The major change is that when `honestRFTree` determines
 #' a valid split point, it looks at whether or not it is valid for both
 #' averaging and splitting dataset.
+#' @exportClass honestRFTree
 setClass(
   Class="honestRFTree",
   contains="RFTree"
+)
+
+#' @export honestRFTree
+setGeneric(
+  name="honestRFTree",
+  def=function(x, y,
+               mtry,
+               nodesize,
+               sampleIndex,
+               splitrule){
+    standardGeneric("honestRFTree")
+  }
 )
 
 #' honestRFTree Constructor

@@ -12,3 +12,4 @@ LazyData: true
 Imports: Rcpp (>= 0.12.9), foreach, doParallel
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
+SystemRequirements: C++11

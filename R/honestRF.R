@@ -3,7 +3,6 @@
 ########################################
 #' @name honstRF-class
 #' @rdname honestRF-class
-#' @exportClass honestRF
 #' @description `honestRF` inherits `RF`, which serves as a modified version of
 #' `RF`. The major change is that it trains honest trees instead of adaptive
 #' trees. Adaptive trees are the original trees as they were used in the
@@ -16,6 +15,7 @@
 #' dataset is empty. If the ratio is 0, then the splitting data set is empty
 #' and all the data is used for the averaging data set (This is not a good
 #' usage however since there will be no data available for splitting).
+#' @exportClass honestRF
 setClass(
   Class="honestRF",
   slots=list(
@@ -24,6 +24,17 @@ setClass(
   contains="RF"
 )
 
+#' @export honestRF
+setGeneric(
+  name="honestRF",
+  def=function(x, y, ntree, replace,
+               sampsize,
+               mtry, nodesize,
+               nthread, splitrule,
+               avgfunc, splitratio, nodesizeAvg){
+    standardGeneric("honestRF")
+  }
+)
 #' honestRF Constructor
 #' @name honestRF
 #' @rdname honestRF-class

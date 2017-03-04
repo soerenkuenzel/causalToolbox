@@ -3,7 +3,6 @@
 ######################################
 #' @name RFTree-class
 #' @rdname RFTree-class
-#' @exportClass RFTree
 #' @description `RFTree` is the unit component in the `RF` which composes
 #' `RFNode`. The tree uses recursively partitioning to determine the best
 #' `splitFeature` and `splitValue` for each level, and recursively split the
@@ -14,12 +13,25 @@
 #' dataset.
 #' @slot root A `RFNode` object which is the root of the tree. If the class is
 #' extended, the list may contain the corresponding extended `RFNode` object.
+#' @exportClass RFTree
 setClass(
   Class="RFTree",
   slots=list(
     sampleIndex="list",
     root="list"
   )
+)
+
+#' @export RFTree
+setGeneric(
+  name="RFTree",
+  def=function(x, y,
+               mtry,
+               nodesize,
+               sampleIndex,
+               splitrule){
+    standardGeneric("RFTree")
+  }
 )
 
 #' `RFTree` Constructor
@@ -46,6 +58,8 @@ setClass(
 #' features. There are two possible split rules in the package, `variance` and
 #' `maxstats`. The default is `variance` to minimize the overall MSE.
 #' @return a `RFTree` object
+#' @importFrom Rcpp evalCpp
+#' @useDynLib causalRF
 RFTree <- function(x, y,
                    mtry=max(floor(ncol(x)/3), 1),
                    nodesize=5,
@@ -87,6 +101,17 @@ RFTree <- function(x, y,
 #######################
 ### Internal Method ###
 #######################
+#' @export selectBestFeature
+setGeneric(
+  name="selectBestFeature",
+  def=function(x, y, featureList,
+               sampleIndex,
+               nodesize,
+               splitrule){
+    standardGeneric("selectBestFeature")
+  }
+)
+
 #' selectBestFeature-RFTree
 #' @name selectBestFeature-RFTree
 #' @rdname selectBestFeature-RFTree
@@ -354,6 +379,7 @@ recursivePartition <- function(x, y,
 #' the `y`s.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFTree-method
+#' @exportMethod predict
 setMethod(
   f="predict",
   signature="RFTree",

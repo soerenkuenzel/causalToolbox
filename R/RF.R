@@ -3,7 +3,6 @@
 #################################
 #' @name RF-class
 #' @rdname RF-class
-#' @exportClass RF
 #' @description `RF` object is an object implementing the most basic version of
 #' a random forest.
 #' @slot x A data frame or a matrix of all training predictors.
@@ -28,6 +27,7 @@
 #' the `y`s.
 #' @slot forest A list of `RFTree` in the forest. If the class is extended, the
 #' list may contain the corresponding extended `RFTree` object.
+#' @exportClass RF
 setClass(
   Class="RF",
   slots=list(
@@ -44,6 +44,16 @@ setClass(
   )
 )
 
+#' @export RF
+setGeneric(
+  name="RF",
+  def=function(x, y, ntree, replace,
+               sampsize,
+               mtry, nodesize,
+               nthread, splitrule, avgfunc){
+    standardGeneric("RF")
+  }
+)
 #' `RF` Constructor
 #' @name RF
 #' @rdname RF-class
@@ -121,6 +131,7 @@ RF <- function(x, y, ntree=500, replace=TRUE,
 #' @param feature.new A data frame or a matrix of all testing predictors.
 #' @return A vector of predicted responses.
 #' @aliases predict, RF-method
+#' @exportMethod predict
 setMethod(
   f="predict",
   signature="RF",
