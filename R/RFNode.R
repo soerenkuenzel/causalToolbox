@@ -1,6 +1,6 @@
-#####################
-### Static Method ###
-#####################
+######################
+### avgMean Method ###
+######################
 #' @title avgMean
 #' @description A default function to average the observations in each tree leaf
 #' by taking the mean of the outcomes.
@@ -14,6 +14,7 @@ avgMean <- function(x, y) {
 ######################################
 ### Random Forest Node Constructor ###
 ######################################
+#' @title RFNode Constructor
 #' @name RFNode-class
 #' @rdname RFNode-class
 #' @description `RFNode` is the basic element inside a `RFTree`. For each node,
@@ -56,20 +57,10 @@ setClass(
   )
 )
 
-#' @export RFNode
-setGeneric(
-  name="RFNode",
-  def=function(sampleIndex,
-               splitFeature,
-               splitValue,
-               child){
-    standardGeneric("RFNode")
-  }
-)
-
-#' RFNode Constructor
+#' @title RFNode Constructor
 #' @name RFNode
 #' @rdname RFNode-class
+#' @description A constructor to create a RFNode
 #' @param sampleIndex A list of index of dataset used in this node and its
 #' children. `sampleIndex` contains two keys `averagingSampleIndex`
 #' and `splittingSampleIndex`. `averagingSampleIndex` is used to generate
@@ -81,6 +72,22 @@ setGeneric(
 #' @param splitValue The value that is used for splitting in this node.
 #' @param child If the node is not a leaf node, the `child` will be a list of
 #' two `RFNode` objects. If it is a leaf node, the `child` will be `NULL`.
+#' @export RFNode
+setGeneric(
+  name="RFNode",
+  def=function(
+    sampleIndex,
+    splitFeature,
+    splitValue,
+    child
+  ){
+    standardGeneric("RFNode")
+  }
+)
+
+#' @title RFNode Constructor
+#' @rdname RFNode-RFNode
+#' @aliases RFNode, RFNode-method
 #' @return a `RFNode` object
 RFNode <- function(
   sampleIndex=list(
@@ -104,20 +111,21 @@ RFNode <- function(
     )
   } else {
     # Create a tree node
-    node <- new("RFNode",
-                sampleIndex=list(),
-                splitFeature=splitFeature,
-                splitValue=splitValue,
-                child=child,
-                nSplit=numeric(),
-                nAverage=numeric()
+    node <- new(
+      "RFNode",
+      sampleIndex=list(),
+      splitFeature=splitFeature,
+      splitValue=splitValue,
+      child=child,
+      nSplit=numeric(),
+      nAverage=numeric()
     )
   }
   return(node)
 }
 
 ######################
-### Generic Method ###
+### Predict Method ###
 ######################
 #' predict-RFNode
 #' @name predict-RFNode
@@ -125,22 +133,27 @@ RFNode <- function(
 #' @description Return the prediction from the current node if it is a leaf
 #' node, otherwise it will recursively call its children according to the
 #' `splitFeature` and `splitValue`.
-#' @param object RFNode object.
-#' @param feature.new A data frame or a matrix of all testing predictors.
-#' @param x A data frame or a matrix of all training predictors.
+#' @param object A `RFNode`` object.
+#' @param feature.new A data frame of testing predictors.
+#' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
-#' @param avgfunc An averaging function to average all the input data. The input
-#' of this function should be a dataframe of predictors `x` and a vector of
-#' outcome `y`. The output is a scalar. The default is to take the mean of all
-#' the `y`s.
+#' @param avgfunc An averaging function to average observations in the node. The
+#' function is used for prediction. The input of this function should be a
+#' dataframe of predictors `x` and a vector of outcomes `y`. The output is a
+#' scalar. The default function is to take the mean of vector `y`.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFNode-method
 #' @exportMethod predict
 setMethod(
   f="predict",
   signature="RFNode",
-  definition=function(object, feature.new, x, y, avgfunc){
-
+  definition=function(
+    object,
+    feature.new,
+    x,
+    y,
+    avgfunc
+    ){
     # If the node is a leaf, aggregate all its averaging data samples
     if (length(object@child) == 0) {
       predicted_value <- avgfunc(
@@ -179,6 +192,9 @@ setMethod(
   }
 )
 
+########################
+### printnode Method ###
+########################
 #' printnode-RFNode
 #' @name printnode-RFNode
 #' @rdname printnode-RFNode

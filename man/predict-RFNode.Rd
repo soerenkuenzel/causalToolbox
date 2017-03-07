@@ -10,18 +10,18 @@
 \S4method{predict}{RFNode}(object, feature.new, x, y, avgfunc)
 }
 \arguments{
-\item{object}{RFNode object.}
+\item{object}{A `RFNode`` object.}
 
-\item{feature.new}{A data frame or a matrix of all testing predictors.}
+\item{feature.new}{A data frame of testing predictors.}
 
-\item{x}{A data frame or a matrix of all training predictors.}
+\item{x}{A data frame of all training predictors.}
 
 \item{y}{A vector of all training responses.}
 
-\item{avgfunc}{An averaging function to average all the input data. The input
-of this function should be a dataframe of predictors `x` and a vector of
-outcome `y`. The output is a scalar. The default is to take the mean of all
-the `y`s.}
+\item{avgfunc}{An averaging function to average observations in the node. The
+function is used for prediction. The input of this function should be a
+dataframe of predictors `x` and a vector of outcomes `y`. The output is a
+scalar. The default function is to take the mean of vector `y`.}
 }
 \value{
 A vector of predicted responses.

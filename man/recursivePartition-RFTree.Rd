@@ -11,12 +11,13 @@ recursivePartition(x, y, mtry = max(floor(ncol(x)/3), 1),
   5), splitrule = "variance")
 }
 \arguments{
-\item{x}{A data frame or a matrix of all training predictors.}
+\item{x}{A data frame of all training predictors.}
 
 \item{y}{A vector of all training responses.}
 
-\item{mtry}{Number of variables randomly sampled as candidates at each split.
-The default value is set to be one third of total feature amount.}
+\item{mtry}{The number of variables randomly selected at each split point.
+The default value is set to be one third of total number of features of the
+training data.}
 
 \item{sampleIndex}{A list of index of dataset used in this node and its
 children. `sampleIndex` contains two keys `averagingSampleIndex`
@@ -25,14 +26,13 @@ aggregated prediction for the node. `splittingSampleIndex` is used for
 `honestRF` which stores the splitting data when creating the tree. In
 default, `splittingSampleIndex` is the same as `averagingSampleIndex`.}
 
-\item{nodesize}{Minimum size of terminal nodes. Setting this number larger
-causes smaller trees to be grown (and thus take less time). This parameter is
-actually a list containing the values for both `splittingNodeSize` and
-`averagingNodeSize`.}
+\item{nodesize}{The minimum observations contained in terminal nodes. This
+parameter is actually a list containing the values for both
+`splittingNodeSize` and `averagingNodeSize`.}
 
-\item{splitrule}{A splitting rule to determine the best split point among the
-features. There are two possible split rules in the package, `variance` and
-`maxstats`. The default is `variance` to minimize the overall MSE.}
+\item{splitrule}{A string to specify how to find the best split among all
+candidate feature values. The current version only supports `variance` which
+minimizes the overall MSE after splitting. The default value is `variance`.}
 }
 \value{
 root node.

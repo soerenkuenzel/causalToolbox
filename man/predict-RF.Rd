@@ -10,13 +10,13 @@
 \S4method{predict}{RF}(object, feature.new)
 }
 \arguments{
-\item{object}{RF object.}
+\item{object}{A `RF` object.}
 
-\item{feature.new}{A data frame or a matrix of all testing predictors.}
+\item{feature.new}{A data frame of testing predictors.}
 }
 \value{
 A vector of predicted responses.
 }
 \description{
-Return the prediction from the current forest.
+Return the prediction from the forest.
 }

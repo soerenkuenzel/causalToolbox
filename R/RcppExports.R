@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rcpp_selectBestFeature <- function(x, y, featureList, sampleIndex, nodesize, splitrule) {
-    .Call('causalRF_rcpp_selectBestFeature', PACKAGE = 'causalRF', x, y, featureList, sampleIndex, nodesize, splitrule)
+    .Call('hte_rcpp_selectBestFeature', PACKAGE = 'hte', x, y, featureList, sampleIndex, nodesize, splitrule)
 }
 

@@ -52,8 +52,8 @@ printnode(rightChild)
 printnode(root)
 
 # Test predict leaf node
-predict(leftChild, x, x, y)
-predict(rightChild, x, x, y)
+predict(leftChild, x, x, y, avgMean)
+predict(rightChild, x, x, y, avgMean)
 
 # Test predict tree node
 predict(root, x, x, y, avgMean)

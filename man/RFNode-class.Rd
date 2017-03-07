@@ -5,11 +5,7 @@
 \alias{RFNode-class}
 \alias{RFNode}
 \title{RFNode Constructor}
-\usage{
-RFNode(sampleIndex = list(averagingSampleIndex = vector(),
-  splittingSampleIndex = vector()), splitFeature = numeric(),
-  splitValue = numeric(), child = list())
-}
+\format{An object of class \code{NULL} of length 0.}
 \arguments{
 \item{sampleIndex}{A list of index of dataset used in this node and its
 children. `sampleIndex` contains two keys `averagingSampleIndex`
@@ -25,9 +21,6 @@ node.}
 
 \item{child}{If the node is not a leaf node, the `child` will be a list of
 two `RFNode` objects. If it is a leaf node, the `child` will be `NULL`.}
-}
-\value{
-a `RFNode` object
 }
 \description{
 `RFNode` is the basic element inside a `RFTree`. For each node,
@@ -45,7 +38,7 @@ aggregated prediction for the node. `splittingSampleIndex` is used for
 default, `RFNode` has the same `averagingSampleIndex` and
 `splittingSampleIndex`.
 
-RFNode Constructor
+A constructor to create a RFNode
 }
 \section{Slots}{
 
@@ -70,3 +63,4 @@ node.}
 \item{\code{nAverage}}{Number of observations in the averaging dataset in this node.}
 }}
 
+\keyword{datasets}

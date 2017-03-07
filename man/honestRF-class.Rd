@@ -3,59 +3,7 @@
 \docType{class}
 \name{honstRF-class}
 \alias{honstRF-class}
-\alias{honestRF}
-\title{honestRF Constructor}
-\usage{
-honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
-  nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
-  nodesize = 5, nthread = 1, splitrule = "variance", avgfunc = avgMean,
-  splitratio = 1, nodesizeAvg = 5)
-}
-\arguments{
-\item{x}{A data frame or a matrix of all training predictors.}
-
-\item{y}{A vector of all training responses.}
-
-\item{ntree}{Number of trees to grow. This should not be set to too small to
-ensure that every input row gets predicted at least a few times. The default
-value is 500.}
-
-\item{replace}{Indicator of whether sampling of cases be done with or without
-replacement.}
-
-\item{sampsize}{Size(s) of sample to draw.}
-
-\item{mtry}{Number of variables randomly sampled as candidates at each split.
-The default value is set to be one third of total feature amount.}
-
-\item{nodesize}{Minimum size of terminal nodes. Setting this number larger
-causes smaller trees to be grown (and thus take less time). The default value
-is 5.}
-
-\item{nthread}{Number of threads to use in parallel}
-
-\item{splitrule}{A splitting rule to determine the best split point among the
-features. There are two possible split rules in the package, `variance` and
-`maxstats`. The default is `variance` to minimize the overall MSE.}
-
-\item{avgfunc}{An averaging function to average all the input data. The input
-of this function should be a dataframe of predictors `x` and a vector of
-outcome `y`. The output is a scalar. The default is to take the mean of all
-the `y`s.}
-
-\item{splitratio}{Proportion of the training data used as the splitting
-dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
-splitting dataset becomes the total entire sampled set and the averaging
-dataset is empty. If the ratio is 0, then the splitting data set is empty
-and all the data is used for the averaging data set (This is not a good
-usage however since there will be no data available for splitting).}
-
-\item{nodesizeAvg}{Minimum size of terminal nodes for averaging dataset.
-The default value is 5.}
-}
-\value{
-A `honestRF` object.
-}
+\title{honstRF Constructor}
 \description{
 `honestRF` inherits `RF`, which serves as a modified version of
 `RF`. The major change is that it trains honest trees instead of adaptive
@@ -63,8 +11,6 @@ trees. Adaptive trees are the original trees as they were used in the
 original implementation and honest trees differ in that they require two
 data sets to do tree estimation. One data set is used to create the trees
 and the other one is used to receive the leaf estimates.
-
-honestRF Constructor
 }
 \section{Slots}{
 

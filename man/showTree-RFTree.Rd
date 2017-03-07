@@ -13,7 +13,7 @@ showTree(object)
 \S4method{showTree}{RFTree}(object)
 }
 \arguments{
-\item{object}{RFTree object}
+\item{object}{A `RFTree`` object}
 }
 \description{
 Print the entire tree starting from the root node

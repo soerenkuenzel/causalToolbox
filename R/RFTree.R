@@ -1,6 +1,7 @@
 ######################################
 ### Random Forest Tree Constructor ###
 ######################################
+#' @title RFTree Constructor
 #' @name RFTree-class
 #' @rdname RFTree-class
 #' @description `RFTree` is the unit component in the `RF` which composes
@@ -22,19 +23,7 @@ setClass(
   )
 )
 
-#' @export RFTree
-setGeneric(
-  name="RFTree",
-  def=function(x, y,
-               mtry,
-               nodesize,
-               sampleIndex,
-               splitrule){
-    standardGeneric("RFTree")
-  }
-)
-
-#' `RFTree` Constructor
+#' @title RFTree-Constructor
 #' @name RFTree
 #' @rdname RFTree-class
 #' @description The actual storation of `RFTree` is different from its input.
@@ -43,28 +32,49 @@ setGeneric(
 #' those are the same value. For other variant of random forest, such as honest
 #' random forest, they can be set differently. The constructor can be
 #' overwritten to reflect the change.
-#' @param x A data frame or a matrix of all training predictors.
+#' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
-#' @param mtry Number of variables randomly sampled as candidates at each split.
-#' The default value is set to be one third of total feature amount.
-#' @param nodesize Minimum size of terminal nodes. Setting this number larger
-#' causes smaller trees to be grown (and thus take less time). The default value
-#' is 5.
+#' @param mtry The number of variables randomly selected at each split point.
+#' The default value is set to be one third of total number of features of the
+#' training data.
+#' @param nodesize The minimum observations contained in terminal nodes. The
+#' default value is 5.
 #' @param sampleIndex A list of the index of observations that are used as
 #' averaging dataset. The index are based on the original dataset `x` and `y`
 #' from forest. Essentially, `x[sampleIndex]` generates the whole splitting
 #' dataset.
-#' @param splitrule A splitting rule to determine the best split point among the
-#' features. There are two possible split rules in the package, `variance` and
-#' `maxstats`. The default is `variance` to minimize the overall MSE.
-#' @return a `RFTree` object
+#' @param splitrule A string to specify how to find the best split among all
+#' candidate feature values. The current version only supports `variance` which
+#' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @export RFTree
+setGeneric(
+  name="RFTree",
+  def=function(
+    x,
+    y,
+    mtry,
+    nodesize,
+    sampleIndex,
+    splitrule
+    ){
+    standardGeneric("RFTree")
+  }
+)
+
+#' @title RFTree-Constructor
+#' @rdname RFTree-RFTree
+#' @aliases RFTree, RFTree-method
 #' @importFrom Rcpp evalCpp
-#' @useDynLib causalRF
-RFTree <- function(x, y,
-                   mtry=max(floor(ncol(x)/3), 1),
-                   nodesize=5,
-                   sampleIndex=1:length(y),
-                   splitrule="variance"){
+#' @useDynLib hte
+#' @return a `RFTree` object
+RFTree <- function(
+  x,
+  y,
+  mtry=max(floor(ncol(x)/3), 1),
+  nodesize=5,
+  sampleIndex=1:length(y),
+  splitrule="variance"
+  ){
 
   # Create the list of nodeSize and sampleIndex
   aggregateNodeSize <- list(
@@ -78,10 +88,11 @@ RFTree <- function(x, y,
   )
 
   # Create a original random forest tree.
-  tree <- new("RFTree",
-              sampleIndex=aggregateSampleIndex,
-              root=list()
-              )
+  tree <- new(
+    "RFTree",
+    sampleIndex=aggregateSampleIndex,
+    root=list()
+  )
 
   # Grow the tree.
   root <- recursivePartition(
@@ -98,22 +109,11 @@ RFTree <- function(x, y,
 }
 
 
-#######################
-### Internal Method ###
-#######################
-#' @export selectBestFeature
-setGeneric(
-  name="selectBestFeature",
-  def=function(x, y, featureList,
-               sampleIndex,
-               nodesize,
-               splitrule){
-    standardGeneric("selectBestFeature")
-  }
-)
-
-#' selectBestFeature-RFTree
-#' @name selectBestFeature-RFTree
+################################
+### selectBestFeature Method ###
+################################
+#' selectBestFeature
+#' @name selectBestFeature
 #' @rdname selectBestFeature-RFTree
 #' @description Find the best `splitfeature`, `splitValue` pair where
 #' `splitfeature` is one of the features specified by `featureList`. The
@@ -122,7 +122,7 @@ setGeneric(
 #' implementation as the tree contains both averaging and splitting dataset.
 #' To check the minimum split, the method checks for both datasets according to
 #' `sampleIndex` and `nodesize`.
-#' @param x A data frame or a matrix of all training predictors.
+#' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
 #' @param featureList A list of candidate variables at the current split.
 #' @param sampleIndex A list of index of dataset used in this node and its
@@ -131,26 +131,52 @@ setGeneric(
 #' aggregated prediction for the node. `splittingSampleIndex` is used for
 #' `honestRF` which stores the splitting data when creating the tree. In
 #' default, `splittingSampleIndex` is the same as `averagingSampleIndex`.
-#' @param nodesize Minimum size of terminal nodes. Setting this number larger
-#' causes smaller trees to be grown (and thus take less time). This parameter is
-#' actually a list containing the values for both `splittingNodeSize` and
-#' `averagingNodeSize`.
-#' @param splitrule A splitting rule to determine the best split point among the
-#' features. There are two possible split rules in the package, `variance` and
-#' `maxstats`. The default is `variance` to minimize the overall MSE.
+#' @param mtry The number of variables randomly selected at each split point.
+#' The default value is set to be one third of total number of features of the
+#' training data.
+#' @param nodesize The minimum observations contained in terminal nodes. This
+#' parameter is actually a list containing the values for both
+#' `splittingNodeSize` and `averagingNodeSize`.
+#' @param splitrule A string to specify how to find the best split among all
+#' candidate feature values. The current version only supports `variance` which
+#' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @export selectBestFeature
+setGeneric(
+  name="selectBestFeature",
+  def=function(
+    x,
+    y,
+    featureList,
+    sampleIndex,
+    nodesize,
+    splitrule
+    ){
+    standardGeneric("selectBestFeature")
+  }
+)
+
+#' @rdname selectBestFeature-RFTree
+#' @aliases selectBestFeature, selectBestFeature-method
 #' @return A list of two outputs: "splitFeature" is the best feature to split
 #' in order to minimize the split loss, "splitValue" is its corresponding split
 #' value.
-selectBestFeature <- function(x, y, featureList,
-                              sampleIndex=list(
-                                "averagingSampleIndex"=1:length(y),
-                                "splittingSampleIndex"=1:length(y)
-                              ),
-                              nodesize=list(
-                                "splittingNodeSize"=5,
-                                "averagingNodeSize"=5
-                              ),
-                              splitrule="variance"){
+#' @note This function is currently depreciated. It has been replaced by the
+#' C++ version in the package. Although the functionality and parameters are
+#' exactly the same.
+selectBestFeature <- function(
+  x,
+  y,
+  featureList,
+  sampleIndex=list(
+    "averagingSampleIndex"=1:length(y),
+    "splittingSampleIndex"=1:length(y)
+  ),
+  nodesize=list(
+    "splittingNodeSize"=5,
+    "averagingNodeSize"=5
+  ),
+  splitrule="variance"
+  ){
 
   # Get the number of total features
   mtry <- length(featureList)
@@ -258,40 +284,46 @@ selectBestFeature <- function(x, y, featureList,
               "bestSplitValue"=bestSplitValueAll[bestFeatureIndex]))
 }
 
+#################################
+### recursivePartition Method ###
+#################################
 #' recursivePartition-RFTree
 #' @name recursivePartition-RFTree
 #' @rdname recursivePartition-RFTree
 #' @description Grow the decision tree by recursively finding the best split
 #' feature and value.
-#' @param x A data frame or a matrix of all training predictors.
+#' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
-#' @param mtry Number of variables randomly sampled as candidates at each split.
-#' The default value is set to be one third of total feature amount.
+#' @param mtry The number of variables randomly selected at each split point.
+#' The default value is set to be one third of total number of features of the
+#' training data.
 #' @param sampleIndex A list of index of dataset used in this node and its
 #' children. `sampleIndex` contains two keys `averagingSampleIndex`
 #' and `splittingSampleIndex`. `averagingSampleIndex` is used to generate
 #' aggregated prediction for the node. `splittingSampleIndex` is used for
 #' `honestRF` which stores the splitting data when creating the tree. In
 #' default, `splittingSampleIndex` is the same as `averagingSampleIndex`.
-#' @param nodesize Minimum size of terminal nodes. Setting this number larger
-#' causes smaller trees to be grown (and thus take less time). This parameter is
-#' actually a list containing the values for both `splittingNodeSize` and
-#' `averagingNodeSize`.
-#' @param splitrule A splitting rule to determine the best split point among the
-#' features. There are two possible split rules in the package, `variance` and
-#' `maxstats`. The default is `variance` to minimize the overall MSE.
+#' @param nodesize The minimum observations contained in terminal nodes. This
+#' parameter is actually a list containing the values for both
+#' `splittingNodeSize` and `averagingNodeSize`.
+#' @param splitrule A string to specify how to find the best split among all
+#' candidate feature values. The current version only supports `variance` which
+#' minimizes the overall MSE after splitting. The default value is `variance`.
 #' @return root node.
-recursivePartition <- function(x, y,
-                               mtry=max(floor(ncol(x)/3), 1),
-                               sampleIndex=list(
-                                 "averagingSampleIndex"=1:length(y),
-                                 "splittingSampleIndex"=1:length(y)
-                               ),
-                               nodesize=list(
-                                 "splittingNodeSize"=5,
-                                 "averagingNodeSize"=5
-                               ),
-                               splitrule="variance"){
+recursivePartition <- function(
+  x,
+  y,
+  mtry=max(floor(ncol(x)/3), 1),
+  sampleIndex=list(
+   "averagingSampleIndex"=1:length(y),
+   "splittingSampleIndex"=1:length(y)
+  ),
+  nodesize=list(
+   "splittingNodeSize"=5,
+   "averagingNodeSize"=5
+  ),
+  splitrule="variance"
+  ){
 
   # Sample features for the split
   selectedFeatureIndex <- sample(1:ncol(x), mtry)
@@ -363,20 +395,20 @@ recursivePartition <- function(x, y,
 
 
 ######################
-### Generic Method ###
+### Predict Method ###
 ######################
 #' predict-RFTree
 #' @name predict-RFTree
 #' @rdname predict-RFTree
 #' @description Return the prediction from the current tree.
-#' @param object RFTree object.
-#' @param feature.new A data frame or a matrix of all testing predictors.
-#' @param x A data frame or a matrix of all training predictors.
+#' @param object A `RFTree`` object.
+#' @param feature.new A data frame of testing predictors.
+#' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
-#' @param avgfunc An averaging function to average all the input data. The input
-#' of this function should be a dataframe of predictors `x` and a vector of
-#' outcome `y`. The output is a scalar. The default is to take the mean of all
-#' the `y`s.
+#' @param avgfunc An averaging function to average observations in the node. The
+#' function is used for prediction. The input of this function should be a
+#' dataframe of predictors `x` and a vector of outcomes `y`. The output is a
+#' scalar. The default function is to take the mean of vector `y`.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFTree-method
 #' @exportMethod predict
@@ -388,11 +420,14 @@ setMethod(
   }
 )
 
+#######################
+### showTree Method ###
+#######################
 #' showTree-RFTree
 #' @name showTree-RFTree
 #' @rdname showTree-RFTree
 #' @description Print the entire tree starting from the root node
-#' @param object RFTree object
+#' @param object A `RFTree`` object
 #' @exportMethod showTree
 setGeneric(
   name="showTree",

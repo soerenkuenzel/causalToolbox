@@ -4,34 +4,28 @@
 \name{RFTree-class}
 \alias{RFTree-class}
 \alias{RFTree}
-\title{`RFTree` Constructor}
-\usage{
-RFTree(x, y, mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
-  sampleIndex = 1:length(y), splitrule = "variance")
-}
+\title{RFTree Constructor}
+\format{An object of class \code{NULL} of length 0.}
 \arguments{
-\item{x}{A data frame or a matrix of all training predictors.}
+\item{x}{A data frame of all training predictors.}
 
 \item{y}{A vector of all training responses.}
 
-\item{mtry}{Number of variables randomly sampled as candidates at each split.
-The default value is set to be one third of total feature amount.}
+\item{mtry}{The number of variables randomly selected at each split point.
+The default value is set to be one third of total number of features of the
+training data.}
 
-\item{nodesize}{Minimum size of terminal nodes. Setting this number larger
-causes smaller trees to be grown (and thus take less time). The default value
-is 5.}
+\item{nodesize}{The minimum observations contained in terminal nodes. The
+default value is 5.}
 
 \item{sampleIndex}{A list of the index of observations that are used as
 averaging dataset. The index are based on the original dataset `x` and `y`
 from forest. Essentially, `x[sampleIndex]` generates the whole splitting
 dataset.}
 
-\item{splitrule}{A splitting rule to determine the best split point among the
-features. There are two possible split rules in the package, `variance` and
-`maxstats`. The default is `variance` to minimize the overall MSE.}
-}
-\value{
-a `RFTree` object
+\item{splitrule}{A string to specify how to find the best split among all
+candidate feature values. The current version only supports `variance` which
+minimizes the overall MSE after splitting. The default value is `variance`.}
 }
 \description{
 `RFTree` is the unit component in the `RF` which composes
@@ -58,3 +52,4 @@ dataset.}
 extended, the list may contain the corresponding extended `RFNode` object.}
 }}
 
+\keyword{datasets}
