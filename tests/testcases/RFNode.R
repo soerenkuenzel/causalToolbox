@@ -1,3 +1,5 @@
+library(hte)
+
 # Use Iris dataset
 x <- iris[, -1]
 x$Species <- as.numeric(x$Species)
@@ -52,8 +54,8 @@ printnode(rightChild)
 printnode(root)
 
 # Test predict leaf node
-predict(leftChild, x, x, y, avgMean)
-predict(rightChild, x, x, y, avgMean)
+predict(leftChild, x, x, y, function(x, y) mean(y))
+predict(rightChild, x, x, y, function(x, y) mean(y))
 
 # Test predict tree node
-predict(root, x, x, y, avgMean)
+predict(root, x, x, y, function(x, y) mean(y))

@@ -1,3 +1,5 @@
+library(hte)
+
 # Use Iris dataset
 x <- iris[, -1]
 x$Species <- as.numeric(x$Species)
@@ -7,38 +9,46 @@ y <- iris[, 1]
 set.seed(24750371)
 
 # Test selectBestFeature - one feature
-rcpp_selectBestFeature(x, y, featureList=c(1),
-                  sampleIndex=list(
-                    "averagingSampleIndex"=1:length(y),
-                    "splittingSampleIndex"=1:length(y)
-                  ),
-                  nodesize=list(
-                    "splittingNodeSize"=5,
-                    "averagingNodeSize"=5
-                  ),
-                  splitrule="variance")
+rcpp_selectBestFeature(
+  x,
+  y,
+  featureList=c(1),
+  sampleIndex=list(
+    "averagingSampleIndex"=1:length(y),
+    "splittingSampleIndex"=1:length(y)
+  ),
+  nodesize=list(
+    "splittingNodeSize"=5,
+    "averagingNodeSize"=5
+  ),
+  splitrule="variance"
+  )
 # Expected answer
 # bestSplitFeature
 # 1
 # bestSplitValue
-# 3.375623
+# 3.320536
 
 # Test selectBestFeature - two features
-rcpp_selectBestFeature(x, y, featureList=c(1, 2),
-                  sampleIndex=list(
-                    "averagingSampleIndex"=1:length(y),
-                    "splittingSampleIndex"=1:length(y)
-                  ),
-                  nodesize=list(
-                    "splittingNodeSize"=5,
-                    "averagingNodeSize"=5
-                  ),
-                  splitrule="variance")
+rcpp_selectBestFeature(
+  x,
+  y,
+  featureList=c(1, 2),
+  sampleIndex=list(
+    "averagingSampleIndex"=1:length(y),
+    "splittingSampleIndex"=1:length(y)
+  ),
+  nodesize=list(
+    "splittingNodeSize"=5,
+    "averagingNodeSize"=5
+  ),
+  splitrule="variance"
+  )
 # Expected answer
 # bestSplitFeature
 # 2
 # bestSplitValue
-# 4.295773
+# 4.293864
 
 # Test creating a tree
 tree <- RFTree(
@@ -54,8 +64,8 @@ tree <- RFTree(
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, avgMean)
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 16.34923
+# 17.58076

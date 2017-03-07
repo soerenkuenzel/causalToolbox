@@ -1,3 +1,5 @@
+library(hte)
+
 # Use Iris dataset
 x <- iris[, -1]
 x$Species <- as.numeric(x$Species)
@@ -26,11 +28,11 @@ tree <- honestRFTree(
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, avgMean)
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 31.93993
+# 17.58076
 
 # Test creating a honest RFTree (half split, half averaging)
 tree <- honestRFTree(
@@ -52,8 +54,8 @@ tree <- honestRFTree(
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, avgMean)
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 34.47635
+# 39.36365
