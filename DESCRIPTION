@@ -9,7 +9,7 @@ Description: Estimate heterogeneous treatment effects in experimental and
     using honest random forest in the first and second stage to estimate
     the Conditional Average Treatment Effect (CATE) function and provides
     convidence intervals for it.
-License: GPL-3
+License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 0.12.9), foreach, doParallel
