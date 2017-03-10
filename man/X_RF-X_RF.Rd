@@ -13,59 +13,74 @@ X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
   secondstageVar = NULL, num_trees_first = 50, num_trees_second = 50,
   mtry_first = ncol(feat)/2, mtry_second = ncol(feat),
   min_node_size_spl_first = 3, min_node_size_ave_first = 3,
-  splitratio_first = 0.5, min_node_size_second = 1, replace_first = FALSE,
-  replace_second = TRUE, sample_fraction_first = 0.7,
-  sample_fraction_second = 0.5, prop_probability_tree = FALSE,
+  splitratio_first = 0.5, replace_first = FALSE, replace_second = TRUE,
+  sample_fraction_first = 0.7, sample_fraction_second = 0.5,
   honest_first = TRUE, honest_second = TRUE, honest_prop = TRUE,
   nthread = 4, min_node_size_spl_second = 5, splitratio_second = 0.5,
   min_node_size_ave_second = 5)
 }
 \arguments{
-\item{feat}{A data frame of all training predictors.}
+\item{feat}{A data frame of all the features.}
 
 \item{tr}{A vector contain 0 for control and 1 for treated variables.}
 
 \item{yobs}{A vector containing the observed outcomes.}
 
-\item{predmode}{default is "propmean".}
+\item{predmode}{One of propmean, control, treated, extreme. It specifies how
+the two estimators of the second stage should be aggregated.}
 
-\item{firststageVar}{later}
+\item{firststageVar}{Variables which are only used in the first stage.}
 
-\item{secondstageVar}{later}
+\item{secondstageVar}{Variables which are only used in the second stage.}
 
-\item{num_trees_first}{later}
+\item{num_trees_first}{Numbers of trees in the first stage.}
 
-\item{num_trees_second}{later}
+\item{num_trees_second}{Numbers of trees in the second stage.}
 
-\item{mtry_first}{later}
+\item{mtry_first}{number of features sampled as possible split features in
+each node in the first stage.}
 
-\item{mtry_second}{later}
+\item{mtry_second}{number of features sampled as possible split features in
+each node in the second stage.}
 
-\item{min_node_size_second}{later}
+\item{min_node_size_spl_first}{minimum nodesize in the first stage for the
+observations in the splitting set.}
 
-\item{replace_first}{later}
+\item{min_node_size_ave_first}{minimum nodesize in the first stage for the
+observations in the average set.}
 
-\item{replace_second}{later}
+\item{splitratio_first}{Proportion of the training data used as the splitting
+dataset in the first stage.}
 
-\item{sample_fraction_first}{later}
+\item{replace_first}{Sample with or without replacement in the first stage.}
 
-\item{sample_fraction_second}{later}
+\item{replace_second}{Sample with or without replacement in the first stage.}
 
-\item{prop_probability_tree}{later}
+\item{sample_fraction_first}{The size of total samples to draw for the
+training data in the first stage.}
 
-\item{honest_first}{later}
+\item{sample_fraction_second}{The size of total samples to draw for the
+training data in the second stage.}
 
-\item{honest_second}{later}
+\item{honest_first}{Whether or not it should be sampled honest or not in the
+first stage.}
 
-\item{honest_prop}{later}
+\item{honest_second}{Whether or not it should be sampled honest or not in the
+second stage.}
 
-\item{importance}{ok}
+\item{honest_prop}{Whether or not it should be sampled honest or not in the
+for the propensity RF.}
 
-\item{min_node_size_first}{later}
+\item{nthread}{number of threats which should be used to work in parallel.}
 
-\item{replace_first}{later}
+\item{min_node_size_spl_second}{minimum nodesize in the second stage for the
+observations in the splitting set.}
 
-\item{replace_second}{later}
+\item{splitratio_second}{Proportion of the training data used as the
+splitting dataset in the second stage.}
+
+\item{min_node_size_ave_second}{minimum nodesize in the second stage for the
+observations in the averaging set.}
 }
 \value{
 A `X_RF` object.

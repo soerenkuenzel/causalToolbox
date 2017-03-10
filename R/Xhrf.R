@@ -54,29 +54,44 @@ setClass(
 #' @name X_RF-X_RF
 #' @rdname X_RF-X_RF
 #' @description Initialize a `honestRF` object.
-#' @param feat A data frame of all training predictors.
+#' @param feat A data frame of all the features.
 #' @param tr A vector contain 0 for control and 1 for treated variables.
 #' @param yobs A vector containing the observed outcomes.
-#' @param predmode default is "propmean".
-#' @param importance ok
-#' @param firststageVar later
-#' @param secondstageVar later
-#' @param num_trees_first later
-#' @param num_trees_second later
-#' @param mtry_first later
-#' @param mtry_second later
-#' @param min_node_size_first later
-#' @param min_node_size_second later
-#' @param replace_first later
-#' @param replace_second later
-#' @param replace_first later
-#' @param replace_second later
-#' @param sample_fraction_first later
-#' @param sample_fraction_second later
-#' @param prop_probability_tree later
-#' @param honest_first later
-#' @param honest_second later
-#' @param honest_prop later
+#' @param predmode One of propmean, control, treated, extreme. It specifies how
+#' the two estimators of the second stage should be aggregated.
+#' @param firststageVar Variables which are only used in the first stage.
+#' @param secondstageVar Variables which are only used in the second stage.
+#' @param num_trees_first Numbers of trees in the first stage.
+#' @param num_trees_second Numbers of trees in the second stage.
+#' @param mtry_first number of features sampled as possible split features in
+#' each node in the first stage.
+#' @param mtry_second number of features sampled as possible split features in
+#' each node in the second stage.
+#' @param min_node_size_spl_first minimum nodesize in the first stage for the
+#' observations in the splitting set.
+#' @param min_node_size_ave_first minimum nodesize in the first stage for the
+#' observations in the average set.
+#' @param min_node_size_spl_second minimum nodesize in the second stage for the
+#' observations in the splitting set.
+#' @param min_node_size_ave_second minimum nodesize in the second stage for the
+#' observations in the averaging set.
+#' @param splitratio_first Proportion of the training data used as the splitting
+#' dataset in the first stage.
+#' @param splitratio_second Proportion of the training data used as the
+#' splitting dataset in the second stage.
+#' @param replace_first Sample with or without replacement in the first stage.
+#' @param replace_second Sample with or without replacement in the first stage.
+#' @param sample_fraction_first The size of total samples to draw for the
+#' training data in the first stage.
+#' @param sample_fraction_second The size of total samples to draw for the
+#' training data in the second stage.
+#' @param honest_first Whether or not it should be sampled honest or not in the
+#' first stage.
+#' @param honest_second Whether or not it should be sampled honest or not in the
+#' second stage.
+#' @param honest_prop Whether or not it should be sampled honest or not in the
+#' for the propensity RF.
+#' @param nthread number of threats which should be used to work in parallel.
 #' @export X_RF
 setGeneric(
   name = "X_RF",
@@ -98,7 +113,6 @@ setGeneric(
                  replace_second,
                  sample_fraction_first,
                  sample_fraction_second,
-                 prop_probability_tree,
                  honest_first,
                  honest_second,
                  honest_prop,
@@ -128,12 +142,10 @@ X_RF <-
            min_node_size_spl_first = 3,
            min_node_size_ave_first = 3,
            splitratio_first = .5,
-           min_node_size_second = 1,
            replace_first = FALSE,
            replace_second = TRUE,
            sample_fraction_first = 0.7,
            sample_fraction_second = 0.5,
-           prop_probability_tree = FALSE,
            honest_first = TRUE,
            honest_second = TRUE,
            honest_prop = TRUE,
