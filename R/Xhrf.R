@@ -240,7 +240,8 @@ X_RF <-
     m_prop <-
       honestRF(x = feat,
                y = tr,
-               ntree = num_trees_second)
+               ntree = num_trees_second,
+               nthread = nthread)
     return(
       new(
         "X_RF",
