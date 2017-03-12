@@ -1,12 +1,14 @@
 # In this file we tune X such that it
-
-
+devtools::load_all()
 library(hte)
+
+seed <- 15435
+set.seed(seed)
 
 nsamples <- 10000
 dim <- 12
 ntrain <- 1000
-ntest <- 10000
+ntest <- 1000
 alpha <- .1
 setup <- "RsparseT2weak"
 nthread <- 32
@@ -53,8 +55,8 @@ for (i in 1:nsamples) {
     tr = experiment$W_tr,
     yobs = experiment$Yobs_tr,
     predmode = "propmean",
-    num_trees_first = 500,
-    num_trees_second = 500,
+    num_trees_first = 50,
+    num_trees_second = 50,
     mtry_first = Rand_tune$mtry_first[i],
     mtry_second = Rand_tune$mtry_second[i],
     min_node_size_spl_first = Rand_tune$min_node_size_spl_first[i],
@@ -67,9 +69,9 @@ for (i in 1:nsamples) {
     replace_second = Rand_tune$replace_second[i],
     sample_fraction_first = Rand_tune$sample_fraction_first[i],
     sample_fraction_second = Rand_tune$sample_fraction_second[i],
-    nthread = nthread
+    nthread = 8
   )
-  EMSE <- mean((tau_te - EstimateCate(L, feat_te)) ^ 2)
+  EMSE <- mean((experiment$tau_te - EstimateCate(L, experiment$feat_te)) ^ 2)
 
   Rand_tune[i, setup] <- EMSE
   print(paste(
@@ -82,5 +84,5 @@ for (i in 1:nsamples) {
     " minutes."
   ))
   write.csv(Rand_tune,
-            paste0("Tune/XLearner/EvalD", dim, "N", ntrain, ".csv"))
+            paste0("Tune/XLearner/tuneX", setup, dim, "N", ntrain, ".csv"))
 }
