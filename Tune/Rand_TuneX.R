@@ -8,7 +8,7 @@ set.seed(seed)
 nsamples <- 10000
 dim <- 12
 ntrain <- 1000
-ntest <- 1000
+ntest <- 10000
 alpha <- .1
 setup <- "RsparseT2weak"
 nthread <- 32
@@ -23,8 +23,8 @@ Rand_tune <- data.frame(
   min_node_size_spl_second = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
   min_node_size_ave_first = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
   min_node_size_ave_second = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
-  splitratio_first = sample(c(.01, .05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
-  splitratio_second = sample(c(.01, .05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
+  splitratio_first = sample(c(.05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
+  splitratio_second = sample(c(.05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
   replace_first = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   replace_second = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   sample_fraction_first = sample(c(.01, .1, .3, .5, 0.632, .7, .9, 1), nsamples,
@@ -55,8 +55,8 @@ for (i in 1:nsamples) {
     tr = experiment$W_tr,
     yobs = experiment$Yobs_tr,
     predmode = "propmean",
-    num_trees_first = 50,
-    num_trees_second = 50,
+    num_trees_first = 500,
+    num_trees_second = 500,
     mtry_first = Rand_tune$mtry_first[i],
     mtry_second = Rand_tune$mtry_second[i],
     min_node_size_spl_first = Rand_tune$min_node_size_spl_first[i],
