@@ -63,10 +63,10 @@ setClass(
 #' each node in the second stage.
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
 #' observations in the splitting set.
-#' @param min_node_size_ave_first minimum nodesize in the first stage for the
-#' observations in the average set.
 #' @param min_node_size_spl_second minimum nodesize in the second stage for the
 #' observations in the splitting set.
+#' @param min_node_size_ave_first minimum nodesize in the first stage for the
+#' observations in the average set.
 #' @param min_node_size_ave_second minimum nodesize in the second stage for the
 #' observations in the averaging set.
 #' @param splitratio_first Proportion of the training data used as the splitting
@@ -79,12 +79,6 @@ setClass(
 #' training data in the first stage.
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
-#' @param honest_first Whether or not it should be sampled honest or not in the
-#' first stage.
-#' @param honest_second Whether or not it should be sampled honest or not in the
-#' second stage.
-#' @param honest_prop Whether or not it should be sampled honest or not in the
-#' for the propensity RF.
 #' @param nthread number of threats which should be used to work in parallel.
 #' @export X_RF
 setGeneric(
@@ -100,20 +94,16 @@ setGeneric(
                  mtry_first,
                  mtry_second,
                  min_node_size_spl_first,
+                 min_node_size_spl_second,
                  min_node_size_ave_first,
+                 min_node_size_ave_second,
                  splitratio_first,
-                 min_node_size_second,
+                 splitratio_second,
                  replace_first,
                  replace_second,
                  sample_fraction_first,
                  sample_fraction_second,
-                 honest_first,
-                 honest_second,
-                 honest_prop,
-                 nthread,
-                 min_node_size_spl_second,
-                 splitratio_second,
-                 min_node_size_ave_second) {
+                 nthread) {
     standardGeneric("X_RF")
   }
 )

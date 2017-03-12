@@ -62,15 +62,6 @@ training data in the first stage.}
 \item{sample_fraction_second}{The size of total samples to draw for the
 training data in the second stage.}
 
-\item{honest_first}{Whether or not it should be sampled honest or not in the
-first stage.}
-
-\item{honest_second}{Whether or not it should be sampled honest or not in the
-second stage.}
-
-\item{honest_prop}{Whether or not it should be sampled honest or not in the
-for the propensity RF.}
-
 \item{nthread}{number of threats which should be used to work in parallel.}
 
 \item{min_node_size_spl_second}{minimum nodesize in the second stage for the
