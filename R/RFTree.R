@@ -46,6 +46,8 @@ setClass(
 #' @param splitrule A string to specify how to find the best split among all
 #' candidate feature values. The current version only supports `variance` which
 #' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @export RFTree
 setGeneric(
   name="RFTree",
@@ -55,7 +57,8 @@ setGeneric(
     mtry,
     nodesize,
     sampleIndex,
-    splitrule
+    splitrule,
+    categoricalFeatureCols
     ){
     standardGeneric("RFTree")
   }
@@ -73,7 +76,8 @@ RFTree <- function(
   mtry=max(floor(ncol(x)/3), 1),
   nodesize=5,
   sampleIndex=1:length(y),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list()
   ){
 
   # Create the list of nodeSize and sampleIndex
@@ -101,7 +105,8 @@ RFTree <- function(
     mtry=mtry,
     nodesize=aggregateNodeSize,
     sampleIndex=aggregateSampleIndex,
-    splitrule=splitrule
+    splitrule=splitrule,
+    categoricalFeatureCols=categoricalFeatureCols
   )
 
   tree@root <- list("node"=root)
@@ -140,6 +145,8 @@ RFTree <- function(
 #' @param splitrule A string to specify how to find the best split among all
 #' candidate feature values. The current version only supports `variance` which
 #' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @export selectBestFeature
 setGeneric(
   name="selectBestFeature",
@@ -149,7 +156,8 @@ setGeneric(
     featureList,
     sampleIndex,
     nodesize,
-    splitrule
+    splitrule,
+    categoricalFeatureCols
     ){
     standardGeneric("selectBestFeature")
   }
@@ -175,7 +183,8 @@ selectBestFeature <- function(
     "splittingNodeSize"=5,
     "averagingNodeSize"=5
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list()
   ){
 
   # Get the number of total features
@@ -189,17 +198,74 @@ selectBestFeature <- function(
 
   # Iterate each selected features
   for (i in 1:mtry) {
-
     currentFeature <- featureList[i]
-    allUniqueValues <- sort(unique(
-      c(
-        x[sampleIndex$splittingSampleIndex, currentFeature],
-        x[sampleIndex$averagingSampleIndex, currentFeature]
+    allUniqueValues <- sort(as.numeric(union(
+      unique(x[sampleIndex$splittingSampleIndex, currentFeature]),
+      unique(x[sampleIndex$averagingSampleIndex, currentFeature])
       )))
-
     # Test if the all the values for the feature are the same, then proceed
     if (length(allUniqueValues) == 1) next()
 
+    # Test if the current feature is categorical
+    if (currentFeature %in% categoricalFeatureCols){
+      # Go through all the values in the selected feature as the splitting
+      # point
+      for (featureValue in allUniqueValues) {
+        # Make partitions on the current feature and value in both splitting
+        # and averaging dataset. (Instead of using less than, we need to
+        # contraint it to make it strictly equal to.
+        leftPartitionAveraging <-
+          x[sampleIndex$averagingSampleIndex, currentFeature] == featureValue
+        leftPartitionSplitting <-
+          x[sampleIndex$splittingSampleIndex, currentFeature] == featureValue
+
+        leftPartitionCountSplitting <- sum(leftPartitionSplitting)
+        rightPartitionCountSplitting <- sum(!leftPartitionSplitting)
+        leftPartitionCountAveraging <- sum(leftPartitionAveraging)
+        rightPartitionCountAveraging <- sum(!leftPartitionAveraging)
+
+        # Check leaf size at least nodesize
+        if (
+          min(leftPartitionCountSplitting,
+              rightPartitionCountSplitting) < nodesize$splittingNodeSize |
+          min(leftPartitionCountAveraging,
+              rightPartitionCountAveraging) < nodesize$averagingNodeSize){
+          next()
+        }
+
+        # Calculate sample mean in both splitting partitions
+        leftPartitionMean <-
+          mean(y[sampleIndex$splittingSampleIndex][leftPartitionSplitting])
+        rightPartitionMean <-
+          mean(y[sampleIndex$splittingSampleIndex][!leftPartitionSplitting])
+
+        # Calculate the variance of the splitting
+        muBarSquareSum <- leftPartitionCountSplitting * leftPartitionMean ^ 2 +
+          rightPartitionCountSplitting * rightPartitionMean ^ 2
+
+        # Update the value if a higher value has been seen
+        if (muBarSquareSum > bestSplitLossAll[i]) {
+          bestSplitLossAll[i] <- muBarSquareSum
+          bestSplitFeatureAll[i] <- currentFeature
+          bestSplitValueAll[i] <- featureValue
+          bestSplitCountAll[i] <- 1
+        } else {
+          # If we are as good as the best split
+          if (muBarSquareSum == bestSplitLossAll[i]) {
+            bestSplitCountAll[i] <- bestSplitCountAll[i] + 1
+            # Only update with probability 1/nseen
+            if (runif(1, 0, bestSplitCountAll[i]) <= 1){
+              bestSplitLossAll[i] <- muBarSquareSum
+              bestSplitFeatureAll[i] <- currentFeature
+              bestSplitValueAll[i] <- featureValue
+            }
+          }
+        }
+      }
+      next()
+    }
+
+    # Proceed as non-categorical feature
     # Keep track of previous feature
     oldFeatureValue <- allUniqueValues[1]
 
@@ -223,7 +289,7 @@ selectBestFeature <- function(
             rightPartitionCountSplitting) < nodesize$splittingNodeSize |
         min(leftPartitionCountAveraging,
             rightPartitionCountAveraging) < nodesize$averagingNodeSize){
-        # Update the oldFeature value before proceeding
+        #' Update the oldFeature value before proceeding
         oldFeatureValue <- featureValue
         next()
       }
@@ -309,6 +375,8 @@ selectBestFeature <- function(
 #' @param splitrule A string to specify how to find the best split among all
 #' candidate feature values. The current version only supports `variance` which
 #' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @return root node.
 recursivePartition <- function(
   x,
@@ -322,7 +390,8 @@ recursivePartition <- function(
    "splittingNodeSize"=5,
    "averagingNodeSize"=5
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list()
   ){
 
   # Sample features for the split
@@ -332,13 +401,15 @@ recursivePartition <- function(
   # Tentatively replaced by the C++ function
   # To switch back, replace rcpp_selectBestFeature with selectBestFeature
   list2env(
-    rcpp_selectBestFeature(
+    selectBestFeature(
       x=x,
       y=y,
       featureList=selectedFeatureIndex,
       sampleIndex=sampleIndex,
       nodesize=nodesize,
-      splitrule=splitrule),
+      splitrule=splitrule,
+      categoricalFeatureCols=categoricalFeatureCols
+      ),
     environment())
 
   # Create a leaf node if the current bestSplitValue is NA
@@ -346,15 +417,24 @@ recursivePartition <- function(
     return(RFNode(sampleIndex=sampleIndex))
 
   } else {
-
     # Create a tree node
     # Update sample index for both left and right partitions
-    leftPartitionSplitting <-
-      x[sampleIndex$splittingSampleIndex,
-        bestSplitFeature] < bestSplitValue
-    leftPartitionAveraging <-
-      x[sampleIndex$averagingSampleIndex,
-        bestSplitFeature] < bestSplitValue
+    # Test if the current feature is categorical
+    if (bestSplitFeature %in% categoricalFeatureCols){
+      leftPartitionSplitting <-
+        x[sampleIndex$splittingSampleIndex,
+          bestSplitFeature] == bestSplitValue
+      leftPartitionAveraging <-
+        x[sampleIndex$averagingSampleIndex,
+          bestSplitFeature] == bestSplitValue
+    } else {
+      leftPartitionSplitting <-
+        x[sampleIndex$splittingSampleIndex,
+          bestSplitFeature] < bestSplitValue
+      leftPartitionAveraging <-
+        x[sampleIndex$averagingSampleIndex,
+          bestSplitFeature] < bestSplitValue
+    }
 
     sampleIndex_left <- list(
       "splittingSampleIndex"=
@@ -372,12 +452,12 @@ recursivePartition <- function(
     # Recursively grow the tree
     leftChild <- recursivePartition(
       x, y, mtry=mtry, sampleIndex=sampleIndex_left, nodesize=nodesize,
-      splitrule=splitrule
+      splitrule=splitrule, categoricalFeatureCols=categoricalFeatureCols
       )
 
     rightChild <- recursivePartition(
       x, y, mtry=mtry, sampleIndex=sampleIndex_right, nodesize=nodesize,
-      splitrule=splitrule
+      splitrule=splitrule, categoricalFeatureCols=categoricalFeatureCols
       )
 
     # Create the leaf node the connects to both children
@@ -409,14 +489,18 @@ recursivePartition <- function(
 #' function is used for prediction. The input of this function should be a
 #' dataframe of predictors `x` and a vector of outcomes `y`. The output is a
 #' scalar. The default function is to take the mean of vector `y`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFTree-method
 #' @exportMethod predict
 setMethod(
   f="predict",
   signature="RFTree",
-  definition=function(object, feature.new, x, y, avgfunc){
-    return(predict(object@root$node, feature.new, x, y, avgfunc))
+  definition=function(object, feature.new, x, y, avgfunc,
+                      categoricalFeatureCols){
+    return(predict(object@root$node, feature.new, x, y, avgfunc,
+                   categoricalFeatureCols))
   }
 )
 

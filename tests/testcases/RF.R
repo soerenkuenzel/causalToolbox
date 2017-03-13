@@ -25,4 +25,4 @@ y_pred <- predict(forest, x)
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 10.24841
+# 8.524729

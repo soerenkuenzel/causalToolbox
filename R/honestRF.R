@@ -43,7 +43,7 @@ setClass(
 #' @param mtry The number of variables randomly selected at each split point.
 #' The default value is set to be one third of total number of features of the
 #' training data.
-#' @param nodesize The minimum observations contained in terminal nodes. The
+#' @param nodesizeSpl The minimum observations contained in terminal nodes. The
 #' default value is 5.
 #' @param nthread The number of threads to use in parallel computing. The
 #' default value is 1.
@@ -72,7 +72,7 @@ setGeneric(
     replace,
     sampsize,
     mtry,
-    nodesize,
+    nodesizeSpl,
     nthread,
     splitrule,
     avgfunc,
@@ -94,7 +94,7 @@ honestRF <- function(
   replace=TRUE,
   sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x)),
   mtry=max(floor(ncol(x)/3), 1),
-  nodesize=5,
+  nodesizeSpl=5,
   nthread=1,
   splitrule="variance",
   avgfunc=avgMean,
@@ -103,26 +103,28 @@ honestRF <- function(
   ){
 
   # Preprocess the data
-  preprocessed <- preprocessing_data(x)
-  x <- preprocessed$x
-  encodingLabels <- preprocessed$labels
+  preprocessedData <- preprocess_training(x, y)
+  x <- preprocessedData$x
+  categoricalFeatureCols <- preprocessedData$categoricalFeatureCols
+  categoricalFeatureMapping <- preprocessedData$categoricalFeatureMapping
 
   # Total number of obervations
   nObservations <- length(y)
 
-  #' @import foreach
-  #' @import doParallel
+  # @import foreach
+  # @import doParallel
   # Set number of threads for parallelism
   registerDoParallel(nthread)
 
   # Create a list of minimum node size
   aggregateNodeSize <- list(
     "averagingNodeSize"=nodesizeAvg,
-    "splittingNodeSize"=nodesize
+    "splittingNodeSize"=nodesizeSpl
   )
 
   # Create trees
   trees <- foreach(i = 1:ntree) %dopar%{
+
     # Bootstrap sample observation index
     sampledIndex <- sample(
       1:nObservations,
@@ -155,7 +157,9 @@ honestRF <- function(
           "averagingSampleIndex"=averagingSampledIndex,
           "splittingSampleIndex"=splittingSampledIndex
         ),
-        splitrule=splitrule)
+        splitrule=splitrule,
+        categoricalFeatureCol=categoricalFeatureCols
+      )
     )
   }
 
@@ -172,7 +176,8 @@ honestRF <- function(
     splitrule=splitrule,
     avgfunc=avgfunc,
     forest=trees,
-    encodingLabels=encodingLabels,
+    categoricalFeatureCols=categoricalFeatureCols,
+    categoricalFeatureMapping=categoricalFeatureMapping,
     splitratio=splitratio
   )
 

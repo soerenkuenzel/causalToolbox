@@ -26,6 +26,9 @@ dataset.}
 \item{splitrule}{A string to specify how to find the best split among all
 candidate feature values. The current version only supports `variance` which
 minimizes the overall MSE after splitting. The default value is `variance`.}
+
+\item{categoricalFeatureCols}{A list of index for all categorical data. Used
+for trees to detect categorical columns.}
 }
 \description{
 `RFTree` is the unit component in the `RF` which composes

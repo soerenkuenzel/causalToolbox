@@ -12,7 +12,7 @@ Description: Estimate heterogeneous treatment effects in experimental and
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 0.12.9), foreach, doParallel
+Imports: Rcpp (>= 0.12.9), foreach, doParallel, plyr
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 SystemRequirements: C++11

@@ -15,7 +15,7 @@ forest <- honestRF(
   replace=TRUE,
   sampsize=nrow(x),
   mtry=3,
-  nodesize=5,
+  nodesizeSpl=5,
   nthread=4,
   splitrule="variance",
   splitratio=1,
@@ -27,7 +27,7 @@ y_pred <- predict(forest, x)
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 10.21317
+# 8.460419
 
 # Test honestRF - half/half split
 forest <- honestRF(
@@ -37,7 +37,7 @@ forest <- honestRF(
   replace=TRUE,
   sampsize=nrow(x),
   mtry=3,
-  nodesize=3,
+  nodesizeSpl=3,
   nthread=4,
   splitrule="variance",
   splitratio=0.5,
@@ -49,5 +49,5 @@ y_pred <- predict(forest, x)
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 13.71617
+# 11.76478
 
