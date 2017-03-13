@@ -47,20 +47,18 @@ setClass(
 #' @title honstRF Constructor
 #' @name X_RF-X_RF
 #' @rdname X_RF-X_RF
-#' @description Initialize a `honestRF` object.
+#' @description This is an implementation of the X-learner with honest random
+#' forest in the first and second stage. The function returns an X-RF object.
 #' @param feat A data frame of all the features.
-#' @param tr A vector contain 0 for control and 1 for treated variables.
-#' @param yobs A vector containing the observed outcomes.
+#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param yobs A numeric vector containing the observed outcomes.
 #' @param predmode One of propmean, control, treated, extreme. It specifies how
-#' the two estimators of the second stage should be aggregated.
+#' the two estimators of the second stage should be aggregated. The default is
+#' propmean which refers to propensity score weighting.
 #' @param firststageVar Variables which are only used in the first stage.
 #' @param secondstageVar Variables which are only used in the second stage.
-#' @param num_trees_first Numbers of trees in the first stage.
-#' @param num_trees_second Numbers of trees in the second stage.
-#' @param mtry_first number of features sampled as possible split features in
-#' each node in the first stage.
-#' @param mtry_second number of features sampled as possible split features in
-#' each node in the second stage.
+#' @param ntree_first Numbers of trees in the first stage.
+#' @param ntree_second Numbers of trees in the second stage.
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
 #' observations in the splitting set.
 #' @param min_node_size_spl_second minimum nodesize in the second stage for the
@@ -89,8 +87,8 @@ setGeneric(
                  predmode,
                  firststageVar,
                  secondstageVar,
-                 num_trees_first,
-                 num_trees_second,
+                 ntree_first,
+                 ntree_second,
                  mtry_first,
                  mtry_second,
                  min_node_size_spl_first,
@@ -119,8 +117,8 @@ X_RF <-
            predmode = "propmean",
            firststageVar = NULL,
            secondstageVar = NULL,
-           num_trees_first = 50,
-           num_trees_second = 50,
+           ntree_first = 50,
+           ntree_second = 50,
            mtry_first = ncol(feat) / 2,
            mtry_second = ncol(feat),
            min_node_size_spl_first = 3,
@@ -179,7 +177,7 @@ X_RF <-
       honestRF(
         x = X_0[, firststageVar],
         y = yobs_0,
-        ntree = num_trees_first,
+        ntree = ntree_first,
         replace = replace_first,
         sampsize = round(sample_fraction_first * length(yobs_0)),
         mtry = mtry_first,
@@ -194,7 +192,7 @@ X_RF <-
       honestRF(
         x = X_1[, firststageVar],
         y = yobs_1,
-        ntree = num_trees_first,
+        ntree = ntree_first,
         replace = replace_first,
         sampsize = round(sample_fraction_first * length(yobs_1)),
         mtry = mtry_first,
@@ -212,7 +210,7 @@ X_RF <-
       honestRF(
         x = X_0[, secondstageVar],
         y = r_0,
-        ntree = num_trees_second,
+        ntree = ntree_second,
         replace = replace_second,
         sampsize = round(sample_fraction_second * length(r_0)),
         mtry = mtry_second,
@@ -227,7 +225,7 @@ X_RF <-
       honestRF(
         x = X_1[, secondstageVar],
         y = r_1,
-        ntree = num_trees_second,
+        ntree = ntree_second,
         replace = replace_second,
         sampsize = round(sample_fraction_second * length(r_1)),
         mtry = mtry_second,
@@ -240,7 +238,7 @@ X_RF <-
     m_prop <-
       honestRF(x = feat,
                y = tr,
-               ntree = num_trees_second,
+               ntree = ntree_second,
                nthread = nthread)
     return(
       new(
