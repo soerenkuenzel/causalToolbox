@@ -34,7 +34,7 @@ y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 35.05281
+# 17.41112
 
 # Test creating a honest RFTree (half split, half averaging)
 tree <- honestRFTree(
@@ -62,4 +62,4 @@ y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 35.88407
+# 34.09712

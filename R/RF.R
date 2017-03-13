@@ -27,7 +27,12 @@ preprocess_training <- function(x, y){
   # Track all categorical features (both factors and characters)
   featureFactorCols <- which(sapply(x, is.factor) == TRUE)
   featureCharacterCols <- which(sapply(x, is.character) == TRUE)
-  categoricalFeatureCols <- list(c(featureFactorCols, featureCharacterCols))
+  categoricalFeatureCols <- c(featureFactorCols, featureCharacterCols)
+  if (length(categoricalFeatureCols) == 0) {
+    categoricalFeatureCols <- list()
+  } else {
+    categoricalFeatureCols <- list(categoricalFeatureCols)
+  }
 
   # For each categorical feature, encode x into numeric representation and
   # save the encoding mapping
@@ -89,6 +94,12 @@ preprocess_testing <- function(x, categoricalFeatureCols,
   featureFactorCols <- which(sapply(x, is.factor) == TRUE)
   featureCharacterCols <- which(sapply(x, is.character) == TRUE)
   testingCategoricalFeatureCols <- c(featureFactorCols, featureCharacterCols)
+  if (length(testingCategoricalFeatureCols) == 0) {
+    testingCategoricalFeatureCols <- list()
+  } else {
+    testingCategoricalFeatureCols <- list(testingCategoricalFeatureCols)
+  }
+
   if (length(setdiff(categoricalFeatureCols,
                      testingCategoricalFeatureCols)) != 0) {
     stop("Categorical columns are different between testing and training data.")
@@ -265,7 +276,7 @@ RF <- function(
   )
 
   # Create trees
-  trees <- foreach(i = 1:ntree) %dopar% {
+  trees <- foreach(i = 1:ntree) %do% {
 
     # Bootstrap sample
     sampleIndex <- sample(
@@ -336,7 +347,7 @@ setMethod(
       )
 
     # Make prediction from each tree
-    predForEachTree <- foreach(i = 1:object@ntree, .combine="rbind") %dopar%{
+    predForEachTree <- foreach(i = 1:object@ntree, .combine="rbind") %do%{
       predict(
         object@forest[[i]],
         processed_x,

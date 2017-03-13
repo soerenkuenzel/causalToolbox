@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // rcpp_selectBestFeature
-List rcpp_selectBestFeature(DataFrame x, NumericVector y, List featureList, List sampleIndex, List nodesize, std::string splitrule);
-RcppExport SEXP hte_rcpp_selectBestFeature(SEXP xSEXP, SEXP ySEXP, SEXP featureListSEXP, SEXP sampleIndexSEXP, SEXP nodesizeSEXP, SEXP splitruleSEXP) {
+List rcpp_selectBestFeature(DataFrame x, NumericVector y, List featureList, List sampleIndex, List nodesize, std::string splitrule, List categoricalFeatureCols);
+RcppExport SEXP hte_rcpp_selectBestFeature(SEXP xSEXP, SEXP ySEXP, SEXP featureListSEXP, SEXP sampleIndexSEXP, SEXP nodesizeSEXP, SEXP splitruleSEXP, SEXP categoricalFeatureColsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -17,7 +17,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type sampleIndex(sampleIndexSEXP);
     Rcpp::traits::input_parameter< List >::type nodesize(nodesizeSEXP);
     Rcpp::traits::input_parameter< std::string >::type splitrule(splitruleSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_selectBestFeature(x, y, featureList, sampleIndex, nodesize, splitrule));
+    Rcpp::traits::input_parameter< List >::type categoricalFeatureCols(categoricalFeatureColsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_selectBestFeature(x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols));
     return rcpp_result_gen;
 END_RCPP
 }

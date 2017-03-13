@@ -12,7 +12,7 @@ set.seed(24750371)
 selectBestFeature(
   x,
   y,
-  featureList=c(4),
+  featureList=c(1,4),
   sampleIndex=list(
     "averagingSampleIndex"=1:length(y),
     "splittingSampleIndex"=1:length(y)
@@ -30,11 +30,11 @@ selectBestFeature(
 # $bestSplitValue
 # [1] 1
 
-# Test selectBestFeature - one feature
+# Test rcpp selectBestFeature
 rcpp_selectBestFeature(
   x,
   y,
-  featureList=c(1),
+  featureList=c(1,4),
   sampleIndex=list(
     "averagingSampleIndex"=1:length(y),
     "splittingSampleIndex"=1:length(y)
@@ -46,11 +46,11 @@ rcpp_selectBestFeature(
   splitrule="variance",
   categoricalFeatureCols=list(4)
   )
-# Expected answer
-# bestSplitFeature
-# 1
-# bestSplitValue
-# 3.320536
+# $bestSplitFeature
+# [1] 4
+#
+# $bestSplitValue
+# [1] 1
 
 # Test selectBestFeature - two features
 rcpp_selectBestFeature(
@@ -72,7 +72,7 @@ rcpp_selectBestFeature(
 # bestSplitFeature
 # 2
 # bestSplitValue
-# 4.293864
+# 4.250153
 
 # Test creating a tree
 tree <- RFTree(
@@ -94,4 +94,4 @@ y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 35.05281
+# 16.78703

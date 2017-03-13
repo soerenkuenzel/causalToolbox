@@ -401,7 +401,7 @@ recursivePartition <- function(
   # Tentatively replaced by the C++ function
   # To switch back, replace rcpp_selectBestFeature with selectBestFeature
   list2env(
-    selectBestFeature(
+    rcpp_selectBestFeature(
       x=x,
       y=y,
       featureList=selectedFeatureIndex,
