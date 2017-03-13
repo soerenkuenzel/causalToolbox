@@ -11,7 +11,7 @@ ntrain <- 1000
 ntest <- 10000
 alpha <- .1
 setup <- "RsparseT2weak"
-nthread <- 32
+nthread <- 2
 
 # Sample each parameter
 Rand_tune <- data.frame(
@@ -33,6 +33,8 @@ Rand_tune <- data.frame(
                                   replace = TRUE)
 )
 
+if (!dir.exists("Tune/"))
+      dir.create("Tune/")
 if (!dir.exists("Tune/XLearner/"))
   dir.create("Tune/XLearner/")
 
@@ -69,7 +71,7 @@ for (i in 1:nsamples) {
     replace_second = Rand_tune$replace_second[i],
     sample_fraction_first = Rand_tune$sample_fraction_first[i],
     sample_fraction_second = Rand_tune$sample_fraction_second[i],
-    nthread = 8
+    nthread = nthread
   )
   EMSE <- mean((experiment$tau_te - EstimateCate(L, experiment$feat_te)) ^ 2)
 
