@@ -10,7 +10,7 @@
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
-  secondstageVar = NULL, num_trees_first = 50, num_trees_second = 50,
+  secondstageVar = NULL, ntree_first = 50, ntree_second = 50,
   mtry_first = ncol(feat)/2, mtry_second = ncol(feat),
   min_node_size_spl_first = 3, min_node_size_ave_first = 3,
   splitratio_first = 0.5, replace_first = FALSE, replace_second = TRUE,
@@ -22,26 +22,21 @@ X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
 \arguments{
 \item{feat}{A data frame of all the features.}
 
-\item{tr}{A vector contain 0 for control and 1 for treated variables.}
+\item{tr}{A numeric vector contain 0 for control and 1 for treated variables.}
 
-\item{yobs}{A vector containing the observed outcomes.}
+\item{yobs}{A numeric vector containing the observed outcomes.}
 
 \item{predmode}{One of propmean, control, treated, extreme. It specifies how
-the two estimators of the second stage should be aggregated.}
+the two estimators of the second stage should be aggregated. The default is
+propmean which refers to propensity score weighting.}
 
 \item{firststageVar}{Variables which are only used in the first stage.}
 
 \item{secondstageVar}{Variables which are only used in the second stage.}
 
-\item{num_trees_first}{Numbers of trees in the first stage.}
+\item{ntree_first}{Numbers of trees in the first stage.}
 
-\item{num_trees_second}{Numbers of trees in the second stage.}
-
-\item{mtry_first}{number of features sampled as possible split features in
-each node in the first stage.}
-
-\item{mtry_second}{number of features sampled as possible split features in
-each node in the second stage.}
+\item{ntree_second}{Numbers of trees in the second stage.}
 
 \item{min_node_size_spl_first}{minimum nodesize in the first stage for the
 observations in the splitting set.}
@@ -77,6 +72,7 @@ observations in the averaging set.}
 A `X_RF` object.
 }
 \description{
-Initialize a `honestRF` object.
+This is an implementation of the X-learner with honest random
+forest in the first and second stage. The function returns an X-RF object.
 }
 \keyword{datasets}
