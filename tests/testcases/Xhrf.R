@@ -7,12 +7,11 @@ feat <- iris[, -1]
 tr <- rbinom(nrow(iris), 1, .5)
 yobs <- iris[, 1]
 
-?X_RF
-
 xl <- X_RF(
   feat = feat,
   tr = tr,
-  yobs = yobs
+  yobs = yobs,
+  nthread = 1
 )
 
 EstimateCate(xl, feat)
