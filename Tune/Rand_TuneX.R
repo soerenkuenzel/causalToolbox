@@ -1,19 +1,21 @@
 # In this file we tune X such that it
-devtools::load_all()
+#devtools::load_all()
 library(hte)
 
-seed <- 15435
-nthread <- 32
+args=(commandArgs(TRUE))
+print(args)
+seed <- -as.numeric(args)
+print(seed)
 
 set.seed(seed)
 
-nsamples <- 10000
+nthread <- 1
+nsamples <- 1000
 dim <- 12
 ntrain <- 1000
 ntest <- 1000
 alpha <- .1
 setup <- "RsparseT2weak"
-nthread <- 2
 
 # Sample each parameter
 Rand_tune <- data.frame(
