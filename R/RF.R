@@ -276,7 +276,7 @@ RF <- function(
   )
 
   # Create trees
-  trees <- foreach(i = 1:ntree) %do% {
+  trees <- foreach(i = 1:ntree) %dopar% {
 
     # Bootstrap sample
     sampleIndex <- sample(
@@ -347,7 +347,7 @@ setMethod(
       )
 
     # Make prediction from each tree
-    predForEachTree <- foreach(i = 1:object@ntree, .combine="rbind") %do%{
+    predForEachTree <- foreach(i = 1:object@ntree, .combine="rbind") %dopar%{
       predict(
         object@forest[[i]],
         processed_x,

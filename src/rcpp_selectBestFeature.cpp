@@ -82,24 +82,29 @@ List rcpp_selectBestFeature(
         averageTotalCount++;
       }
       int total_categories = all_categories.size();
+
       // Create map to track the count and sum of y squares
-      int *splittingCategoryCount = new int[total_categories];
-      int *averagingCategoryCount = new int[total_categories];
-      double *splittingCategoryYSum = new double[total_categories];
+      std::map<int, int> splittingCategoryCount;
+      std::map<int, int> averagingCategoryCount;
+      std::map<int, double> splittingCategoryYSum;
+
       for (int j=0; j<total_categories; j++) {
         splittingCategoryCount[j] = 0;
         averagingCategoryCount[j] = 0;
         splittingCategoryYSum[j] = 0;
       }
       for (int j=0; j<splittingSampleIndex.size(); j++){
-        int currentXValue = currentFeatureValues[splittingSampleIndex[j]-1];
+        int currentXValue = currentFeatureValues[splittingSampleIndex[j]-1] - 1;
         double currentYValue = y[splittingSampleIndex[j]-1];
-        splittingCategoryCount[currentXValue-1] ++;
-        splittingCategoryYSum[currentXValue-1] += currentYValue;
+        splittingCategoryCount[currentXValue] =
+          splittingCategoryCount[currentXValue] + 1;
+        splittingCategoryYSum[currentXValue] =
+          splittingCategoryYSum[currentXValue] + currentYValue;
       }
       for (int j=0; j<averagingSampleIndex.size(); j++){
         int currentXValue = currentFeatureValues[averagingSampleIndex[j]-1];
-        averagingCategoryCount[currentXValue-1] ++;
+        averagingCategoryCount[currentXValue-1] =
+          averagingCategoryCount[currentXValue-1] + 1;
       }
 
       // Go through the sums and determine the best partition

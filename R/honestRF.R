@@ -123,7 +123,7 @@ honestRF <- function(
   )
 
   # Create trees
-  trees <- foreach(i = 1:ntree) %do%{
+  trees <- foreach(i = 1:ntree) %dopar%{
 
     # Bootstrap sample observation index
     sampledIndex <- sample(
