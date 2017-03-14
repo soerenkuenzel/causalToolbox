@@ -55,3 +55,10 @@ print(l + 3)
 call
 ##########################################
 sbatch simulate.sh 44
+
+
+#########################################
+in the tune folder run for example:
+for i in {1..3}; do sbatch Rand_TuneX.sh $i; done
+
+for i in {10..13}; do sbatch Rand_TuneX.sh $i;sleep 10; done
