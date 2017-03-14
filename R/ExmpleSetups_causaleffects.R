@@ -23,23 +23,7 @@
 #' outcomes and the treatment assignment.
 #' @return A list of the transformed object `x`, and encoding information
 #' `labels`.
-setGeneric(
-  name="simulate_causal_experiment",
-  def=function(
-    ntrain,
-    ntest,
-    dim,
-    alpha,
-    feat_distribution,
-    given_features,
-    setup
-  ){
-  }
-)
-
-#' @title simulate a RCT or observational data for causal effect estimation
-#' @rdname simulate_causal_experiment
-#' @return A `honestRF` object.
+#' @export simulate_causal_experiment
 simulate_causal_experiment <- function(ntrain,
                                        ntest,
                                        dim,

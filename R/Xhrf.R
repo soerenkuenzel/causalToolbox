@@ -1,4 +1,4 @@
-setOldClass("honestRF")
+# setOldClass("honestRF")
 
 ############################
 ### Xlearner - hRF - hRF ###
