@@ -80,7 +80,7 @@ honestRFTree <- function(
     nodesize$splittingNodeSize <- length(sampleIndex$splittingSampleIndex)
   }
   if(length(sampleIndex$splittingSampleIndex) == 0 |
-     length(sampleIndex$averagingSampleIndex)){
+     length(sampleIndex$averagingSampleIndex) == 0){
     stop("Either splitting or averaging set is empty.")
   }
 
