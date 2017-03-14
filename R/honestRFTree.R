@@ -79,6 +79,11 @@ honestRFTree <- function(
             length of the entier data set.")
     nodesize$splittingNodeSize <- length(sampleIndex$splittingSampleIndex)
   }
+  if(length(sampleIndex$splittingSampleIndex) == 0 |
+     length(sampleIndex$averagingSampleIndex)){
+    stop("Either splitting or averaging set is empty.")
+  }
+
 
   tree <- new(
     "honestRFTree",
