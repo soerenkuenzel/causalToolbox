@@ -47,7 +47,7 @@ for (i in 1:nsamples) {
   print(paste("Starting with", i, "of", nsamples))
   stat.time <- Sys.time()
   # run the experiment:
-  experiment <- simulate_causal_experiment(
+  experiment <- hte:::simulate_causal_experiment(
     ntrain = ntrain,
     ntest = ntest,
     dim = dim,
