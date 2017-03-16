@@ -10,14 +10,13 @@
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
-  secondstageVar = NULL, ntree_first = 50, ntree_second = 50,
-  mtry_first = ncol(feat)/2, mtry_second = ncol(feat),
+  secondstageVar = NULL, ntree_first = 500, ntree_second = 500,
+  mtry_first = round(ncol(feat)/2), mtry_second = ncol(feat),
   min_node_size_spl_first = 3, min_node_size_ave_first = 3,
-  splitratio_first = 0.5, replace_first = FALSE, replace_second = TRUE,
-  sample_fraction_first = 0.7, sample_fraction_second = 0.5,
-  honest_first = TRUE, honest_second = TRUE, honest_prop = TRUE,
-  nthread = 4, min_node_size_spl_second = 5, splitratio_second = 0.5,
-  min_node_size_ave_second = 5)
+  min_node_size_spl_second = 5, min_node_size_ave_second = 3,
+  splitratio_first = 0.5, splitratio_second = 0.5, replace_first = TRUE,
+  replace_second = TRUE, sample_fraction_first = 0.9,
+  sample_fraction_second = 0.9, nthread = 4)
 }
 \arguments{
 \item{feat}{A data frame of all the features.}
@@ -44,8 +43,17 @@ observations in the splitting set.}
 \item{min_node_size_ave_first}{minimum nodesize in the first stage for the
 observations in the average set.}
 
+\item{min_node_size_spl_second}{minimum nodesize in the second stage for the
+observations in the splitting set.}
+
+\item{min_node_size_ave_second}{minimum nodesize in the second stage for the
+observations in the averaging set.}
+
 \item{splitratio_first}{Proportion of the training data used as the splitting
 dataset in the first stage.}
+
+\item{splitratio_second}{Proportion of the training data used as the
+splitting dataset in the second stage.}
 
 \item{replace_first}{Sample with or without replacement in the first stage.}
 
@@ -58,15 +66,6 @@ training data in the first stage.}
 training data in the second stage.}
 
 \item{nthread}{number of threats which should be used to work in parallel.}
-
-\item{min_node_size_spl_second}{minimum nodesize in the second stage for the
-observations in the splitting set.}
-
-\item{splitratio_second}{Proportion of the training data used as the
-splitting dataset in the second stage.}
-
-\item{min_node_size_ave_second}{minimum nodesize in the second stage for the
-observations in the averaging set.}
 }
 \value{
 A `X_RF` object.
