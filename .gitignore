@@ -5,3 +5,9 @@
 *.so
 legacy/
 .Rproj.user
+
+playground.R
+
+*.csv
+
+tests/crashes/Rdies.R
