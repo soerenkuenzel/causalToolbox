@@ -11,8 +11,8 @@
 \usage{
 honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
   nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
-  nodesize = 5, nthread = 1, splitrule = "variance", avgfunc = avgMean,
-  splitratio = 1, nodesizeAvg = 5)
+  nodesizeSpl = 5, nthread = 1, splitrule = "variance",
+  avgfunc = avgMean, splitratio = 1, nodesizeAvg = 5)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -34,7 +34,7 @@ the length of the training data.}
 The default value is set to be one third of total number of features of the
 training data.}
 
-\item{nodesize}{The minimum observations contained in terminal nodes. The
+\item{nodesizeSpl}{The minimum observations contained in terminal nodes. The
 default value is 5.}
 
 \item{nthread}{The number of threads to use in parallel computing. The

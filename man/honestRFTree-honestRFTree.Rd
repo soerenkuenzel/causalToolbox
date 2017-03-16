@@ -9,7 +9,7 @@
 honestRFTree(x, y, mtry = max(floor(ncol(x)/3), 1),
   nodesize = list(averagingNodeSize = 5, splittingNodeSize = 5),
   sampleIndex = list(averagingSampleIndex = 1:length(y), splittingSampleIndex
-  = 1:length(y)), splitrule = "variance")
+  = 1:length(y)), splitrule = "variance", categoricalFeatureCols = list())
 }
 \value{
 a `honestRFTree` object

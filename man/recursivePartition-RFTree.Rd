@@ -8,7 +8,7 @@
 recursivePartition(x, y, mtry = max(floor(ncol(x)/3), 1),
   sampleIndex = list(averagingSampleIndex = 1:length(y), splittingSampleIndex
   = 1:length(y)), nodesize = list(splittingNodeSize = 5, averagingNodeSize =
-  5), splitrule = "variance")
+  5), splitrule = "variance", categoricalFeatureCols = list())
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -33,6 +33,9 @@ parameter is actually a list containing the values for both
 \item{splitrule}{A string to specify how to find the best split among all
 candidate feature values. The current version only supports `variance` which
 minimizes the overall MSE after splitting. The default value is `variance`.}
+
+\item{categoricalFeatureCols}{A list of index for all categorical data. Used
+for trees to detect categorical columns.}
 }
 \value{
 root node.

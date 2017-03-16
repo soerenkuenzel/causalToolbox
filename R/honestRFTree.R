@@ -33,6 +33,8 @@ setClass(
 #' @param splitrule A string to specify how to find the best split among all
 #' candidate feature values. The current version only supports `variance` which
 #' minimizes the overall MSE after splitting. The default value is `variance`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @export honestRFTree
 setGeneric(
   name="honestRFTree",
@@ -42,7 +44,8 @@ setGeneric(
     mtry,
     nodesize,
     sampleIndex,
-    splitrule
+    splitrule,
+    categoricalFeatureCols
     ){
     standardGeneric("honestRFTree")
   }
@@ -64,7 +67,8 @@ honestRFTree <- function(
    "averagingSampleIndex"=1:length(y),
    "splittingSampleIndex"=1:length(y)
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list()
   ){
 
   if(nodesize$averagingNodeSize > length(sampleIndex$averagingSampleIndex)){
@@ -98,7 +102,8 @@ honestRFTree <- function(
     mtry=mtry,
     nodesize=nodesize,
     sampleIndex=sampleIndex,
-    splitrule=splitrule
+    splitrule=splitrule,
+    categoricalFeatureCols=categoricalFeatureCols
   )
 
   tree@root <- list("node"=root)

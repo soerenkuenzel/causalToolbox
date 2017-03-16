@@ -7,7 +7,8 @@
 \title{RFTree-Constructor}
 \usage{
 RFTree(x, y, mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
-  sampleIndex = 1:length(y), splitrule = "variance")
+  sampleIndex = 1:length(y), splitrule = "variance",
+  categoricalFeatureCols = list())
 }
 \value{
 a `RFTree` object

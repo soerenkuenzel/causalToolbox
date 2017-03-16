@@ -7,7 +7,8 @@
 \alias{RFTree-method}
 \title{predict-RFTree}
 \usage{
-\S4method{predict}{RFTree}(object, feature.new, x, y, avgfunc)
+\S4method{predict}{RFTree}(object, feature.new, x, y, avgfunc,
+  categoricalFeatureCols)
 }
 \arguments{
 \item{object}{A `RFTree`` object.}
@@ -22,6 +23,9 @@
 function is used for prediction. The input of this function should be a
 dataframe of predictors `x` and a vector of outcomes `y`. The output is a
 scalar. The default function is to take the mean of vector `y`.}
+
+\item{categoricalFeatureCols}{A list of index for all categorical data. Used
+for trees to detect categorical columns.}
 }
 \value{
 A vector of predicted responses.

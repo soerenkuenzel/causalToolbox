@@ -18,7 +18,8 @@ List rcpp_selectBestFeature(
     List featureList,
     List sampleIndex,
     List nodesize,
-    std::string splitrule
+    std::string splitrule,
+    List categoricalFeatureCols
 ) {
 
   // Get the number of total features
@@ -53,6 +54,107 @@ List rcpp_selectBestFeature(
 
     int splittingNodeSize = as<int>(nodesize["splittingNodeSize"]);
     int averagingNodeSize = as<int>(nodesize["averagingNodeSize"]);
+
+    // Test if the current feature is in the categorical list
+    bool categorialFeature = false;
+    for (List::iterator it = categoricalFeatureCols.begin();
+         it != categoricalFeatureCols.end(); ++it ) {
+      if ((int) *it == currentFeature) {
+        categorialFeature = true;
+        continue;
+      }
+    }
+
+    // Deal with categorical data differently
+    if (categorialFeature) {
+      // Count total number of different categories
+      std::set<int> all_categories;
+      double splitTotalSum = 0;
+      int splitTotalCount = 0;
+      int averageTotalCount = 0;
+      for (int j=0; j<splittingSampleIndex.size(); j++){
+        all_categories.insert(currentFeatureValues[splittingSampleIndex[j]-1]);
+        splitTotalSum += y[splittingSampleIndex[j]-1];
+        splitTotalCount++;
+      }
+      for (int j=0; j<averagingSampleIndex.size(); j++){
+        all_categories.insert(currentFeatureValues[averagingSampleIndex[j]-1]);
+        averageTotalCount++;
+      }
+      int total_categories = all_categories.size();
+
+      // Create map to track the count and sum of y squares
+      std::map<int, int> splittingCategoryCount;
+      std::map<int, int> averagingCategoryCount;
+      std::map<int, double> splittingCategoryYSum;
+
+      for (int j=0; j<total_categories; j++) {
+        splittingCategoryCount[j] = 0;
+        averagingCategoryCount[j] = 0;
+        splittingCategoryYSum[j] = 0;
+      }
+      for (int j=0; j<splittingSampleIndex.size(); j++){
+        int currentXValue = currentFeatureValues[splittingSampleIndex[j]-1] - 1;
+        double currentYValue = y[splittingSampleIndex[j]-1];
+        splittingCategoryCount[currentXValue] =
+          splittingCategoryCount[currentXValue] + 1;
+        splittingCategoryYSum[currentXValue] =
+          splittingCategoryYSum[currentXValue] + currentYValue;
+      }
+      for (int j=0; j<averagingSampleIndex.size(); j++){
+        int currentXValue = currentFeatureValues[averagingSampleIndex[j]-1];
+        averagingCategoryCount[currentXValue-1] =
+          averagingCategoryCount[currentXValue-1] + 1;
+      }
+
+      // Go through the sums and determine the best partition
+      for (int j=0; j<total_categories; j++) {
+        // Check leaf size at least nodesize
+        if (
+            std::min(
+              splittingCategoryCount[j],
+              splitTotalCount - splittingCategoryCount[j]
+            ) < splittingNodeSize||
+              std::min(
+                averagingCategoryCount[j],
+                averageTotalCount - averagingCategoryCount[j]
+              ) < averagingNodeSize
+        ){
+          continue;
+        }
+
+        double leftPartitionMean = splittingCategoryYSum[j] /
+          splittingCategoryCount[j];
+        double rightPartitionMean = (splitTotalSum - splittingCategoryYSum[j]) /
+          (splitTotalCount - splittingCategoryCount[j]);
+        double currentSplitLoss =
+          splittingCategoryCount[j] * leftPartitionMean * leftPartitionMean +
+          (splitTotalCount - splittingCategoryCount[j]) * rightPartitionMean *
+          rightPartitionMean;
+
+        // Update the value if a higher value has been seen
+        if (currentSplitLoss > bestSplitLossAll[i]) {
+          bestSplitLossAll[i] = currentSplitLoss;
+          bestSplitFeatureAll[i] = currentFeature;
+          bestSplitValueAll[i] = j + 1;
+          bestSplitCountAll[i] = 1;
+        } else {
+          //If we are as good as the best split
+          if (currentSplitLoss == bestSplitLossAll[i]) {
+            bestSplitCountAll[i] = bestSplitCountAll[i] + 1;
+            // Only update with probability 1/nseen
+            double tmp_random = (double) rand() / RAND_MAX;
+            if (tmp_random * bestSplitCountAll[i] <= 1) {
+              bestSplitLossAll[i] = currentSplitLoss;
+              bestSplitFeatureAll[i] = currentFeature;
+              bestSplitValueAll[i] = j + 1;
+            }
+          }
+        }
+      }
+      continue;
+    }
+
 
     // Create specific vectors to holddata
     typedef std::tuple<double,double> dataPair;

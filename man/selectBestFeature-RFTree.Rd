@@ -12,7 +12,7 @@
 selectBestFeature(x, y, featureList, sampleIndex = list(averagingSampleIndex =
   1:length(y), splittingSampleIndex = 1:length(y)),
   nodesize = list(splittingNodeSize = 5, averagingNodeSize = 5),
-  splitrule = "variance")
+  splitrule = "variance", categoricalFeatureCols = list())
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -36,6 +36,9 @@ parameter is actually a list containing the values for both
 candidate feature values. The current version only supports `variance` which
 minimizes the overall MSE after splitting. The default value is `variance`.}
 
+\item{categoricalFeatureCols}{A list of index for all categorical data. Used
+for trees to detect categorical columns.}
+
 \item{mtry}{The number of variables randomly selected at each split point.
 The default value is set to be one third of total number of features of the
 training data.}
@@ -58,5 +61,6 @@ To check the minimum split, the method checks for both datasets according to
 This function is currently depreciated. It has been replaced by the
 C++ version in the package. Although the functionality and parameters are
 exactly the same.
+Update the oldFeature value before proceeding
 }
 \keyword{datasets}

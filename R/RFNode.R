@@ -141,6 +141,8 @@ RFNode <- function(
 #' function is used for prediction. The input of this function should be a
 #' dataframe of predictors `x` and a vector of outcomes `y`. The output is a
 #' scalar. The default function is to take the mean of vector `y`.
+#' @param categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
 #' @return A vector of predicted responses.
 #' @aliases predict, RFNode-method
 #' @exportMethod predict
@@ -152,7 +154,8 @@ setMethod(
     feature.new,
     x,
     y,
-    avgfunc
+    avgfunc,
+    categoricalFeatureCols
     ){
     # If the node is a leaf, aggregate all its averaging data samples
     if (length(object@child) == 0) {
@@ -164,26 +167,36 @@ setMethod(
       return(prediction)
 
     } else {
-      # Test if the testing data have smaller feature value or bigger than the
-      # current `splitFeature` and `splitValue`.
-      leftIndicator <-
-        feature.new[, object@splitFeature] < object@splitValue
+
+      # Test if the splitting feature is categorical
+      if (object@splitFeature %in% categoricalFeatureCols){
+        leftIndicator <-
+          feature.new[, object@splitFeature] == object@splitValue
+      } else {
+        # For regression, split left and right according to the split point
+        leftIndicator <-
+          feature.new[, object@splitFeature] < object@splitValue
+      }
 
       # Initialize a matrix for predictions
       prediction <- rep(NA, nrow(feature.new))
 
       # Assign predictions from the left child
       if (sum(leftIndicator) > 0) {
-        prediction[leftIndicator] <- predict(object@child$leftChild,
-                                             feature.new[leftIndicator, ],
-                                             x, y, avgfunc)
+        prediction[leftIndicator] <- predict(
+          object@child$leftChild,
+          feature.new[leftIndicator, ],
+          x, y, avgfunc, categoricalFeatureCols
+          )
       }
 
       # Assign predictions from the right child
       if (sum(!leftIndicator) > 0) {
-        prediction[!leftIndicator] <- predict(object@child$rightChild,
-                                              feature.new[!leftIndicator, ],
-                                              x, y, avgfunc)
+        prediction[!leftIndicator] <- predict(
+          object@child$rightChild,
+          feature.new[!leftIndicator, ],
+          x, y, avgfunc, categoricalFeatureCols
+          )
       }
 
       # Return the prediction

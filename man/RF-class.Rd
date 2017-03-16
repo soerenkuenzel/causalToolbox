@@ -45,7 +45,11 @@ scalar. The default function is to take the mean of vector `y`.}
 \item{\code{forest}}{A list of `RFTree` objects in the forest. If the class is
 extended, the list may contain the corresponding extended `RFTree` object.}
 
-\item{\code{encodingLabels}}{A list contains all encodings that are used to encode
-categorical columns in the training data.}
+\item{\code{categoricalFeatureCols}}{A list of index for all categorical data. Used
+for trees to detect categorical columns.}
+
+\item{\code{categoricalFeatureMapping}}{A list of encoding details for each
+categorical column, including all unique factor values and their
+corresponding numeric representation.}
 }}
 

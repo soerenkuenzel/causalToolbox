@@ -54,8 +54,11 @@ printnode(rightChild)
 printnode(root)
 
 # Test predict leaf node
-predict(leftChild, x, x, y, function(x, y) mean(y))
-predict(rightChild, x, x, y, function(x, y) mean(y))
+predict(leftChild, x, x, y, function(x, y) mean(y),
+        categoricalFeatureCols=list(4))
+predict(rightChild, x, x, y, function(x, y) mean(y),
+        categoricalFeatureCols=list(4))
 
 # Test predict tree node
-predict(root, x, x, y, function(x, y) mean(y))
+predict(root, x, x, y, function(x, y) mean(y),
+        categoricalFeatureCols=list(4))

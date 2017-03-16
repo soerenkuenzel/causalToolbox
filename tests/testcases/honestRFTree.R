@@ -21,18 +21,20 @@ tree <- honestRFTree(
     "averagingSampleIndex"=1:length(y),
     "splittingSampleIndex"=1:length(y)
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
 )
 
 # Test showtree
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
+                  categoricalFeatureCols=list(4))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 17.58076
+# 17.41112
 
 # Test creating a honest RFTree (half split, half averaging)
 tree <- honestRFTree(
@@ -47,15 +49,17 @@ tree <- honestRFTree(
     "averagingSampleIndex"=1:(length(y)/2),
     "splittingSampleIndex"=(length(y)/2+1):length(y)
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
 )
 
 # Test showtree
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
+                  categoricalFeatureCols=list(4))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 39.36365
+# 34.09712

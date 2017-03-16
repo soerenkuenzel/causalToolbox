@@ -9,10 +9,10 @@ y <- iris[, 1]
 set.seed(24750371)
 
 # Test selectBestFeature - one feature
-rcpp_selectBestFeature(
+selectBestFeature(
   x,
   y,
-  featureList=c(1),
+  featureList=c(1,4),
   sampleIndex=list(
     "averagingSampleIndex"=1:length(y),
     "splittingSampleIndex"=1:length(y)
@@ -21,13 +21,36 @@ rcpp_selectBestFeature(
     "splittingNodeSize"=5,
     "averagingNodeSize"=5
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
+)
+# $bestSplitFeature
+# [1] 4
+#
+# $bestSplitValue
+# [1] 1
+
+# Test rcpp selectBestFeature
+rcpp_selectBestFeature(
+  x,
+  y,
+  featureList=c(1,4),
+  sampleIndex=list(
+    "averagingSampleIndex"=1:length(y),
+    "splittingSampleIndex"=1:length(y)
+  ),
+  nodesize=list(
+    "splittingNodeSize"=5,
+    "averagingNodeSize"=5
+  ),
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
   )
-# Expected answer
-# bestSplitFeature
-# 1
-# bestSplitValue
-# 3.320536
+# $bestSplitFeature
+# [1] 4
+#
+# $bestSplitValue
+# [1] 1
 
 # Test selectBestFeature - two features
 rcpp_selectBestFeature(
@@ -42,13 +65,14 @@ rcpp_selectBestFeature(
     "splittingNodeSize"=5,
     "averagingNodeSize"=5
   ),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
   )
 # Expected answer
 # bestSplitFeature
 # 2
 # bestSplitValue
-# 4.293864
+# 4.250153
 
 # Test creating a tree
 tree <- RFTree(
@@ -57,15 +81,17 @@ tree <- RFTree(
   mtry=max(floor(ncol(x)/3), 1),
   nodesize=5,
   sampleIndex=1:length(y),
-  splitrule="variance"
+  splitrule="variance",
+  categoricalFeatureCols=list(4)
 )
 
 # Test showtree
 showTree(tree)
 
 # Test predict
-y_pred <- predict(tree, x, x, y, function(x, y) mean(y))
+y_pred <- predict(tree, x, x, y, function(x, y) mean(y),
+                  categoricalFeatureCols=list(4))
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 17.58076
+# 16.78703
