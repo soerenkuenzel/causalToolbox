@@ -1,0 +1,63 @@
+for i in {1..3}; do echo $i; done
+
+for q in *.sh; do qsub -pe smp 3 $q; done
+
+#############################
+In the R file write:
+#############################
+args=(commandArgs(TRUE))
+if(length(args)==0){
+    print("No arguments supplied.")
+    ##supply default values
+    a = 1
+    b = c(1,1,1)
+ }else{
+	for(i in 1:length(args)){
+	      eval(parse(text=args[[i]]
+    	}
+}
+print(a*2)
+print(b*3)
+
+
+############################
+In the sh file
+############################
+#!/bin/bash
+R CMD BATCH --no-save '--args a=1 b=c(2,5,6)' simulate.R  simulate.out
+
+
+
+###########################################
+###########################################
+#####   Next level:   #####################
+###########################################
+###########################################
+
+
+###########################################
+sh file
+###########################################
+#!/bin/bash
+R CMD BATCH --no-save --args -$1 simulate.R  simulate$1.out
+
+
+##########################################
+R file
+##########################################
+print("Hallo")
+args=(commandArgs(TRUE))
+print(args)
+l <- as.numeric(args)
+print(l + 3)
+
+##########################################
+call
+##########################################
+sbatch simulate.sh 44
+
+
+#########################################
+in the tune folder run for example:
+for i in {1..3}; do sbatch Rand_TuneX.sh $i; done
+

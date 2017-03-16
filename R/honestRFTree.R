@@ -67,6 +67,24 @@ honestRFTree <- function(
   splitrule="variance"
   ){
 
+  if(nodesize$averagingNodeSize > length(sampleIndex$averagingSampleIndex)){
+    warning("For at least one tree, the averagingNodeSize is chosen to be bigger
+            than the entier data set. It is not set to be equal to the
+            length of the entier data set.")
+    nodesize$averagingNodeSize <- length(sampleIndex$averagingSampleIndex)
+  }
+  if(nodesize$splittingNodeSize > length(sampleIndex$splittingSampleIndex)){
+    warning("For at least one tree, the splittingNodeSize is chosen to be bigger
+            than the entier data set. It is not set to be equal to the
+            length of the entier data set.")
+    nodesize$splittingNodeSize <- length(sampleIndex$splittingSampleIndex)
+  }
+  if(length(sampleIndex$splittingSampleIndex) == 0 |
+     length(sampleIndex$averagingSampleIndex) == 0){
+    stop("Either splitting or averaging set is empty.")
+  }
+
+
   tree <- new(
     "honestRFTree",
     sampleIndex=sampleIndex,

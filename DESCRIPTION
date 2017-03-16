@@ -2,17 +2,17 @@ Package: hte
 Type: Package
 Title: Heterogeneous Treatment Effect Estimator Using Random Forests
 Version: 0.1.0
-Author: Allen Tang
-Maintainer: Allen Tang <actang.me@gmail.com>
+Author: Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
+Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
-    observational studies with application ranging from personalized medicine 
-    to online advertisement recommendation systems. Implement a number of 
-    algorithms that are based on random forest to estimate the conditional 
-    average treatment effect (CATE) function.
-License: What license is it under?
+    observational studies. Implements honest random forest and X-learner
+    using honest random forest in the first and second stage to estimate
+    the Conditional Average Treatment Effect (CATE) function and provides
+    convidence intervals for it.
+License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 0.12.9), foreach, doParallel
+Imports: Rcpp (>= 0.12.9), foreach, doParallel, MASS (>= 7.3.0)
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 SystemRequirements: C++11
