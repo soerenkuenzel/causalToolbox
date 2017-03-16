@@ -79,11 +79,6 @@ preprocess_testing <- function(x, categoricalFeatureCols,
                                 categoricalFeatureMapping){
   x <- as.data.frame(x)
 
-  # Check if the input dimension of x matches y
-  if (nrow(x) != length(y)) {
-    stop("The dimension of input dataset x doesn't match the output vector y.")
-  }
-
   # Track the order of all features
   testingFeatureNames <- colnames(x)
   if (is.null(testingFeatureNames)) {
