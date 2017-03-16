@@ -117,8 +117,8 @@ X_RF <-
            predmode = "propmean",
            firststageVar = NULL,
            secondstageVar = NULL,
-           ntree_first = 500,
-           ntree_second = 500,
+           ntree_first = 100,
+           ntree_second = 100,
            mtry_first = round(ncol(feat) / 2),
            mtry_second = ncol(feat),
            min_node_size_spl_first = 3,
@@ -200,6 +200,8 @@ X_RF <-
         nodesizeAvg = min_node_size_ave_first
       )
 
+    print("Done with the first stage.")
+
     r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
     r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
 
@@ -232,11 +234,17 @@ X_RF <-
         splitratio = splitratio_second,
         nodesizeAvg = min_node_size_ave_second
       )
+
+    print("Done with the second stage.")
+
     m_prop <-
       honestRF(x = feat,
                y = tr,
-               ntree = ntree_second,
+               ntree = 50,
                nthread = nthread)
+
+    print("Done with the propensity score estimation.")
+
     return(
       new(
         "X_RF",
