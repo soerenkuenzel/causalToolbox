@@ -200,8 +200,8 @@ X_RF <-
         nodesizeAvg = min_node_size_ave_first
       )
 
-    r_0 <- predict(m_1, X_0) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1)
+    r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
 
     m_tau_0 <-
       honestRF(
