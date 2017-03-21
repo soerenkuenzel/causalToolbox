@@ -238,10 +238,12 @@ X_RF <-
     print("Done with the second stage.")
 
     m_prop <-
-      honestRF(x = feat,
-               y = tr,
-               ntree = 50,
-               nthread = nthread)
+      honestRF(
+        x = feat,
+        y = tr,
+        ntree = 50,
+        nthread = nthread
+      )
 
     print("Done with the propensity score estimation.")
 
@@ -267,11 +269,12 @@ X_RF <-
 ############################
 ### Estimate CATE Method ###
 ############################
-setGeneric(name="EstimateCate",
-           def=function(theObject, feature_new)
-           {
-             standardGeneric("EstimateCate")
-           }
+setGeneric(
+  name = "EstimateCate",
+  def = function(theObject, feature_new)
+  {
+    standardGeneric("EstimateCate")
+  }
 )
 
 #' EstimateCate-X_hRF
@@ -296,21 +299,305 @@ setMethod(
       )
     }
     if (theObject@predmode == "extreme") {
-      return(
-        ifelse(prop_scores > .5,
-               predict(theObject@m_tau_0, feature_new),
-               predict(theObject@m_tau_1, feature_new))
-      )
+      return(ifelse(
+        prop_scores > .5,
+        predict(theObject@m_tau_0, feature_new),
+        predict(theObject@m_tau_1, feature_new)
+      ))
     }
     if (theObject@predmode == "control") {
-      return(
-        predict(theObject@m_tau_0, feature_new)
-      )
+      return(predict(theObject@m_tau_0, feature_new))
     }
     if (theObject@predmode == "treated") {
-      return(
-        predict(theObject@m_tau_1, feature_new)
+      return(predict(theObject@m_tau_1, feature_new))
+    }
+  }
+)
+
+############################
+### CateCI Method ###
+############################
+setGeneric(
+  name = "CateCI",
+  def = function(theObject, feature_new, method = "n2TBS", B, nthread = 8)
+  {
+    standardGeneric("CateCI")
+  }
+)
+
+#' CateCI-X_hRF
+#' @name CateCI-X_hRF
+#' @rdname CateCI-X_hRF
+#' @description Return the estimated confidence intervals for the CATE
+#' @param object A `X_hRF` object.
+#' @param feature_new A data frame.
+#' @param method different versions of the bootstrap. Only n2TBS implemented
+#' @param B number of bootstrap samples.
+#' @param nthread number of threats used.
+#' @return A data frame of estimated CATE Confidence Intervals
+#' @aliases CateCI, X_hRF-method
+#' @exportMethod CateCI
+setMethod(
+  f = "CateCI",
+  signature = "X_RF",
+  definition = function(theObject,
+                        feature_new,
+                        method,
+                        B,
+                        nthread)
+  {
+    ## shortcuts:
+    feat <- theObject@feature_train
+    tr <- theObject@tr_train
+    yobs <- theObject@yobs_train
+    predmode <- theObject@predmode
+    ntrain <- length(tr)
+
+    ############################################################################
+    # parametric bootstrap based ###############################################
+
+    # if (method %in% c("pF1", "pF2")) {
+    #   if (method == "pF1") {
+    #     createbootstrappedData <- function() {
+    #       feat_b <<- feat
+    #       tr_b <<- tr
+    #
+    #       # retrain the first stage to be more variable in unsure positions:
+    #       yobs_0 <- yobs[tr == 0]
+    #       yobs_1 <- yobs[tr == 1]
+    #       X_0 <- feat[tr == 0,]
+    #       X_1 <- feat[tr == 1,]
+    #       smpl0 <- sample(1:length(yobs_0),
+    #                       size = round(length(yobs_0) * .66),
+    #                       replace = FALSE)
+    #       smpl1 <- sample(1:length(yobs_1),
+    #                       size = round(length(yobs_1) * .66),
+    #                       replace = FALSE)
+    #
+    #       m_0 <<-
+    #         ranger(yobs_0 ~ .,
+    #                data = cbind(X_0, yobs_0)[smpl0, ],
+    #                write.forest = TRUE)
+    #       m_1 <<-
+    #         ranger(yobs_1 ~ .,
+    #                data = cbind(X_1, yobs_1)[smpl1, ],
+    #                write.forest = TRUE)
+    #
+    #       # pretend m1 and m2 are correct
+    #       y_fitted <- ifelse(
+    #         tr_b == 1,
+    #         predict(m_1, data = feat_b)$predictions,
+    #         predict(m_0, data = feat_b)$predictions
+    #       )
+    #
+    #       y_res <- yobs - y_fitted
+    #       yobs_b <<- y_fitted + sample(y_res, replace = TRUE)
+    #     }
+    #
+    #     pred_B <-
+    #       as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+    #     for (b in 1:B) {
+    #       print(b)
+    #       createbootstrappedData()
+    #       tau_estimate <-
+    #         EstimateCate(X_RF(feat_b, tr_b, yobs_b,  predmode),
+    #                      feature_new = feature_new)
+    #       tau_truth <-
+    #         predict(m_1, data = feature_new)$predictions -
+    #         predict(m_0, data = feature_new)$predictions
+    #       pred_B[, b] <- tau_estimate - tau_truth
+    #     }
+    #     # get the predictions from the original method
+    #     pred <- EstimateCate(theObject, feature_new = feature_new)
+    #
+    #     # the the 5% and 95% CI from the bootstrapped procedure
+    #     CI_b <- data.frame(
+    #       X5. =  apply(pred_B, 1, function(x)
+    #         quantile(x, c(.025))),
+    #       X95. = apply(pred_B, 1, function(x)
+    #         quantile(x, c(.975))),
+    #       sd = apply(pred_B, 1, function(x)
+    #         sd(x))
+    #     )
+    #
+    #     return(data.frame(
+    #       pred = pred,
+    #       # X5. =  pred - 1.96 * CI_b$sd,
+    #       # X95. = pred + 1.96 * CI_b$sd
+    #       # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
+    #       # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
+    #       X5. =  pred + CI_b$X5.,
+    #       X95. = pred + CI_b$X95.
+    #     ))
+    #   }
+    #
+    #   if (method == "pF2") {
+    #     createbootstrappedData <- function() {
+    #       feat_b <<- feat
+    #       tr_b <<- tr
+    #
+    #       #####
+    #       ##### retrain the first stage to be more variable in unsure positions:
+    #       yobs_0 <- yobs[tr == 0]
+    #       yobs_1 <- yobs[tr == 1]
+    #       X_0 <- feat[tr == 0,]
+    #       X_1 <- feat[tr == 1,]
+    #       smpl0 <- sample(1:length(yobs_0),
+    #                       size = round(length(yobs_0) * .66),
+    #                       replace = FALSE)
+    #       smpl1 <- sample(1:length(yobs_1),
+    #                       size = round(length(yobs_1) * .66),
+    #                       replace = FALSE)
+    #       estm_b <<- X_RF(
+    #         feat = rbind(X_0[smpl0,], X_1[smpl1,]),
+    #         tr = c(rep(0, length(smpl0)), rep(1, length(smpl1))),
+    #         yobs = c(yobs_0[smpl0], yobs_1[smpl1])
+    #       )
+    #
+    #       # (a) create bernoulli with propscore:
+    #       prop_scores <-
+    #         predict(estm_b@m_prop, data = feat_b)$predictions
+    #       M_b <- rbinom(length(tr_b), 1, prop_scores)
+    #
+    #       # (b)
+    #       y_fitted <-
+    #         ifelse(
+    #           tr_b == 1,
+    #           ifelse(
+    #             M_b == 1,
+    #             predict(estm_b@m_1,     data = feat_b)$predictions,
+    #             predict(estm_b@m_0,     data = feat_b)$predictions +
+    #               predict(estm_b@m_tau_1, data = feat_b)$predictions
+    #           ),
+    #           ifelse(
+    #             M_b == 1,
+    #             predict(estm_b@m_1,     data = feat_b)$predictions -
+    #               predict(estm_b@m_tau_0, data = feat_b)$predictions,
+    #             predict(estm_b@m_0,     data = feat_b)$predictions
+    #           )
+    #         )
+    #
+    #       y_res <- yobs - y_fitted
+    #       yobs_b <<- y_fitted
+    #       yobs_b[tr_b == 1] <<-
+    #         yobs_b[tr_b == 1] + sample(y_res[tr_b == 1], replace = TRUE)
+    #       yobs_b[tr_b == 0] <<-
+    #         yobs_b[tr_b == 0] + sample(y_res[tr_b == 0], replace = TRUE)
+    #     }
+    #
+    #     pred_B <-
+    #       as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+    #     for (b in 1:B) {
+    #       print(b)
+    #       createbootstrappedData()
+    #       tau_estimate <-
+    #         EstimateCate(X_RF(feat_b, tr_b, yobs_b, predmode),
+    #                      feature_new = feature_new)
+    #       tau_truth <-     EstimateCate(estm_b,
+    #                                     feature_new = feature_new)
+    #       pred_B[, b] <- tau_estimate - tau_truth
+    #     }
+    #     # get the predictions from the original method
+    #     pred <- EstimateCate(theObject, feature_new = feature_new)
+    #
+    #     # the the 5% and 95% CI from the bootstrapped procedure
+    #     CI_b <- data.frame(
+    #       X5. =  apply(pred_B, 1, function(x)
+    #         quantile(x, c(.025))),
+    #       X95. = apply(pred_B, 1, function(x)
+    #         quantile(x, c(.975))),
+    #       sd = apply(pred_B, 1, function(x)
+    #         sd(x))
+    #     )
+    #
+    #     return(data.frame(
+    #       pred = pred,
+    #       # X5. =  pred - 1.96 * CI_b$sd,
+    #       # X95. = pred + 1.96 * CI_b$sd
+    #       # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
+    #       # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
+    #       X5. =  pred + CI_b$X5.,
+    #       X95. = pred + CI_b$X95.
+    #     ))
+    #   }
+    # }
+
+    ############################################################################
+    # standard bootstrap based #################################################
+
+    if (method %in% c("defaultBS", "n2FBS", "n2TBS")) {
+      # if (method == "defaultBS") {
+      #   createbootstrappedData <- function() {
+      #     smpl <- sample(1:ntrain, replace = TRUE, size = ntrain)
+      #     feat_b <<- feat[smpl,]
+      #     tr_b <<- tr[smpl]
+      #     yobs_b <<- yobs[smpl]
+      #   }
+      # }
+      # if (method == "n2FBS") {
+      #   createbootstrappedData <- function() {
+      #     smpl <- sample(1:ntrain,
+      #                    replace = FALSE,
+      #                    size = round(ntrain / 2))
+      #     feat_b <<- feat[smpl,]
+      #     tr_b <<- tr[smpl]
+      #     yobs_b <<- yobs[smpl]
+      #   }
+      # }
+
+      if (method == "n2TBS") {
+        createbootstrappedData <- function() {
+          smpl <- sample(1:ntrain,
+                         replace = TRUE,
+                         size = round(ntrain / 2))
+          return(list(
+            feat_b = feat[smpl,],
+            tr_b = tr[smpl],
+            yobs_b = yobs[smpl]
+          ))
+        }
+      }
+
+      #### Run the bootstrap CI estimation #####################################
+
+      # pred_B will contain for each simulation the prediction of each of the B
+      # simulaions:
+      pred_B <- as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+      for (b in 1:B) {
+        print(b)
+        bs <- createbootstrappedData()
+        pred_B[, b] <-
+          EstimateCate(X_RF(
+            feat = bs$feat_b,
+            tr = bs$tr_b,
+            yobs = bs$yobs_b,
+            predmode,
+            nthread = nthread
+          ),
+          feature_new = feature_new)
+      }
+
+      # get the predictions from the original method
+      pred <- EstimateCate(theObject, feature_new = feature_new)
+      # the the 5% and 95% CI from the bootstrapped procedure
+      CI_b <- data.frame(
+        X5. =  apply(pred_B, 1, function(x)
+          quantile(x, c(.025))),
+        X95. = apply(pred_B, 1, function(x)
+          quantile(x, c(.975))),
+        sd = apply(pred_B, 1, function(x)
+          sd(x))
       )
+
+      return(data.frame(
+        pred = pred,
+        X5. =  pred - 1.96 * CI_b$sd,
+        X95. = pred + 1.96 * CI_b$sd
+        # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
+        # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
+        # X5. =  2 * pred - CI_b$X95.,
+        # X95. = 2 * pred - CI_b$X5.
+      ))
     }
   }
 )
