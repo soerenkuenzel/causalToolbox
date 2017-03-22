@@ -27,8 +27,8 @@ for (ntrain in ntrain_loop) {
         alpha = .1,
         setup = setup
       )
-
-      forest <-
+        forest <-
+            tryCatch({
         causalForest(
           X = experiment$feat_tr,
           Y = experiment$Yobs_tr,
@@ -36,9 +36,21 @@ for (ntrain in ntrain_loop) {
           num.trees = 100,
           sample.size = round(length(experiment$Yobs_tr) / 2)
         )
-      #make predictions on the test sample
-      predictions = predict(forest, experiment$feat_te)
-
+            },
+        error = function(e){
+            print(e)
+            NA
+        })
+                                        #make predictions on the test sample
+        
+        predictions <-
+            tryCatch({
+                predict(forest, experiment$feat_te)
+            },
+            error = function(e){
+                NA}
+            )
+      
       CIs <- tryCatch({
         #get confidence intervals on the predictions
         forest.ci = randomForestInfJack(forest,
@@ -48,9 +60,16 @@ for (ntrain in ntrain_loop) {
       },
       error = function(e) {
         print(e)
-        forest.ci = randomForestInfJack(forest,
-                                        experiment$feat_te,
-                                        calibrate = FALSE)
+        forest.ci <- tryCatch({
+            randomForestInfJack(forest,
+                                experiment$feat_te,
+                                calibrate = FALSE)
+        },
+        error = function(e){
+            print(e)
+            NA
+        })
+        
         cbind(predictions, forest.ci)
       })
 
