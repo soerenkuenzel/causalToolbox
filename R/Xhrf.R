@@ -167,8 +167,8 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
 
     m_0 <-
       honestRF(
@@ -555,7 +555,7 @@ setMethod(
                          replace = TRUE,
                          size = round(ntrain / 2))
           return(list(
-            feat_b = feat[smpl, ],
+            feat_b = feat[smpl,],
             tr_b = tr[smpl],
             yobs_b = yobs[smpl]
           ))
@@ -598,6 +598,7 @@ setMethod(
             })
           went_wrong <- went_wrong + 1
         }
+      }
 
 
       # get the predictions from the original method
@@ -621,6 +622,6 @@ setMethod(
         # X5. =  2 * pred - CI_b$X95.,
         # X95. = 2 * pred - CI_b$X5.
       ))
-    }
   }
-          )
+  }
+  )
