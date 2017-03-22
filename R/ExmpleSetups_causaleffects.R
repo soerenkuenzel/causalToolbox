@@ -119,7 +119,7 @@ simulate_causal_experiment <- function(ntrain,
   ## Now we introduce different setups:
   # 1.) RespSparseTau1strong:
   if (setup == "RespSparseTau1strong") {
-    if(dim < 3)
+    if (dim < 3)
       stop("For RespSparseTau1strong the dimension must be at least 3")
 
     m_t_truth <-
@@ -155,7 +155,7 @@ simulate_causal_experiment <- function(ntrain,
 
   # 2.) Response is sparse; Tau has only two weak predictor:
   if (setup == "RsparseT2weak") {
-    if(dim < 3)
+    if (dim < 3)
       stop("For RsparseT2weak the dimension must be at least 3")
 
     m_t_truth <-
@@ -189,9 +189,53 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+  if (setup == "complexTau") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1421)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, 1, 30)
+    beatt_raw <- runif(dim, 1, 30)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      betac_trunc <- beatc_raw[1:ncol(feat)]
+      as.matrix(feat) %*% betac_trunc                 # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beatt_trunc <- beatt_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beatt_trunc                  # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
   ## If nothing was returned by now, then something went wrong and we want to
   # throw an error:
-  stop("setup must be one of RespSparseTau1strong, RsparseT2weak")
+  stop("setup must be one of RespSparseTau1strong, RsparseT2weak, complexTau")
 }
 
 # #
@@ -247,30 +291,6 @@ simulate_causal_experiment <- function(ntrain,
 #   }
 #   propscore <- function(feat) .5                    # propensity score
 #   # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# #
-# setup_TTMpp <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "TTMpp"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   # set.seed(1145)
-#   beatc.raw <- runif(dim,1, 30)
-#   beatt.raw <- runif(dim,1, 30)
-#
-#   m_t_truth <<- function(feat){
-#     beta.m <- beatc.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m                  # mu^t
-#   }
-#   m_c_truth <<- function(feat){
-#     beta.m <- beatt.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m                  # mu^t
-#   }
-#   propscore <- function(feat) .5                    # propensity score
-#
 #
 #   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
 # }
