@@ -7,6 +7,8 @@ files <- dir("tests/ConfidenceIntervals/data/")
 
 CI <- data.frame()
 for (file in files) {
+  if (substr(file, 1, 12) == "causalForest")
+    next
   setup <-
     gsub("([^_]*)(_[^_]*)(_[^_]*)(_[^_]*)(_[^_.]*).csv" ,
          "\\1",
@@ -59,7 +61,8 @@ for (setup_i in setup_loop) {
         next
 
       coverage <-
-        CI_selected %>% mutate(covered = X5. <= tau & tau  <= X95.) %>%
+        CI_selected %>% mutate(covered = X5. <= tau &
+                                 tau  <= X95.) %>%
         summarize(sum(covered) / n()) %>% as.numeric()
 
       CI_selected_sampled <- CI_selected %>% sample_n(70)
@@ -83,7 +86,16 @@ for (setup_i in setup_loop) {
         theme_bw() +
         ylab("predicted CATE") +
         xlab("true CATE") +
-        ggtitle(paste0(setup, ", dim  =", dim_i, ", n =", n_i, ", alpha = .1",  ", coverage =", coverage))
+        ggtitle(paste0(
+          setup_i,
+          ", dim  =",
+          dim_i,
+          ", n =",
+          n_i,
+          ", alpha = .1",
+          ", coverage =",
+          coverage
+        ))
 
       ggsave(
         paste0(
