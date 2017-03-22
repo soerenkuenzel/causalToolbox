@@ -8,12 +8,12 @@ set.seed(seed)
 setup_loop <-
   c("RsparseT2weak", "RespSparseTau1strong", "complexTau")
 dim_loop <- c(20, 50, 100)
-ntrain_loop <- c(100, 500, 1000, 200)
+ntrain_loop <- c(100, 500, 1000, 2000, 10000, 100000)
 
 # Experiment 1:
-for (setup in setup_loop) {
-  for (dim in dim_loop) {
-    for (ntrain in ntrain_loop){
+for (ntrain in ntrain_loop){
+  for (setup in setup_loop) {
+    for (dim in dim_loop) {
       print(paste("setup =", setup, "dim =", dim, "ntrain =", ntrain))
 
       experiment <- simulate_causal_experiment(
