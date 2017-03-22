@@ -14,3 +14,5 @@ Tune/XLearner/tuneXRsparseT2weak12N1000.csv
 *.csv
 *#
 tests/crashes/Rdies.R
+
+*.pdf
