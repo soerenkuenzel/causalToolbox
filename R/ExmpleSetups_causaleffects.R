@@ -276,17 +276,17 @@ simulate_causal_experiment <- function(ntrain,
 
     current_seed <- .Random.seed  # saves the current random stage
     set.seed(1444)                # introduces a new seed to stay consistent
-    beat.raw <- runif(dim, 1, 30)
+    beat_raw <- runif(dim, 1, 30)
     .Random.seed <-
       current_seed  # sets back the current random stage
 
     m_t_truth <- function(feat) {
-      beta.m <- beat.raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
+      beta_m <- beat_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
     }
     m_c_truth <- function(feat) {
-      beta.m <- beat.raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
+      beta_m <- beat_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
     }
     propscore <-
       function(feat)
@@ -326,12 +326,12 @@ simulate_causal_experiment <- function(ntrain,
       current_seed  # sets back the current random stage
 
     m_t_truth <- function(feat) {
-      beta.m <- beat.raw[1:ncol(feat)]
+      beta_m <- beatc_raw[1:ncol(feat)]
       as.matrix(feat) %*% beta.m                      # mu^t
     }
     m_c_truth <- function(feat) {
-      beta.m <- beat.raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta.m                      # mu^t
+      beta.m <- beatc_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta_m                      # mu^t
     }
     propscore <-
       function(feat)
