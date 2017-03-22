@@ -5,8 +5,9 @@ library(hte)
 seed <- 2
 set.seed(seed)
 
-setup_loop <-
-  c("RsparseT2weak", "RespSparseTau1strong", "complexTau")
+setup_loop <- c("Conf1", "STMpp", "Ufail", "Usual1", "Wager1")
+# c("RespSparseTau1strong", "RsparseT2weak", "complexTau", "Conf1", "rare1",
+# "STMpp", "Ufail", "Usual1", "Wager1", "Wager2", "Wager3")
 dim_loop <- c(20, 50, 100)
 ntrain_loop <- c(100, 500, 1000, 2000, 10000, 100000)
 

@@ -8,8 +8,10 @@ library(causalForest)
 seed <- 2
 set.seed(seed)
 
-setup_loop <-
-  c("RsparseT2weak", "RespSparseTau1strong", "complexTau")
+setup_loop <- c("Conf1", "STMpp", "Ufail", "Usual1", "Wager1")
+# c("RespSparseTau1strong", "RsparseT2weak", "complexTau", "Conf1", "rare1",
+# "STMpp", "Ufail", "Usual1", "Wager1", "Wager2", "Wager3")
+
 dim_loop <- c(20, 50, 100)
 ntrain_loop <- c(100, 500, 1000, 2000, 10000, 100000)
 
@@ -42,7 +44,7 @@ for (ntrain in ntrain_loop) {
             NA
         })
                                         #make predictions on the test sample
-        
+
         predictions <-
             tryCatch({
                 predict(forest, experiment$feat_te)
@@ -50,7 +52,7 @@ for (ntrain in ntrain_loop) {
             error = function(e){
                 NA}
             )
-      
+
       CIs <- tryCatch({
         #get confidence intervals on the predictions
         forest.ci = randomForestInfJack(forest,
@@ -69,7 +71,7 @@ for (ntrain in ntrain_loop) {
             print(e)
             NA
         })
-        
+
         cbind(predictions, forest.ci)
       })
 
