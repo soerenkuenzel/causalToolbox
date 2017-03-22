@@ -8,17 +8,20 @@ set.seed(seed)
 setup_loop <-
   c("RsparseT2weak", "RespSparseTau1strong", "complexTau")
 dim_loop <- c(20, 50, 100)
+ntrain_loop <- c(100, 500, 1000, 200)
 
 # Experiment 1:
 for (setup in setup_loop) {
   for (dim in dim_loop) {
-    for (ntrain in c(100, 500, 1000, 2000)) {
+    for (ntrain in ntrain_loop){
+      print(paste("setup =", setup, "dim =", dim, "ntrain =", ntrain))
+
       experiment <- simulate_causal_experiment(
         ntrain = ntrain,
         ntest = 1000,
         dim = dim,
         alpha = .1,
-        setup = "RsparseT2weak"
+        setup = setup
       )
 
       L <- X_RF(
@@ -28,16 +31,22 @@ for (setup in setup_loop) {
         predmode = "propmean",
         ntree_first = 100,
         ntree = 100,
-        nthread = 32
+        nthread = 24
       )
 
-      mean((experiment$tau_te - EstimateCate(L, experiment$feat_te)) ^ 2)
-      CIs <- CateCI(L, feature_new = experiment$feat_te, B = 100)
+      CIs <- tryCatch({
+          CateCI(L, feature_new = experiment$feat_te, B = 100)
+      },
+      error = function(e){
+          print(e)
+          NA
+      }
+      )
 
       write.csv(
         cbind(CIs, experiment$tau_te),
         file = paste0(
-          "tests/ConfidenceIntervals/data/",
+          "data/",
           setup,
           "_n",
           ntrain,
