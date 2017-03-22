@@ -167,8 +167,8 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0,]
-    X_1 <- feat[tr == 1,]
+    X_0 <- feat[tr == 0, ]
+    X_1 <- feat[tr == 1, ]
 
     m_0 <-
       honestRF(
@@ -319,7 +319,11 @@ setMethod(
 ############################
 setGeneric(
   name = "CateCI",
-  def = function(theObject, feature_new, method = "n2TBS", B, nthread = 8)
+  def = function(theObject,
+                 feature_new,
+                 method = "n2TBS",
+                 B,
+                 nthread = 8)
   {
     standardGeneric("CateCI")
   }
@@ -551,7 +555,7 @@ setMethod(
                          replace = TRUE,
                          size = round(ntrain / 2))
           return(list(
-            feat_b = feat[smpl,],
+            feat_b = feat[smpl, ],
             tr_b = tr[smpl],
             yobs_b = yobs[smpl]
           ))
@@ -562,20 +566,39 @@ setMethod(
 
       # pred_B will contain for each simulation the prediction of each of the B
       # simulaions:
-      pred_B <- as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+      pred_B <-
+        as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
       for (b in 1:B) {
         print(b)
         bs <- createbootstrappedData()
-        pred_B[, b] <-
-          EstimateCate(X_RF(
-            feat = bs$feat_b,
-            tr = bs$tr_b,
-            yobs = bs$yobs_b,
-            predmode,
-            nthread = nthread
-          ),
-          feature_new = feature_new)
-      }
+
+
+        went_wrong <-
+          0 # if that is 100 we really cannot fit it and bootstrap
+        # seems to be infeasible.
+        while (is.na(pred_B[1, b])) {
+          if (went_wrong == 100)
+            stop("one of the groups might be too small to
+                 do valid inference.")
+          pred_B[, b] <-
+            tryCatch({
+              EstimateCate(
+                X_RF(
+                  feat = bs$feat_b,
+                  tr = bs$tr_b,
+                  yobs = bs$yobs_b,
+                  predmode,
+                  nthread = nthread
+                ),
+                feature_new = feature_new
+              )
+            },
+            error = function(e) {
+              return(NA)
+            })
+          went_wrong <- went_wrong + 1
+        }
+
 
       # get the predictions from the original method
       pred <- EstimateCate(theObject, feature_new = feature_new)
@@ -600,4 +623,4 @@ setMethod(
       ))
     }
   }
-)
+          )
