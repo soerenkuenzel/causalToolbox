@@ -20,7 +20,9 @@
 #' @param given_features This is used, if we already have features and want to test
 #' the performance of different estimators for a particular set of features.
 #' @param setup This is used to specify the function form of the potential
-#' outcomes and the treatment assignment.
+#' outcomes and the treatment assignment. One of
+#' RespSparseTau1strong, RsparseT2weak, complexTau,
+#' Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3.
 #' @return A list of the transformed object `x`, and encoding information
 #' `labels`.
 #' @export simulate_causal_experiment
