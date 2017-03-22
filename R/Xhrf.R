@@ -570,9 +570,6 @@ setMethod(
         as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
       for (b in 1:B) {
         print(b)
-        bs <- createbootstrappedData()
-
-
         went_wrong <-
           0 # if that is 100 we really cannot fit it and bootstrap
         # seems to be infeasible.
@@ -582,6 +579,10 @@ setMethod(
                  do valid inference.")
           pred_B[, b] <-
             tryCatch({
+
+              bs <- createbootstrappedData()
+
+
               EstimateCate(
                 X_RF(
                   feat = bs$feat_b,
