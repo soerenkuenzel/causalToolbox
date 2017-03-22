@@ -23,6 +23,10 @@
 #' outcomes and the treatment assignment. One of
 #' RespSparseTau1strong, RsparseT2weak, complexTau,
 #' Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3.
+#' @param testseed is the seed used to generate the testing data, if NULL, then
+#' the seed of the main session is used.
+#' @param trainseed is the seed used to generate the training data, if NULL,
+#' then the seed of the main session is used.
 #' @return A list of the transformed object `x`, and encoding information
 #' `labels`.
 #' @export simulate_causal_experiment
@@ -32,7 +36,9 @@ simulate_causal_experiment <- function(ntrain,
                                        alpha = .1,
                                        feat_distribution = "normal",
                                        given_features = NULL,
-                                       setup = "RespSparseTau1strong") {
+                                       setup = "RespSparseTau1strong",
+                                       testseed = NULL,
+                                       trainseed = NULL) {
   if (!is.null(given_features))
     stop("We have not implemented this yet.")
 
@@ -99,21 +105,43 @@ simulate_causal_experiment <- function(ntrain,
           m_c_truth(feat) + rnorm(nn, 0, 1)   # control
         ))
       }
-      feat_te <- given_features_fkt(ntest, dim)
-      W_te <- getW(feat_te)
+
+      ## fixing the training and testing seed (if given) without changing the
+      # seed of the seesion:
+      # first save the current random seed, then set the seed to what we like,
+      # and then set the seed back to what it was.
+
+      if (!is.null(trainseed)) {
+        current_seed <- .Random.seed  # saves the current random stage
+        set.seed(trainseed)           # introduces a new seed to stay consistent
+      }
       feat_tr <- given_features_fkt(ntrain, dim)
       W_tr <- getW(feat_tr)
+      Yobs_tr <- getYobs(feat_tr, W_tr)
+      if (!is.null(trainseed)) {
+        .Random.seed <- current_seed  # sets back the current random stage
+      }
+      if (!is.null(testseed)) {
+        current_seed <- .Random.seed  # saves the current random stage
+        set.seed(testseed)          # introduces a new seed to stay consistent
+      }
+      feat_te <- given_features_fkt(ntest, dim)
+      W_te <- getW(feat_te)
+      Yobs_te <- getYobs(feat_te, W_te)
+      if (!is.null(testseed)) {
+        .Random.seed <- current_seed  # sets back the current random stage
+      }
       return(
         list(
           alpha = alpha,
           feat_te = feat_te,
           W_te = W_te,
           tau_te = tau(feat_te),
-          Yobs_te = getYobs(feat_te, W_te),
+          Yobs_te = Yobs_te,
           feat_tr = feat_tr,
           W_tr = W_tr,
           tau_tr = tau(feat_tr),
-          Yobs_tr = getYobs(feat_tr, W_tr)
+          Yobs_tr = Yobs_tr
         )
       )
     }
