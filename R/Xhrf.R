@@ -167,8 +167,8 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0,]
-    X_1 <- feat[tr == 1,]
+    X_0 <- feat[tr == 0, ]
+    X_1 <- feat[tr == 1, ]
 
     m_0 <-
       honestRF(
@@ -555,7 +555,7 @@ setMethod(
                          replace = TRUE,
                          size = round(ntrain / 2))
           return(list(
-            feat_b = feat[smpl,],
+            feat_b = feat[smpl, ],
             tr_b = tr[smpl],
             yobs_b = yobs[smpl]
           ))
@@ -579,9 +579,7 @@ setMethod(
                  do valid inference.")
           pred_B[, b] <-
             tryCatch({
-
               bs <- createbootstrappedData()
-
 
               EstimateCate(
                 X_RF(
@@ -625,4 +623,4 @@ setMethod(
       ))
   }
   }
-  )
+)

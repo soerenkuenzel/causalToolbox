@@ -189,6 +189,7 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+  # 3.) complex tau : control and treated group have nothing in common
   if (setup == "complexTau") {
     # the following is used so that the seed is fixed for the creation of this
     # data set, but th seed is set back afterwards:
@@ -233,144 +234,325 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+  # 4.) treatment effect and treatment assignment are dependent
+  if (setup == "Conf1") {
+    m_t_truth <- function(feat) {
+      2 * feat$x1 - 100 * feat$x2      # mu^t
+    }
+    m_c_truth <- function(feat) {
+      2 * feat$x1 + 2 * feat$x2      # mu^c
+    }
+    propscore <-
+      function(feat)
+        max(0.05, min(.95, feat$x1 / 2 + 1 / 4))             # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 5.) few treated
+  if (setup == "rare1") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1444)                # introduces a new seed to stay consistent
+    beat.raw <- runif(dim, 1, 30)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      beta.m <- beat.raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beta.m <- beat.raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
+    }
+    propscore <-
+      function(feat)
+        .01                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 6.) no treatment effect
+  if (setup == "STMpp") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(112)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, 1, 30)
+    beatt_raw <- runif(dim, 1, 30)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      beta.m <- beat.raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta.m                      # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beta.m <- beat.raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta.m                      # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 7.) Ufail
+  if (setup == "Ufail") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    beat.raw <- (1:5 - 3)
+
+    m_t_truth <- function(feat) {
+      dim <- ncol(feat)
+      beta.m <- c(beat.raw, rep(0, dim - 5))
+      as.matrix(feat) %*% beta.m                  # mu^t
+    }
+    m_c_truth <- function(feat) {
+      dim <- ncol(feat)
+      beta.m <- rep(0, dim)
+      as.matrix(feat) %*% beta.m                  # mu^c
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 8.) Usual 1
+  if (setup == "Usual1") {
+    if (dim < 3)
+      stop("For Usual1 the dimension must be at least 3")
+
+    m_t_truth <-
+      function(feat)
+        3 * feat$x1 + 4 * feat$x2  + 30 * feat$x3  # mu^t
+    m_c_truth <-
+      function(feat)
+        3 * feat$x1 + 5 * feat$x2               # mu^c
+    propscore <-
+      function(feat)
+        .5                                     # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 9.) Wager1
+  if (setup == "Wager1") {
+    if (dim < 3)
+      stop("For Wager1 the dimension must be at least 3")
+
+    m_t_truth <-
+      function(feat)
+        2 * (feat$x1  - 0.5)  # mu^t
+    m_c_truth <-
+      function(feat)
+        2 * (feat$x1  - 0.5)  # mu^c
+    propscore <-
+      function(feat)
+        0.25 + dbeta(feat$x1, 2, 4) / 4  # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 10.) Wager2
+  if (setup == "Wager2") {
+    if (dim < 2)
+      stop("For Wager2 the dimension must be at least 2")
+    effect <- function(feat) {
+      (1 + 1 / (1 + exp(-20 * (feat$x1 - 1 / 3)))) *
+        (1 + 1 / (1 + exp(-20 * (feat$x2 - 1 / 3))))
+    }
+    m_t_truth <-
+      function(feat)
+        1 / 2 * effect(feat) # mu^t
+    m_c_truth <-
+      function(feat)
+        - 1 / 2 * effect(feat) # mu^c
+    propscore <-
+      function(feat)
+        .5                                      # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  # 11.) Wager 3
+  if (setup == "Wager3") {
+    if (dim < 2)
+      stop("For Wager3 the dimension must be at least 2")
+
+    effect <- function(feat) {
+      4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
+             (1 + exp(-12 * (feat$x2 - 0.5))))
+    }
+
+    m_t_truth <-
+      function(feat)
+        1 / 2 * effect(feat)  # mu^t
+    m_c_truth <-
+      function(feat)
+        - 1 / 2 * effect(feat) # mu^c
+    propscore <-
+      function(feat)
+        .5 # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
   ## If nothing was returned by now, then something went wrong and we want to
   # throw an error:
-  stop("setup must be one of RespSparseTau1strong, RsparseT2weak, complexTau")
+  stop(
+    "setup must be one of RespSparseTau1strong, RsparseT2weak, complexTau,
+    Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3"
+  )
 }
-
-# #
-# setup_Conf1 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Conf1"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   m_t_truth <<- function(feat) 2 * feat$x1 - 100 * feat$x2      # mu^t
-#   m_c_truth <<- function(feat) 2 * feat$x1 + 2 * feat$x2      # mu^c
-#   propscore <- function(feat) max(0.05, min(.95, feat$x1 / 2 + 1/4))             # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# # Response is sparse; Tau has only two weak predictor:
-# setup_rare1 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "rare1"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   # set.seed(11)
-#   beat.raw <- runif(dim, 1, 30)
-#   m_t_truth <<- function(feat){
-#     beta.m <- beat.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
-#   }
-#   m_c_truth <<- function(feat){
-#     beta.m <- beat.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
-#   }
-#   propscore <- function(feat) .01                               # propensity score
-#   # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# #
-# setup_STMpp <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "STMpp"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   # set.seed(112)
-#   beat.raw <- runif(dim,1, 30)
-#
-#   m_t_truth <<- function(feat){
-#     beta.m <- beat.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m                      # mu^t
-#   }
-#   m_c_truth <<- function(feat){
-#     beta.m <- beat.raw[1:ncol(feat)]
-#     as.matrix(feat) %*% beta.m                      # mu^t
-#   }
-#   propscore <- function(feat) .5                    # propensity score
-#   # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# setup_Ufail <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Ufail"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   beat.raw <- (1:5 - 3)
-#
-#   m_t_truth <<- function(feat){
-#     dim <- ncol(feat)
-#     beta.m <- c(beat.raw, rep(0, dim - 5))
-#     as.matrix(feat) %*% beta.m                  # mu^t
-#   }
-#   m_c_truth <<- function(feat){
-#     dim <- ncol(feat)
-#     beta.m <- rep(0, dim)
-#     as.matrix(feat) %*% beta.m                  # mu^c
-#   }
-#   propscore <- function(feat) .5                    # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# setup_Usual1 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Usual1"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   m_t_truth <<- function(feat) 3 * feat$x1 + 4 * feat$x2  + 30 * feat$x3    # mu^t
-#   m_c_truth <<- function(feat) 3 * feat$x1 + 5 * feat$x2               # mu^c
-#   propscore <- function(feat) .5
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# setup_Wager1 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Wager1"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   m_t_truth <<- function(feat) 2 * (feat$x1  - 0.5)         # mu^t
-#   m_c_truth <<- function(feat) 2 * (feat$x1  - 0.5)         # mu^c
-#   propscore <- function(feat) 0.25 + dbeta(feat$x1, 2, 4) / 4  # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# setup_Wager2 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Wager2"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   effect <- function(feat){
-#     (1 + 1 / (1 + exp(-20 * (feat$x1 - 1 / 3)))) *
-#       (1 + 1 / (1 + exp(-20 * (feat$x2 - 1 / 3))))
-#   }
-#   m_t_truth <<- function(feat)    1/2 * effect(feat)        # mu^t
-#   m_c_truth <<- function(feat)   -1/2 * effect(feat)        # mu^c
-#   propscore <- function(feat) 0.5                           # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, alpha, ...)
-# }
-#
-#
-# setup_Wager3 <- function(ntrain, ntest, dim, alpha = 0, ...){
-#   setup_name <<- "Wager3"
-#   if(exists("alpha")) setup_name <<- paste0(setup_name, alpha)
-#
-#   # Setup potential outcome functions:
-#   effect <- function(feat){
-#     4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
-#            (1 + exp(-12 * (feat$x2 - 0.5))))
-#   }
-#   m_t_truth <<- function(feat)    1/2 * effect(feat)        # mu^t
-#   m_c_truth <<- function(feat)   -1/2 * effect(feat)        # mu^c
-#   propscore <- function(feat) 0.5                           # propensity score
-#
-#   createTrainAndTest_base(ntrain, ntest, dim, m_t_truth, m_c_truth, propscore, ...)
-# }
-#
