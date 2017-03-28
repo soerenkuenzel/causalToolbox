@@ -18,19 +18,20 @@ EstimateCate(xl, feat)
 
 # Example 2: large n
 set.seed(400189)
-n <- 100
+n <- 2000
 d <- 12
 
 feat <- as.data.frame(matrix(rnorm(n*d), nrow = n))
 tr <- rbinom(n, 1, feat$V1/ 20 +.5)
 yobs <- feat$V1  + feat$V2 + tr * feat$V3
 
-# this takes approximately 20 min to run.
+# this takes approximately 2 min to run.
 xl <- X_RF(
   feat = feat,
   tr = tr,
   yobs = yobs,
   nthread = 8
 )
+EstimateCate(xl, feat)
 
 
