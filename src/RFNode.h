@@ -38,7 +38,7 @@ public:
   void predict(
     std::vector<double> &outputPrediction,
     std::vector<size_t>* updateIndex,
-    std::vector<std::vector<double>>* xNew,
+    std::vector< std::vector<double> >* xNew,
     DataFrame* trainingData
   );
 

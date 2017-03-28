@@ -33,7 +33,7 @@ public:
 
   void predict(
     std::vector<double> &outputPrediction,
-    std::vector<std::vector<double>>* xNew
+    std::vector< std::vector<double> >* xNew
   );
 
   void recursivePartition(
@@ -83,9 +83,9 @@ public:
 
 private:
   DataFrame* _trainingData;
-  size_t _mtry=3;
-  size_t _nodeSizeSpt=5;
-  size_t _nodeSizeAvg=5;
+  size_t _mtry;
+  size_t _nodeSizeSpt;
+  size_t _nodeSizeAvg;
   std::vector<size_t>* _averagingSampleIndex;
   std::vector<size_t>* _splittingSampleIndex;
   RFNode* _root;

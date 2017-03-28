@@ -4,6 +4,10 @@
 #include <set>
 #include <map>
 #include <tuple>
+#include <random>
+#include <algorithm>
+// [[Rcpp::plugins(cpp11)]]
+
 
 honestRFTree::honestRFTree():
   _trainingData(0), _mtry(0), _nodeSizeSpt(0), _nodeSizeAvg(0),
@@ -33,7 +37,7 @@ honestRFTree::honestRFTree(
     throw "sample size cannot be 0.";
   }
 
-  if (mtry == 0 | mtry > (*trainingData).getNumColumns()) {
+  if (mtry == 0 || mtry > (*trainingData).getNumColumns()) {
     throw "mtry must be positive and cannot exceed total amount of features";
   }
 
@@ -67,7 +71,7 @@ void honestRFTree::setDummyTree(
 
 void honestRFTree::predict(
   std::vector<double> &outputPrediction,
-  std::vector<std::vector<double>>* xNew
+  std::vector< std::vector<double> >* xNew
 ){
 
   struct rangeGenerator {
@@ -109,7 +113,7 @@ void honestRFTree::recursivePartition(
                     &featureList, averagingSampleIndex, splittingSampleIndex);
 
   // Create a leaf node if the current bestSplitValue is NA
-  if (isnan(bestSplitValue)) {
+  if (std::isnan(bestSplitValue)) {
     std::vector<size_t> *averagingSampleIndex_ =
             new std::vector<size_t>(*averagingSampleIndex);
     std::vector<size_t> *splittingSampleIndex_ =
@@ -209,7 +213,7 @@ void honestRFTree::selectBestFeature(
   size_t* bestSplitFeatureAll = new size_t[mtry];
   size_t* bestSplitCountAll = new size_t[mtry];
 
-  for (int i=0; i<mtry; i++) {
+  for (size_t i=0; i<mtry; i++) {
     bestSplitLossAll[i] = -std::numeric_limits<double>::infinity();
     bestSplitValueAll[i] = std::numeric_limits<double>::quiet_NaN();
     bestSplitFeatureAll[i] = std::numeric_limits<size_t>::quiet_NaN();
@@ -217,7 +221,7 @@ void honestRFTree::selectBestFeature(
   }
 
   // Iterate each selected features
-  for (int i=0; i<mtry; i++) {
+  for (size_t i=0; i<mtry; i++) {
     size_t currentFeature = (*featureList)[i];
     // Test if the current feature is in the categorical list
     std::vector<size_t> categorialCols = *(*getTrainingData()).getCatCols();
@@ -231,7 +235,7 @@ void honestRFTree::selectBestFeature(
       double splitTotalSum = 0;
       size_t splitTotalCount = 0;
       size_t averageTotalCount = 0;
-      for (int j=0; j<(*splittingSampleIndex).size(); j++){
+      for (size_t j=0; j<(*splittingSampleIndex).size(); j++){
         all_categories.insert(
                 (*getTrainingData()).getPoint((*splittingSampleIndex)[j],
                                               currentFeature));
@@ -239,7 +243,7 @@ void honestRFTree::selectBestFeature(
                 getOutcomePoint((*splittingSampleIndex)[j]);
         splitTotalCount++;
       }
-      for (int j=0; j<(*averagingSampleIndex).size(); j++){
+      for (size_t j=0; j<(*averagingSampleIndex).size(); j++){
         all_categories.insert(
                 (*getTrainingData()).getPoint((*averagingSampleIndex)[j],
                                               currentFeature));
@@ -258,7 +262,7 @@ void honestRFTree::selectBestFeature(
         splittingCategoryYSum[*it] = 0;
       }
 
-      for (int j=0; j<(*splittingSampleIndex).size(); j++){
+      for (size_t j=0; j<(*splittingSampleIndex).size(); j++){
         double currentXValue = (*getTrainingData()).
                 getPoint((*splittingSampleIndex)[j], currentFeature);
         double currentYValue = (*getTrainingData()).
@@ -267,7 +271,7 @@ void honestRFTree::selectBestFeature(
         splittingCategoryYSum[currentXValue] += currentYValue;
       }
 
-      for (int j=0; j<(*averagingSampleIndex).size(); j++){
+      for (size_t j=0; j<(*averagingSampleIndex).size(); j++){
         double currentXValue = (*getTrainingData()).
                 getPoint((*averagingSampleIndex)[j], currentFeature);
         averagingCategoryCount[currentXValue] += 1;
@@ -328,7 +332,7 @@ void honestRFTree::selectBestFeature(
     std::vector<dataPair> splittingData;
     std::vector<dataPair> averagingData;
     double splitTotalSum = 0;
-    for (int j=0; j<(*splittingSampleIndex).size(); j++){
+    for (size_t j=0; j<(*splittingSampleIndex).size(); j++){
       // Retrieve the current feature value
       double tmpFeatureValue = (*getTrainingData()).
               getPoint((*splittingSampleIndex)[j], currentFeature);
@@ -345,7 +349,7 @@ void honestRFTree::selectBestFeature(
       );
     }
 
-    for (int j=0; j<(*averagingSampleIndex).size(); j++){
+    for (size_t j=0; j<(*averagingSampleIndex).size(); j++){
       // Retrieve the current feature value
       double tmpFeatureValue = (*getTrainingData()).
               getPoint((*averagingSampleIndex)[j], currentFeature);
@@ -502,7 +506,7 @@ void honestRFTree::selectBestFeature(
   double bestSplitLoss_ = -std::numeric_limits<double>::infinity();
   std::vector<size_t> bestFeatures;
 
-  for (int i=0; i<mtry; i++) {
+  for (size_t i=0; i<mtry; i++) {
     if (bestSplitLossAll[i] > bestSplitLoss_) {
       bestSplitLoss_ = bestSplitLossAll[i];
     }
@@ -512,7 +516,7 @@ void honestRFTree::selectBestFeature(
 
   for (size_t i=0; i<mtry; i++) {
     if (bestSplitLossAll[i] == bestSplitLoss_) {
-      for (int j=0; j<bestSplitCountAll[i]; j++){
+      for (size_t j=0; j<bestSplitCountAll[i]; j++){
         bestFeatures.push_back(i);
       }
 //      std::cout << bestSplitLossAll[i] << std::endl;

@@ -11,7 +11,7 @@ DataFrame::DataFrame():
 DataFrame::~DataFrame(){}
 
 DataFrame::DataFrame(
-  std::vector<std::vector<double>>* featureData,
+  std::vector< std::vector<double> >* featureData,
 //  std::vector<std::string>* featureNames,
   std::vector<double>* outcomeData,
 //  std::string outcomeName,

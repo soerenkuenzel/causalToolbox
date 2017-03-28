@@ -1,4 +1,10 @@
 #include "honestRF.h"
+// [[Rcpp::plugins(openmp)]]
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include <random>
+#include <algorithm>
 
 honestRF::honestRF():
   _trainingData(0), _ntree(0), _replace(0), _sampSize(0), _splitRatio(0),
@@ -38,7 +44,16 @@ honestRF::honestRF(
 
   std::vector<honestRFTree> *forest = new std::vector<honestRFTree>;
 
-  for (size_t i=0; i<getNtree(); i++) {
+  #ifdef _OPENMP
+    int nProcessors=omp_get_max_threads();
+      std::cout<<nProcessors<<std::endl;
+      omp_set_num_threads(nProcessors);
+      std::cout<<omp_get_num_threads()<<std::endl;
+      #pragma omp parallel for
+      for (size_t i=0; i<getNtree(); i++) {
+  #else
+    for (size_t i=0; i<getNtree(); i++) {
+  #endif
 
     if (isVerbose()) {
       std::cout << "Start training tree # " << (i + 1) << std::endl;
@@ -105,7 +120,7 @@ honestRF::honestRF(
 }
 
 std::vector<double>* honestRF::predict(
-  std::vector<std::vector<double>>* xNew
+  std::vector< std::vector<double> >* xNew
 ){
   std::vector<double> *prediction = new std::vector<double>;
   size_t numObservations = (*xNew)[0].size();

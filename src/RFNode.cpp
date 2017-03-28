@@ -1,5 +1,5 @@
 #include "RFNode.h"
-
+#include <algorithm>
 RFNode::RFNode():
   _averagingSampleIndex(0), _splittingSampleIndex(0), _splitFeature(0),
   _splitValue(0), _leftChild(0), _rightChild(0), _averageCount(0),
@@ -66,7 +66,7 @@ void RFNode::setSplitNode(
 void RFNode::predict(
   std::vector<double> &outputPrediction,
   std::vector<size_t>* updateIndex,
-  std::vector<std::vector<double>>* xNew,
+  std::vector< std::vector<double> >* xNew,
   DataFrame* trainingData
 ){
 
@@ -88,12 +88,8 @@ void RFNode::predict(
       outputPrediction[*it] = predictedMean;
     }
   } else {
-    std::vector<size_t>* leftPartitionIndex = (std::vector<size_t>*)
-            malloc(sizeof(std::vector<size_t>));
-    std::vector<size_t>* rightPartitionIndex = (std::vector<size_t>*)
-            malloc(sizeof(std::vector<size_t>));
-    new (leftPartitionIndex) std::vector<size_t>();
-    new (rightPartitionIndex) std::vector<size_t>();
+    std::vector<size_t>* leftPartitionIndex = new std::vector<size_t>;
+    std::vector<size_t>* rightPartitionIndex = new std::vector<size_t>;
 
     // Test if the splitting feature is categorical
     std::vector<size_t> categorialCols = *(*trainingData).getCatCols();

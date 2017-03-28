@@ -24,11 +24,11 @@ SEXP rcpp_cppBuildInterface(
   bool verbose){
 
   try {
-    std::vector<std::vector<double>> featureData =
-      Rcpp::as<std::vector<std::vector<double>> >(x);
+    std::vector< std::vector<double> > featureData =
+      Rcpp::as< std::vector< std::vector<double> > >(x);
 
-    std::vector<std::vector<double>>* featureDataRcpp =
-      new std::vector<std::vector<double>>(featureData);
+    std::vector< std::vector<double> >* featureDataRcpp =
+      new std::vector< std::vector<double> >(featureData);
 
     // std::vector<std::string> featureNames =
     //   Rcpp::as< std::vector<std::string> >(colNames);
@@ -87,8 +87,8 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
   try {
     Rcpp::XPtr<honestRF> testFullForest(forest) ;
 
-    std::vector<std::vector<double>> featureData =
-      Rcpp::as<std::vector<std::vector<double>> >(x);
+    std::vector< std::vector<double> > featureData =
+      Rcpp::as< std::vector< std::vector<double> > >(x);
 
     // // Print first two trees
     // std::vector<honestRFTree>* firstForest = (*testFullForest).getForest();

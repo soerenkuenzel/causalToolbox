@@ -26,7 +26,7 @@ public:
   );
 
   std::vector<double>* predict(
-    std::vector<std::vector<double>>* xNew
+    std::vector< std::vector<double> >* xNew
   );
 
   DataFrame* getTrainingData(){
