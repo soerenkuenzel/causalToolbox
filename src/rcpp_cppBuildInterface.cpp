@@ -69,11 +69,14 @@ SEXP rcpp_cppBuildInterface(
 
     Rcpp::XPtr<honestRF> p(testFullForest, true) ;
 
+    return p;
+
   } catch (const char *msg) {
     std::cerr << msg << std::endl;
+
+    return NULL;
   }
 
-  return p;
 }
 
 // [[Rcpp::export]]
@@ -96,8 +99,11 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
 
     Rcpp::NumericVector output = Rcpp::wrap(*testForestPrediction);
 
+    return output;
+
   } catch (const char *msg) {
     std::cerr << msg << std::endl;
+
+    return NULL;
   }
-  return output;
 }

@@ -35,6 +35,8 @@ for (p in 1:length(nfeatures)){
 # RF_result = read.table("tests/performance/RFResult")
 # randomForest_result = read.table("tests/performance/randomForestResult")
 
+library(ggplot2)
+
 for (i in 1:length(nfeatures)){
   df <- data.frame(nrows,
                    honestRFResult[,i],
