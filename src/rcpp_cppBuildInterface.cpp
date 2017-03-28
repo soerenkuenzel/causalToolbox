@@ -23,50 +23,56 @@ SEXP rcpp_cppBuildInterface(
   int seed,
   bool verbose){
 
-  std::vector<std::vector<double>> featureData =
-    Rcpp::as<std::vector<std::vector<double>> >(x);
+  try {
+    std::vector<std::vector<double>> featureData =
+      Rcpp::as<std::vector<std::vector<double>> >(x);
 
-  std::vector<std::vector<double>>* featureDataRcpp =
-    new std::vector<std::vector<double>>(featureData);
+    std::vector<std::vector<double>>* featureDataRcpp =
+      new std::vector<std::vector<double>>(featureData);
 
-  // std::vector<std::string> featureNames =
-  //   Rcpp::as< std::vector<std::string> >(colNames);
-  //
-  // std::string outcomeName = (Rcpp::as< std::vector<std::string> >(yName))[0];
+    // std::vector<std::string> featureNames =
+    //   Rcpp::as< std::vector<std::string> >(colNames);
+    //
+    // std::string outcomeName = (Rcpp::as< std::vector<std::string> >(yName))[0];
 
-  std::vector<double> outcomeData = Rcpp::as< std::vector<double> >(y);
-  std::vector<double>* outcomeDataRcpp =
-    new std::vector<double>(outcomeData);
+    std::vector<double> outcomeData = Rcpp::as< std::vector<double> >(y);
+    std::vector<double>* outcomeDataRcpp =
+      new std::vector<double>(outcomeData);
 
-  std::vector<size_t> categoricalFeatureCols =
-    Rcpp::as< std::vector<size_t> >(catCols);
-  std::vector<size_t>* categoricalFeatureColsRcpp =
-    new std::vector<size_t>(categoricalFeatureCols);
+    std::vector<size_t> categoricalFeatureCols =
+      Rcpp::as< std::vector<size_t> >(catCols);
+    std::vector<size_t>* categoricalFeatureColsRcpp =
+      new std::vector<size_t>(categoricalFeatureCols);
 
-  DataFrame* trainingData = new DataFrame(
-    featureDataRcpp,
-    // &featureNames,
-    outcomeDataRcpp,
-    // outcomeName,
-    categoricalFeatureColsRcpp,
-    (size_t) numRows,
-    (size_t) numColumns
-  );
+    DataFrame* trainingData = new DataFrame(
+      featureDataRcpp,
+      // &featureNames,
+      outcomeDataRcpp,
+      // outcomeName,
+      categoricalFeatureColsRcpp,
+      (size_t) numRows,
+      (size_t) numColumns
+    );
 
-  honestRF *testFullForest = new honestRF(
-    trainingData,
-    (size_t) ntree,
-    replace,
-    (size_t) sampsize,
-    splitratio,
-    (size_t) mtry,
-    (size_t) nodesizeSpl,
-    (size_t) nodesizeAvg,
-    (unsigned int) seed,
-    verbose
-  );
+    honestRF *testFullForest = new honestRF(
+      trainingData,
+      (size_t) ntree,
+      replace,
+      (size_t) sampsize,
+      splitratio,
+      (size_t) mtry,
+      (size_t) nodesizeSpl,
+      (size_t) nodesizeAvg,
+      (unsigned int) seed,
+      verbose
+    );
 
-  Rcpp::XPtr<honestRF> p(testFullForest, true) ;
+    Rcpp::XPtr<honestRF> p(testFullForest, true) ;
+
+  } catch (const char *msg) {
+    std::cerr << msg << std::endl;
+  }
+
   return p;
 }
 
@@ -75,19 +81,23 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
   SEXP forest,
   Rcpp::List x){
 
-  Rcpp::XPtr<honestRF> testFullForest(forest) ;
+  try {
+    Rcpp::XPtr<honestRF> testFullForest(forest) ;
 
-  std::vector<std::vector<double>> featureData =
-    Rcpp::as<std::vector<std::vector<double>> >(x);
+    std::vector<std::vector<double>> featureData =
+      Rcpp::as<std::vector<std::vector<double>> >(x);
 
-  // // Print first two trees
-  // std::vector<honestRFTree>* firstForest = (*testFullForest).getForest();
-  // (*firstForest)[0].printTree();
+    // // Print first two trees
+    // std::vector<honestRFTree>* firstForest = (*testFullForest).getForest();
+    // (*firstForest)[0].printTree();
 
-  std::vector<double>* testForestPrediction =
-    (*testFullForest).predict(&featureData);
+    std::vector<double>* testForestPrediction =
+      (*testFullForest).predict(&featureData);
 
-  Rcpp::NumericVector output = Rcpp::wrap(*testForestPrediction);
+    Rcpp::NumericVector output = Rcpp::wrap(*testForestPrediction);
 
+  } catch (const char *msg) {
+    std::cerr << msg << std::endl;
+  }
   return output;
 }
