@@ -3,7 +3,7 @@ nfeatures <- c(3, 5, 20)
 nrows <- c(20, 100, 500, 1000, 10000)
 randomForestResult <- matrix(numeric(), nrow=length(nrows), ncol=length(nfeatures))
 rangerResult <- matrix(numeric(), nrow=length(nrows), ncol=length(nfeatures))
-honestRFResult <- matrix(numeric(), nrow=length(nrows), ncol=length(nfeatures))
+# honestRFResult <- matrix(numeric(), nrow=length(nrows), ncol=length(nfeatures))
 honestRFCppResult <- matrix(numeric(), nrow=length(nrows), ncol=length(nfeatures))
 
 library(ranger)
@@ -18,9 +18,9 @@ for (p in 1:length(nfeatures)){
     rf_brei <- randomForest(x, y)
     randomForestResult[[n, p]] <- difftime(Sys.time(), start_time, units='secs')
     start_time <- Sys.time()
-    rf_our <- RF(x, y, nthread=10)
-    honestRFResult[[n, p]] <- difftime(Sys.time(), start_time, units='secs')
-    start_time <- Sys.time()
+    # rf_our <- RF(x, y, nthread=10)
+    # honestRFResult[[n, p]] <- difftime(Sys.time(), start_time, units='secs')
+    # start_time <- Sys.time()
     rf_cpp <- honestRFRcpp(x, y)
     honestRFCppResult[[n, p]] <- difftime(Sys.time(), start_time, units='secs')
     start_time <- Sys.time()
@@ -38,20 +38,34 @@ for (p in 1:length(nfeatures)){
 library(ggplot2)
 
 for (i in 1:length(nfeatures)){
-  df <- data.frame(nrows,
-                   honestRFResult[,i],
-                   honestRFCppResult[,i],
-                   rangerResult[, i],
-                   randomForestResult[,i])
-  colnames(df) <- c("nrows", "honestRF_R", "honestRF_Rcpp", "ranger", "randomForest")
-  ggplot(df, aes(nrows)) +
-    geom_line(aes(y=honestRF_R, fill="honestRF_R"), colour="red") +
-    geom_line(aes(y=honestRF_Rcpp, fill="honestRF_Rcpp"), colour="green")  +
-    geom_line(aes(y=ranger, fill="ranger"), colour="blue") +
-    geom_line(aes(y=randomForest, fill="randomForest"), colour="yellow")  +
-    scale_colour_manual(values = c("red", "green", "blue", "yellow")) +
+  df <- data.frame(
+    nrows=nrows,
+    # honestRFResult[,i],
+    hte=honestRFCppResult[,i],
+    ranger=rangerResult[, i],
+    randomForest=randomForestResult[,i]
+    )
+
+  colnames(df) <- c(
+    "nrows",
+    "honestRF_Rcpp",
+    "ranger",
+    "randomForest")
+
+  ggplot(df,
+    aes(x=nrows)) +
+    # geom_line(aes(y=honestRF_R, fill="honestRF_R"), colour="hte_R") +
+    geom_line(aes(y=honestRF_Rcpp, colour="hte"))  +
+    geom_line(aes(y=ranger, colour="ranger")) +
+    geom_line(aes(y=randomForest, colour="randomForest"))  +
+    scale_colour_manual(values = c(
+      "hte" = "red",
+      "ranger" = "green",
+      "randomForest" = "blue")) +
     xlab("nrows") +
     ylab("running time (seconds)")+
-    ggtitle(paste("Comparision when total features = ", nfeatures[i]))
+    ggtitle(paste("Comparision when total features = ", nfeatures[i])) +
+    theme_classic()
+
   ggsave(paste("tests/performance/nfeatures", nfeatures[i], ".pdf", sep=""), width = 13, height = 8)
 }
