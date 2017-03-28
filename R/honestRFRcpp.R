@@ -51,6 +51,7 @@ setClass(
 #' and all the data is used for the averaging data set (This is not a good
 #' usage however since there will be no data available for splitting).
 #' @param seed random seed
+#' @param verbose if training process in verbose mode
 #' @export honestRFRcpp
 setGeneric(
   name="honestRFRcpp",
@@ -64,7 +65,8 @@ setGeneric(
     nodesizeSpl,
     nodesizeAvg,
     splitratio,
-    seed
+    seed,
+    verbose
     ){
     standardGeneric("honestRFRcpp")
   }
@@ -86,7 +88,8 @@ honestRFRcpp <- function(
   nodesizeSpl=5,
   nodesizeAvg=5,
   splitratio=1,
-  seed=24750371
+  seed=24750371,
+  verbose=FALSE
   ){
 
   # Preprocess the data
@@ -112,7 +115,7 @@ honestRFRcpp <- function(
       categoricalFeatureCols_cpp,
       nObservations,
       numColumns, ntree, replace, sampsize, mtry,
-      splitratio, nodesizeSpl, nodesizeAvg, seed
+      splitratio, nodesizeSpl, nodesizeAvg, seed, verbose
   )
 
   # Create a forest object

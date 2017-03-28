@@ -20,7 +20,8 @@ SEXP rcpp_cppBuildInterface(
   double splitratio,
   int nodesizeSpl,
   int nodesizeAvg,
-  int seed){
+  int seed,
+  bool verbose){
 
   std::vector<std::vector<double>> featureData =
     Rcpp::as<std::vector<std::vector<double>> >(x);
@@ -61,7 +62,8 @@ SEXP rcpp_cppBuildInterface(
     (size_t) mtry,
     (size_t) nodesizeSpl,
     (size_t) nodesizeAvg,
-    (unsigned int) seed
+    (unsigned int) seed,
+    verbose
   );
 
   Rcpp::XPtr<honestRF> p(testFullForest, true) ;

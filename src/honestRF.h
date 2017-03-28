@@ -21,7 +21,8 @@ public:
     size_t mtry,
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
-    unsigned int seed
+    unsigned int seed,
+    bool verbose
   );
 
   std::vector<double>* predict(
@@ -68,6 +69,10 @@ public:
     return _forest;
   }
 
+  bool isVerbose(){
+    return _verbose;
+  }
+
 private:
   DataFrame* _trainingData;
   size_t _ntree;
@@ -79,6 +84,7 @@ private:
   size_t _nodeSizeAvg;
   std::vector<honestRFTree>* _forest;
   unsigned int _seed;
+  bool _verbose;
 };
 
 #endif //HTECPP_RF_H

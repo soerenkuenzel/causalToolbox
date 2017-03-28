@@ -2,7 +2,8 @@
 
 honestRF::honestRF():
   _trainingData(0), _ntree(0), _replace(0), _sampSize(0), _splitRatio(0),
-  _mtry(0), _nodeSizeSpt(0), _nodeSizeAvg(0), _forest(0), _seed(0) {};
+  _mtry(0), _nodeSizeSpt(0), _nodeSizeAvg(0), _forest(0), _seed(0),
+  _verbose(0){};
 
 honestRF::~honestRF(){};
 
@@ -15,7 +16,8 @@ honestRF::honestRF(
   size_t mtry,
   size_t nodeSizeSpt,
   size_t nodeSizeAvg,
-  unsigned int seed
+  unsigned int seed,
+  bool verbose
 ){
   this->_trainingData = trainingData;
   this->_ntree = ntree;
@@ -26,6 +28,7 @@ honestRF::honestRF(
   this->_nodeSizeSpt = nodeSizeSpt;
   this->_nodeSizeAvg = nodeSizeAvg;
   this->_seed = seed;
+  this->_verbose = verbose;
 
   srand(getSeed());
 
@@ -36,6 +39,10 @@ honestRF::honestRF(
   std::vector<honestRFTree> *forest = new std::vector<honestRFTree>;
 
   for (size_t i=0; i<getNtree(); i++) {
+
+    if (isVerbose()) {
+      std::cout << "Start training tree # " << (i + 1) << std::endl;
+    }
 
     std::vector<size_t> sampleIndex;
     if (isReplacement()) {
