@@ -34,8 +34,6 @@ honestRF::honestRF(
   this->_seed = seed;
   this->_verbose = verbose;
 
-  srand(getSeed());
-
   if (splitRatio > 1 || splitRatio < 0) {
     throw "splitRatio shoule be between 0 and 1.";
   }
@@ -43,7 +41,7 @@ honestRF::honestRF(
   std::vector<honestRFTree> *forest = new std::vector<honestRFTree>;
 
   const size_t maxThreads = std::thread::hardware_concurrency();
-  std::cout << "Parallel using " << maxThreads << " threads..." << std::endl;
+//  std::cout << "Parallel using " << maxThreads << " threads..." << std::endl;
   std::vector<std::thread> allThreads(maxThreads);
   std::mutex threadLock;
 
@@ -51,19 +49,21 @@ honestRF::honestRF(
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
         // loop over all items
-        for (int i=iStart; i < iEnd; i++){
+        for (int i = iStart; i < iEnd; i++){
+
+          unsigned int myseed = getSeed() * (i + 1);
 
           std::vector<size_t> sampleIndex;
           if (isReplacement()) {
             while (sampleIndex.size() < getSampleSize()) {
               size_t randomIndex = (size_t)
-                      (rand() % ((int) (*getTrainingData()).getNumRows()));
+                      (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
               sampleIndex.push_back(randomIndex);
             }
           } else {
             while (sampleIndex.size() < getSampleSize()) {
               size_t randomIndex = (size_t)
-                      (rand() % ((int) (*getTrainingData()).getNumRows()));
+                      (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
               if (sampleIndex.size() == 0 ||
                   std::find(sampleIndex.begin(),
                             sampleIndex.end(),
@@ -103,9 +103,10 @@ honestRF::honestRF(
           }
 
           honestRFTree *oneTree = new honestRFTree(
-                  getTrainingData(), getMtry(),
-                  getNodeSizeSpt(), getNodeSizeAvg(),
-                  splitSampleIndex, averageSampleIndex
+            getTrainingData(), getMtry(),
+            getNodeSizeSpt(), getNodeSizeAvg(),
+            splitSampleIndex, averageSampleIndex,
+            myseed
           );
 
           std::lock_guard<std::mutex> lock(threadLock);
@@ -140,14 +141,38 @@ std::vector<double>* honestRF::predict(
     (*prediction).push_back(0);
   }
 
-  for (size_t i=0; i<getNtree(); i++) {
-    std::vector<double> currentTreePrediction(numObservations);
-    honestRFTree currentTree = (*getForest())[i];
-    currentTree.predict(currentTreePrediction, xNew);
-    for (size_t j=0; j<numObservations; j++){
-      (*prediction)[j] += currentTreePrediction[j];
-    }
+  const size_t maxThreads = std::thread::hardware_concurrency();
+//  std::cout << "Parallel using " << maxThreads << " threads..." << std::endl;
+  std::vector<std::thread> allThreads(maxThreads);
+  std::mutex threadLock;
+
+  for (size_t t = 0; t < maxThreads; t++) {
+    auto dummyThread = std::bind(
+      [&](const int iStart, const int iEnd, const int t) {
+        // loop over all items
+        for (int i=iStart; i < iEnd; i++){
+          std::vector<double> currentTreePrediction(numObservations);
+          honestRFTree currentTree = (*getForest())[i];
+          currentTree.predict(currentTreePrediction, xNew);
+          std::lock_guard<std::mutex> lock(threadLock);
+          for (size_t j=0; j<numObservations; j++){
+            (*prediction)[j] += currentTreePrediction[j];
+          }
+        }
+      },
+      t * getNtree() / maxThreads,
+      (t + 1) == maxThreads ? getNtree() : (t + 1) * getNtree() / maxThreads,
+      t
+    );
+    allThreads[t] = std::thread(dummyThread);
   }
+
+  std::for_each(
+          allThreads.begin(),
+          allThreads.end(),
+          [](std::thread& x){x.join();}
+  );
+
   for (size_t j=0; j<numObservations; j++){
     (*prediction)[j] /= getNtree();
   }

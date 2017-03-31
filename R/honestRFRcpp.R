@@ -88,7 +88,7 @@ honestRFRcpp <- function(
   nodesizeSpl=5,
   nodesizeAvg=5,
   splitratio=1,
-  seed=24750371,
+  seed=as.integer(runif(1)*1000),
   verbose=FALSE
   ){
 

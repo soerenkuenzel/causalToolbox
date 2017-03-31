@@ -21,7 +21,8 @@ honestRFTree::honestRFTree(
   size_t nodeSizeSpt,
   size_t nodeSizeAvg,
   std::vector<size_t>* averagingSampleIndex,
-  std::vector<size_t>* splittingSampleIndex
+  std::vector<size_t>* splittingSampleIndex,
+  unsigned int myseed
 ){
   if (nodeSizeAvg == 0 || nodeSizeSpt == 0) {
     throw "nodeSize cannot be set to 0.";
@@ -50,7 +51,7 @@ honestRFTree::honestRFTree(
   RFNode *root = new RFNode();
   this->_root = root;
   recursivePartition(*root, getAveragingIndex(),
-                     getSplittingIndex());
+                     getSplittingIndex(), myseed);
 }
 
 void honestRFTree::setDummyTree(
@@ -90,13 +91,14 @@ void honestRFTree::predict(
 void honestRFTree::recursivePartition(
   RFNode &rootNode,
   std::vector<size_t>* averagingSampleIndex,
-  std::vector<size_t>* splittingSampleIndex
+  std::vector<size_t>* splittingSampleIndex,
+  unsigned int myseed
 ){
   // Sample mtry amounts of features
   std::vector<size_t> featureList;
 
   while (featureList.size() < getMtry()){
-    size_t randomIndex = (size_t) (rand() %
+    size_t randomIndex = (size_t) (rand_r(&myseed) %
             ((int) (*getTrainingData()).getNumColumns()));
     if (featureList.size() == 0 ||
         std::find(featureList.begin(),
@@ -110,7 +112,8 @@ void honestRFTree::recursivePartition(
   double bestSplitValue;
   double bestSplitLoss;
   selectBestFeature(bestSplitFeature, bestSplitValue, bestSplitLoss,
-                    &featureList, averagingSampleIndex, splittingSampleIndex);
+                    &featureList, averagingSampleIndex, splittingSampleIndex,
+                    myseed);
 
   // Create a leaf node if the current bestSplitValue is NA
   if (std::isnan(bestSplitValue)) {
@@ -185,9 +188,9 @@ void honestRFTree::recursivePartition(
 //    std::cout << "Preparing to create right child: #split " << splittingRightPartitionIndex.size() << " #average" << averagingRightPartitionIndex.size() << std::endl;
 //    std::cout << "========" << std::endl;
     recursivePartition(*leftChild, &averagingLeftPartitionIndex,
-                       &splittingLeftPartitionIndex);
+                       &splittingLeftPartitionIndex, myseed);
     recursivePartition(*rightChild, &averagingRightPartitionIndex,
-                       &splittingRightPartitionIndex);
+                       &splittingRightPartitionIndex, myseed);
 //    std::cout << "Preparing merging " << bestSplitFeature << ' ' << bestSplitValue << std::endl;
     // Create the leaf node the connects to both children
 //    std::cout << "Merging left=" << leftChild << " right=" << rightChild << " to " << &rootNode << std::endl;
@@ -202,7 +205,8 @@ void honestRFTree::selectBestFeature(
   double &bestSplitLoss,
   std::vector<size_t>* featureList,
   std::vector<size_t>* averagingSampleIndex,
-  std::vector<size_t>* splittingSampleIndex
+  std::vector<size_t>* splittingSampleIndex,
+  unsigned int myseed
 ){
   // Get the number of total features
   size_t mtry = (*featureList).size();
@@ -315,7 +319,7 @@ void honestRFTree::selectBestFeature(
           if (currentSplitLoss == bestSplitLossAll[i]) {
             bestSplitCountAll[i] = bestSplitCountAll[i] + 1;
             // Only update with probability 1/nseen
-            double tmp_random = (double) rand() / RAND_MAX;
+            double tmp_random = (double) rand_r(&myseed) / RAND_MAX;
             if (tmp_random * bestSplitCountAll[i] <= 1) {
               bestSplitLossAll[i] = currentSplitLoss;
               bestSplitFeatureAll[i] = currentFeature;
@@ -477,7 +481,7 @@ void honestRFTree::selectBestFeature(
       if (muBarSquareSum > bestSplitLossAll[i]) {
         bestSplitLossAll[i] = muBarSquareSum;
         bestSplitFeatureAll[i] = currentFeature;
-        double tmp_random = (double) rand() / RAND_MAX;
+        double tmp_random = (double) rand_r(&myseed) / RAND_MAX;
         bestSplitValueAll[i] = tmp_random *
                                (newFeatureValue - featureValue) + featureValue;
         bestSplitCountAll[i] = 1;
@@ -486,11 +490,11 @@ void honestRFTree::selectBestFeature(
         if (muBarSquareSum == bestSplitLossAll[i]) {
           bestSplitCountAll[i] = bestSplitCountAll[i] + 1;
           // Only update with probability 1/nseen
-          double tmp_random = (double) rand() / RAND_MAX;
+          double tmp_random = (double) rand_r(&myseed) / RAND_MAX;
           if (tmp_random * bestSplitCountAll[i] <= 1) {
             bestSplitLossAll[i] = muBarSquareSum;
             bestSplitFeatureAll[i] = currentFeature;
-            tmp_random = (double) rand() / RAND_MAX;
+            tmp_random = (double) rand_r(&myseed) / RAND_MAX;
             bestSplitValueAll[i] = tmp_random * (newFeatureValue
                                                  - featureValue) + featureValue;
           }
@@ -527,7 +531,7 @@ void honestRFTree::selectBestFeature(
   if (bestFeatures.size() > 0) {
     // If there are multiple best features, sample one according to their
     // frequency of occurence
-    size_t tmp_random = rand() % bestFeatures.size();
+    size_t tmp_random = rand_r(&myseed) % bestFeatures.size();
     size_t bestFeatureIndex = bestFeatures.at(tmp_random);
     // Return the best splitFeature and splitValue
     bestSplitFeature = bestSplitFeatureAll[bestFeatureIndex];

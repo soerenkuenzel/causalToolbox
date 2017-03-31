@@ -18,7 +18,8 @@ public:
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
     std::vector<size_t>* averagingSampleIndex,
-    std::vector<size_t>* splittingSampleIndex
+    std::vector<size_t>* splittingSampleIndex,
+    unsigned int myseed
   );
 
   // This tree is only for testing purpose
@@ -39,7 +40,8 @@ public:
   void recursivePartition(
     RFNode &rootNode,
     std::vector<size_t>* averagingSampleIndex,
-    std::vector<size_t>* splittingSampleIndex
+    std::vector<size_t>* splittingSampleIndex,
+    unsigned int myseed
   );
 
   void selectBestFeature(
@@ -48,7 +50,8 @@ public:
     double& bestSplitLoss,
     std::vector<size_t>* featureList,
     std::vector<size_t>* averagingSampleIndex,
-    std::vector<size_t>* splittingSampleIndex
+    std::vector<size_t>* splittingSampleIndex,
+    unsigned int myseed
   );
 
   void printTree();

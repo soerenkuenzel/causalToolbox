@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 
 #include "DataFrame.h"
 #include "RFNode.h"
@@ -28,7 +29,7 @@ int main() {
   size_t numRows = 150;
   size_t numColumns = featureNames.size();
 
-  std::vector<std::vector<double>> featureData = {
+  std::vector< std::vector<double> > featureData = {
     {
       5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9,
       5.4, 4.8, 4.8, 4.3, 5.8, 5.7, 5.4, 5.1, 5.7, 5.1,
@@ -121,7 +122,7 @@ int main() {
     3
   };
 
-  DataFrame iris = DataFrame::DataFrame(
+  DataFrame iris = DataFrame(
     &featureData,
 //    &featureNames,
     &outcomeData,
@@ -209,11 +210,11 @@ int main() {
       }
 
       // Test RFNode constructor for leaf node
-      RFNode leafNode1 = RFNode::RFNode(
+      RFNode leafNode1 = RFNode(
         &leftPartitionIndex,
         &leftPartitionIndex
       );
-      RFNode leafNode2 = RFNode::RFNode(
+      RFNode leafNode2 = RFNode(
         &rightPartitionIndex,
         &rightPartitionIndex
       );
@@ -233,7 +234,7 @@ int main() {
       std::cout << std::endl;
 
       // Test RFNode constructor for tree node
-      RFNode splitNode = RFNode::RFNode(1, 3.1, &leafNode1, &leafNode2);
+      RFNode splitNode = RFNode(1, 3.1, &leafNode1, &leafNode2);
 
       std::cout << splitNode.is_leaf() << std::endl;
       std::cout << splitNode.getSplitValue() << std::endl;
@@ -255,7 +256,7 @@ int main() {
 
   if (TEST_RFTree) {
     try {
-      honestRFTree testDummyTree = honestRFTree::honestRFTree();
+      honestRFTree testDummyTree = honestRFTree();
       testDummyTree.setDummyTree(&iris, 4, 5, 5,
                                  &testAllSampleIndex, &testAllSampleIndex);
       double testBestSplitValue;
@@ -268,7 +269,8 @@ int main() {
         testBestSplitLoss,
         &testFeatureList,
         &testAllSampleIndex,
-        &testAllSampleIndex
+        &testAllSampleIndex,
+        24750371
       );
       // Expected 3
       std::cout << testBestSplitFeature << ' ';
@@ -283,7 +285,8 @@ int main() {
         testBestSplitLoss,
         &testFeatureList,
         &testAllSampleIndex,
-        &testAllSampleIndex
+        &testAllSampleIndex,
+        24750371
       );
       // Expected 0
       std::cout << testBestSplitFeature << ' ';
@@ -293,9 +296,10 @@ int main() {
 
       // Test full tree
       srand (24750371);
-      honestRFTree testFullTree = honestRFTree::honestRFTree(
+      honestRFTree testFullTree = honestRFTree(
         &iris, 4, 5, 5,
-        &testAllSampleIndex, &testAllSampleIndex
+        &testAllSampleIndex, &testAllSampleIndex,
+        24750371
       );
       // Test showtree
       testFullTree.printTree();
@@ -326,7 +330,7 @@ int main() {
     try {
       // Test RF
       honestRF testFullForest = honestRF(
-        &iris, 500, true, 150, 1, 3, 5, 5, 24750371
+        &iris, 500, true, 150, 1, 3, 5, 5, 24750371, true
       );
       // Print first two trees
       std::vector<honestRFTree>* forest = testFullForest.getForest();
