@@ -27,7 +27,7 @@ setClass(
   ),
   validity = function(object)
   {
-    if (!all(object@tr.train %in% c(0, 1))) {
+    if (!all(object@tr_train %in% c(0, 1))) {
       return("TR is the treatment and must be either 0 or 1")
     }
     return(TRUE)
@@ -53,7 +53,7 @@ setClass(
 #' @param nodesizeAvg ...
 #' @export T_RF
 setGeneric(
-  name = "X_RF",
+  name = "T_RF",
   def = function(feat,
                  tr,
                  yobs,
@@ -65,14 +65,14 @@ setGeneric(
                  nthread,
                  splitratio,
                  nodesizeAvg) {
-    standardGeneric("X_RF")
+    standardGeneric("T_RF")
   }
 )
 
-#' @title X_RF Constructor
-#' @rdname X_RF-X_RF
-#' @aliases X_RF, X_RF-X_RF
-#' @return A `X_RF` object.
+#' @title T_RF Constructor
+#' @rdname T_RF-T_RF
+#' @aliases T_RF, T_RF-T_RF
+#' @return A `T_RF` object.
 T_RF <-
   function(feat,
            tr,
@@ -81,7 +81,7 @@ T_RF <-
            nodesizeSpl = 1,
            nodesizeAvg = 3,
            replace = TRUE,
-           ntree = 5000,
+           ntree = 500,
            sample_fraction = 0.9,
            nthread = 4,
            splitratio = .5) {
@@ -173,8 +173,8 @@ setMethod(
   definition = function(theObject, feature_new)
   {
     return(
-      predict(theObject@m_y_t, data = feature_new)$predictions -
-        predict(theObject@m_y_c, data = feature_new)$predictions
+      predict(theObject@m_y_t, feature_new) -
+        predict(theObject@m_y_c, feature_new)
     )
   }
 )
