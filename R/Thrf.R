@@ -1,4 +1,4 @@
-# setOldClass("honestRF")
+#' @include EstimateCate.R
 
 ############################
 ### Tlearner - hRF ###
@@ -21,8 +21,8 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    m_y_t = "ranger",
-    m_y_c = "ranger",
+    m_y_t = "honestRF",
+    m_y_c = "honestRF",
     creator = "function"
   ),
   validity = function(object)
@@ -44,9 +44,13 @@ setClass(
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param mtry Number of variables to try at each node.
-#' @param nodesize ...asdasd
-#' @param replace ...asdasda
-#' @param ntree ...asdasd
+#' @param nodesize ...
+#' @param replace ...
+#' @param ntree ...
+#' @param sample_fraction ...
+#' @param nthread ...
+#' @param splitratio ...
+#' @param nodesizeAvg ...
 #' @export T_RF
 setGeneric(
   name = "X_RF",
@@ -75,7 +79,7 @@ T_RF <-
            yobs,
            mtry = ncol(feat),
            nodesizeSpl = 1,
-           nodesizeAvg = 1,
+           nodesizeAvg = 3,
            replace = TRUE,
            ntree = 5000,
            sample_fraction = 0.9,
@@ -151,18 +155,9 @@ T_RF <-
     )
   }
 
-
 ############################
 ### Estimate CATE Method ###
 ############################
-setGeneric(
-  name = "EstimateCate",
-  def = function(theObject, feature_new)
-  {
-    standardGeneric("EstimateCate")
-  }
-)
-
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_hRF
 #' @rdname EstimateCate-X_hRF
@@ -175,11 +170,12 @@ setGeneric(
 setMethod(
   f = "EstimateCate",
   signature = "T_RF",
-  definition = function(theObject, feature.new)
+  definition = function(theObject, feature_new)
   {
     return(
-      predict(theObject@m_y_t, data = feature.new)$predictions -
-        predict(theObject@m_y_c, data = feature.new)$predictions
+      predict(theObject@m_y_t, data = feature_new)$predictions -
+        predict(theObject@m_y_c, data = feature_new)$predictions
     )
   }
 )
+

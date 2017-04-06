@@ -1,4 +1,5 @@
-# setOldClass("honestRF")
+#' @include EstimateCate.R
+
 
 ############################
 ### Xlearner - hRF - hRF ###
@@ -259,12 +260,16 @@ X_RF <-
 ############################
 ### Estimate CATE Method ###
 ############################
-setGeneric(name="EstimateCate",
-           def=function(theObject, feature_new)
-           {
-             standardGeneric("EstimateCate")
-           }
-)
+
+# This is documented out, because we use the include statement in the beginning
+# of the document to be able to load the generic in many different places
+
+# setGeneric(name="EstimateCate",
+#            def=function(theObject, feature_new)
+#            {
+#              standardGeneric("EstimateCate")
+#            }
+# )
 
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_hRF
