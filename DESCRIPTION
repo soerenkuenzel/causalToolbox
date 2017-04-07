@@ -23,7 +23,7 @@ Collate:
     'RFNode.R'
     'RFTree.R'
     'RcppExports.R'
+    'honestRF.R'
     'Thrf.R'
     'Xhrf.R'
-    'honestRF.R'
     'honestRFTree.R'

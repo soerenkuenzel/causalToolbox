@@ -1,4 +1,7 @@
 #' @include EstimateCate.R
+#' @include honestRF.R
+setOldClass("honestRF")
+
 
 ############################
 ### Tlearner - hRF ###

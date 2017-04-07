@@ -10,7 +10,7 @@
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
-  secondstageVar = NULL, ntree_first = 500, ntree_second = 500,
+  secondstageVar = NULL, ntree_first = 100, ntree_second = 100,
   mtry_first = round(ncol(feat)/2), mtry_second = ncol(feat),
   min_node_size_spl_first = 3, min_node_size_ave_first = 3,
   min_node_size_spl_second = 5, min_node_size_ave_second = 3,
