@@ -1,6 +1,5 @@
 #' @include EstimateCate.R
 #' @include honestRF.R
-setOldClass("honestRF")
 
 ############################
 ### Xlearner - hRF - hRF ###
