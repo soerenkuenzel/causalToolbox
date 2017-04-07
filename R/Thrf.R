@@ -123,7 +123,7 @@ T_RF <-
       y = yobs_1,
       ntree = ntree,
       replace = replace,
-      sampsize = round(sample_fraction * length(yobs_0)),
+      sampsize = round(sample_fraction * length(yobs_1)),
       mtry = mtry,
       nodesize = nodesizeSpl,
       nodesizeAvg = nodesizeAvg,
@@ -161,14 +161,14 @@ T_RF <-
 ############################
 ### Estimate CATE Method ###
 ############################
-#' EstimateCate-X_hRF
-#' @name EstimateCate-X_hRF
-#' @rdname EstimateCate-X_hRF
+#' EstimateCate-T_hRF
+#' @name EstimateCate-T_hRF
+#' @rdname EstimateCate-T_hRF
 #' @description Return the estimated CATE
-#' @param object A `X_hRF` object.
+#' @param object A `T_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, X_hRF-method
+#' @aliases EstimateCate, T_hRF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
