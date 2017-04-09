@@ -1,77 +1,50 @@
-#include <algorithm>
 #include "DataFrame.h"
 
 DataFrame::DataFrame():
-  featureData(0),
-//  featureNames(0),
-  outcomeData(0),
-//  outcomeName(0),
-  categoricalFeatureCols(0), numRows(0), numColumns(0) {}
+  _featureData(nullptr), _outcomeData(nullptr),
+  _categoricalFeatureCols(nullptr), _numRows(0), _numColumns(0) {}
 
-DataFrame::~DataFrame(){}
+DataFrame::~DataFrame() {
+//  std::cout << "DataFrame() destructor is called." << std::endl;
+}
 
 DataFrame::DataFrame(
-  std::vector< std::vector<double> >* featureData,
-//  std::vector<std::string>* featureNames,
-  std::vector<double>* outcomeData,
-//  std::string outcomeName,
-  std::vector<size_t>* categoricalFeatureCols,
+  std::unique_ptr< std::vector< std::vector<double> > > featureData,
+  std::unique_ptr< std::vector<double> > outcomeData,
+  std::unique_ptr< std::vector<size_t> > categoricalFeatureCols,
   std::size_t numRows,
   std::size_t numColumns
 ) {
-  this->featureData = featureData;
-//  this->featureNames = featureNames;
-  this->outcomeData = outcomeData;
-//  this->outcomeName = outcomeName;
-  this->categoricalFeatureCols = categoricalFeatureCols;
-  this->numRows = numRows;
-  this->numColumns = numColumns;
+  this->_featureData = std::move(featureData);
+  this->_outcomeData = std::move(outcomeData);
+  this->_categoricalFeatureCols = std::move(categoricalFeatureCols);
+  this->_numRows = numRows;
+  this->_numColumns = numColumns;
 }
 
-double DataFrame::getPoint(size_t rowIndex, size_t colIndex){
+double DataFrame::getPoint(size_t rowIndex, size_t colIndex) {
   // Check if rowIndex and colIndex are valid
-  if (rowIndex < numRows && colIndex < numColumns) {
-    return (*featureData)[colIndex][rowIndex];
+  if (rowIndex < getNumRows() && colIndex < getNumColumns()) {
+    return (*getAllFeatureData())[colIndex][rowIndex];
   } else {
     throw "Invalid rowIndex or colIndex.";
   }
 }
 
-double DataFrame::getOutcomePoint(size_t rowIndex){
+double DataFrame::getOutcomePoint(size_t rowIndex) {
   // Check if rowIndex is valid
-  if (rowIndex < numRows) {
-    return (*outcomeData)[rowIndex];
+  if (rowIndex < getNumRows()) {
+    return (*getOutcomeData())[rowIndex];
   } else {
     throw "Invalid rowIndex.";
   }
 }
 
-//std::string DataFrame::getFeatureName(size_t colIndex){
-//  if (colIndex < numColumns) {
-//    return (*featureNames)[colIndex];
-//  } else {
-//    throw "Invalid colIndex.";
-//  }
-//}
-//
-//size_t DataFrame::getFeatureIndex(std::string colName){
-//  std::vector<std::string>::iterator searchColNam= std::find(
-//    (*featureNames).begin(),
-//    (*featureNames).end(),
-//    colName
-//  );
-//  if (searchColNam != (*featureNames).end()) {
-//    // Found
-//    ptrdiff_t colIndex = searchColNam - (*featureNames).begin();
-//    return (size_t) colIndex;
-//  } else {
-//    throw "Index name not found.";
-//  }
-//}
-
-std::vector<double>* DataFrame::getFeatureData(size_t colIndex){
-  if (colIndex < numColumns) {
-    return &(*featureData)[colIndex];
+std::vector<double>* DataFrame::getFeatureData(
+  size_t colIndex
+) {
+  if (colIndex < getNumColumns()) {
+    return &(*getAllFeatureData())[colIndex];
   } else {
     throw "Invalid colIndex.";
   }
@@ -80,24 +53,27 @@ std::vector<double>* DataFrame::getFeatureData(size_t colIndex){
 void DataFrame::getObservationData(
   std::vector<double> &rowData,
   size_t rowIndex
-){
-  if (rowIndex < numRows){
-    for (size_t i=0; i < numColumns; i++){
-      rowData[i] = (*featureData)[i][rowIndex];
+) {
+  if (rowIndex < getNumRows()) {
+    for (size_t i=0; i < getNumColumns(); i++) {
+      rowData[i] = (*getAllFeatureData())[i][rowIndex];
     }
   } else {
     throw "Invalid rowIndex.";
   }
 }
 
-double DataFrame::partitionMean(std::vector<size_t>* sampleIndex){
+double DataFrame::partitionMean(
+  std::vector<size_t>* sampleIndex
+){
   size_t totalSampleSize = (*sampleIndex).size();
   double accummulatedSum = 0;
-  for(std::vector<size_t>::iterator it = (*sampleIndex).begin();
-      it != (*sampleIndex).end();
-      ++it) {
+  for (
+    std::vector<size_t>::iterator it = (*sampleIndex).begin();
+    it != (*sampleIndex).end();
+    ++it
+  ) {
     accummulatedSum += getOutcomePoint(*it);
   }
-  return accummulatedSum/totalSampleSize;
+  return accummulatedSum / totalSampleSize;
 }
-

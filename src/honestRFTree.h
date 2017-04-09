@@ -8,6 +8,7 @@
 #include "RFNode.h"
 
 class honestRFTree {
+
 public:
   honestRFTree();
   virtual ~honestRFTree();
@@ -17,30 +18,31 @@ public:
     size_t mtry,
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
-    std::vector<size_t>* averagingSampleIndex,
-    std::vector<size_t>* splittingSampleIndex,
+    std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
+    std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
     unsigned int myseed
   );
 
   // This tree is only for testing purpose
   void setDummyTree(
-    DataFrame* trainingData,
     size_t mtry,
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
-    std::vector<size_t>* averagingSampleIndex,
-    std::vector<size_t>* splittingSampleIndex
+    std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
+    std::unique_ptr< std::vector<size_t> > splittingSampleIndex
   );
 
   void predict(
     std::vector<double> &outputPrediction,
-    std::vector< std::vector<double> >* xNew
+    std::vector< std::vector<double> >* xNew,
+    DataFrame* trainingData
   );
 
   void recursivePartition(
-    RFNode &rootNode,
+    RFNode* rootNode,
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
+    DataFrame* trainingData,
     unsigned int myseed
   );
 
@@ -51,47 +53,43 @@ public:
     std::vector<size_t>* featureList,
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
+    DataFrame* trainingData,
     unsigned int myseed
   );
 
   void printTree();
 
-  DataFrame* getTrainingData(){
-    return _trainingData;
-  }
-
-  size_t getMtry(){
+  size_t getMtry() {
     return _mtry;
   }
 
-  size_t getNodeSizeSpt(){
+  size_t getNodeSizeSpt() {
     return _nodeSizeSpt;
   }
 
-  size_t getNodeSizeAvg(){
+  size_t getNodeSizeAvg() {
     return _nodeSizeAvg;
   }
 
-  std::vector<size_t>* getSplittingIndex(){
-    return _averagingSampleIndex;
+  std::vector<size_t>* getSplittingIndex() {
+    return _averagingSampleIndex.get();
   }
 
-  std::vector<size_t>* getAveragingIndex(){
-    return _splittingSampleIndex;
+  std::vector<size_t>* getAveragingIndex() {
+    return _splittingSampleIndex.get();
   }
 
-  RFNode* getRoot(){
-    return _root;
+  RFNode* getRoot() {
+    return _root.get();
   }
 
 private:
-  DataFrame* _trainingData;
   size_t _mtry;
   size_t _nodeSizeSpt;
   size_t _nodeSizeAvg;
-  std::vector<size_t>* _averagingSampleIndex;
-  std::vector<size_t>* _splittingSampleIndex;
-  RFNode* _root;
+  std::unique_ptr< std::vector<size_t> > _averagingSampleIndex;
+  std::unique_ptr< std::vector<size_t> > _splittingSampleIndex;
+  std::unique_ptr< RFNode > _root;
 };
 
 

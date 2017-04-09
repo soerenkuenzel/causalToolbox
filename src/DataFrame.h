@@ -4,18 +4,19 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <memory>
 
 class DataFrame {
+
 public:
   DataFrame();
   virtual ~DataFrame();
 
   DataFrame(
-    std::vector< std::vector<double> >* featureData,
-//    std::vector<std::string>* featureNames,
-    std::vector<double>* outcomeData,
-//    std::string outcomeName,
-    std::vector<size_t>* categoricalFeatureCols,
+    std::unique_ptr< std::vector< std::vector<double> > > featureData,
+    std::unique_ptr< std::vector<double> > outcomeData,
+    std::unique_ptr< std::vector<size_t> > categoricalFeatureCols,
     std::size_t numRows,
     std::size_t numColumns
   );
@@ -24,44 +25,38 @@ public:
 
   double getOutcomePoint(size_t rowIndex);
 
-//  std::string getFeatureName(size_t colIndex);
-//
-//  size_t getFeatureIndex(std::string colName);
-
   std::vector<double>* getFeatureData(size_t colIndex);
 
   void getObservationData(std::vector<double> &rowData, size_t rowIndex);
 
   double partitionMean(std::vector<size_t>* sampleIndex);
 
-//  std::vector<std::string>* getFeatureNames(){
-//    return featureNames;
-//  }
-
-  std::vector<double>* getOutcomeData(){
-    return outcomeData;
+  std::vector< std::vector<double> >* getAllFeatureData() {
+    return _featureData.get();
   }
 
-  size_t getNumColumns(){
-    return numColumns;
+  std::vector<double>* getOutcomeData() {
+    return _outcomeData.get();
   }
 
-  size_t getNumRows(){
-    return numRows;
+  size_t getNumColumns() {
+    return _numColumns;
   }
 
-  std::vector<size_t>* getCatCols(){
-    return categoricalFeatureCols;
+  size_t getNumRows() {
+    return _numRows;
+  }
+
+  std::vector<size_t>* getCatCols() {
+    return _categoricalFeatureCols.get();
   }
 
 private:
-  std::vector< std::vector<double> >* featureData;
-//  std::vector<std::string>* featureNames;
-  std::vector<double>* outcomeData;
-//  std::string outcomeName;
-  std::vector<size_t>* categoricalFeatureCols;
-  std::size_t numRows;
-  std::size_t numColumns;
+  std::unique_ptr< std::vector< std::vector<double> > > _featureData;
+  std::unique_ptr< std::vector<double> > _outcomeData;
+  std::unique_ptr< std::vector<size_t> > _categoricalFeatureCols;
+  std::size_t _numRows;
+  std::size_t _numColumns;
 };
 
 

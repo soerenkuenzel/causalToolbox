@@ -160,3 +160,35 @@ setMethod(
     return(rcpp_cppPredictInterface(object@forest, processed_x))
   }
 )
+
+
+######################
+### Predict Method ###
+######################
+#' @title honestRFRcpp-free
+#' @name free-honestRFRcpp
+#' @rdname free-honestRFRcpp
+#' @description Free the Rcpp object in the memory.
+#' @param object A `honestRFRcpp` object.
+#' @export free
+setGeneric(
+  name="free",
+  def=function(
+    object
+  ){
+    standardGeneric("free")
+  }
+)
+
+#' @title honestRFRcpp-free
+#' @rdname free-honestRFRcpp
+#' @aliases free, honestRFRcpp-method
+setMethod(
+  f="free",
+  signature="honestRFRcpp",
+  definition=function(
+    object
+  ){
+    rcpp_cppFreeInterface(object@forest)
+  }
+)

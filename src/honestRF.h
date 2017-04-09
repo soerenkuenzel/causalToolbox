@@ -8,12 +8,13 @@
 #include "honestRFTree.h"
 
 class honestRF {
+
 public:
   honestRF();
   virtual ~honestRF();
 
   honestRF(
-    DataFrame* trainingData,
+    std::unique_ptr<DataFrame> trainingData,
     size_t ntree,
     bool replace,
     size_t sampSize,
@@ -25,56 +26,56 @@ public:
     bool verbose
   );
 
-  std::vector<double>* predict(
+  std::unique_ptr< std::vector<double> > predict(
     std::vector< std::vector<double> >* xNew
   );
 
-  DataFrame* getTrainingData(){
-    return _trainingData;
+  DataFrame* getTrainingData() {
+    return _trainingData.get();
   }
 
-  size_t getMtry(){
+  size_t getMtry() {
     return _mtry;
   }
 
-  size_t getNodeSizeSpt(){
+  size_t getNodeSizeSpt() {
     return _nodeSizeSpt;
   }
 
-  size_t getNodeSizeAvg(){
+  size_t getNodeSizeAvg() {
     return _nodeSizeAvg;
   }
 
-  size_t getNtree(){
+  size_t getNtree() {
     return _ntree;
   }
 
-  size_t getSampleSize(){
+  size_t getSampleSize() {
     return _sampSize;
   }
 
-  double getSplitRatio(){
+  double getSplitRatio() {
     return _splitRatio;
   }
 
-  bool isReplacement(){
+  bool isReplacement() {
     return _replace;
   }
 
-  unsigned int getSeed(){
+  unsigned int getSeed() {
     return _seed;
   }
 
-  std::vector<honestRFTree>* getForest(){
-    return _forest;
+  std::vector< std::unique_ptr< honestRFTree > >* getForest() {
+    return _forest.get();
   }
 
-  bool isVerbose(){
+  bool isVerbose() {
     return _verbose;
   }
 
 private:
-  DataFrame* _trainingData;
+  std::unique_ptr<DataFrame> _trainingData;
   size_t _ntree;
   bool _replace;
   size_t _sampSize;
@@ -82,7 +83,7 @@ private:
   size_t _mtry;
   size_t _nodeSizeSpt;
   size_t _nodeSizeAvg;
-  std::vector<honestRFTree>* _forest;
+  std::unique_ptr< std::vector< std::unique_ptr< honestRFTree > > > _forest;
   unsigned int _seed;
   bool _verbose;
 };
