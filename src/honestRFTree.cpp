@@ -619,6 +619,12 @@ void honestRFTree::selectBestFeature(
     bestSplitLoss = std::numeric_limits<double>::quiet_NaN();
 
   }
+
+  delete[](bestSplitLossAll);
+  delete[](bestSplitValueAll);
+  delete[](bestSplitFeatureAll);
+  delete[](bestSplitCountAll);
+
 }
 
 void honestRFTree::printTree(){

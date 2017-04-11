@@ -72,6 +72,7 @@ SEXP rcpp_cppBuildInterface(
       verbose
     );
 
+    // delete(testFullForest);
     Rcpp::XPtr<honestRF> ptr(testFullForest, true) ;
     R_RegisterCFinalizerEx(
       ptr,
@@ -79,6 +80,7 @@ SEXP rcpp_cppBuildInterface(
       (Rboolean) TRUE
     );
     return ptr;
+
 
   } catch (std::exception& __ex__){
     forward_exception_to_r( __ex__ );

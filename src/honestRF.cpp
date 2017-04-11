@@ -61,7 +61,7 @@ honestRF::honestRF(
       [&](const int iStart, const int iEnd, const int t) {
         // loop over all items
         for (int i = iStart; i < iEnd; i++) {
-
+//  for(int i=0; i<getNtree(); i++ ){
           unsigned int myseed = getSeed() * (i + 1);
 
           std::vector<size_t> sampleIndex;
@@ -139,7 +139,7 @@ honestRF::honestRF(
 
           }
 
-          std::unique_ptr<honestRFTree> oneTree ( new honestRFTree(
+          honestRFTree* oneTree ( new honestRFTree(
             getTrainingData(), getMtry(),
             getNodeSizeSpt(), getNodeSizeAvg(),
             std::move(splitSampleIndex), std::move(averageSampleIndex),
@@ -152,7 +152,7 @@ honestRF::honestRF(
             std::cout << "Finish training tree # " << (i + 1) << std::endl;
           }
 
-          (*forest).push_back(std::move(oneTree));
+          (*forest).emplace_back(oneTree);
 
         }
       },
@@ -191,8 +191,9 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
   for (size_t t = 0; t < maxThreads; t++) {
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
-        // loop over all items
+         // loop over all items
         for (int i=iStart; i < iEnd; i++) {
+//  for(int i=0; i<getNtree(); i++ ){
           std::vector<double> currentTreePrediction(numObservations);
           honestRFTree* currentTree = (*getForest())[i].get();
           (*currentTree).predict(
