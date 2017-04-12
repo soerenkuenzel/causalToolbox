@@ -16,3 +16,4 @@ Tune/XLearner/tuneXRsparseT2weak12N1000.csv
 tests/crashes/Rdies.R
 
 SimulationsStudies/ACIC2016/data/data/readme.txt
+tests/ConfidenceIntervals/
