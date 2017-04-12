@@ -26,7 +26,7 @@ tr <- rbinom(n, 1, feat$V1/ 20 +.5)
 yobs <- feat$V1  + feat$V2 + tr * feat$V3
 
 # this takes approximately 2 min to run.
-xl <- X_RF(
+tl <- T_RF(
   feat = feat,
   tr = tr,
   yobs = yobs
