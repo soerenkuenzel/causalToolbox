@@ -6,7 +6,7 @@
 \usage{
 simulate_causal_experiment(ntrain, ntest, dim, alpha = 0.1,
   feat_distribution = "normal", given_features = NULL,
-  setup = "RespSparseTau1strong")
+  setup = "RespSparseTau1strong", testseed = NULL, trainseed = NULL)
 }
 \arguments{
 \item{ntrain}{Number of training examples.}
@@ -27,7 +27,15 @@ features can be very correlated.}
 the performance of different estimators for a particular set of features.}
 
 \item{setup}{This is used to specify the function form of the potential
-outcomes and the treatment assignment.}
+outcomes and the treatment assignment. One of
+RespSparseTau1strong, RsparseT2weak, complexTau,
+Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3.}
+
+\item{testseed}{is the seed used to generate the testing data, if NULL, then
+the seed of the main session is used.}
+
+\item{trainseed}{is the seed used to generate the training data, if NULL,
+then the seed of the main session is used.}
 }
 \value{
 A list of the transformed object `x`, and encoding information
