@@ -54,6 +54,9 @@ setClass(
 #' @param verbose if training process in verbose mode
 #' @param nthread Number of threads to train and predict thre forest. The
 #' default number is 0 which represents using all cores.
+#' @param splitrule only variance is implemented at this point and it contains
+#' specifies the loss function according to which the splits of random forest
+#' should be made
 #' @export honestRF
 setGeneric(
   name="honestRF",
@@ -69,7 +72,8 @@ setGeneric(
     splitratio,
     seed,
     verbose,
-    nthread
+    nthread,
+    splitrule
     ){
     standardGeneric("honestRF")
   }
@@ -93,7 +97,8 @@ honestRF <- function(
   splitratio=1,
   seed=as.integer(runif(1)*1000),
   verbose=FALSE,
-  nthread=0
+  nthread=0,
+  splitrule="variance"
   ){
 
   # Preprocess the data
