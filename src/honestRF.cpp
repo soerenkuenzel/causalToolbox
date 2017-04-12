@@ -27,6 +27,7 @@ honestRF::honestRF(
   size_t nodeSizeSpt,
   size_t nodeSizeAvg,
   unsigned int seed,
+  size_t nthread,
   bool verbose
 ){
   this->_trainingData = std::move(trainingData);
@@ -48,15 +49,20 @@ honestRF::honestRF(
     new std::vector< std::unique_ptr< honestRFTree > >
   );
 
-  const size_t maxThreads = std::thread::hardware_concurrency();
+  size_t nthreadToUse = nthread;
+  if (nthread == 0) {
+    // Use all threads
+    nthreadToUse = std::thread::hardware_concurrency();
+  }
+
   if (isVerbose()) {
-    std::cout << "Training parallel using " << maxThreads << " threads"
+    std::cout << "Training parallel using " << nthreadToUse << " threads"
               << std::endl;
   }
-  std::vector<std::thread> allThreads(maxThreads);
+  std::vector<std::thread> allThreads( nthreadToUse );
   std::mutex threadLock;
 
-  for (size_t t = 0; t < maxThreads; t++) {
+  for (size_t t = 0; t < nthreadToUse; t++) {
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
         // loop over all items
@@ -156,8 +162,8 @@ honestRF::honestRF(
 
         }
       },
-      t * getNtree() / maxThreads,
-      (t + 1) == maxThreads ? getNtree() : (t + 1) * getNtree() / maxThreads,
+      t * getNtree() / nthreadToUse,
+      (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
       t
     );
 
@@ -174,7 +180,8 @@ honestRF::honestRF(
 }
 
 std::unique_ptr< std::vector<double> > honestRF::predict(
-  std::vector< std::vector<double> >* xNew
+  std::vector< std::vector<double> >* xNew,
+  size_t nthread
 ){
 
   std::vector<double> prediction;
@@ -183,12 +190,16 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
     prediction.push_back(0);
   }
 
-  const size_t maxThreads = std::thread::hardware_concurrency();
-//  std::cout << "Parallel using " << maxThreads << " threads..." << std::endl;
-  std::vector<std::thread> allThreads(maxThreads);
+  size_t nthreadToUse = nthread;
+  if (nthread == 0) {
+    // Use all threads
+    nthreadToUse = std::thread::hardware_concurrency();
+  }
+//  std::cout << "Parallel using " << nthreadToUse << " threads..." << std::endl;
+  std::vector<std::thread> allThreads(nthreadToUse);
   std::mutex threadLock;
 
-  for (size_t t = 0; t < maxThreads; t++) {
+  for (size_t t = 0; t < nthreadToUse; t++) {
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
          // loop over all items
@@ -207,8 +218,8 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
           }
         }
       },
-      t * getNtree() / maxThreads,
-      (t + 1) == maxThreads ? getNtree() : (t + 1) * getNtree() / maxThreads,
+      t * getNtree() / nthreadToUse,
+      (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
       t
     );
     allThreads[t] = std::thread(dummyThread);

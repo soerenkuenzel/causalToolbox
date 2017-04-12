@@ -23,11 +23,13 @@ public:
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
     unsigned int seed,
+    size_t nthread,
     bool verbose
   );
 
   std::unique_ptr< std::vector<double> > predict(
-    std::vector< std::vector<double> >* xNew
+    std::vector< std::vector<double> >* xNew,
+    size_t nthread
   );
 
   DataFrame* getTrainingData() {

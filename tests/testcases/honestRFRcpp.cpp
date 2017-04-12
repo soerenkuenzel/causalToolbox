@@ -401,7 +401,7 @@ int main() {
     try {
       // Test RF
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(iris), 500, true, 150, 1, 3, 5, 5, 24750371, false
+        std::move(iris), 500, true, 150, 1, 3, 5, 5, 24750371, 0, false
       ));
 
       // Print first two trees
@@ -414,7 +414,7 @@ int main() {
       // Test prediction
       std::unique_ptr< std::vector<double> > testForestPrediction (
         (*testFullForest).predict(
-          (*testFullForest).getTrainingData()->getAllFeatureData()
+          (*testFullForest).getTrainingData()->getAllFeatureData(), 0
         )
       );
 
@@ -439,7 +439,7 @@ int main() {
     try {
       // Test RF
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(iris), 100, true, numRows, 1, 3, 5, 5, 24750371, true
+        std::move(iris), 100, true, numRows, 1, 3, 5, 5, 24750371, 1, true
       ));
 
     } catch (const char *msg) {

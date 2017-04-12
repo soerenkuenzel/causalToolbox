@@ -1,32 +1,29 @@
-########################################
-### Honest Random Forest Constructor ###
-########################################
-#' @title honstRF Constructor
-#' @name honstRF-class
+#################################
+### Random Forest Constructor ###
+#################################
+#' @title honestRF-Constructor
+#' @name honestRF-class
 #' @rdname honestRF-class
-#' @description `honestRF` inherits `RF`, which serves as a modified version of
-#' `RF`. The major change is that it trains honest trees instead of adaptive
-#' trees. Adaptive trees are the original trees as they were used in the
-#' original implementation and honest trees differ in that they require two
-#' data sets to do tree estimation. One data set is used to create the trees
-#' and the other one is used to receive the leaf estimates.
-#' @slot splitratio Proportion of the training data used as the splitting
-#' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
-#' splitting dataset becomes the total entire sampled set and the averaging
-#' dataset is empty. If the ratio is 0, then the splitting data set is empty
-#' and all the data is used for the averaging data set (This is not a good
-#' usage however since there will be no data available for splitting).
+#' @description `honestRF` object implementing the most basic version of
+#' a random forest.
+#' @slot forest A list of `RFTree` objects in the forest. If the class is
+#' extended, the list may contain the corresponding extended `RFTree` object.
+#' @slot categoricalFeatureCols A list of index for all categorical data. Used
+#' for trees to detect categorical columns.
+#' @slot categoricalFeatureMapping A list of encoding details for each
+#' categorical column, including all unique factor values and their
+#' corresponding numeric representation.
 #' @exportClass honestRF
 setClass(
   Class="honestRF",
   slots=list(
-    splitratio="numeric"
-  ),
-  contains="RF"
+    forest="externalptr",
+    categoricalFeatureCols="list",
+    categoricalFeatureMapping="list"
+  )
 )
 
-
-#' @title honstRF Constructor
+#' @title honestRF-Constructor
 #' @name honestRF-honestRF
 #' @rdname honestRF-honestRF
 #' @description Initialize a `honestRF` object.
@@ -45,23 +42,18 @@ setClass(
 #' training data.
 #' @param nodesizeSpl The minimum observations contained in terminal nodes. The
 #' default value is 5.
-#' @param nthread The number of threads to use in parallel computing. The
-#' default value is 1.
-#' @param splitrule A string to specify how to find the best split among all
-#' candidate feature values. The current version only supports `variance` which
-#' minimizes the overall MSE after splitting. The default value is `variance`.
-#' @param avgfunc An averaging function to average observations in the node. The
-#' function is used for prediction. The input of this function should be a
-#' dataframe of predictors `x` and a vector of outcomes `y`. The output is a
-#' scalar. The default function is to take the mean of vector `y`.
+#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset.
+#' The default value is 5.
 #' @param splitratio Proportion of the training data used as the splitting
 #' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
 #' splitting dataset becomes the total entire sampled set and the averaging
 #' dataset is empty. If the ratio is 0, then the splitting data set is empty
 #' and all the data is used for the averaging data set (This is not a good
 #' usage however since there will be no data available for splitting).
-#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset.
-#' The default value is 5.
+#' @param seed random seed
+#' @param verbose if training process in verbose mode
+#' @param nthread Number of threads to train and predict thre forest. The
+#' default number is 0 which represents using all cores.
 #' @export honestRF
 setGeneric(
   name="honestRF",
@@ -73,19 +65,21 @@ setGeneric(
     sampsize,
     mtry,
     nodesizeSpl,
-    nthread,
-    splitrule,
-    avgfunc,
+    nodesizeAvg,
     splitratio,
-    nodesizeAvg
+    seed,
+    verbose,
+    nthread
     ){
     standardGeneric("honestRF")
   }
 )
 
-#' @title honstRF Constructor
+#' @title honestRF-Constructor
 #' @rdname honestRF-honestRF
 #' @aliases honestRF, honestRF-method
+#' @importFrom Rcpp evalCpp
+#' @useDynLib hte
 #' @return A `honestRF` object.
 honestRF <- function(
   x,
@@ -95,91 +89,81 @@ honestRF <- function(
   sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x)),
   mtry=max(floor(ncol(x)/3), 1),
   nodesizeSpl=5,
-  nthread=1,
-  splitrule="variance",
-  avgfunc=avgMean,
+  nodesizeAvg=5,
   splitratio=1,
-  nodesizeAvg=5
+  seed=as.integer(runif(1)*1000),
+  verbose=FALSE,
+  nthread=0
   ){
 
   # Preprocess the data
   preprocessedData <- preprocess_training(x, y)
-  x <- preprocessedData$x
+  processed_x <- preprocessedData$x
   categoricalFeatureCols <- preprocessedData$categoricalFeatureCols
   categoricalFeatureMapping <- preprocessedData$categoricalFeatureMapping
 
   # Total number of obervations
   nObservations <- length(y)
+  numColumns <- ncol(x)
 
-  # @import foreach
-  # @import doParallel
-  # Set number of threads for parallelism
-  registerDoParallel(nthread)
-
-  # Create a list of minimum node size
-  aggregateNodeSize <- list(
-    "averagingNodeSize"=nodesizeAvg,
-    "splittingNodeSize"=nodesizeSpl
-  )
-
-  # Create trees
-  trees <- foreach(i = 1:ntree) %dopar%{
-
-    # Bootstrap sample observation index
-    sampledIndex <- sample(
-      1:nObservations,
-      sampsize,
-      replace=replace
-      )
-
-    # Sample splitting index from the sampled observation index
-    splittingSamples <- sample(
-      1:length(sampledIndex),
-      as.integer(sampsize * splitratio)
-      )
-    splittingSampledIndex <- sampledIndex[splittingSamples]
-
-    # If splitratio is 1, set averagingSampledIndex to be the same as
-    # splittingSampledIndex
-    if (splitratio == 1) {
-      averagingSampledIndex <- splittingSampledIndex
-    } else {
-      averagingSampledIndex <- sampledIndex[-splittingSamples]
-    }
-
-    return(
-      honestRFTree(
-        x=x,
-        y=y,
-        mtry=mtry,
-        nodesize=aggregateNodeSize,
-        sampleIndex=list(
-          "averagingSampleIndex"=averagingSampledIndex,
-          "splittingSampleIndex"=splittingSampledIndex
-        ),
-        splitrule=splitrule,
-        categoricalFeatureCol=categoricalFeatureCols
-      )
-    )
+  categoricalFeatureCols_cpp <- unlist(categoricalFeatureCols)
+  if (is.null(categoricalFeatureCols_cpp)){
+    categoricalFeatureCols_cpp <- vector(mode="numeric", length=0)
+  } else {
+    categoricalFeatureCols_cpp <- categoricalFeatureCols_cpp - 1
   }
+
+  # Create rcpp object
+  rcppForest <- rcpp_cppBuildInterface(
+      x, y,
+      categoricalFeatureCols_cpp,
+      nObservations,
+      numColumns, ntree, replace, sampsize, mtry,
+      splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose
+  )
 
   # Create a forest object
   forest <- new(
     "honestRF",
-    x=x,
-    y=y,
-    ntree=ntree,
-    replace=replace,
-    sampsize=sampsize,
-    mtry=mtry,
-    nodesize=aggregateNodeSize,
-    splitrule=splitrule,
-    avgfunc=avgfunc,
-    forest=trees,
+    forest=rcppForest,
     categoricalFeatureCols=categoricalFeatureCols,
-    categoricalFeatureMapping=categoricalFeatureMapping,
-    splitratio=splitratio
-  )
+    categoricalFeatureMapping=categoricalFeatureMapping
+    )
 
   return(forest)
 }
+
+
+######################
+### Predict Method ###
+######################
+#' predict-honestRF
+#' @name predict-honestRF
+#' @rdname predict-honestRF
+#' @description Return the prediction from the forest.
+#' @param object A `honestRF` object.
+#' @param feature.new A data frame of testing predictors.
+#' @param nthread Number of threads to train and predict thre forest. The
+#' default number is 0 which represents using all cores.
+#' @return A vector of predicted responses.
+#' @aliases predict, honestRF-method
+#' @exportMethod predict
+setMethod(
+  f="predict",
+  signature="honestRF",
+  definition=function(
+    object,
+    feature.new,
+    nthread=0
+  ){
+
+    # Preprocess the data
+    processed_x <- preprocess_testing(
+      feature.new,
+      object@categoricalFeatureCols,
+      object@categoricalFeatureMapping
+    )
+
+    return(rcpp_cppPredictInterface(object@forest, processed_x, nthread))
+  }
+)

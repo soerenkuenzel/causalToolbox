@@ -30,6 +30,7 @@ SEXP rcpp_cppBuildInterface(
   int nodesizeSpl,
   int nodesizeAvg,
   int seed,
+  int nthread,
   bool verbose){
 
   try {
@@ -69,6 +70,7 @@ SEXP rcpp_cppBuildInterface(
       (size_t) nodesizeSpl,
       (size_t) nodesizeAvg,
       (unsigned int) seed,
+      (size_t) nthread,
       verbose
     );
 
@@ -91,7 +93,8 @@ SEXP rcpp_cppBuildInterface(
 // [[Rcpp::export]]
 Rcpp::NumericVector rcpp_cppPredictInterface(
   SEXP forest,
-  Rcpp::List x
+  Rcpp::List x,
+  int nthread
 ){
 
   try {
@@ -102,7 +105,7 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
       Rcpp::as< std::vector< std::vector<double> > >(x);
 
     std::unique_ptr< std::vector<double> > testForestPrediction (
-      (*testFullForest).predict(&featureData)
+      (*testFullForest).predict(&featureData, (size_t) nthread)
     );
 
     std::vector<double>* testForestPrediction_ =

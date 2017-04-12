@@ -4,6 +4,7 @@ library(ranger)
 library(randomForest)
 mem_used()
 
+# Iris example
 x <- iris[, -4]
 y <- iris[, 4]
 testForest <- honestRFRcpp(x, y, mtry=3, verbose=TRUE)
@@ -11,22 +12,39 @@ ypred <- predict(testForest, x)
 sum((ypred - y)^2)
 
 
-start_time <- Sys.time()
+# Random Numbers
 n <- 10000
 p <- 10
 x <- as.data.frame(matrix(rnorm(n*p), nrow = n))
 y <- rnorm(n)
 
-
-test = rcpp_cppBuildInterface(x, y, vector(), n, p, 100, TRUE, n, 3, 1, 5, 5, 24750371, FALSE)
-rm(test)
-gc(verbose = TRUE)
-
+# Time 11 seconds
+# Create Memory + 250 MB
+# Remove Memory - 118 MB
+start_time <- Sys.time()
 testForest <- ranger(y ~. ,data=data.frame(x,y))
-testForest <- honestRFRcpp(x, y)
+end_time <- Sys.time()
+end_time - start_time
 rm(testForest)
 gc(verbose = TRUE)
 
+# Time 23 seconds
+# Create Memory + 352 MB
+# Remove Memory - 290 MB
+start_time <- Sys.time()
+testForest <- honestRF(x, y)
+y_pred <- predict(testForest, x)
+end_time <- Sys.time()
+end_time - start_time
+rm(testForest)
+gc(verbose = TRUE)
+
+# Time 59 seconds
+# Create Memory + 548 MB
+# Remove Memory - 0 MB
+start_time <- Sys.time()
 testForest <- randomForest(x, y)
 end_time <- Sys.time()
 end_time - start_time
+rm(testForest)
+gc(verbose = TRUE)
