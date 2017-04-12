@@ -225,7 +225,7 @@ List rcpp_selectBestFeature(
     bool oneValueDistinctFlag = true;
 
     while (
-        splittingDataIter < splittingData.end() |
+        splittingDataIter < splittingData.end() ||
           averagingDataIter < averagingData.end()
     ){
 
