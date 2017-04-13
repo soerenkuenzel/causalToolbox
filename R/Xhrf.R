@@ -79,6 +79,7 @@ setClass(
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
 #' @param nthread number of threats which should be used to work in parallel.
+#' @param verbose whether or not to print messages of the training procedure.
 #' @export X_RF
 setGeneric(
   name = "X_RF",
@@ -102,7 +103,8 @@ setGeneric(
                  replace_second,
                  sample_fraction_first,
                  sample_fraction_second,
-                 nthread) {
+                 nthread,
+                 verbose) {
     standardGeneric("X_RF")
   }
 )
@@ -132,7 +134,8 @@ X_RF <-
            replace_second = TRUE,
            sample_fraction_first = 0.9,
            sample_fraction_second = 0.9,
-           nthread = 4) {
+           nthread = 4,
+           verbose = TRUE) {
     # if firststageVar is not set, then set it to select all:
     if (is.null(firststageVar)) {
       firststageVar <- 1:ncol(feat)
@@ -201,8 +204,9 @@ X_RF <-
         nodesizeAvg = min_node_size_ave_first
       )
 
-    print("Done with the first stage.")
-
+    if (verbose) {
+      print("Done with the first stage.")
+    }
     r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
     r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
 
@@ -235,8 +239,9 @@ X_RF <-
         splitratio = splitratio_second,
         nodesizeAvg = min_node_size_ave_second
       )
-
-    print("Done with the second stage.")
+    if (verbose) {
+      print("Done with the second stage.")
+    }
 
     m_prop <-
       honestRF(
@@ -245,9 +250,9 @@ X_RF <-
         ntree = 50,
         nthread = nthread
       )
-
-    print("Done with the propensity score estimation.")
-
+    if (verbose) {
+      print("Done with the propensity score estimation.")
+    }
     return(
       new(
         "X_RF",

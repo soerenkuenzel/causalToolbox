@@ -16,7 +16,7 @@ X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
   min_node_size_spl_second = 5, min_node_size_ave_second = 3,
   splitratio_first = 0.5, splitratio_second = 0.5, replace_first = TRUE,
   replace_second = TRUE, sample_fraction_first = 0.9,
-  sample_fraction_second = 0.9, nthread = 4)
+  sample_fraction_second = 0.9, nthread = 4, verbose = TRUE)
 }
 \arguments{
 \item{feat}{A data frame of all the features.}
@@ -66,6 +66,8 @@ training data in the first stage.}
 training data in the second stage.}
 
 \item{nthread}{number of threats which should be used to work in parallel.}
+
+\item{verbose}{whether or not to print messages of the training procedure.}
 }
 \value{
 A `X_RF` object.

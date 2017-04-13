@@ -46,7 +46,7 @@ estimator_grid <- list(
   "T_RF" = function(feat, W, Yobs)
     T_RF(feat, W, Yobs),
   "X_RF" = function(feat, W, Yobs)
-    X_RF(feat, W, Yobs)
+    X_RF(feat, W, Yobs, verbose = FALSE)
 )
 
 ## Setting up where the data should be saved:
@@ -55,7 +55,7 @@ if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
   paste0(data_folder_name, "MSE_rates_", setup, "_", Sys.Date(), ".csv")
-if (dir.exists(filename))
+if (file.exists(filename))
   file.remove(filename)
 
 
@@ -97,6 +97,8 @@ for (seed in seed_grid) {
           estimator <- estimator_grid[[estimator_i]]
           estimator_name <- names(estimator_grid)[estimator_i]
 
+          start_time <- Sys.time()
+
           tryCatch({
             L <- estimator(
               feat = dt$feat_tr,
@@ -120,6 +122,8 @@ for (seed in seed_grid) {
             MAE_sd <<- NA
           })
 
+          min_taken <- as.numeric(difftime(Sys.time(), start_time, tz, units = "mins"))
+
           Residuals <- data.frame(
             ntrain = ntrain,
             dim = dim,
@@ -132,8 +136,11 @@ for (seed in seed_grid) {
             MSE = MSE,
             MSE_sd = MSE_sd,
             MAE = MAE,
-            MAE_sd = MAE_sd
+            MAE_sd = MAE_sd,
+            timetaken = min_taken
           )
+
+
           col.names <- !file.exists(filename)
           write.table(
             Residuals,
@@ -143,7 +150,8 @@ for (seed in seed_grid) {
             row.names = FALSE,
             sep = ","
           )
-          print(paste("   Done with", seed, dim, alpha, ntrain, estimator_name))
+          print(paste("   Done with", seed, dim, alpha, ntrain, estimator_name,
+                      "  -- it took ", round(min_taken, 2), " min"))
         }
       }
     }
