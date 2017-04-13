@@ -6,7 +6,7 @@
 \alias{X_RF}
 \alias{X_RF,}
 \alias{X_RF-X_RF}
-\title{honstRF Constructor}
+\title{X-Learner with honest RF for both stages}
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
@@ -36,6 +36,10 @@ propmean which refers to propensity score weighting.}
 \item{ntree_first}{Numbers of trees in the first stage.}
 
 \item{ntree_second}{Numbers of trees in the second stage.}
+
+\item{mtry_first}{Numbers of trees in the second stage.}
+
+\item{mtry_second}{Numbers of trees in the second stage.}
 
 \item{min_node_size_spl_first}{minimum nodesize in the first stage for the
 observations in the splitting set.}

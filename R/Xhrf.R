@@ -45,7 +45,7 @@ setClass(
 )
 
 
-#' @title honstRF Constructor
+#' @title X-Learner with honest RF for both stages
 #' @name X_RF-X_RF
 #' @rdname X_RF-X_RF
 #' @description This is an implementation of the X-learner with honest random
@@ -60,12 +60,14 @@ setClass(
 #' @param secondstageVar Variables which are only used in the second stage.
 #' @param ntree_first Numbers of trees in the first stage.
 #' @param ntree_second Numbers of trees in the second stage.
+#' @param mtry_first Numbers of trees in the second stage.
+#' @param mtry_second Numbers of trees in the second stage.
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
-#' observations in the splitting set.
-#' @param min_node_size_spl_second minimum nodesize in the second stage for the
 #' observations in the splitting set.
 #' @param min_node_size_ave_first minimum nodesize in the first stage for the
 #' observations in the average set.
+#' @param min_node_size_spl_second minimum nodesize in the second stage for the
+#' observations in the splitting set.
 #' @param min_node_size_ave_second minimum nodesize in the second stage for the
 #' observations in the averaging set.
 #' @param splitratio_first Proportion of the training data used as the splitting
