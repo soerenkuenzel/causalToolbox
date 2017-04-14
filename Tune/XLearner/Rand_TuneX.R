@@ -2,10 +2,10 @@
 library(hte)
 
 # We start by loading the setup and
-args = (commandArgs(TRUE))
-print(args)
-seed <- -as.numeric(args)
-print(seed)
+# args = (commandArgs(TRUE))
+# print(args)
+# seed <- -as.numeric(args)
+# print(seed)
 
 setup_grid <- c(
     "RespSparseTau1strong",
@@ -24,32 +24,31 @@ setup <- setup_grid[1]
 
 set.seed(59906)
 nthread <- 4
-nsamples <- 10
+nsamples <- 30
 dim <- 20
 ntrain <- 10000
 ntest <- 10000
 alpha <- .01
 
 
-
-
 # Sample each parameter
 Rand_tune <- data.frame(
+  setup = setup,
   dim = dim,
   ntrain = ntrain,
   mtry_first = sample(1:dim, nsamples, replace = TRUE),
   mtry_second = sample(1:dim, nsamples, replace = TRUE),
-  min_node_size_spl_first = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
-  min_node_size_spl_second = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
-  min_node_size_ave_first = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
-  min_node_size_ave_second = sample(c(1, 3, 10, 30, 100), nsamples, replace = TRUE),
-  splitratio_first = sample(c(1, .05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
-  splitratio_second = sample(c(1, .05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
+  min_node_size_spl_first = sample(c(1, 3, 5, 10, 30, 100), nsamples, replace = TRUE),
+  min_node_size_spl_second = sample(c(1, 3, 5, 10, 30, 100), nsamples, replace = TRUE),
+  min_node_size_ave_first = sample(c(1, 3, 5, 10, 30, 100), nsamples, replace = TRUE),
+  min_node_size_ave_second = sample(c(1, 3, 5, 10, 30, 100), nsamples, replace = TRUE),
+  splitratio_first = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
+  splitratio_second = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
   replace_first = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   replace_second = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
-  sample_fraction_first = sample(c(.7, .9, 1), nsamples,
+  sample_fraction_first = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,
                                  replace = TRUE),
-  sample_fraction_second = sample(c(.7, .9, 1), nsamples,
+  sample_fraction_second = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,
                                   replace = TRUE)
 )
 
@@ -60,8 +59,8 @@ if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
   paste0(data_folder_name, "Rand_tune_", setup, "_XRF_", Sys.Date(), ".csv")
-if (file.exists(filename))
-  file.remove(filename)
+# if (file.exists(filename))
+#   file.remove(filename)
 
 # loop through rows and fill in the NA columns:
 for (i in 1:nsamples) {
@@ -131,17 +130,4 @@ for (i in 1:nsamples) {
     row.names = FALSE,
     sep = ","
   )
-
-
-  # write.csv(Rand_tune,
-  #           paste0(
-  #             "Tune/XLearner/tuneX",
-  #             setup,
-  #             dim,
-  #             "N",
-  #             ntrain,
-  #             "S",
-  #             seed,
-  #             ".csv"
-  #           ))
 }
