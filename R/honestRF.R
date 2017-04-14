@@ -88,7 +88,9 @@ training_data_checker <- function(
   }
 
   splitSampleSize <- splitratio * sampsize
-  avgSampleSize <- sampsize - splitSampleSize
+  # if the splitratio is 1, then we use adaptive rf and avgSampleSize is the
+  # equal to the total sampsize
+  avgSampleSize <-ifelse(splitratio != 1, sampsize - splitSampleSize, sampsize)
 
   if (nodesizeSpl > splitSampleSize) {
     stop("nodesizeSpl cannot exceed splitting sample size.")
