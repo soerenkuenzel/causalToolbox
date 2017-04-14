@@ -104,7 +104,7 @@ training_data_checker <- function(
       stop("splitratio is too small such that splitting data cannot even be splitted!")
     }
 
-    if (averageSampleSize < 2 * nodeSizeAvg) {
+    if (avgSampleSize < 2 * nodesizeAvg) {
       stop("splitratio is too big such that averaging data cannot even be splitted!")
     }
 
