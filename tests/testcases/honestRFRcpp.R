@@ -7,7 +7,7 @@ mem_used()
 # Iris example
 x <- iris[, -4]
 y <- iris[, 4]
-testForest <- honestRFRcpp(x, y, mtry=3, verbose=TRUE)
+testForest <- honestRF(x, y, mtry=3, verbose=TRUE)
 ypred <- predict(testForest, x)
 sum((ypred - y)^2)
 

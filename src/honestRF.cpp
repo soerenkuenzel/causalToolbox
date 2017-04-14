@@ -2,6 +2,7 @@
 #include <random>
 #include <thread>
 #include <mutex>
+#define DOPARELLEL true
 
 honestRF::honestRF():
   _trainingData(nullptr), _ntree(0), _replace(0), _sampSize(0),
@@ -59,6 +60,19 @@ honestRF::honestRF(
     std::cout << "Training parallel using " << nthreadToUse << " threads"
               << std::endl;
   }
+
+  size_t splitSampleSize = (size_t) (getSplitRatio() * sampSize);
+  size_t averageSampleSize = sampSize - splitSampleSize;
+
+  if (
+    (splitSampleSize < 2 * nodeSizeSpt || averageSampleSize < 2 * nodeSizeAvg)
+    &&
+    (splitRatio != 1 && splitRatio != 0)
+  ) {
+    throw "splitRatio too big or too small.";
+  }
+
+  #if DOPARELLEL
   std::vector<std::thread> allThreads( nthreadToUse );
   std::mutex threadLock;
 
@@ -67,7 +81,9 @@ honestRF::honestRF(
       [&](const int iStart, const int iEnd, const int t) {
         // loop over all items
         for (int i = iStart; i < iEnd; i++) {
-//  for(int i=0; i<getNtree(); i++ ){
+  #else
+  for(int i=0; i<getNtree(); i++ ){
+  #endif
           unsigned int myseed = getSeed() * (i + 1);
 
           std::vector<size_t> sampleIndex;
@@ -110,16 +126,6 @@ honestRF::honestRF(
 
           } else {
 
-            size_t splitSampleSize = (size_t) (getSplitRatio() * sampSize);
-            size_t averageSampleSize = sampSize - splitSampleSize;
-
-            if (
-              splitSampleSize < 2 * nodeSizeSpt ||
-              averageSampleSize < 2 * nodeSizeAvg
-            ) {
-              throw "splitRatio too big or too small.";
-            }
-
             // Generate sample index
             std::vector<size_t> splitSampleIndex_;
             std::vector<size_t> averageSampleIndex_;
@@ -152,7 +158,9 @@ honestRF::honestRF(
             myseed
           ));
 
+          #if DOPARELLEL
           std::lock_guard<std::mutex> lock(threadLock);
+          #endif
 
           if (isVerbose()) {
             std::cout << "Finish training tree # " << (i + 1) << std::endl;
@@ -161,6 +169,7 @@ honestRF::honestRF(
           (*forest).emplace_back(oneTree);
 
         }
+  #if DOPARELLEL
       },
       t * getNtree() / nthreadToUse,
       (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
@@ -175,6 +184,7 @@ honestRF::honestRF(
     allThreads.end(),
     [](std::thread& x){x.join();}
   );
+  #endif
 
   this->_forest = std::move(forest);
 }
@@ -196,6 +206,8 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
     nthreadToUse = std::thread::hardware_concurrency();
   }
 //  std::cout << "Parallel using " << nthreadToUse << " threads..." << std::endl;
+
+  #if DOPARELLEL
   std::vector<std::thread> allThreads(nthreadToUse);
   std::mutex threadLock;
 
@@ -204,7 +216,9 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
       [&](const int iStart, const int iEnd, const int t) {
          // loop over all items
         for (int i=iStart; i < iEnd; i++) {
-//  for(int i=0; i<getNtree(); i++ ){
+  #else
+  for(int i=0; i<getNtree(); i++ ){
+  #endif
           std::vector<double> currentTreePrediction(numObservations);
           honestRFTree* currentTree = (*getForest())[i].get();
           (*currentTree).predict(
@@ -217,6 +231,7 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
             prediction[j] += currentTreePrediction[j];
           }
         }
+  #if DOPARELLEL
       },
       t * getNtree() / nthreadToUse,
       (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
@@ -230,6 +245,7 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
     allThreads.end(),
     [](std::thread& x) { x.join(); }
   );
+  #endif
 
   for (size_t j=0; j<numObservations; j++){
     prediction[j] /= getNtree();

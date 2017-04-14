@@ -11,8 +11,11 @@ a random forest.
 \section{Slots}{
 
 \describe{
-\item{\code{forest}}{A list of `RFTree` objects in the forest. If the class is
-extended, the list may contain the corresponding extended `RFTree` object.}
+\item{\code{forest}}{A list of `RFTree` objects in the forest. If the class is}
+
+\item{\code{x}}{A data frame of all training predictors.}
+
+\item{\code{y}}{A vector of all training responses.}
 
 \item{\code{categoricalFeatureCols}}{A list of index for all categorical data. Used
 for trees to detect categorical columns.}

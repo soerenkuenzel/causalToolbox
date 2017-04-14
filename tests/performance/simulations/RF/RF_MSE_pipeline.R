@@ -66,14 +66,14 @@ simulate_RF_experiment <- function(
           ncol = dim
         )
         diag(Sigma) <- 1
-        Sigma <- Sigma %*% t(Sigma) # make it positive definite.
+        correlation_mat <- simulate_correlation_matrix(dim, alpha = alpha)
         mu <- rep(0, dim)
         #' @import MASS
         feat <-
           data.frame(mvrnorm(
             n = n,
             mu = mu,
-            Sigma = Sigma %*% t(Sigma)
+            Sigma = correlation_mat
           ))
       }
       if (feat_distribution == "unif") {
