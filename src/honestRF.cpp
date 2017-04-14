@@ -43,7 +43,7 @@ honestRF::honestRF(
   this->_verbose = verbose;
 
   if (splitRatio > 1 || splitRatio < 0) {
-    throw "splitRatio shoule be between 0 and 1.";
+    throw std::runtime_error("splitRatio shoule be between 0 and 1.");
   }
 
   std::unique_ptr< std::vector< std::unique_ptr< honestRFTree > > > forest (
@@ -69,7 +69,7 @@ honestRF::honestRF(
     &&
     (splitRatio != 1 && splitRatio != 0)
   ) {
-    throw "splitRatio too big or too small.";
+    throw std::runtime_error("splitRatio too big or too small.");
   }
 
   #if DOPARELLEL
@@ -79,6 +79,7 @@ honestRF::honestRF(
   for (size_t t = 0; t < nthreadToUse; t++) {
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
+
         // loop over all items
         for (int i = iStart; i < iEnd; i++) {
   #else
@@ -92,7 +93,8 @@ honestRF::honestRF(
 
             while (sampleIndex.size() < getSampleSize()) {
               size_t randomIndex = (size_t)
-                (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
+                      (rand_r(&myseed) %
+                       ((int) (*getTrainingData()).getNumRows()));
               sampleIndex.push_back(randomIndex);
             }
 
@@ -100,29 +102,30 @@ honestRF::honestRF(
 
             while (sampleIndex.size() < getSampleSize()) {
               size_t randomIndex = (size_t)
-                (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
+                      (rand_r(&myseed) %
+                       ((int) (*getTrainingData()).getNumRows()));
               if (
-                  sampleIndex.size() == 0 ||
-                  std::find(
-                    sampleIndex.begin(),
-                    sampleIndex.end(),
-                    randomIndex
-                  ) == sampleIndex.end()
-              ) {
+                      sampleIndex.size() == 0 ||
+                      std::find(
+                              sampleIndex.begin(),
+                              sampleIndex.end(),
+                              randomIndex
+                      ) == sampleIndex.end()
+                      ) {
                 sampleIndex.push_back(randomIndex);
               }
             }
 
           }
 
-          std::unique_ptr< std::vector<size_t> > splitSampleIndex;
-          std::unique_ptr< std::vector<size_t> > averageSampleIndex;
+          std::unique_ptr<std::vector<size_t> > splitSampleIndex;
+          std::unique_ptr<std::vector<size_t> > averageSampleIndex;
 
           if (splitRatio == 1 || splitRatio == 0) {
 
             // Treat it as normal RF
-            splitSampleIndex.reset( new std::vector<size_t>(sampleIndex) );
-            averageSampleIndex.reset( new std::vector<size_t>(sampleIndex) );
+            splitSampleIndex.reset(new std::vector<size_t>(sampleIndex));
+            averageSampleIndex.reset(new std::vector<size_t>(sampleIndex));
 
           } else {
 
@@ -131,10 +134,10 @@ honestRF::honestRF(
             std::vector<size_t> averageSampleIndex_;
 
             for (
-              std::vector<size_t>::iterator it=sampleIndex.begin();
-              it!=sampleIndex.end();
-              ++it
-            ) {
+                    std::vector<size_t>::iterator it = sampleIndex.begin();
+                    it != sampleIndex.end();
+                    ++it
+                    ) {
               if (splitSampleIndex_.size() < splitSampleSize) {
                 splitSampleIndex_.push_back(*it);
               } else {
@@ -143,30 +146,36 @@ honestRF::honestRF(
             }
 
             splitSampleIndex.reset(
-              new std::vector<size_t>(splitSampleIndex_)
+                    new std::vector<size_t>(splitSampleIndex_)
             );
             averageSampleIndex.reset(
-              new std::vector<size_t>(averageSampleIndex_)
+                    new std::vector<size_t>(averageSampleIndex_)
             );
 
           }
 
-          honestRFTree* oneTree ( new honestRFTree(
-            getTrainingData(), getMtry(),
-            getNodeSizeSpt(), getNodeSizeAvg(),
-            std::move(splitSampleIndex), std::move(averageSampleIndex),
-            myseed
-          ));
+          try{
+            honestRFTree *oneTree(new honestRFTree(
+                    getTrainingData(), getMtry(),
+                    getNodeSizeSpt(), getNodeSizeAvg(),
+                    std::move(splitSampleIndex),
+                    std::move(averageSampleIndex),
+                    myseed
+            ));
 
-          #if DOPARELLEL
-          std::lock_guard<std::mutex> lock(threadLock);
-          #endif
+            #if DOPARELLEL
+                  std::lock_guard<std::mutex> lock(threadLock);
+            #endif
 
-          if (isVerbose()) {
-            std::cout << "Finish training tree # " << (i + 1) << std::endl;
+            if (isVerbose()) {
+              std::cout << "Finish training tree # " << (i + 1) << std::endl;
+            }
+
+            (*forest).emplace_back(oneTree);
+
+          } catch (std::runtime_error &err) {
+            std::cerr << err.what() << std::endl;
           }
-
-          (*forest).emplace_back(oneTree);
 
         }
   #if DOPARELLEL
@@ -214,24 +223,34 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
   for (size_t t = 0; t < nthreadToUse; t++) {
     auto dummyThread = std::bind(
       [&](const int iStart, const int iEnd, const int t) {
-         // loop over all items
+
+        // loop over all items
         for (int i=iStart; i < iEnd; i++) {
   #else
-  for(int i=0; i<getNtree(); i++ ){
-  #endif
-          std::vector<double> currentTreePrediction(numObservations);
-          honestRFTree* currentTree = (*getForest())[i].get();
-          (*currentTree).predict(
-            currentTreePrediction,
-            xNew,
-            getTrainingData()
-          );
-          std::lock_guard<std::mutex> lock(threadLock);
-          for (size_t j=0; j<numObservations; j++){
-            prediction[j] += currentTreePrediction[j];
+  for(int i=0; i<getNtree(); i++ ) {
+#endif
+          try {
+            std::vector<double> currentTreePrediction(numObservations);
+            honestRFTree *currentTree = (*getForest())[i].get();
+            (*currentTree).predict(
+                    currentTreePrediction,
+                    xNew,
+                    getTrainingData()
+            );
+
+          #if DOPARELLEL
+            std::lock_guard<std::mutex> lock(threadLock);
+          #endif
+
+            for (size_t j = 0; j < numObservations; j++) {
+              prediction[j] += currentTreePrediction[j];
+            }
+
+          } catch (std::runtime_error &err) {
+            std::cerr << err.what() << std::endl;
           }
-        }
-  #if DOPARELLEL
+      }
+#if DOPARELLEL
       },
       t * getNtree() / nthreadToUse,
       (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,

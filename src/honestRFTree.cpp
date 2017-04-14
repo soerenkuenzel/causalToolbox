@@ -19,30 +19,33 @@ honestRFTree::honestRFTree(
   size_t mtry,
   size_t nodeSizeSpt,
   size_t nodeSizeAvg,
-  std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
   std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
+  std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
   unsigned int myseed
 ){
+
   if (nodeSizeAvg == 0 || nodeSizeSpt == 0) {
-    throw "nodeSize cannot be set to 0.";
+    throw std::runtime_error("nodeSize cannot be set to 0.");
   }
 
   if (
     nodeSizeAvg > (*averagingSampleIndex).size() ||
     nodeSizeSpt > (*splittingSampleIndex).size()
   ) {
-    throw "nodeSize cannot exceed total elements in the sample.";
+    throw std::runtime_error("nodeSize cannot exceed total "
+                                   "elements in the sample.");
   }
 
   if (
     (*averagingSampleIndex).size() == 0 ||
     (*splittingSampleIndex).size() == 0
   ) {
-    throw "sample size cannot be 0.";
+    throw std::runtime_error("sample size cannot be 0.");
   }
 
   if (mtry == 0 || mtry > (*trainingData).getNumColumns()) {
-    throw "mtry must be positive and cannot exceed total amount of features";
+    throw std::runtime_error("mtry must be positive and cannot "
+                                   "exceed total amount of features");
   }
 
   this->_mtry = mtry;
@@ -61,8 +64,8 @@ void honestRFTree::setDummyTree(
   size_t mtry,
   size_t nodeSizeSpt,
   size_t nodeSizeAvg,
-  std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
-  std::unique_ptr< std::vector<size_t> > splittingSampleIndex
+  std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
+  std::unique_ptr< std::vector<size_t> > averagingSampleIndex
 ){
   this->_mtry = mtry;
   this->_nodeSizeSpt = nodeSizeSpt;

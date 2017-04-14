@@ -27,7 +27,7 @@ double DataFrame::getPoint(size_t rowIndex, size_t colIndex) {
   if (rowIndex < getNumRows() && colIndex < getNumColumns()) {
     return (*getAllFeatureData())[colIndex][rowIndex];
   } else {
-    throw "Invalid rowIndex or colIndex.";
+    throw std::runtime_error("Invalid rowIndex or colIndex.");
   }
 }
 
@@ -36,7 +36,7 @@ double DataFrame::getOutcomePoint(size_t rowIndex) {
   if (rowIndex < getNumRows()) {
     return (*getOutcomeData())[rowIndex];
   } else {
-    throw "Invalid rowIndex.";
+    throw std::runtime_error("Invalid rowIndex.");
   }
 }
 
@@ -46,7 +46,7 @@ std::vector<double>* DataFrame::getFeatureData(
   if (colIndex < getNumColumns()) {
     return &(*getAllFeatureData())[colIndex];
   } else {
-    throw "Invalid colIndex.";
+    throw std::runtime_error("Invalid colIndex.");
   }
 }
 
@@ -59,7 +59,7 @@ void DataFrame::getObservationData(
       rowData[i] = (*getAllFeatureData())[i][rowIndex];
     }
   } else {
-    throw "Invalid rowIndex.";
+    throw std::runtime_error("Invalid rowIndex.");
   }
 }
 

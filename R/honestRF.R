@@ -80,11 +80,21 @@ training_data_checker <- function(
     stop("mtry cannot exceed total amount of features in x.")
   }
 
-  if (nodesizeSpl > sampsize) {
-    stop("nodesizeSpl cannot exceed total sample size.")
+  if (nodesizeSpl <= 0 || nodesizeSpl %% 1 != 0) {
+    stop("nodesizeSpl must be a positive integer.")
   }
-  if (nodesizeAvg > sampsize) {
-    stop("nodesizeAvg cannot exceed total sample size.")
+  if (nodesizeAvg <= 0 || nodesizeAvg %% 1 != 0) {
+    stop("nodesizeAvg must be a positive integer.")
+  }
+
+  splitSampleSize <- splitratio * sampsize
+  avgSampleSize <- sampsize - splitSampleSize
+
+  if (nodesizeSpl > splitSampleSize) {
+    stop("nodesizeSpl cannot exceed splitting sample size.")
+  }
+  if (nodesizeAvg > avgSampleSize) {
+    stop("nodesizeAvg cannot exceed averaging sample size.")
   }
 
   if (splitratio < 0 || splitratio > 1){
@@ -96,9 +106,6 @@ training_data_checker <- function(
     warning("honestRF is used as adaptive random forest.")
 
   } else {
-
-    splitSampleSize <- splitratio * sampsize
-    avgSampleSize <- sampsize - splitSampleSize
 
     if (splitSampleSize < 2 * nodesizeSpl){
       stop("splitratio is too small such that splitting data cannot even be splitted!")

@@ -18,7 +18,7 @@ RFNode::RFNode(
     (*averagingSampleIndex).size() == 0 &&
     (*splittingSampleIndex).size() == 0
   ) {
-    throw "Intend to create an empty node.";
+    throw std::runtime_error("Intend to create an empty node.");
   }
   // Leaf node constructor
   // Give the ownership of the index pointer to the RFNode object
