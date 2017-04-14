@@ -8,6 +8,8 @@ setup_i <- -as.numeric(args[1])
 print(setup_i)
 
 set.seed(1145)
+nthread = 8
+
 
 library(hte)
 library(dplyr)
@@ -32,7 +34,7 @@ setup <- setup_grid[[setup_i]]
 print(setup)
 
 dim_grid <- c(5, 20, 100)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
+ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .5))
 # if (setup == "rare1"){
 #   ntrain_grid <- c(1500, 2000, 4000, 10000, 40000)
 # }
@@ -42,11 +44,11 @@ alpha_grid <- c(0, .01, .1, 10)
 
 estimator_grid <- list(
   "S_RF" = function(feat, W, Yobs)
-    S_RF(feat, W, Yobs),
+    S_RF(feat, W, Yobs, nthread = nthread),
   "T_RF" = function(feat, W, Yobs)
-    T_RF(feat, W, Yobs),
+    T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
-    X_RF(feat, W, Yobs, verbose = FALSE)
+    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)
 )
 
 ## Setting up where the data should be saved:
