@@ -47,9 +47,9 @@ Rand_tune <- data.frame(
   splitratio_second = sample(c(1, .05, .1, .2, .3, .5, .8), nsamples, replace = TRUE),
   replace_first = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   replace_second = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
-  sample_fraction_first = sample(c(.01, .1, .3, .5, 0.632, .7, .9, 1), nsamples,
+  sample_fraction_first = sample(c(.7, .9, 1), nsamples,
                                  replace = TRUE),
-  sample_fraction_second = sample(c(.01, .1, .3, .5, 0.632, .7, .9, 1), nsamples,
+  sample_fraction_second = sample(c(.7, .9, 1), nsamples,
                                   replace = TRUE)
 )
 
