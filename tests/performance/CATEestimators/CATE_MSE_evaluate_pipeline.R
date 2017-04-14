@@ -31,14 +31,14 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- c(5, 10) # , 20, 100)
-ntrain_grid <- c(400, 600, 800) #, 1000, 1500, 2000, 4000, 10000)
+dim_grid <- c(5, 20, 100)
+ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
 # if (setup == "rare1"){
 #   ntrain_grid <- c(1500, 2000, 4000, 10000, 40000)
 # }
-ntest <- 5000
-seed_grid <- 1:2
-alpha_grid <- c(0, .01) #, .1, 10)
+ntest <- 10000
+seed_grid <- 1:100
+alpha_grid <- c(0, .01, .1, 10)
 
 estimator_grid <- list(
   "S_RF" = function(feat, W, Yobs)
@@ -50,7 +50,7 @@ estimator_grid <- list(
 )
 
 ## Setting up where the data should be saved:
-data_folder_name <- "tests/performance/CATEestimators/sim_data"
+data_folder_name <- "sim_data"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
@@ -63,22 +63,18 @@ if (file.exists(filename))
 for (seed in seed_grid) {
   for (dim in dim_grid) {
     for (alpha in alpha_grid) {
+      print(paste(
+        "Starting with seed = ",
+        seed,
+        "of",
+        max(seed_grid),
+        "dim = ",
+        dim,
+        "of",
+        paste(dim_grid, collapse = ", ")
+      ))
       for (ntrain in ntrain_grid) {
-        print(
-          paste(
-            "Starting with seed",
-            seed,
-            "of",
-            max(seed_grid),
-            "dim",
-            dim,
-            "of",
-            paste(dim_grid, collapse = ", "),
-            ntrain,
-            "of",
-            paste(ntrain_grid, collapse = ", ")
-          )
-        )
+
         # create training and test data: note that the test seed is constant:
         set.seed(seed)
         dt <- simulate_causal_experiment(
@@ -122,7 +118,8 @@ for (seed in seed_grid) {
             MAE_sd <<- NA
           })
 
-          min_taken <- as.numeric(difftime(Sys.time(), start_time, tz, units = "mins"))
+          min_taken <-
+            as.numeric(difftime(Sys.time(), start_time, tz, units = "mins"))
 
           Residuals <- data.frame(
             ntrain = ntrain,
@@ -150,8 +147,17 @@ for (seed in seed_grid) {
             row.names = FALSE,
             sep = ","
           )
-          print(paste("   Done with", seed, dim, alpha, ntrain, estimator_name,
-                      "  -- it took ", round(min_taken, 2), " min"))
+          print(
+            paste(
+              "      Done with ntrain = ",
+              ntrain,
+              ", estimator = ",
+              estimator_name,
+              "  -- it took ",
+              round(min_taken, 2),
+              " min"
+            )
+          )
         }
       }
     }
