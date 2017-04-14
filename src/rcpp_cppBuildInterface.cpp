@@ -83,8 +83,8 @@ SEXP rcpp_cppBuildInterface(
     );
     return ptr;
 
-  } catch(std::exception &ex) {
-    forward_exception_to_r(ex);
+  } catch(std::runtime_error const& err) {
+    forward_exception_to_r(err);
   } catch(...) {
     ::Rf_error("c++ exception (unknown reason)");
   }
@@ -116,8 +116,8 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
 
     return output;
 
-  } catch(std::exception &ex) {
-    forward_exception_to_r(ex);
+  } catch(std::runtime_error const& err) {
+    forward_exception_to_r(err);
   } catch(...) {
     ::Rf_error("c++ exception (unknown reason)");
   }

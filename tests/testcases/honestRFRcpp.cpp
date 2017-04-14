@@ -9,7 +9,7 @@
 #define TEST_RFNode false
 #define TEST_RFTree false
 #define TEST_RF false
-#define TEST_MEMORY true
+#define TEST_CRASH true
 
 template<typename Generator>
 void getrands(std::vector<double>& x, Generator& gen, unsigned num)
@@ -21,9 +21,9 @@ int main() {
 
   std::cout << "Test starts" << std::endl;
 
-  size_t numRows = 150;
+  size_t numRows = 1033;
 
-  size_t numColumns = 4;
+  size_t numColumns = 20;
 
   std::vector< std::vector<double> > featureData_;
 
@@ -204,8 +204,8 @@ int main() {
       }
       std::cout << std::endl;
 
-    } catch (const char *msg) {
-      std::cerr << msg << std::endl;
+    } catch (std::runtime_error const& err) {
+      std::cerr << err.what() << std::endl;
     }
   }
 
@@ -291,8 +291,8 @@ int main() {
       }
       std::cout << std::endl;
 
-    } catch (const char *msg) {
-      std::cerr << msg << std::endl;
+    } catch (std::runtime_error const& err) {
+      std::cerr << err.what() << std::endl;
     }
   }
 
@@ -392,8 +392,8 @@ int main() {
       }
       std::cout << testMSE << std::endl;
 
-    } catch (const char *msg) {
-      std::cerr << msg << std::endl;
+    } catch (std::runtime_error const& err) {
+      std::cerr << err.what() << std::endl;
     }
   }
 
@@ -430,20 +430,20 @@ int main() {
       }
       std::cout << testMSE << std::endl;
 
-    } catch (const char *msg) {
-      std::cerr << msg << std::endl;
+    } catch (std::runtime_error const& err) {
+      std::cerr << err.what() << std::endl;
     }
   }
 
-  if (TEST_MEMORY) {
+  if (TEST_CRASH) {
     try {
       // Test RF
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(iris), 100, true, numRows, 1, 3, 5, 5, 24750371, 1, true
+        std::move(iris), 500, true, 929, 0.1, 16, 3, 100, 24750371, 1, true
       ));
 
-    } catch (const char *msg) {
-      std::cerr << msg << std::endl;
+    } catch (std::runtime_error &err) {
+      std::cout << err.what() << std::endl;
     }
   }
 

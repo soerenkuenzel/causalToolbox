@@ -18,8 +18,8 @@ public:
     size_t mtry,
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
-    std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
     std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
+    std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
     unsigned int myseed
   );
 
@@ -28,8 +28,8 @@ public:
     size_t mtry,
     size_t nodeSizeSpt,
     size_t nodeSizeAvg,
-    std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
-    std::unique_ptr< std::vector<size_t> > splittingSampleIndex
+    std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
+    std::unique_ptr< std::vector<size_t> > averagingSampleIndex
   );
 
   void predict(

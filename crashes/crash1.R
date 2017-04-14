@@ -10,7 +10,6 @@ experiment <- simulate_causal_experiment(
   trainseed = 93007
 )
 
-
 yobs_1 <- experiment$Yobs_tr[experiment$W_tr == 1]
 X_1 <- experiment$feat_tr[experiment$W_tr == 1, ]
 
@@ -21,12 +20,12 @@ m_1 <-
     x = X_1,
     y = yobs_1,
     ntree = 500,
+    mtry = 16,
+    nodesizeSpl = 3,
+    nodesizeAvg = 100,
+    splitratio = 0.1,
     replace = TRUE,
-    sampsize = round(0.1 * length(yobs_1)),
-    mtry = 13,
-    nodesizeSpl = 30,
+    sampsize = round(0.9 * length(yobs_1)),
     nthread = 4,
-    splitrule =  'variance',
-    splitratio = 0.5,
-    nodesizeAvg = 1
+    splitrule =  'variance'
   )
