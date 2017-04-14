@@ -1,0 +1,5 @@
+for the normal cluster
+	for i in {1..11}; do sbatch CATE_MSE_evaluate_pipeline.sh $i; done
+
+for the high priority
+    	for i in {1..11}; do sbatch -p high CATE_MSE_evaluate_pipeline.sh $i; done
