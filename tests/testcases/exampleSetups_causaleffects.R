@@ -8,3 +8,23 @@ simulate_causal_experiment(ntrain = 15, ntest = 7, dim = 4, alpha = .1,
 
 simulate_causal_experiment(ntrain = 15, ntest = 7, dim = 4, alpha = .1,
                            setup = "complexTau")
+
+
+setup_grid <- c(
+  "RespSparseTau1strong",
+  "RsparseT2weak",
+  "complexTau",
+  "Conf1",
+  "rare1",
+  "STMpp",
+  "Ufail",
+  "Usual1",
+  "Wager1",
+  "Wager2",
+  "Wager3"
+)
+
+for(i in 1:11 ){
+  simulate_causal_experiment(ntrain = 15, ntest = 7, dim = 6, alpha = .1,
+                             setup = setup_grid[i])
+}

@@ -406,10 +406,10 @@ simulate_causal_experiment <- function(ntrain,
 
     m_t_truth <- function(feat) {
       beta_m <- beatc_raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta.m                      # mu^t
+      as.matrix(feat) %*% beta_m                      # mu^t
     }
     m_c_truth <- function(feat) {
-      beta.m <- beatc_raw[1:ncol(feat)]
+      beta_m <- beatc_raw[1:ncol(feat)]
       as.matrix(feat) %*% beta_m                      # mu^t
     }
     propscore <-
@@ -442,17 +442,19 @@ simulate_causal_experiment <- function(ntrain,
     # the following is used so that the seed is fixed for the creation of this
     # data set, but th seed is set back afterwards:
 
-    beat.raw <- (1:5 - 3)
+    if(dim < 6) stop("For Ufail the dimension must be at least 6.")
+
+    beat_raw <- (1:5 - 3)
 
     m_t_truth <- function(feat) {
       dim <- ncol(feat)
-      beta.m <- c(beat.raw, rep(0, dim - 5))
-      as.matrix(feat) %*% beta.m                  # mu^t
+      beta_m <- c(beat_raw, rep(0, dim - 5))
+      as.matrix(feat) %*% beta_m                  # mu^t
     }
     m_c_truth <- function(feat) {
       dim <- ncol(feat)
-      beta.m <- rep(0, dim)
-      as.matrix(feat) %*% beta.m                  # mu^c
+      beta_m <- rep(0, dim)
+      as.matrix(feat) %*% beta_m                  # mu^c
     }
     propscore <-
       function(feat)
