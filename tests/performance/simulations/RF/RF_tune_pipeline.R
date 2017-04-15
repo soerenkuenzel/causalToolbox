@@ -91,7 +91,7 @@ for (i in 1:nsamples) {
         nodesizeAvg = Rand_tune$min_node_size_ave[i],
         splitratio = Rand_tune$splitratio[i],
         replace = Rand_tune$replace[i],
-        sampsize = Rand_tune$sample_fraction[i] * ntrain,
+        sampsize = as.integer(Rand_tune$sample_fraction[i] * ntrain),
         nthread = nthread
       )
       mean((dt$testY - predict(L, dt$testX)) ^ 2)
