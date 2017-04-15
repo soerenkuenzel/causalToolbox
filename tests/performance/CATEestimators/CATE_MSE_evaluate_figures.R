@@ -17,11 +17,11 @@ Results <- tbl_df(Results[, -14])
 
 # setup the colors
 cols <- c(
-  "S_RF" = "green",
-  "T_RF" = "green3",
-  "X_RF" = "blue",
+  "S_RF" = "blue",
+  "T_RF" = "blue3",
+  "X_RF" = "green",
   "CF" = "red",
-  "CF_p" = "red3"
+  "CF_p" = "red2"
   # "U_half_RF" = "#00C094",
   # "X_RF_sRF" = "blue3"
 )
@@ -47,7 +47,8 @@ for (this_setup in unique(Results$setup)) {
     geom_point(aes(shape = estimator), size = 1) +
     facet_wrap( ~ dima, scales = "free") +
     scale_y_log10() +
-    ggtitle(this_setup)
+    ggtitle(this_setup) +
+    theme_minimal()
 
   # scale_shape_manual(values = LETTERS[1:26]) +
   # coord_cartesian(xlim = NULL, ylim = NULL) +
