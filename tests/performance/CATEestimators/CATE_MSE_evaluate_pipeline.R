@@ -50,7 +50,9 @@ estimator_grid <- list(
     T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
-  "CF_p" = function(feat, W, Yobs)
+  "CF_p" = function(feat, W, Yobs) {
+    feat <- as.matrix(feat)
+    colnames(feat) <- NULL
     propensityForest(
       X = feat,
       W = W,
@@ -58,8 +60,11 @@ estimator_grid <- list(
       num.trees = 500,
       sample.size = nrow(feat) / 10,
       nodesize = 1
-    ),
-  "CF" = function(feat, W, Yobs)
+    )
+  },
+  "CF" = function(feat, W, Yobs) {
+    feat <- as.matrix(feat)
+    colnames(feat) <- NULL
     causalForest(
       X = feat,
       W = W,
@@ -68,7 +73,28 @@ estimator_grid <- list(
       sample.size = nrow(feat) / 10,
       nodesize = 1
     )
+  }
 )
+
+CATEpredictor_grid <- list(
+  "S_RF" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "T_RF" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "X_RF" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "CF_p" = function(estimator, feat_te) {
+    feat_te <- as.matrix(feat_te)
+    colnames(feat_te) <- NULL
+    return(predict(estimator, feat_te))
+  },
+  "CF" = function(estimator, feat_te)  {
+    feat_te <- as.matrix(feat_te)
+    colnames(feat_te) <- NULL
+    return(predict(estimator, feat_te))
+  }
+)
+
 
 ## Setting up where the data should be saved:
 data_folder_name <- "sim_data/"
@@ -95,7 +121,6 @@ for (seed in seed_grid) {
         paste(dim_grid, collapse = ", ")
       ))
       for (ntrain in ntrain_grid) {
-
         # create training and test data: note that the test seed is constant:
         set.seed(seed)
         dt <- simulate_causal_experiment(
@@ -112,6 +137,7 @@ for (seed in seed_grid) {
         # go through all estimators we want to compare:
         for (estimator_i in 1:length(estimator_grid)) {
           estimator <- estimator_grid[[estimator_i]]
+          CATEpredictor <- CATEpredictor_grid[[estimator_i]]
           estimator_name <- names(estimator_grid)[estimator_i]
 
           start_time <- Sys.time()
@@ -122,7 +148,7 @@ for (seed in seed_grid) {
               W = dt$W_tr,
               Yobs = dt$Yobs_tr
             )
-            estimates <- EstimateCate(L, dt$feat_te)
+            estimates <- CATEpredictor(L, dt$feat_te)
             MSE    <<- mean((dt$tau_te - estimates) ^ 2)
             MSE_sd <<-
               sd((dt$tau_te - estimates) ^ 2) / sqrt(length(dt$tau_te))
