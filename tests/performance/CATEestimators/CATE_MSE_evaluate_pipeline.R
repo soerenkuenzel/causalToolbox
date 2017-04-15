@@ -52,7 +52,7 @@ estimator_grid <- list(
 )
 
 ## Setting up where the data should be saved:
-data_folder_name <- "sim_data"
+data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-

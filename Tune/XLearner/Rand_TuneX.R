@@ -2,10 +2,10 @@
 library(hte)
 
 # We start by loading the setup and
-# args = (commandArgs(TRUE))
-# print(args)
-# seed <- -as.numeric(args)
-# print(seed)
+args = (commandArgs(TRUE))
+print(args)
+setup_i <- -as.numeric(args)
+print(setup_i)
 
 setup_grid <- c(
     "RespSparseTau1strong",
@@ -20,11 +20,12 @@ setup_grid <- c(
     "Wager2",
     "Wager3"
   )
-setup <- setup_grid[1]
+setup <- setup_grid[setup_i]
+print(setup)
 
 set.seed(59906)
-nthread <- 4
-nsamples <- 30
+nthread <- 2
+nsamples <- 1e5
 dim <- 20
 ntrain <- 10000
 ntest <- 10000
@@ -54,7 +55,7 @@ Rand_tune <- data.frame(
 
 
 ## Setting up where the data should be saved:
-data_folder_name <- "Tune/sim_data/"
+data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
