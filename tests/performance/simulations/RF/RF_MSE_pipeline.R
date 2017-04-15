@@ -35,11 +35,11 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- c(5, 10, 20, 50)
-ntrain_grid <- c(100, 316, 1000, 3162, 10000, 31622, 100000)
-ntest <- 5000
-seed_grid <- 1:500
-alpha_grid <- c(0, .3, 1, 2)
+dim_grid <- c(5, 10, 50)
+ntrain_grid <- c(100, 316, 1000, 3162, 10000)
+ntest <- 10000
+seed_grid <- 1:20
+alpha_grid <- c(0, 1)
 
 estimator_grid <- list(
   "ranger" = function(x, y)
