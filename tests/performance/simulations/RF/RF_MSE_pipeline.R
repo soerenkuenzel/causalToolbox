@@ -1,8 +1,18 @@
 ## Setting up what to loop over: This will be given to the file and we will
 #execude it for i raning from 1 to 11 to go thorough all settings:
-# args <- commandArgs(TRUE)
-# setup_i <- as.numeric(args[1])
-setup_i <- 3
+args <- commandArgs(TRUE)
+
+if(length(args)==0){
+    print("No arguments supplied.")
+    setup_i = 1
+    nthread = 4
+}else{
+    for(i in 1:length(args)){
+      eval(parse(text=args[[i]]))
+    }
+}
+
+
 set.seed(1223)
 
 library(hte)
@@ -11,6 +21,52 @@ library(randomForest)
 library(dplyr)
 library(reshape)
 library(MASS)
+
+#################
+# Configuration #
+#################
+setup_grid <-
+  c(
+    "randomNoise",
+    "HighSignalToNoiseLinearModel",
+    "LowSignalToNoiseLinearModel"
+  )
+
+setup <- setup_grid[[setup_i]]
+print(setup)
+
+dim_grid <- c(5, 10, 20, 50)
+ntrain_grid <- c(100, 316, 1000, 3162, 10000, 31622, 100000)
+ntest <- 5000
+seed_grid <- 1:500
+alpha_grid <- c(0, .3, 1, 2)
+
+estimator_grid <- list(
+  "ranger" = function(x, y)
+    ranger(y ~. , data=data.frame(x, y), num.threads=nthread),
+  "randomForest" = function(x, y)
+    randomForest(x, y),
+  "honestRF" = function(x, y)
+    honestRF(x, y, nthread=nthread)
+)
+
+predictor_grid <- list(
+  "ranger" = function(estimator, x)
+    predict(estimator, dat=x)$predictions,
+  "randomForest" = function(estimator, x)
+    predict(estimator, newdata=x),
+  "honestRF" = function(estimator, x)
+    predict(estimator, x)
+)
+
+## Setting up where the data should be saved:
+data_folder_name <- "sim_data/"
+if (!dir.exists(data_folder_name))
+  dir.create(data_folder_name)
+filename <- paste0(data_folder_name, "simulation_", setup, "_", Sys.Date(), ".csv")
+if (dir.exists(filename))
+  file.remove(filename)
+
 
 #############################
 # Simulation Data Generator #
@@ -188,49 +244,6 @@ simulate_RF_experiment <- function(
 ##############
 # Simulation #
 ##############
-setup_grid <-
-  c(
-    "randomNoise",
-    "HighSignalToNoiseLinearModel",
-    "LowSignalToNoiseLinearModel"
-  )
-
-setup <- setup_grid[[setup_i]]
-print(setup)
-
-dim_grid <- c(5, 10, 20)
-ntrain_grid <- c(100, 316, 1000, 3162, 10000)
-ntest <- 5000
-seed_grid <- 1:2
-alpha_grid <- c(0, .3) #, 1, 2)
-
-estimator_grid <- list(
-  "ranger" = function(x, y)
-    ranger(y ~. , data=data.frame(x, y)),
-  "randomForest" = function(x, y)
-    randomForest(x, y),
-  "honestRF" = function(x, y)
-    honestRF(x, y)
-)
-
-predictor_grid <- list(
-  "ranger" = function(estimator, x)
-    predict(estimator, dat=x)$predictions,
-  "randomForest" = function(estimator, x)
-    predict(estimator, newdata=x),
-  "honestRF" = function(estimator, x)
-    predict(estimator, x)
-)
-
-## Setting up where the data should be saved:
-data_folder_name <- "tests/performance/simulations/RF/sim_data/"
-if (!dir.exists(data_folder_name))
-  dir.create(data_folder_name)
-filename <- paste0(data_folder_name, "simulation_", setup, "_", Sys.Date(), ".csv")
-if (dir.exists(filename))
-  file.remove(filename)
-
-
 ## loop through all cases:
 for (seed in seed_grid) {
   for (dim in dim_grid) {
