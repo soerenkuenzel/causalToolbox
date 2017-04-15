@@ -17,18 +17,19 @@ Results <- tbl_df(Results[, -14])
 
 # setup the colors
 cols <- c(
-  "F_RF" = "grey",
-  "S_RF" = "red",
-  "T_RF" = "green",
-  "U_RF" = "green3",
-  "U_half_RF" = "#00C094",
+  "S_RF" = "green",
+  "T_RF" = "green3",
   "X_RF" = "blue",
-  "X_RF_sRF" = "blue3"
+  "CF" = "red",
+  "CF_p" = "red3"
+  # "U_half_RF" = "#00C094",
+  # "X_RF_sRF" = "blue3"
 )
 
 # all estimators:
 for (this_setup in unique(Results$setup)) {
-  Results %>% filter(setup == this_setup) %>% group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
+  Results %>% filter(setup == this_setup) %>%
+    group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
     summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
     filter(dim %in% c(5, 20, 100), alpha %in% c(0, 0.1, 10)) %>%
     mutate(dima = factor(
