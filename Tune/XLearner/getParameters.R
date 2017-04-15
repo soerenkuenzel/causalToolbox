@@ -70,13 +70,54 @@ bscols(
   d3scatter(shared_tuning_settings_all, ~Wager1, ~STMpp,~aa, width="100%", height=300 )
 )
 
-
+#starting point 1
 apply(tuning_settings[ , 1:14] , 2, function(x) table(x, relevant_high))
 
 
+sp_1_firstStage <- data.frame(
+  mtry_first = round(ncol(feat) / 2),
+  min_node_size_spl_first = 1,
+  min_node_size_ave_first = 5,
+  splitratio_first = .5,
+  replace_first = TRUE,
+  sample_fraction_first = 0.8
+)
+sp_1_secondStage <- data.frame(
+  predmode = "propmean",
+  mtry_second = ncol(feat),
+  min_node_size_spl_second = 5,
+  min_node_size_ave_second = 3,
+  splitratio_second = .5,
+  replace_second = TRUE,
+  sample_fraction_second = 0.9
+)
+
+#starting point 2
+
+ss <- as.data.frame(ss)
+ss$rare1
+relevant_high2 <- !is.na(ss$rare1) & (ss$rare1 == 1 | ss$STMpp == 1 | ss$Wager1 == 1)
+
+apply(tuning_settings[ , 1:14] , 2, function(x) table(x, relevant_high2))
 
 
-
+sp_2_firstStage <- data.frame(
+    mtry_first = round(ncol(feat) / 2),
+    min_node_size_spl_first = 1,
+    min_node_size_ave_first = 1,
+    splitratio_first = .4,
+    replace_first = FALSE,
+    sample_fraction_first = 0.7
+  )
+sp_2_secondStage <- data.frame(
+  predmode = "propmean",
+  mtry_second = max(1, round(ncol(feat) / 5)),
+  min_node_size_spl_second = 10,
+  min_node_size_ave_second = 3,
+  splitratio_second = .75,
+  replace_second = FALSE,
+  sample_fraction_second = 0.8
+)
 
 
 

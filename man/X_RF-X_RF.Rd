@@ -10,12 +10,12 @@
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
-  secondstageVar = NULL, ntree_first = 100, ntree_second = 100,
+  secondstageVar = NULL, ntree_first = 500, ntree_second = 500,
   mtry_first = round(ncol(feat)/2), mtry_second = ncol(feat),
-  min_node_size_spl_first = 3, min_node_size_ave_first = 3,
+  min_node_size_spl_first = 1, min_node_size_ave_first = 5,
   min_node_size_spl_second = 5, min_node_size_ave_second = 3,
   splitratio_first = 0.5, splitratio_second = 0.5, replace_first = TRUE,
-  replace_second = TRUE, sample_fraction_first = 0.9,
+  replace_second = TRUE, sample_fraction_first = 0.8,
   sample_fraction_second = 0.9, nthread = 4, verbose = TRUE)
 }
 \arguments{
