@@ -1,4 +1,5 @@
 library(dplyr)
+library(MASS)
 
 #############################
 # Simulation Data Generator #

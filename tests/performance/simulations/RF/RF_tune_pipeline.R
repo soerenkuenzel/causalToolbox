@@ -6,11 +6,8 @@ if(length(args)==0){
   print("No arguments supplied.")
   setup_i = 1
   nthread = 4
-  nsamples = 100000
-  dim = 20
   ntrain = 10000
-  ntest = 10000
-  alpha = 0.1
+  dim = 20
 }else{
   for(i in 1:length(args)){
     eval(parse(text=args[[i]]))
@@ -28,6 +25,10 @@ setup_grid <-
     "HighSignalToNoiseLinearModel",
     "LowSignalToNoiseLinearModel"
   )
+
+nsamples = 100000
+ntest = 10000
+alpha = 0.1
 
 setup <- setup_grid[[setup_i]]
 print(setup)
@@ -54,7 +55,7 @@ data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
-  paste0(data_folder_name, "tuning_", setup, "_", Sys.Date(), ".csv")
+  paste0(data_folder_name, "tuning_", setup, "_", ntrain, "_", dim, "_", Sys.Date(), ".csv")
 if (file.exists(filename))
   file.remove(filename)
 
