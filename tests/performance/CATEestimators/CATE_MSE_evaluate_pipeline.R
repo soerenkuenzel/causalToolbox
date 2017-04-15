@@ -5,7 +5,7 @@
 #execude it for i raning from 1 to 11 to go thorough all settings:
 args <- commandArgs(TRUE)
 setup_i <- -as.numeric(args[1])
-print(setup_i)
+print(setup_i) #setup_i <- 1
 
 set.seed(1145)
 nthread = 8
@@ -14,6 +14,7 @@ nthread = 8
 library(hte)
 library(dplyr)
 library(reshape)
+library(causalForest)
 
 setup_grid <-
   c(
@@ -48,7 +49,25 @@ estimator_grid <- list(
   "T_RF" = function(feat, W, Yobs)
     T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
-    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)
+    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
+  "CF_p" = function(feat, W, Yobs)
+    propensityForest(
+      X = feat,
+      W = W,
+      Y = Yobs,
+      num.trees = 500,
+      sample.size = nrow(feat) / 10,
+      nodesize = 1
+    ),
+  "CF" = function(feat, W, Yobs)
+    causalForest(
+      X = feat,
+      W = W,
+      Y = Yobs,
+      num.trees = 500,
+      sample.size = nrow(feat) / 10,
+      nodesize = 1
+    )
 )
 
 ## Setting up where the data should be saved:
