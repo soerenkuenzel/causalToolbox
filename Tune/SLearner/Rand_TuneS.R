@@ -2,31 +2,31 @@
 library(hte)
 
 # We start by loading the setup and
-# args = (commandArgs(TRUE))
-# print(args)
-# setup_i <- -as.numeric(args)
-# print(setup_i)
+args = (commandArgs(TRUE))
+print(args)
+setup_i <- -as.numeric(args)
+print(setup_i)
 
-# setup_grid <- c(
-#     "RespSparseTau1strong",
-#     "RsparseT2weak",
-#     "complexTau",
-#     "Conf1",
-#     "rare1",
-#     "STMpp",
-#     "Ufail",
-#     "Usual1",
-#     "Wager1",
-#     "Wager2",
-#     "Wager3"
-#   )
-# setup <- setup_grid[setup_i]
-# print(setup)
+setup_grid <- c(
+  "RespSparseTau1strong",
+  "RsparseT2weak",
+  "complexTau",
+  "Conf1",
+  "rare1",
+  "STMpp",
+  "Ufail",
+  "Usual1",
+  "Wager1",
+  "Wager2",
+  "Wager3"
+)
+setup <- setup_grid[setup_i]
+print(setup)
 
-setup <- "Wager1"
+# setup <- "Wager1"
 
 set.seed(59906)
-nthread <- 32
+nthread <- 1
 nsamples <- 1e5
 dim <- 20
 ntrain <- 10000
@@ -44,7 +44,7 @@ Rand_tune <- data.frame(
   splitratio = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
   replace = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   sample_fraction = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,
-                                 replace = TRUE)
+                           replace = TRUE)
 )
 
 

@@ -1,4 +1,4 @@
 #!/bin/bash
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 1
 R CMD BATCH --no-save Rand_TuneS.R Rand_TuneS_setup_9.Rout
 
