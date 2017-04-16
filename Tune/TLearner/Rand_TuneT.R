@@ -8,26 +8,26 @@ setup_i <- -as.numeric(args)
 print(setup_i)
 
 setup_grid <- c(
-    "RespSparseTau1strong",
-    "RsparseT2weak",
-    "complexTau",
-    "Conf1",
-    "rare1",
-    "STMpp",
-    "Ufail",
-    "Usual1",
-    "Wager1",
-    "Wager2",
-    "Wager3"
-  )
-setup <- setup_grid[setup_i]
-print(setup)
+     "RespSparseTau1strong",
+     "RsparseT2weak",
+     "complexTau",
+     "Conf1",
+     "rare1",
+     "STMpp",
+     "Ufail",
+     "Usual1",
+     "Wager1",
+     "Wager2",
+     "Wager3"
+   )
+ setup <- setup_grid[setup_i]
+ print(setup)
 
-# setup <- "RespSparseTau1strong"
+#setup <- "RespSparseTau1strong"
 
 set.seed(59906)
-nthread <- 1
-nsamples <- 1e5
+nthread <- 24
+nsamples <- 10000
 dim <- 20
 ntrain <- 10000
 ntest <- 10000
