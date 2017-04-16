@@ -26,7 +26,7 @@ library(hte)
 setup <- "Wager1"
 
 set.seed(59906)
-nthread <- 32
+nthread <- 24
 nsamples <- 1e5
 dim <- 20
 ntrain <- 10000
