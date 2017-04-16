@@ -18,7 +18,7 @@ EstimateCate(xl, feat)
 
 # Example 2: large n
 set.seed(400189)
-n <- 2000
+n <- 20000
 d <- 12
 
 feat <- as.data.frame(matrix(rnorm(n*d), nrow = n))
