@@ -32,8 +32,8 @@ for (j in 1:length(estimator_folders)) {
   tuning_settings[[estimator_name]] <-
     tbl_df(tuning_settings[[estimator_name]])
 }
-tuning_settings
 
+apply(tuning_settings[[1]], 2, function(x) table(is.na(x)))
 
 ## Which settings to use?
 tuning_settings[["X-learner"]] %>%
@@ -41,5 +41,30 @@ tuning_settings[["X-learner"]] %>%
   ggplot(aes(x=RespSparseTau1strong, y=STMpp)) +
   geom_point()
 # decided on "RsparseT2weak" "STMpp"
+
+
+
+tuning_settings[["X-learner"]] %>%
+  filter(STMpp < 100, RespSparseTau1strong < 100) %>%
+  ggplot(aes(x=RespSparseTau1strong, y=STMpp)) +
+  geom_point()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
