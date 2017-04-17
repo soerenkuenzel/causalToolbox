@@ -28,6 +28,6 @@ test_that("Tests that random forest is working correctly", {
 
   # Mean Square Error
   sum((y_pred - y) ^ 2)
-  expect_equivalent(round(sum((y_pred - y) ^ 2), 6)
-                    , 8.457087)
+  expect_equivalent(sum((y_pred - y) ^ 2)
+                    , 8.457087156)
 })

@@ -28,6 +28,7 @@ cols <- c(
 
 # all estimators:
 for (this_setup in unique(Results$setup)) {
+  plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
   Results %>% filter(setup == this_setup) %>%
     group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
     summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
@@ -45,7 +46,7 @@ for (this_setup in unique(Results$setup)) {
     ggplot(aes(x = ntrain, y = MSE, color = estimator)) +
     geom_line() +
     geom_point(aes(shape = estimator), size = 1) +
-    facet_wrap( ~ dima, scales = "free") +
+    facet_wrap( ~ dima, scales = "free", ncol = plot_ncol) +
     scale_y_log10() +
     ggtitle(this_setup) +
     theme_minimal()
