@@ -26,7 +26,7 @@ print(setup)
 # setup <- "Wager1"
 
 set.seed(59906)
-nthread <- 20
+nthread <- 24
 nsamples <- 10000
 dim <- 20
 ntrain <- 10000

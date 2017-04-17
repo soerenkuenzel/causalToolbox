@@ -24,7 +24,7 @@ setup <- setup_grid[setup_i]
 print(setup)
 
 set.seed(59906)
-nthread <- 2
+nthread <- 24
 nsamples <- 1e5
 dim <- 20
 ntrain <- 10000
