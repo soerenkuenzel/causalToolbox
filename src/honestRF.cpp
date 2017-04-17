@@ -7,7 +7,7 @@
 honestRF::honestRF():
   _trainingData(nullptr), _ntree(0), _replace(0), _sampSize(0),
   _splitRatio(0), _mtry(0), _nodeSizeSpt(0), _nodeSizeAvg(0),
-  _forest(nullptr), _seed(0), _verbose(0){};
+  _forest(nullptr), _seed(0), _verbose(0), _nthread(0), _OOBError(0){};
 
 honestRF::~honestRF(){
 //  for (std::vector<honestRFTree*>::iterator it = (*_forest).begin();
@@ -40,6 +40,7 @@ honestRF::honestRF(
   this->_nodeSizeSpt = nodeSizeSpt;
   this->_nodeSizeAvg = nodeSizeAvg;
   this->_seed = seed;
+  this->_nthread = nthread;
   this->_verbose = verbose;
 
   if (splitRatio > 1 || splitRatio < 0) {
@@ -83,7 +84,7 @@ honestRF::honestRF(
         // loop over all items
         for (int i = iStart; i < iEnd; i++) {
   #else
-  for(int i=0; i<getNtree(); i++ ){
+  for(int i=0; i< ((int) getNtree()); i++ ){
   #endif
           unsigned int myseed = getSeed() * (i + 1);
 
@@ -199,8 +200,7 @@ honestRF::honestRF(
 }
 
 std::unique_ptr< std::vector<double> > honestRF::predict(
-  std::vector< std::vector<double> >* xNew,
-  size_t nthread
+  std::vector< std::vector<double> >* xNew
 ){
 
   std::vector<double> prediction;
@@ -209,14 +209,14 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
     prediction.push_back(0);
   }
 
-  size_t nthreadToUse = nthread;
-  if (nthread == 0) {
+  #if DOPARELLEL
+  size_t nthreadToUse = getNthread();
+  if (getNthread() == 0) {
     // Use all threads
     nthreadToUse = std::thread::hardware_concurrency();
   }
 //  std::cout << "Parallel using " << nthreadToUse << " threads..." << std::endl;
 
-  #if DOPARELLEL
   std::vector<std::thread> allThreads(nthreadToUse);
   std::mutex threadLock;
 
@@ -227,8 +227,8 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
         // loop over all items
         for (int i=iStart; i < iEnd; i++) {
   #else
-  for(int i=0; i<getNtree(); i++ ) {
-#endif
+  for(int i=0; i<((int) getNtree()); i++ ) {
+  #endif
           try {
             std::vector<double> currentTreePrediction(numObservations);
             honestRFTree *currentTree = (*getForest())[i].get();
@@ -250,7 +250,7 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
             std::cerr << err.what() << std::endl;
           }
       }
-#if DOPARELLEL
+  #if DOPARELLEL
       },
       t * getNtree() / nthreadToUse,
       (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
@@ -276,3 +276,88 @@ std::unique_ptr< std::vector<double> > honestRF::predict(
 
   return prediction_;
 }
+
+void honestRF::calculateOOBError() {
+
+  size_t numObservations = getTrainingData()->getNumRows();
+
+  std::vector<double> outputOOBPrediction(numObservations);
+  std::vector<size_t> outputOOBCount(numObservations);
+
+  for (size_t i=0; i<numObservations; i++) {
+    outputOOBPrediction[i] = 0;
+    outputOOBCount[i] = 0;
+  }
+
+  #if DOPARELLEL
+  size_t nthreadToUse = getNthread();
+  if (nthreadToUse == 0) {
+    // Use all threads
+    nthreadToUse = std::thread::hardware_concurrency();
+  }
+  std::vector<std::thread> allThreads(nthreadToUse);
+  std::mutex threadLock;
+
+  for (size_t t = 0; t < nthreadToUse; t++) {
+    auto dummyThread = std::bind(
+      [&](const int iStart, const int iEnd, const int t) {
+
+        // loop over all items
+        for (int i=iStart; i < iEnd; i++) {
+  #else
+  for (int i=0; i<((int) getNtree()); i++ ) {
+  #endif
+          try {
+            std::vector<double> outputOOBPrediction_iteration(numObservations);
+            std::vector<size_t> outputOOBCount_iteration(numObservations);
+            for (size_t j=0; j<numObservations; j++) {
+              outputOOBPrediction_iteration[j] = 0;
+              outputOOBCount_iteration[j] = 0;
+            }
+            honestRFTree *currentTree = (*getForest())[i].get();
+            (*currentTree).getOOBPrediction(
+              outputOOBPrediction_iteration,
+              outputOOBCount_iteration,
+              getTrainingData()
+            );
+
+          #if DOPARELLEL
+            std::lock_guard<std::mutex> lock(threadLock);
+          #endif
+
+            for (size_t j=0; j < numObservations; j++) {
+              outputOOBPrediction[j] += outputOOBPrediction_iteration[j];
+              outputOOBCount[j] += outputOOBCount_iteration[j];
+            }
+
+          } catch (std::runtime_error &err) {
+            std::cerr << err.what() << std::endl;
+          }
+        }
+#if DOPARELLEL
+        },
+        t * getNtree() / nthreadToUse,
+        (t + 1) == nthreadToUse ? getNtree() : (t + 1) * getNtree() / nthreadToUse,
+        t
+    );
+    allThreads[t] = std::thread(dummyThread);
+  }
+
+  std::for_each(
+    allThreads.begin(),
+    allThreads.end(),
+    [](std::thread& x) { x.join(); }
+  );
+  #endif
+
+  double OOB_MSE = 0;
+  for (size_t j=0; j<numObservations; j++){
+    double trueValue = getTrainingData()->getOutcomePoint(j);
+    if (outputOOBCount[j] != 0) {
+      OOB_MSE +=
+        pow(trueValue - outputOOBPrediction[j] / outputOOBCount[j], 2);
+    }
+  }
+
+  this->_OOBError = OOB_MSE;
+};

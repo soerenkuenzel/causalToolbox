@@ -9,7 +9,8 @@
 #define TEST_RFNode false
 #define TEST_RFTree false
 #define TEST_RF false
-#define TEST_CRASH true
+#define TEST_CRASH false
+#define TEST_OOB true
 
 template<typename Generator>
 void getrands(std::vector<double>& x, Generator& gen, unsigned num)
@@ -414,7 +415,7 @@ int main() {
       // Test prediction
       std::unique_ptr< std::vector<double> > testForestPrediction (
         (*testFullForest).predict(
-          (*testFullForest).getTrainingData()->getAllFeatureData(), 0
+          (*testFullForest).getTrainingData()->getAllFeatureData()
         )
       );
 
@@ -441,6 +442,66 @@ int main() {
       std::unique_ptr<honestRF> testFullForest( new honestRF(
         std::move(iris), 500, true, 929, 0.1, 16, 3, 100, 24750371, 1, true
       ));
+
+    } catch (std::runtime_error &err) {
+      std::cout << err.what() << std::endl;
+    }
+  }
+
+  if (TEST_OOB) {
+    try {
+      // Test RF
+      srand (24750371);
+
+      size_t sample_size = (size_t) numRows / 3;
+
+      std::vector<size_t> firstHalfIndex(sample_size);
+      IncGenerator h1(0);
+      std::generate(firstHalfIndex.begin(), firstHalfIndex.end(), h1);
+      std::vector<size_t> secondHalfIndex(sample_size);
+      IncGenerator h2(sample_size);
+      std::generate(secondHalfIndex.begin(), secondHalfIndex.end(), h2);
+
+      std::unique_ptr< std::vector<size_t> > averagingSampleIndex__(
+              new std::vector<size_t>(firstHalfIndex));
+      std::unique_ptr< std::vector<size_t> > splittingSampleIndex__(
+              new std::vector<size_t>(secondHalfIndex));
+
+      std::unique_ptr< honestRFTree > testFullTree( new honestRFTree(
+        iris.get(), 4, 5, 5,
+        std::move(averagingSampleIndex__),
+        std::move(splittingSampleIndex__),
+        24750371
+      ) );
+
+      std::vector<double> outputOOBPrediction(numRows);
+      std::vector<size_t> outputOOBCount(numRows);
+      for (size_t i=0; i<numRows; i++) {
+        outputOOBPrediction[i] = 0;
+        outputOOBCount[i] = 0;
+      }
+
+      (*testFullTree).getOOBPrediction(
+        outputOOBPrediction,
+        outputOOBCount,
+        iris.get()
+      );
+
+      for (size_t i=0; i<numRows; i++) {
+        std::cout << outputOOBPrediction[i] << "  ";
+      }
+      std::cout << std::endl;
+
+      for (size_t i=0; i<numRows; i++) {
+        std::cout << outputOOBCount[i] << "  ";
+      }
+      std::cout << std::endl;
+
+      std::unique_ptr<honestRF> testFullForest( new honestRF(
+        std::move(iris), 500, true, 929, 1, 16, 100, 100, 24750371, 4, true
+      ));
+
+      std::cout << (*testFullForest).getOOBError() << std::endl;
 
     } catch (std::runtime_error &err) {
       std::cout << err.what() << std::endl;

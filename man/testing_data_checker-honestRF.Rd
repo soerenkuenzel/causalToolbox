@@ -5,15 +5,12 @@
 \alias{testing_data_checker}
 \title{testing_data_checker-hoenstRF}
 \usage{
-testing_data_checker(x, feature.new, nthread)
+testing_data_checker(x, feature.new)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
 
 \item{feature.new}{A data frame of testing predictors.}
-
-\item{nthread}{Number of threads to train and predict thre forest. The
-default number is 0 which represents using all cores.}
 }
 \description{
 Check the testing data to do prediction

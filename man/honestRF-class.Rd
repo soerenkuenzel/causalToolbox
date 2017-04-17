@@ -23,5 +23,33 @@ for trees to detect categorical columns.}
 \item{\code{categoricalFeatureMapping}}{A list of encoding details for each
 categorical column, including all unique factor values and their
 corresponding numeric representation.}
+
+\item{\code{ntree}}{The number of trees to grow in the forest. The default value is
+500.}
+
+\item{\code{replace}}{An indicator of whether sampling of training data is with
+replacement. The default value is TRUE.}
+
+\item{\code{sampsize}}{The size of total samples to draw for the training data. If
+sampling with replacement, the default value is the length of the training
+data. If samplying without replacement, the default value is two-third of
+the length of the training data.}
+
+\item{\code{mtry}}{The number of variables randomly selected at each split point.
+The default value is set to be one third of total number of features of the
+training data.}
+
+\item{\code{nodesizeSpl}}{The minimum observations contained in terminal nodes. The
+default value is 5.}
+
+\item{\code{nodesizeAvg}}{Minimum size of terminal nodes for averaging dataset.
+The default value is 5.}
+
+\item{\code{splitratio}}{Proportion of the training data used as the splitting
+dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
+splitting dataset becomes the total entire sampled set and the averaging
+dataset is empty. If the ratio is 0, then the splitting data set is empty
+and all the data is used for the averaging data set (This is not a good
+usage however since there will be no data available for splitting).}
 }}
 

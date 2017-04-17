@@ -94,8 +94,7 @@ SEXP rcpp_cppBuildInterface(
 // [[Rcpp::export]]
 Rcpp::NumericVector rcpp_cppPredictInterface(
   SEXP forest,
-  Rcpp::List x,
-  int nthread
+  Rcpp::List x
 ){
 
   try {
@@ -106,7 +105,7 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
       Rcpp::as< std::vector< std::vector<double> > >(x);
 
     std::unique_ptr< std::vector<double> > testForestPrediction (
-      (*testFullForest).predict(&featureData, (size_t) nthread)
+      (*testFullForest).predict(&featureData)
     );
 
     std::vector<double>* testForestPrediction_ =
@@ -122,4 +121,22 @@ Rcpp::NumericVector rcpp_cppPredictInterface(
     ::Rf_error("c++ exception (unknown reason)");
   }
   return NULL;
+}
+
+
+// [[Rcpp::export]]
+double rcpp_OBBPredictInterface(
+    SEXP forest
+){
+
+  try {
+    Rcpp::XPtr< honestRF > testFullForest(forest) ;
+    double OOBError = (*testFullForest).getOOBError();
+    return OOBError;
+  } catch(std::runtime_error const& err) {
+    forward_exception_to_r(err);
+  } catch(...) {
+    ::Rf_error("c++ exception (unknown reason)");
+  }
+  return Rcpp::NumericVector::get_na() ;
 }

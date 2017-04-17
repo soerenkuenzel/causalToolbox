@@ -7,15 +7,12 @@
 \alias{honestRF-method}
 \title{predict-honestRF}
 \usage{
-\S4method{predict}{honestRF}(object, feature.new, nthread = 0)
+\S4method{predict}{honestRF}(object, feature.new)
 }
 \arguments{
 \item{object}{A `honestRF` object.}
 
 \item{feature.new}{A data frame of testing predictors.}
-
-\item{nthread}{Number of threads to train and predict thre forest. The
-default number is 0 which represents using all cores.}
 }
 \value{
 A vector of predicted responses.

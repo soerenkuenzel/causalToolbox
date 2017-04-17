@@ -146,13 +146,10 @@ training_data_checker <- function(
 #' @description Check the testing data to do prediction
 #' @param x A data frame of all training predictors.
 #' @param feature.new A data frame of testing predictors.
-#' @param nthread Number of threads to train and predict thre forest. The
-#' default number is 0 which represents using all cores.
 #' @export honestRF
 testing_data_checker <- function(
   x,
-  feature.new,
-  nthread
+  feature.new
 ){
   feature.new <- as.data.frame(feature.new)
   x <- as.data.frame(x)
@@ -165,19 +162,6 @@ testing_data_checker <- function(
     stop("training data and testing data do not have same dimensionality.")
   }
 
-  if (nthread < 0 || nthread %% 1 != 0) {
-    stop("nthread must be a nonegative integer.")
-  }
-
-  if (nthread > 0) {
-    #' @import parallel
-    library(parallel)
-    if (nthread > detectCores()) {
-      stop(paster0(
-        "nthread cannot exceed total cores in the computer: ", detectCores()
-      ))
-    }
-  }
 }
 
 ########################################
@@ -196,6 +180,27 @@ testing_data_checker <- function(
 #' @slot categoricalFeatureMapping A list of encoding details for each
 #' categorical column, including all unique factor values and their
 #' corresponding numeric representation.
+#' @slot ntree The number of trees to grow in the forest. The default value is
+#' 500.
+#' @slot replace An indicator of whether sampling of training data is with
+#' replacement. The default value is TRUE.
+#' @slot sampsize The size of total samples to draw for the training data. If
+#' sampling with replacement, the default value is the length of the training
+#' data. If samplying without replacement, the default value is two-third of
+#' the length of the training data.
+#' @slot mtry The number of variables randomly selected at each split point.
+#' The default value is set to be one third of total number of features of the
+#' training data.
+#' @slot nodesizeSpl The minimum observations contained in terminal nodes. The
+#' default value is 5.
+#' @slot nodesizeAvg Minimum size of terminal nodes for averaging dataset.
+#' The default value is 5.
+#' @slot splitratio Proportion of the training data used as the splitting
+#' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
+#' splitting dataset becomes the total entire sampled set and the averaging
+#' dataset is empty. If the ratio is 0, then the splitting data set is empty
+#' and all the data is used for the averaging data set (This is not a good
+#' usage however since there will be no data available for splitting).
 #' @exportClass honestRF
 setClass(
   Class="honestRF",
@@ -204,7 +209,14 @@ setClass(
     x="data.frame",
     y="numeric",
     categoricalFeatureCols="list",
-    categoricalFeatureMapping="list"
+    categoricalFeatureMapping="list",
+    ntree="numeric",
+    replace="logical",
+    sampsize="numeric",
+    mtry="numeric",
+    nodesizeSpl="numeric",
+    nodesizeAvg="numeric",
+    splitratio="numeric"
   )
 )
 
@@ -323,7 +335,14 @@ honestRF <- function(
         x=as.data.frame(x),
         y=y,
         categoricalFeatureCols=categoricalFeatureCols,
-        categoricalFeatureMapping=categoricalFeatureMapping
+        categoricalFeatureMapping=categoricalFeatureMapping,
+        ntree=ntree,
+        replace=replace,
+        sampsize=sampsize,
+        mtry=mtry,
+        nodesizeSpl=nodesizeSpl,
+        nodesizeAvg=nodesizeAvg,
+        splitratio=splitratio
       )
     )
   }, error = function(err) {
@@ -344,8 +363,6 @@ honestRF <- function(
 #' @description Return the prediction from the forest.
 #' @param object A `honestRF` object.
 #' @param feature.new A data frame of testing predictors.
-#' @param nthread Number of threads to train and predict thre forest. The
-#' default number is 0 which represents using all cores.
 #' @return A vector of predicted responses.
 #' @aliases predict, honestRF-method
 #' @exportMethod predict
@@ -354,12 +371,11 @@ setMethod(
   signature="honestRF",
   definition=function(
     object,
-    feature.new,
-    nthread=0
+    feature.new
   ){
 
     # Preprocess the data
-    testing_data_checker(object@x, feature.new, nthread)
+    testing_data_checker(object@x, feature.new)
 
     processed_x <- preprocess_testing(
       feature.new,
@@ -368,12 +384,56 @@ setMethod(
     )
 
     rcppPrediction <- tryCatch({
-      return(rcpp_cppPredictInterface(object@forest, processed_x, nthread))
+      return(rcpp_cppPredictInterface(object@forest, processed_x))
     }, error = function(err) {
       print(err)
       return(NULL)
     })
 
     return(rcppPrediction)
+  }
+)
+
+
+###########################
+### Calculate OOB Error ###
+###########################
+#' @title getOOB-honestRF
+#' @name getOOB-honestRF
+#' @rdname getOOB-honestRF
+#' @description Calculate the out-of-bag error of a given forest.
+#' @param object A `honestRF` object.
+setGeneric(
+  name="getOOB",
+  def=function(
+    object
+  ){
+    standardGeneric("getOOB")
+  }
+)
+
+#' @title getOOB-honestRF
+#' @aliases getOOB, honestRF-method
+#' @return The OOB error of the forest.
+#' @exportMethod getOOB
+setMethod(
+  f="getOOB",
+  signature="honestRF",
+  definition=function(
+    object
+  ){
+
+    if (!object@replace && 0.8 * nrow(object@x) < object@sampsize) {
+      warning("Samples are drawn without replacement and sample size is too big!")
+    }
+
+    rcppOOB <- tryCatch({
+      return(rcpp_OBBPredictInterface(object@forest))
+    }, error = function(err) {
+      print(err)
+      return(NA)
+    })
+
+    return(rcppOOB)
   }
 )

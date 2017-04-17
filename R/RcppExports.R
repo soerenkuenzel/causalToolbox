@@ -5,8 +5,12 @@ rcpp_cppBuildInterface <- function(x, y, catCols, numRows, numColumns, ntree, re
     .Call('hte_rcpp_cppBuildInterface', PACKAGE = 'hte', x, y, catCols, numRows, numColumns, ntree, replace, sampsize, mtry, splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose)
 }
 
-rcpp_cppPredictInterface <- function(forest, x, nthread) {
-    .Call('hte_rcpp_cppPredictInterface', PACKAGE = 'hte', forest, x, nthread)
+rcpp_cppPredictInterface <- function(forest, x) {
+    .Call('hte_rcpp_cppPredictInterface', PACKAGE = 'hte', forest, x)
+}
+
+rcpp_OBBPredictInterface <- function(forest) {
+    .Call('hte_rcpp_OBBPredictInterface', PACKAGE = 'hte', forest)
 }
 
 rcpp_selectBestFeature <- function(x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols) {

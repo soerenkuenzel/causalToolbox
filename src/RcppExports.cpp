@@ -31,15 +31,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_cppPredictInterface
-Rcpp::NumericVector rcpp_cppPredictInterface(SEXP forest, Rcpp::List x, int nthread);
-RcppExport SEXP hte_rcpp_cppPredictInterface(SEXP forestSEXP, SEXP xSEXP, SEXP nthreadSEXP) {
+Rcpp::NumericVector rcpp_cppPredictInterface(SEXP forest, Rcpp::List x);
+RcppExport SEXP hte_rcpp_cppPredictInterface(SEXP forestSEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type forest(forestSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type nthread(nthreadSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_cppPredictInterface(forest, x, nthread));
+    rcpp_result_gen = Rcpp::wrap(rcpp_cppPredictInterface(forest, x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_OBBPredictInterface
+double rcpp_OBBPredictInterface(SEXP forest);
+RcppExport SEXP hte_rcpp_OBBPredictInterface(SEXP forestSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type forest(forestSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_OBBPredictInterface(forest));
     return rcpp_result_gen;
 END_RCPP
 }

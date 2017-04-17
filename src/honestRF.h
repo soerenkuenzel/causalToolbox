@@ -28,9 +28,15 @@ public:
   );
 
   std::unique_ptr< std::vector<double> > predict(
-    std::vector< std::vector<double> >* xNew,
-    size_t nthread
+    std::vector< std::vector<double> >* xNew
   );
+
+  void calculateOOBError();
+
+  double getOOBError() {
+    calculateOOBError();
+    return _OOBError;
+  }
 
   DataFrame* getTrainingData() {
     return _trainingData.get();
@@ -76,6 +82,10 @@ public:
     return _verbose;
   }
 
+  size_t getNthread(){
+    return _nthread;
+  }
+
 private:
   std::unique_ptr<DataFrame> _trainingData;
   size_t _ntree;
@@ -88,6 +98,8 @@ private:
   std::unique_ptr< std::vector< std::unique_ptr< honestRFTree > > > _forest;
   unsigned int _seed;
   bool _verbose;
+  size_t _nthread;
+  double _OOBError;
 };
 
 #endif //HTECPP_RF_H

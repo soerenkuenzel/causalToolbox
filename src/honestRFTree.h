@@ -59,6 +59,17 @@ public:
 
   void printTree();
 
+  void getOOBindex(
+    std::vector<size_t> &outputOOBIndex,
+    size_t nRows
+  );
+
+  void getOOBPrediction(
+    std::vector<double> &outputOOBPrediction,
+    std::vector<size_t> &outputOOBCount,
+    DataFrame* trainingData
+  );
+
   size_t getMtry() {
     return _mtry;
   }

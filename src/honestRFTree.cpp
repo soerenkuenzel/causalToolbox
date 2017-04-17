@@ -633,3 +633,105 @@ void honestRFTree::selectBestFeature(
 void honestRFTree::printTree(){
   (*getRoot()).printSubtree();
 }
+
+void honestRFTree::getOOBindex(
+  std::vector<size_t> &outputOOBIndex,
+  size_t nRows
+){
+
+  // Generate union of splitting and averaging dataset
+  std::sort(
+    (*getSplittingIndex()).begin(),
+    (*getSplittingIndex()).end()
+  );
+  std::sort(
+    (*getAveragingIndex()).begin(),
+    (*getAveragingIndex()).end()
+  );
+
+  std::vector<size_t> allSampledIndex(
+    (*getSplittingIndex()).size() + (*getAveragingIndex()).size()
+  );
+
+  std::vector<size_t>::iterator it= std::set_union(
+    (*getSplittingIndex()).begin(),
+    (*getSplittingIndex()).end(),
+    (*getAveragingIndex()).begin(),
+    (*getAveragingIndex()).end(),
+    allSampledIndex.begin()
+  );
+
+  allSampledIndex.resize((unsigned long) (it - allSampledIndex.begin()));
+
+  // Generate a vector of all index based on nRows
+  struct IncGenerator {
+    size_t current_;
+    IncGenerator(size_t start): current_(start) {}
+    size_t operator()() { return current_++; }
+  };
+  std::vector<size_t> allIndex(nRows);
+  IncGenerator g(0);
+  std::generate(allIndex.begin(), allIndex.end(), g);
+
+  // OOB index is the set difference between sampled index and all index
+  std::vector<size_t> OOBIndex(nRows);
+
+  it = std::set_difference (
+    allIndex.begin(),
+    allIndex.end(),
+    allSampledIndex.begin(),
+    allSampledIndex.end(),
+    OOBIndex.begin()
+  );
+  OOBIndex.resize((unsigned long) (it - OOBIndex.begin()));
+
+  for (
+    std::vector<size_t>::iterator it = OOBIndex.begin();
+    it != OOBIndex.end();
+    ++it
+  ) {
+    outputOOBIndex.push_back(*it);
+  }
+
+}
+
+void honestRFTree::getOOBPrediction(
+  std::vector<double> &outputOOBPrediction,
+  std::vector<size_t> &outputOOBCount,
+  DataFrame* trainingData
+){
+
+  std::vector<size_t> OOBIndex;
+  getOOBindex(OOBIndex, trainingData->getNumRows());
+
+  for (
+    std::vector<size_t>::iterator it = OOBIndex.begin();
+    it != OOBIndex.end();
+    ++it
+  ) {
+
+    size_t OOBSampleIndex = *it;
+
+    // Predict current oob sample
+    std::vector<double> currentTreePrediction(1);
+    std::vector<double> OOBSampleObservation((*trainingData).getNumColumns());
+    (*trainingData).getObservationData(OOBSampleObservation, OOBSampleIndex);
+
+    std::vector< std::vector<double> > OOBSampleObservation_;
+    for (size_t k=0; k<(*trainingData).getNumColumns(); k++){
+      std::vector<double> OOBSampleObservation_iter(1);
+      OOBSampleObservation_iter[0] = OOBSampleObservation[k];
+      OOBSampleObservation_.push_back(OOBSampleObservation_iter);
+    }
+
+    predict(
+      currentTreePrediction,
+      &OOBSampleObservation_,
+      trainingData
+    );
+
+    // Update the global OOB vector
+    outputOOBPrediction[OOBSampleIndex] += currentTreePrediction[0];
+    outputOOBCount[OOBSampleIndex] += 1;
+  }
+}
