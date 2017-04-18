@@ -13,7 +13,7 @@ honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
   nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
   nodesizeSpl = 5, nodesizeAvg = 5, splitratio = 1,
   seed = as.integer(runif(1) * 1000), verbose = FALSE, nthread = 0,
-  splitrule = "variance")
+  splitrule = "variance", middleSplit = FALSE)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -58,6 +58,10 @@ default number is 0 which represents using all cores.}
 \item{splitrule}{only variance is implemented at this point and it contains
 specifies the loss function according to which the splits of random forest
 should be made}
+
+\item{middleSplit}{if the split value is taking the average of two feature
+values. If false, it will take a point based on a uniform distribution
+between two feature values. (Default = FALSE)}
 }
 \value{
 A `honestRF` object.

@@ -24,7 +24,8 @@ public:
     size_t nodeSizeAvg,
     unsigned int seed,
     size_t nthread,
-    bool verbose
+    bool verbose,
+    bool splitMiddle
   );
 
   std::unique_ptr< std::vector<double> > predict(
@@ -37,6 +38,8 @@ public:
     calculateOOBError();
     return _OOBError;
   }
+
+  void addTrees(size_t ntree);
 
   DataFrame* getTrainingData() {
     return _trainingData.get();
@@ -86,6 +89,10 @@ public:
     return _nthread;
   }
 
+  bool getSplitMiddle(){
+    return _splitMiddle;
+  }
+
 private:
   std::unique_ptr<DataFrame> _trainingData;
   size_t _ntree;
@@ -100,6 +107,7 @@ private:
   bool _verbose;
   size_t _nthread;
   double _OOBError;
+  bool _splitMiddle;
 };
 
 #endif //HTECPP_RF_H

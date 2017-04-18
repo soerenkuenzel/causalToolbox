@@ -30,6 +30,9 @@
 #' usage however since there will be no data available for splitting).
 #' @param nthread Number of threads to train and predict thre forest. The
 #' default number is 0 which represents using all cores.
+#' @param middleSplit if the split value is taking the average of two feature
+#' values. If false, it will take a point based on a uniform distribution
+#' between two feature values. (Default = FALSE)
 #' @export honestRF
 training_data_checker <- function(
   x,
@@ -41,7 +44,8 @@ training_data_checker <- function(
   nodesizeSpl,
   nodesizeAvg,
   splitratio,
-  nthread
+  nthread,
+  middleSplit
 ){
   x <- as.data.frame(x)
 
@@ -112,15 +116,15 @@ training_data_checker <- function(
 
     warning("honestRF is used as adaptive random forest.")
 
-  } else {
-
-    if (splitSampleSize < 2 * nodesizeSpl){
-      stop("splitratio is too small such that splitting data cannot even be splitted!")
-    }
-
-    if (avgSampleSize < 2 * nodesizeAvg) {
-      stop("splitratio is too big such that averaging data cannot even be splitted!")
-    }
+#   } else {
+#
+#     if (splitSampleSize < 2 * nodesizeSpl){
+#       stop("splitratio is too small such that splitting data cannot even be splitted!")
+#     }
+#
+#     if (avgSampleSize < 2 * nodesizeAvg) {
+#       stop("splitratio is too big such that averaging data cannot even be splitted!")
+#     }
 
   }
 
@@ -136,6 +140,10 @@ training_data_checker <- function(
         "nthread cannot exceed total cores in the computer: ", detectCores()
         ))
     }
+  }
+
+  if (!is.logical(middleSplit)) {
+    stop("middleSplit must be TRUE or FALSE.")
   }
 
 }
@@ -201,6 +209,9 @@ testing_data_checker <- function(
 #' dataset is empty. If the ratio is 0, then the splitting data set is empty
 #' and all the data is used for the averaging data set (This is not a good
 #' usage however since there will be no data available for splitting).
+#' @slot middleSplit if the split value is taking the average of two feature
+#' values. If false, it will take a point based on a uniform distribution
+#' between two feature values. (Default = FALSE)
 #' @exportClass honestRF
 setClass(
   Class="honestRF",
@@ -216,7 +227,8 @@ setClass(
     mtry="numeric",
     nodesizeSpl="numeric",
     nodesizeAvg="numeric",
-    splitratio="numeric"
+    splitratio="numeric",
+    middleSplit="logical"
   )
 )
 
@@ -254,6 +266,9 @@ setClass(
 #' @param splitrule only variance is implemented at this point and it contains
 #' specifies the loss function according to which the splits of random forest
 #' should be made
+#' @param middleSplit if the split value is taking the average of two feature
+#' values. If false, it will take a point based on a uniform distribution
+#' between two feature values. (Default = FALSE)
 #' @export honestRF
 setGeneric(
   name="honestRF",
@@ -270,7 +285,8 @@ setGeneric(
     seed,
     verbose,
     nthread,
-    splitrule
+    splitrule,
+    middleSplit
     ){
     standardGeneric("honestRF")
   }
@@ -295,12 +311,13 @@ honestRF <- function(
   seed=as.integer(runif(1)*1000),
   verbose=FALSE,
   nthread=0,
-  splitrule="variance"
+  splitrule="variance",
+  middleSplit=FALSE
   ){
 
   # Preprocess the data
   training_data_checker(x, y, ntree,replace, sampsize, mtry, nodesizeSpl,
-                        nodesizeAvg, splitratio, nthread)
+                        nodesizeAvg, splitratio, nthread, middleSplit)
 
   preprocessedData <- preprocess_training(x, y)
   processed_x <- preprocessedData$x
@@ -326,7 +343,8 @@ honestRF <- function(
       categoricalFeatureCols_cpp,
       nObservations,
       numColumns, ntree, replace, sampsize, mtry,
-      splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose
+      splitratio, nodesizeSpl, nodesizeAvg, seed,
+      nthread, verbose, middleSplit
     )
     return(
       new(
@@ -342,7 +360,8 @@ honestRF <- function(
         mtry=mtry,
         nodesizeSpl=nodesizeSpl,
         nodesizeAvg=nodesizeAvg,
-        splitratio=splitratio
+        splitratio=splitratio,
+        middleSplit=middleSplit
       )
     )
   }, error = function(err) {
@@ -435,5 +454,54 @@ setMethod(
     })
 
     return(rcppOOB)
+  }
+)
+
+
+
+######################
+### Add More Trees ###
+######################
+#' @title addTrees-honestRF
+#' @name addTrees-honestRF
+#' @rdname addTrees-honestRF
+#' @description Add more trees to the existing forest.
+#' @param object A `honestRF` object.
+#' @param ntree Number of new trees to add
+setGeneric(
+  name="addTrees",
+  def=function(
+    object,
+    ntree
+  ){
+    standardGeneric("addTrees")
+  }
+)
+
+#' @title addTrees-honestRF
+#' @aliases addTrees, honestRF-method
+#' @exportMethod addTrees
+#' @return A `honestRF` object
+setMethod(
+  f="addTrees",
+  signature="honestRF",
+  definition=function(
+    object,
+    ntree
+  ){
+
+    if (ntree <= 0 || ntree %% 1 != 0) {
+      stop("ntree must be a positive integer.")
+    }
+
+    tryCatch({
+      rcpp_AddTreeInterface(object@forest, ntree)
+      object@ntree = object@ntree + ntree
+      return(object)
+    }, error = function(err) {
+      print(err)
+      return(NA)
+    })
+
   }
 )

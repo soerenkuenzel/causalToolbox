@@ -51,5 +51,9 @@ splitting dataset becomes the total entire sampled set and the averaging
 dataset is empty. If the ratio is 0, then the splitting data set is empty
 and all the data is used for the averaging data set (This is not a good
 usage however since there will be no data available for splitting).}
+
+\item{\code{middleSplit}}{if the split value is taking the average of two feature
+values. If false, it will take a point based on a uniform distribution
+between two feature values. (Default = FALSE)}
 }}
 

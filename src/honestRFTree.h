@@ -20,7 +20,8 @@ public:
     size_t nodeSizeAvg,
     std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
     std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
-    unsigned int myseed
+    unsigned int myseed,
+    bool splitMiddle
   );
 
   // This tree is only for testing purpose
@@ -43,7 +44,8 @@ public:
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
     DataFrame* trainingData,
-    unsigned int myseed
+    unsigned int myseed,
+    bool splitMiddle
   );
 
   void selectBestFeature(
@@ -54,7 +56,8 @@ public:
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
     DataFrame* trainingData,
-    unsigned int myseed
+    unsigned int myseed,
+    bool splitMiddle
   );
 
   void printTree();

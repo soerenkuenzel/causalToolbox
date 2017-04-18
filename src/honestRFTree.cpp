@@ -21,7 +21,8 @@ honestRFTree::honestRFTree(
   size_t nodeSizeAvg,
   std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
   std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
-  unsigned int myseed
+  unsigned int myseed,
+  bool splitMiddle
 ){
 
   if (nodeSizeAvg == 0 || nodeSizeSpt == 0) {
@@ -32,8 +33,9 @@ honestRFTree::honestRFTree(
     nodeSizeAvg > (*averagingSampleIndex).size() ||
     nodeSizeSpt > (*splittingSampleIndex).size()
   ) {
-    throw std::runtime_error("nodeSize cannot exceed total "
-                                   "elements in the sample.");
+    throw std::runtime_error(
+      "nodeSize cannot exceed total elements in the sample."
+    );
   }
 
   if (
@@ -44,8 +46,9 @@ honestRFTree::honestRFTree(
   }
 
   if (mtry == 0 || mtry > (*trainingData).getNumColumns()) {
-    throw std::runtime_error("mtry must be positive and cannot "
-                                   "exceed total amount of features");
+    throw std::runtime_error(
+      "mtry must be positive and cannot exceed total amount of features"
+    );
   }
 
   this->_mtry = mtry;
@@ -56,7 +59,8 @@ honestRFTree::honestRFTree(
   std::unique_ptr< RFNode > root ( new RFNode() );
   this->_root = std::move(root);
   recursivePartition(
-    getRoot(), getAveragingIndex(), getSplittingIndex(), trainingData, myseed
+    getRoot(), getAveragingIndex(), getSplittingIndex(), trainingData, myseed,
+    splitMiddle
   );
 }
 
@@ -97,7 +101,8 @@ void honestRFTree::recursivePartition(
   std::vector<size_t>* averagingSampleIndex,
   std::vector<size_t>* splittingSampleIndex,
   DataFrame* trainingData,
-  unsigned int myseed
+  unsigned int myseed,
+  bool splitMiddle
 ){
 
   // Sample mtry amounts of features
@@ -123,7 +128,8 @@ void honestRFTree::recursivePartition(
   double bestSplitLoss;
   selectBestFeature(
     bestSplitFeature, bestSplitValue, bestSplitLoss, &featureList,
-    averagingSampleIndex, splittingSampleIndex, trainingData, myseed
+    averagingSampleIndex, splittingSampleIndex, trainingData, myseed,
+    splitMiddle
   );
 
   // Create a leaf node if the current bestSplitValue is NA
@@ -227,11 +233,11 @@ void honestRFTree::recursivePartition(
 
     recursivePartition(
       leftChild.get(), &averagingLeftPartitionIndex,
-      &splittingLeftPartitionIndex, trainingData, myseed
+      &splittingLeftPartitionIndex, trainingData, myseed, splitMiddle
     );
     recursivePartition(
       rightChild.get(), &averagingRightPartitionIndex,
-      &splittingRightPartitionIndex, trainingData, myseed
+      &splittingRightPartitionIndex, trainingData, myseed, splitMiddle
     );
 
     (*rootNode).setSplitNode(
@@ -251,7 +257,8 @@ void honestRFTree::selectBestFeature(
   std::vector<size_t>* averagingSampleIndex,
   std::vector<size_t>* splittingSampleIndex,
   DataFrame* trainingData,
-  unsigned int myseed
+  unsigned int myseed,
+  bool splitMiddle
 ){
   // Get the number of total features
   size_t mtry = (*featureList).size();
@@ -553,9 +560,15 @@ void honestRFTree::selectBestFeature(
 
         bestSplitLossAll[i] = muBarSquareSum;
         bestSplitFeatureAll[i] = currentFeature;
-        double tmp_random = (double) rand_r(&myseed) / RAND_MAX;
-        bestSplitValueAll[i] = tmp_random *
-          (newFeatureValue - featureValue) + featureValue;
+
+        if (splitMiddle) {
+          bestSplitValueAll[i] = (newFeatureValue + featureValue) / 2.0;
+        } else {
+          double tmp_random = (double) rand_r(&myseed) / RAND_MAX;
+          bestSplitValueAll[i] =
+            tmp_random * (newFeatureValue - featureValue) + featureValue;
+        }
+
         bestSplitCountAll[i] = 1;
 
       } else {
@@ -570,9 +583,15 @@ void honestRFTree::selectBestFeature(
           if (tmp_random * bestSplitCountAll[i] <= 1) {
             bestSplitLossAll[i] = muBarSquareSum;
             bestSplitFeatureAll[i] = currentFeature;
-            tmp_random = (double) rand_r(&myseed) / RAND_MAX;
-            bestSplitValueAll[i] = tmp_random * (newFeatureValue
-              - featureValue) + featureValue;
+
+            if (splitMiddle) {
+              bestSplitValueAll[i] = (newFeatureValue + featureValue) / 2.0;
+            } else {
+              tmp_random = (double) rand_r(&myseed) / RAND_MAX;
+              bestSplitValueAll[i] =
+                tmp_random * (newFeatureValue - featureValue) + featureValue;
+            }
+
           }
 
         }
@@ -686,11 +705,11 @@ void honestRFTree::getOOBindex(
   OOBIndex.resize((unsigned long) (it - OOBIndex.begin()));
 
   for (
-    std::vector<size_t>::iterator it = OOBIndex.begin();
-    it != OOBIndex.end();
-    ++it
+    std::vector<size_t>::iterator it_ = OOBIndex.begin();
+    it_ != OOBIndex.end();
+    ++it_
   ) {
-    outputOOBIndex.push_back(*it);
+    outputOOBIndex.push_back(*it_);
   }
 
 }
@@ -705,8 +724,8 @@ void honestRFTree::getOOBPrediction(
   getOOBindex(OOBIndex, trainingData->getNumRows());
 
   for (
-    std::vector<size_t>::iterator it = OOBIndex.begin();
-    it != OOBIndex.end();
+    std::vector<size_t>::iterator it=OOBIndex.begin();
+    it!=OOBIndex.end();
     ++it
   ) {
 

@@ -31,7 +31,9 @@ SEXP rcpp_cppBuildInterface(
   int nodesizeAvg,
   int seed,
   int nthread,
-  bool verbose){
+  bool verbose,
+  bool middleSplit
+){
 
   try {
     std::unique_ptr<std::vector< std::vector<double> > > featureDataRcpp (
@@ -71,7 +73,8 @@ SEXP rcpp_cppBuildInterface(
       (size_t) nodesizeAvg,
       (unsigned int) seed,
       (size_t) nthread,
-      verbose
+      verbose,
+      middleSplit
     );
 
     // delete(testFullForest);
@@ -139,4 +142,21 @@ double rcpp_OBBPredictInterface(
     ::Rf_error("c++ exception (unknown reason)");
   }
   return Rcpp::NumericVector::get_na() ;
+}
+
+
+
+// [[Rcpp::export]]
+void rcpp_AddTreeInterface(
+    SEXP forest,
+    int ntree
+){
+  try {
+    Rcpp::XPtr< honestRF > testFullForest(forest) ;
+    (*testFullForest).addTrees(ntree);
+  } catch(std::runtime_error const& err) {
+    forward_exception_to_r(err);
+  } catch(...) {
+    ::Rf_error("c++ exception (unknown reason)");
+  }
 }
