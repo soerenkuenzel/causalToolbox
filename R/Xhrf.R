@@ -1,4 +1,5 @@
-# setOldClass("honestRF")
+#' @include EstimateCate.R
+#' @include honestRF.R
 
 ############################
 ### Xlearner - hRF - hRF ###
@@ -44,7 +45,7 @@ setClass(
 )
 
 
-#' @title honstRF Constructor
+#' @title X-Learner with honest RF for both stages
 #' @name X_RF-X_RF
 #' @rdname X_RF-X_RF
 #' @description This is an implementation of the X-learner with honest random
@@ -59,12 +60,14 @@ setClass(
 #' @param secondstageVar Variables which are only used in the second stage.
 #' @param ntree_first Numbers of trees in the first stage.
 #' @param ntree_second Numbers of trees in the second stage.
+#' @param mtry_first Numbers of trees in the second stage.
+#' @param mtry_second Numbers of trees in the second stage.
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
-#' observations in the splitting set.
-#' @param min_node_size_spl_second minimum nodesize in the second stage for the
 #' observations in the splitting set.
 #' @param min_node_size_ave_first minimum nodesize in the first stage for the
 #' observations in the average set.
+#' @param min_node_size_spl_second minimum nodesize in the second stage for the
+#' observations in the splitting set.
 #' @param min_node_size_ave_second minimum nodesize in the second stage for the
 #' observations in the averaging set.
 #' @param splitratio_first Proportion of the training data used as the splitting
@@ -78,6 +81,7 @@ setClass(
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
 #' @param nthread number of threats which should be used to work in parallel.
+#' @param verbose whether or not to print messages of the training procedure.
 #' @export X_RF
 setGeneric(
   name = "X_RF",
@@ -101,7 +105,8 @@ setGeneric(
                  replace_second,
                  sample_fraction_first,
                  sample_fraction_second,
-                 nthread) {
+                 nthread,
+                 verbose) {
     standardGeneric("X_RF")
   }
 )
@@ -117,21 +122,22 @@ X_RF <-
            predmode = "propmean",
            firststageVar = NULL,
            secondstageVar = NULL,
-           ntree_first = 100,
-           ntree_second = 100,
+           ntree_first = 500,
+           ntree_second = 500,
            mtry_first = round(ncol(feat) / 2),
            mtry_second = ncol(feat),
-           min_node_size_spl_first = 3,
-           min_node_size_ave_first = 3,
+           min_node_size_spl_first = 1,
+           min_node_size_ave_first = 5,
            min_node_size_spl_second = 5,
            min_node_size_ave_second = 3,
            splitratio_first = .5,
            splitratio_second = .5,
            replace_first = TRUE,
            replace_second = TRUE,
-           sample_fraction_first = 0.9,
+           sample_fraction_first = 0.8,
            sample_fraction_second = 0.9,
-           nthread = 4) {
+           nthread = 4,
+           verbose = TRUE) {
     # if firststageVar is not set, then set it to select all:
     if (is.null(firststageVar)) {
       firststageVar <- 1:ncol(feat)
@@ -200,8 +206,9 @@ X_RF <-
         nodesizeAvg = min_node_size_ave_first
       )
 
-    print("Done with the first stage.")
-
+    if (verbose) {
+      print("Done with the first stage.")
+    }
     r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
     r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
 
@@ -234,8 +241,9 @@ X_RF <-
         splitratio = splitratio_second,
         nodesizeAvg = min_node_size_ave_second
       )
-
-    print("Done with the second stage.")
+    if (verbose) {
+      print("Done with the second stage.")
+    }
 
     m_prop <-
       honestRF(
@@ -244,9 +252,9 @@ X_RF <-
         ntree = 50,
         nthread = nthread
       )
-
-    print("Done with the propensity score estimation.")
-
+    if (verbose) {
+      print("Done with the propensity score estimation.")
+    }
     return(
       new(
         "X_RF",
@@ -269,13 +277,15 @@ X_RF <-
 ############################
 ### Estimate CATE Method ###
 ############################
-setGeneric(
-  name = "EstimateCate",
-  def = function(theObject, feature_new)
-  {
-    standardGeneric("EstimateCate")
-  }
-)
+# This is documented out, because we use the include statement in the beginning
+# of the document to be able to load the generic in many different places
+
+# setGeneric(name="EstimateCate",
+#            def=function(theObject, feature_new)
+#            {
+#              standardGeneric("EstimateCate")
+#            }
+# )
 
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_hRF

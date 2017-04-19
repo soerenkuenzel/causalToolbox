@@ -2,6 +2,61 @@
 # Example data generator #
 ##########################
 
+
+
+
+#' @title simulate a RCT or observational data for causal effect estimation
+#' @name simulate_correlation_matrix
+#' @rdname simulate_correlation_matrix
+#' @description This function uses the C-vine method for simulating correlation
+#'   matrixes as in the paper "Generating random correlation matrices based on
+#'   vines and extended onion method" by Daniel Lewandowskia, Dorota Kurowickaa,
+#'   Harry Joe
+#' @param dim Number of training examples.
+#' @param alpha level of random correlation beteween the features. Choose 0 for
+#'   independent featues. The bigger alpha the bigger the correlation. For the
+#'   partial correlations the coefficients are created according to
+#'   beta(1/alpha, 1/alpha)
+#' @return A correlation matrix
+#' @export simulate_correlation_matrix
+simulate_correlation_matrix <- function(dim, alpha) {
+
+  betaparam <- 1/ alpha
+
+  P <-
+    matrix(nrow = dim, ncol = dim)           # storing partial correlations
+  S <- diag(dim)
+
+  for (k in 1:(dim - 1)) {
+    for (i in (k + 1):dim) {
+      P[k, i] <- rbeta(1, betaparam, betaparam) # sampling from beta
+      P[k, i] <- (P[k, i] - 0.5) * 2     # linearly shifting to [-1, 1]
+      p <- P[k, i]
+      if (k > 1) {
+        for (l in (k - 1):1) {
+          # converting partial correlation to raw correlation
+          p <- p * sqrt((1 - P[l, i] ^ 2) * (1 - P[l, k] ^ 2)) + P[l, i] *
+            P[l, k]
+          # p  = p * sqrt((1-P(l,i)^2)*(1-P(l,k)^2)) + P(l,i)*P(l,k);
+        }
+      }
+      S[k, i] <- p
+      S[i, k] <- p
+    }
+  }
+
+  # permuting the variables to make the distribution permutation-invariant
+  permutation <- sample(1:dim)
+  S <- S[permutation, permutation]
+  return(S)
+}
+
+
+
+
+
+
+
 #' @title simulate a RCT or observational data for causal effect estimation
 #' @name simulate_causal_experiment
 #' @rdname simulate_causal_experiment
@@ -64,18 +119,14 @@ simulate_causal_experiment <- function(ntrain,
       if (is.null(given_features)) {
         given_features_fkt <- function(n, dim) {
           if (feat_distribution == "normal") {
-            Sigma <- matrix(runif(dim ^ 2, 0, alpha),
-                            nrow = dim,
-                            ncol = dim)
-            diag(Sigma) <- 1
-            Sigma <- Sigma %*% t(Sigma) # make it positive definite.
+            correlation_mat <- simulate_correlation_matrix(dim, alpha = alpha)
             mu <- rep(0, dim)
             #' @import MASS
             feat <-
               data.frame(mvrnorm(
                 n = n,
                 mu = mu,
-                Sigma = Sigma %*% t(Sigma)
+                Sigma = correlation_mat
               ))
           }
           if (feat_distribution == "unif") {
@@ -355,10 +406,10 @@ simulate_causal_experiment <- function(ntrain,
 
     m_t_truth <- function(feat) {
       beta_m <- beatc_raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta.m                      # mu^t
+      as.matrix(feat) %*% beta_m                      # mu^t
     }
     m_c_truth <- function(feat) {
-      beta.m <- beatc_raw[1:ncol(feat)]
+      beta_m <- beatc_raw[1:ncol(feat)]
       as.matrix(feat) %*% beta_m                      # mu^t
     }
     propscore <-
@@ -391,17 +442,19 @@ simulate_causal_experiment <- function(ntrain,
     # the following is used so that the seed is fixed for the creation of this
     # data set, but th seed is set back afterwards:
 
-    beat.raw <- (1:5 - 3)
+    if(dim < 6) stop("For Ufail the dimension must be at least 6.")
+
+    beat_raw <- (1:5 - 3)
 
     m_t_truth <- function(feat) {
       dim <- ncol(feat)
-      beta.m <- c(beat.raw, rep(0, dim - 5))
-      as.matrix(feat) %*% beta.m                  # mu^t
+      beta_m <- c(beat_raw, rep(0, dim - 5))
+      as.matrix(feat) %*% beta_m                  # mu^t
     }
     m_c_truth <- function(feat) {
       dim <- ncol(feat)
-      beta.m <- rep(0, dim)
-      as.matrix(feat) %*% beta.m                  # mu^c
+      beta_m <- rep(0, dim)
+      as.matrix(feat) %*% beta_m                  # mu^c
     }
     propscore <-
       function(feat)

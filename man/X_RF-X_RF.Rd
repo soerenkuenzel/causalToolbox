@@ -6,17 +6,17 @@
 \alias{X_RF}
 \alias{X_RF,}
 \alias{X_RF-X_RF}
-\title{honstRF Constructor}
+\title{X-Learner with honest RF for both stages}
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", firststageVar = NULL,
-  secondstageVar = NULL, ntree_first = 100, ntree_second = 100,
+  secondstageVar = NULL, ntree_first = 500, ntree_second = 500,
   mtry_first = round(ncol(feat)/2), mtry_second = ncol(feat),
-  min_node_size_spl_first = 3, min_node_size_ave_first = 3,
+  min_node_size_spl_first = 1, min_node_size_ave_first = 5,
   min_node_size_spl_second = 5, min_node_size_ave_second = 3,
   splitratio_first = 0.5, splitratio_second = 0.5, replace_first = TRUE,
-  replace_second = TRUE, sample_fraction_first = 0.9,
-  sample_fraction_second = 0.9, nthread = 4)
+  replace_second = TRUE, sample_fraction_first = 0.8,
+  sample_fraction_second = 0.9, nthread = 4, verbose = TRUE)
 }
 \arguments{
 \item{feat}{A data frame of all the features.}
@@ -36,6 +36,10 @@ propmean which refers to propensity score weighting.}
 \item{ntree_first}{Numbers of trees in the first stage.}
 
 \item{ntree_second}{Numbers of trees in the second stage.}
+
+\item{mtry_first}{Numbers of trees in the second stage.}
+
+\item{mtry_second}{Numbers of trees in the second stage.}
 
 \item{min_node_size_spl_first}{minimum nodesize in the first stage for the
 observations in the splitting set.}
@@ -66,6 +70,8 @@ training data in the first stage.}
 training data in the second stage.}
 
 \item{nthread}{number of threats which should be used to work in parallel.}
+
+\item{verbose}{whether or not to print messages of the training procedure.}
 }
 \value{
 A `X_RF` object.

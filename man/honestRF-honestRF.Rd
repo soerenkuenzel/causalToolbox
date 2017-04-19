@@ -6,13 +6,14 @@
 \alias{honestRF}
 \alias{honestRF,}
 \alias{honestRF-method}
-\title{honstRF Constructor}
+\title{honestRF-Constructor}
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
   nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
-  nodesizeSpl = 5, nthread = 1, splitrule = "variance",
-  avgfunc = avgMean, splitratio = 1, nodesizeAvg = 5)
+  nodesizeSpl = 3, nodesizeAvg = 3, splitratio = 1,
+  seed = as.integer(runif(1) * 1000), verbose = FALSE, nthread = 0,
+  splitrule = "variance", middleSplit = FALSE)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -35,19 +36,10 @@ The default value is set to be one third of total number of features of the
 training data.}
 
 \item{nodesizeSpl}{The minimum observations contained in terminal nodes. The
-default value is 5.}
+default value is 3.}
 
-\item{nthread}{The number of threads to use in parallel computing. The
-default value is 1.}
-
-\item{splitrule}{A string to specify how to find the best split among all
-candidate feature values. The current version only supports `variance` which
-minimizes the overall MSE after splitting. The default value is `variance`.}
-
-\item{avgfunc}{An averaging function to average observations in the node. The
-function is used for prediction. The input of this function should be a
-dataframe of predictors `x` and a vector of outcomes `y`. The output is a
-scalar. The default function is to take the mean of vector `y`.}
+\item{nodesizeAvg}{Minimum size of terminal nodes for averaging dataset.
+The default value is 3.}
 
 \item{splitratio}{Proportion of the training data used as the splitting
 dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
@@ -56,8 +48,20 @@ dataset is empty. If the ratio is 0, then the splitting data set is empty
 and all the data is used for the averaging data set (This is not a good
 usage however since there will be no data available for splitting).}
 
-\item{nodesizeAvg}{Minimum size of terminal nodes for averaging dataset.
-The default value is 5.}
+\item{seed}{random seed}
+
+\item{verbose}{if training process in verbose mode}
+
+\item{nthread}{Number of threads to train and predict thre forest. The
+default number is 0 which represents using all cores.}
+
+\item{splitrule}{only variance is implemented at this point and it contains
+specifies the loss function according to which the splits of random forest
+should be made}
+
+\item{middleSplit}{if the split value is taking the average of two feature
+values. If false, it will take a point based on a uniform distribution
+between two feature values. (Default = FALSE)}
 }
 \value{
 A `honestRF` object.

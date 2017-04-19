@@ -27,7 +27,7 @@ y_pred <- predict(forest, x)
 
 # Mean Square Error
 sum((y_pred - y)^2)
-# 8.460419
+# 8.457087
 
 # Test honestRF - half/half split
 forest <- honestRF(
