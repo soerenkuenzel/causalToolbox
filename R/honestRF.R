@@ -442,8 +442,12 @@ setMethod(
     object
   ){
 
-    if (!object@replace && 0.8 * nrow(object@x) < object@sampsize) {
+    #' (all) TODO: find a better threshold for throwing such warning. 25 is
+    #' currently set up arbitrarily.
+    if (!object@replace &&
+        object@ntree * (1 - object@sampsize) * nrow(object@x) < 25) {
       warning("Samples are drawn without replacement and sample size is too big!")
+      return(NA)
     }
 
     rcppOOB <- tryCatch({
