@@ -173,8 +173,8 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
 
     m_0 <-
       honestRF(
@@ -332,8 +332,9 @@ setGeneric(
   def = function(theObject,
                  feature_new,
                  method = "n2TBS",
-                 B,
-                 nthread = 8)
+                 B = 200,
+                 nthread = 8,
+                 verbose = TRUE)
   {
     standardGeneric("CateCI")
   }
@@ -358,214 +359,22 @@ setMethod(
                         feature_new,
                         method,
                         B,
-                        nthread)
-  {
+                        nthread,
+                        verbose){
     ## shortcuts:
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
     predmode <- theObject@predmode
     ntrain <- length(tr)
-
-    ############################################################################
-    # parametric bootstrap based ###############################################
-
-    # if (method %in% c("pF1", "pF2")) {
-    #   if (method == "pF1") {
-    #     createbootstrappedData <- function() {
-    #       feat_b <<- feat
-    #       tr_b <<- tr
-    #
-    #       # retrain the first stage to be more variable in unsure positions:
-    #       yobs_0 <- yobs[tr == 0]
-    #       yobs_1 <- yobs[tr == 1]
-    #       X_0 <- feat[tr == 0,]
-    #       X_1 <- feat[tr == 1,]
-    #       smpl0 <- sample(1:length(yobs_0),
-    #                       size = round(length(yobs_0) * .66),
-    #                       replace = FALSE)
-    #       smpl1 <- sample(1:length(yobs_1),
-    #                       size = round(length(yobs_1) * .66),
-    #                       replace = FALSE)
-    #
-    #       m_0 <<-
-    #         ranger(yobs_0 ~ .,
-    #                data = cbind(X_0, yobs_0)[smpl0, ],
-    #                write.forest = TRUE)
-    #       m_1 <<-
-    #         ranger(yobs_1 ~ .,
-    #                data = cbind(X_1, yobs_1)[smpl1, ],
-    #                write.forest = TRUE)
-    #
-    #       # pretend m1 and m2 are correct
-    #       y_fitted <- ifelse(
-    #         tr_b == 1,
-    #         predict(m_1, data = feat_b)$predictions,
-    #         predict(m_0, data = feat_b)$predictions
-    #       )
-    #
-    #       y_res <- yobs - y_fitted
-    #       yobs_b <<- y_fitted + sample(y_res, replace = TRUE)
-    #     }
-    #
-    #     pred_B <-
-    #       as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
-    #     for (b in 1:B) {
-    #       print(b)
-    #       createbootstrappedData()
-    #       tau_estimate <-
-    #         EstimateCate(X_RF(feat_b, tr_b, yobs_b,  predmode),
-    #                      feature_new = feature_new)
-    #       tau_truth <-
-    #         predict(m_1, data = feature_new)$predictions -
-    #         predict(m_0, data = feature_new)$predictions
-    #       pred_B[, b] <- tau_estimate - tau_truth
-    #     }
-    #     # get the predictions from the original method
-    #     pred <- EstimateCate(theObject, feature_new = feature_new)
-    #
-    #     # the the 5% and 95% CI from the bootstrapped procedure
-    #     CI_b <- data.frame(
-    #       X5. =  apply(pred_B, 1, function(x)
-    #         quantile(x, c(.025))),
-    #       X95. = apply(pred_B, 1, function(x)
-    #         quantile(x, c(.975))),
-    #       sd = apply(pred_B, 1, function(x)
-    #         sd(x))
-    #     )
-    #
-    #     return(data.frame(
-    #       pred = pred,
-    #       # X5. =  pred - 1.96 * CI_b$sd,
-    #       # X95. = pred + 1.96 * CI_b$sd
-    #       # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
-    #       # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
-    #       X5. =  pred + CI_b$X5.,
-    #       X95. = pred + CI_b$X95.
-    #     ))
-    #   }
-    #
-    #   if (method == "pF2") {
-    #     createbootstrappedData <- function() {
-    #       feat_b <<- feat
-    #       tr_b <<- tr
-    #
-    #       #####
-    #       ##### retrain the first stage to be more variable in unsure positions:
-    #       yobs_0 <- yobs[tr == 0]
-    #       yobs_1 <- yobs[tr == 1]
-    #       X_0 <- feat[tr == 0,]
-    #       X_1 <- feat[tr == 1,]
-    #       smpl0 <- sample(1:length(yobs_0),
-    #                       size = round(length(yobs_0) * .66),
-    #                       replace = FALSE)
-    #       smpl1 <- sample(1:length(yobs_1),
-    #                       size = round(length(yobs_1) * .66),
-    #                       replace = FALSE)
-    #       estm_b <<- X_RF(
-    #         feat = rbind(X_0[smpl0,], X_1[smpl1,]),
-    #         tr = c(rep(0, length(smpl0)), rep(1, length(smpl1))),
-    #         yobs = c(yobs_0[smpl0], yobs_1[smpl1])
-    #       )
-    #
-    #       # (a) create bernoulli with propscore:
-    #       prop_scores <-
-    #         predict(estm_b@m_prop, data = feat_b)$predictions
-    #       M_b <- rbinom(length(tr_b), 1, prop_scores)
-    #
-    #       # (b)
-    #       y_fitted <-
-    #         ifelse(
-    #           tr_b == 1,
-    #           ifelse(
-    #             M_b == 1,
-    #             predict(estm_b@m_1,     data = feat_b)$predictions,
-    #             predict(estm_b@m_0,     data = feat_b)$predictions +
-    #               predict(estm_b@m_tau_1, data = feat_b)$predictions
-    #           ),
-    #           ifelse(
-    #             M_b == 1,
-    #             predict(estm_b@m_1,     data = feat_b)$predictions -
-    #               predict(estm_b@m_tau_0, data = feat_b)$predictions,
-    #             predict(estm_b@m_0,     data = feat_b)$predictions
-    #           )
-    #         )
-    #
-    #       y_res <- yobs - y_fitted
-    #       yobs_b <<- y_fitted
-    #       yobs_b[tr_b == 1] <<-
-    #         yobs_b[tr_b == 1] + sample(y_res[tr_b == 1], replace = TRUE)
-    #       yobs_b[tr_b == 0] <<-
-    #         yobs_b[tr_b == 0] + sample(y_res[tr_b == 0], replace = TRUE)
-    #     }
-    #
-    #     pred_B <-
-    #       as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
-    #     for (b in 1:B) {
-    #       print(b)
-    #       createbootstrappedData()
-    #       tau_estimate <-
-    #         EstimateCate(X_RF(feat_b, tr_b, yobs_b, predmode),
-    #                      feature_new = feature_new)
-    #       tau_truth <-     EstimateCate(estm_b,
-    #                                     feature_new = feature_new)
-    #       pred_B[, b] <- tau_estimate - tau_truth
-    #     }
-    #     # get the predictions from the original method
-    #     pred <- EstimateCate(theObject, feature_new = feature_new)
-    #
-    #     # the the 5% and 95% CI from the bootstrapped procedure
-    #     CI_b <- data.frame(
-    #       X5. =  apply(pred_B, 1, function(x)
-    #         quantile(x, c(.025))),
-    #       X95. = apply(pred_B, 1, function(x)
-    #         quantile(x, c(.975))),
-    #       sd = apply(pred_B, 1, function(x)
-    #         sd(x))
-    #     )
-    #
-    #     return(data.frame(
-    #       pred = pred,
-    #       # X5. =  pred - 1.96 * CI_b$sd,
-    #       # X95. = pred + 1.96 * CI_b$sd
-    #       # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
-    #       # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
-    #       X5. =  pred + CI_b$X5.,
-    #       X95. = pred + CI_b$X95.
-    #     ))
-    #   }
-    # }
-
-    ############################################################################
-    # standard bootstrap based #################################################
-
     if (method %in% c("defaultBS", "n2FBS", "n2TBS")) {
-      # if (method == "defaultBS") {
-      #   createbootstrappedData <- function() {
-      #     smpl <- sample(1:ntrain, replace = TRUE, size = ntrain)
-      #     feat_b <<- feat[smpl,]
-      #     tr_b <<- tr[smpl]
-      #     yobs_b <<- yobs[smpl]
-      #   }
-      # }
-      # if (method == "n2FBS") {
-      #   createbootstrappedData <- function() {
-      #     smpl <- sample(1:ntrain,
-      #                    replace = FALSE,
-      #                    size = round(ntrain / 2))
-      #     feat_b <<- feat[smpl,]
-      #     tr_b <<- tr[smpl]
-      #     yobs_b <<- yobs[smpl]
-      #   }
-      # }
-
       if (method == "n2TBS") {
         createbootstrappedData <- function() {
           smpl <- sample(1:ntrain,
                          replace = TRUE,
                          size = round(ntrain / 2))
           return(list(
-            feat_b = feat[smpl, ],
+            feat_b = feat[smpl,],
             tr_b = tr[smpl],
             yobs_b = yobs[smpl]
           ))
@@ -578,11 +387,15 @@ setMethod(
       # simulaions:
       pred_B <-
         as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+
+      known_warnings <- c()
+      # this is needed such that bootstrapped warnings are only printed once
       for (b in 1:B) {
-        print(b)
-        went_wrong <-
-          0 # if that is 100 we really cannot fit it and bootstrap
+        if(verbose) print(b)
+        went_wrong <- 0
+        # if that is 100 we really cannot fit it and bootstrap
         # seems to be infeasible.
+
         while (is.na(pred_B[1, b])) {
           if (went_wrong == 100)
             stop("one of the groups might be too small to
@@ -591,15 +404,29 @@ setMethod(
             tryCatch({
               bs <- createbootstrappedData()
 
-              EstimateCate(
-                X_RF(
-                  feat = bs$feat_b,
-                  tr = bs$tr_b,
-                  yobs = bs$yobs_b,
-                  predmode,
-                  nthread = nthread
+              withCallingHandlers(
+                # this is needed such that bootstrapped warnings are only
+                # printed once
+                EstimateCate(
+                  X_RF(
+                    feat = bs$feat_b,
+                    tr = bs$tr_b,
+                    yobs = bs$yobs_b,
+                    predmode,
+                    nthread = nthread,
+                    verbose = FALSE
+                  ),
+                  feature_new = feature_new
                 ),
-                feature_new = feature_new
+                warning = function(w) {
+                  if (w$message %in% known_warnings) {
+                    # message was already printed and can be ignored
+                    invokeRestart("muffleWarning")
+                  } else{
+                    # message is added to the known_warning list:
+                    known_warnings <<- c(known_warnings, w$message)
+                  }
+                }
               )
             },
             error = function(e) {
