@@ -29,4 +29,7 @@ Collate:
     'Xhrf.R'
     'honestRFTree.R'
     'honestRF_R.R'
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
