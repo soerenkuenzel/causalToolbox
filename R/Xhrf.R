@@ -188,8 +188,7 @@ X_RF <-
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_first,
-        nodesizeAvg = min_node_size_ave_first,
-        verbose = verbose
+        nodesizeAvg = min_node_size_ave_first
       )
 
     m_1 <-
