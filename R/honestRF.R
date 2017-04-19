@@ -442,8 +442,8 @@ setMethod(
     object
   ){
 
-    #' (all) TODO: find a better threshold for throwing such warning. 25 is
-    #' currently set up arbitrarily.
+    #' TODO: find a better threshold for throwing such warning. 25 is
+    #' TODO: currently set up arbitrarily.
     if (!object@replace &&
         object@ntree * (1 - object@sampsize) * nrow(object@x) < 25) {
       warning("Samples are drawn without replacement and sample size is too big!")
@@ -509,3 +509,4 @@ setMethod(
 
   }
 )
+
