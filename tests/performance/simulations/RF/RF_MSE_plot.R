@@ -3,10 +3,12 @@ library(dplyr)
 library(plyr)
 
 dir_name <- "tests/performance/simulations/RF/sim_data/"
+plot_dir_name <- "tests/performance/simulations/RF/sim_plot/"
+
 file_name <- c(
-  "simulation_randomNoise_2017-04-13.csv",
-  "simulation_HighSignalToNoiseLinearModel_2017-04-13.csv",
-  "simulation_LowSignalToNoiseLinearModel_2017-04-13.csv"
+  "simulation_randomNoise_2017-04-15.csv",
+  "simulation_HighSignalToNoiseLinearModel_2017-04-15.csv",
+  "simulation_LowSignalToNoiseLinearModel_2017-04-15.csv"
 )
 
 setup_loop <- 1:length(file_name)
@@ -49,7 +51,7 @@ for (setup_i in setup_loop) {
 
       ggsave(
         paste0(
-          dir_name,
+          plot_dir_name,
           field,
           "_on_",
           strsplit(file_name[setup_i], "_")[[1]][2],
