@@ -17,4 +17,12 @@ test_that("Tests that XhRF is working correctly", {
 )
 
   expect_equal(EstimateCate(xl, feat)[1], 0.1298953446, tolerance=1e-7)
+
+  expect_warning(
+  CIs <- CateCI(xl, feat, B = 5, verbose = FALSE),
+  "honestRF is used as adaptive random forest."
+  )
+  expect_equal(as.numeric(CIs[1, ]), c(0.1298953, -0.1173602, 0.3771509),
+               tolerance=1e-5)
+
 })

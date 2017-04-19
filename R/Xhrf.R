@@ -173,8 +173,8 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
 
     m_0 <-
       honestRF(
@@ -188,7 +188,8 @@ X_RF <-
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_first,
-        nodesizeAvg = min_node_size_ave_first
+        nodesizeAvg = min_node_size_ave_first,
+        verbose = verbose
       )
 
     m_1 <-
@@ -332,8 +333,9 @@ setGeneric(
   def = function(theObject,
                  feature_new,
                  method = "n2TBS",
-                 B,
-                 nthread = 8)
+                 B = 200,
+                 nthread = 8,
+                 verbose = TRUE)
   {
     standardGeneric("CateCI")
   }
@@ -358,8 +360,8 @@ setMethod(
                         feature_new,
                         method,
                         B,
-                        nthread)
-  {
+                        nthread,
+                        verbose){
     ## shortcuts:
     feat <- theObject@feature_train
     tr <- theObject@tr_train
@@ -367,14 +369,13 @@ setMethod(
     predmode <- theObject@predmode
     ntrain <- length(tr)
     if (method %in% c("defaultBS", "n2FBS", "n2TBS")) {
-
       if (method == "n2TBS") {
         createbootstrappedData <- function() {
           smpl <- sample(1:ntrain,
                          replace = TRUE,
                          size = round(ntrain / 2))
           return(list(
-            feat_b = feat[smpl, ],
+            feat_b = feat[smpl,],
             tr_b = tr[smpl],
             yobs_b = yobs[smpl]
           ))
@@ -387,11 +388,15 @@ setMethod(
       # simulaions:
       pred_B <-
         as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+
+      known_warnings <- c()
+      # this is needed such that bootstrapped warnings are only printed once
       for (b in 1:B) {
-        print(b)
-        went_wrong <-
-          0 # if that is 100 we really cannot fit it and bootstrap
+        if(verbose) print(b)
+        went_wrong <- 0
+        # if that is 100 we really cannot fit it and bootstrap
         # seems to be infeasible.
+
         while (is.na(pred_B[1, b])) {
           if (went_wrong == 100)
             stop("one of the groups might be too small to
@@ -400,15 +405,29 @@ setMethod(
             tryCatch({
               bs <- createbootstrappedData()
 
-              EstimateCate(
-                X_RF(
-                  feat = bs$feat_b,
-                  tr = bs$tr_b,
-                  yobs = bs$yobs_b,
-                  predmode,
-                  nthread = nthread
+              withCallingHandlers(
+                # this is needed such that bootstrapped warnings are only
+                # printed once
+                EstimateCate(
+                  X_RF(
+                    feat = bs$feat_b,
+                    tr = bs$tr_b,
+                    yobs = bs$yobs_b,
+                    predmode,
+                    nthread = nthread,
+                    verbose = FALSE
+                  ),
+                  feature_new = feature_new
                 ),
-                feature_new = feature_new
+                warning = function(w) {
+                  if (w$message %in% known_warnings) {
+                    # message was already printed and can be ignored
+                    invokeRestart("muffleWarning")
+                  } else{
+                    # message is added to the known_warning list:
+                    known_warnings <<- c(known_warnings, w$message)
+                  }
+                }
               )
             },
             error = function(e) {

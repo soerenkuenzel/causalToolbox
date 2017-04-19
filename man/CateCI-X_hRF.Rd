@@ -7,8 +7,8 @@
 \alias{X_hRF-method}
 \title{CateCI-X_hRF}
 \usage{
-\S4method{CateCI}{X_RF}(theObject, feature_new, method = "n2TBS", B,
-  nthread = 8)
+\S4method{CateCI}{X_RF}(theObject, feature_new, method = "n2TBS", B = 200,
+  nthread = 8, verbose = TRUE)
 }
 \arguments{
 \item{feature_new}{A data frame.}
