@@ -422,10 +422,12 @@ setMethod(
 #' @rdname getOOB-honestRF
 #' @description Calculate the out-of-bag error of a given forest.
 #' @param object A `honestRF` object.
+#' @param noWarning flag to not display warnings
 setGeneric(
   name="getOOB",
   def=function(
-    object
+    object,
+    noWarning=TRUE
   ){
     standardGeneric("getOOB")
   }
@@ -439,15 +441,18 @@ setMethod(
   f="getOOB",
   signature="honestRF",
   definition=function(
-    object
+    object,
+    noWarning
   ){
 
     # (all) TODO: find a better threshold for throwing such warning. 25 is
     # currently set up arbitrarily.
     if (!object@replace &&
         object@ntree * (1 - object@sampsize) * nrow(object@x) < 25) {
-      warning("Samples are drawn without replacement and sample size is too big!")
-      return(NA)
+      if (!noWarning) {
+        warning("Samples are drawn without replacement and sample size is too big!")
+      }
+      return(Inf)
     }
 
     rcppOOB <- tryCatch({
@@ -511,4 +516,180 @@ setMethod(
 )
 
 
+#################
+### Auto-Tune ###
+#################
+#' @title autotune-honestRF
+#' @name autotune-honestRF
+#' @rdname autotune-honestRF
+#' @aliases autotune, honestRF-method
+#' @description Autotune a honestRF based on the input dataset. The methodology
+#' is based on paper `Hyperband: A Novel Bandit-Based Approach to
+#' Hyperparameter Optimization` by Lisha Li, et al.
+#' @param x A data frame of all training predictors.
+#' @param y A vector of all training responses.
+#' @param sampsize The size of total samples to draw for the training data.
+#' @param num_iter Maximum iterations/epochs per configuration. Default is 81.
+#' @param eta Downsampling rate. Default value is 3.
+#' @param verbose if tuning process in verbose mode
+#' @param seed random seed
+#' @param nthread Number of threads to train and predict thre forest. The
+#' default number is 0 which represents using all cores.
+#' @return A `honestRF` object
+#' @exportMethod autotune
+autotune <- function(
+  x, y,
+  sampsize=as.integer(nrow(x)*0.75),
+  num_iter=81, eta=3, verbose=TRUE, seed=24750371,
+  nthread=0
+) {
+
+  if (verbose) {
+    print("Start auto-tuning.")
+  }
+
+  # Number of unique executions of Successive Halving (minus one)
+  s_max <- as.integer(log(num_iter) / log(eta))
+
+  # Total number of iterations (without reuse) per execution of
+  # successive halving (n,r)
+  B <- (s_max + 1) * num_iter
+
+  if (verbose) {
+    print(paste(
+      "Hyperband will run successive halving in", s_max,
+      "times, with", B, "iterations per execution."
+    ))
+  }
+
+  # Begin finite horizon hyperband outlerloop
+  models <- vector("list", s_max+1)
+  models_OOB <- vector("list", s_max+1)
+
+  set.seed(seed)
+
+  for (s in s_max : 0) {
+    if (verbose) {
+      print(paste("Hyperband successive halving round", s_max + 1 - s))
+    }
+
+    # Initial number of configurations
+    n <- as.integer(ceiling(B / num_iter / (s + 1) * eta ^ s))
+
+    # Initial number of iterations to run configurations for
+    r <- num_iter * eta ^ (-s)
+
+    if (verbose) {
+      print(paste(">>> Total number of configurations:",n))
+      print(paste(">>> Number of iterations per configuration:", as.integer(r)))
+    }
+
+    # Begin finite horizon successive halving with (n,r)
+    # Generate parameters:
+    allConfigs <- data.frame(
+      mtry = sample(1:ncol(x), n, replace = TRUE),
+      min_node_size_spl = sample(1:min(30, nrow(x)), n, replace = TRUE),
+      min_node_size_ave = sample(1:min(30, nrow(x)), n, replace = TRUE),
+      splitratio = runif(n, min = 0.1, max = 1),
+      replace = sample(c(TRUE, FALSE), n, replace = TRUE),
+      middleSplit = sample(c(TRUE, FALSE), n, replace = TRUE)
+    )
+
+    if (verbose) {
+      print(paste(">>>", n, " configurations have been generated."))
+    }
+
+    val_models <- vector("list", nrow(allConfigs))
+    r_old <- 1
+    for (j in 1:nrow(allConfigs)) {
+      tryCatch({
+        val_models[[j]] <- honestRF(
+          x = x,
+          y = y,
+          ntree = r_old,
+          mtry = allConfigs$mtry[j],
+          nodesizeSpl = allConfigs$min_node_size_spl[j],
+          nodesizeAvg = allConfigs$min_node_size_ave[j],
+          splitratio = allConfigs$splitratio[j],
+          replace = allConfigs$replace[j],
+          sampsize = sampsize,
+          nthread = nthread,
+          middleSplit = allConfigs$middleSplit[j]
+        )
+      }, error = function(err) {
+        val_models[[j]] <- NULL
+      })
+    }
+
+    if (s != 0) {
+
+      for (i in 0:(s-1)) {
+        # Run each of the n_i configs for r_i iterations and keep best
+        # n_i/eta
+        n_i <- as.integer(n * eta ^ (-i))
+        r_i <- as.integer(r * eta ^ i)
+        r_new <- r_i - r_old
+
+        if (verbose) {
+          print(paste("Iterations", i))
+          print(paste("Total number of configurations:", n_i))
+          print(paste("Number of iterations per configuration:", r_i))
+        }
+
+        val_losses <- vector("list", nrow(allConfigs))
+
+        # Iterate to evaluate each parameter combination and cut the
+        # parameter pools in half every iteration based on its score
+        for (j in 1:nrow(allConfigs)) {
+          if (r_new > 0 && !is.null(val_models[[j]])){
+            val_models[[j]] <- addTrees(val_models[[j]], r_new)
+          }
+          if (!is.null(val_models[[j]])) {
+            val_losses[[j]] <- getOOB(val_models[[j]], noWarning=TRUE)
+          } else {
+            val_losses[[j]] <- Inf
+          }
+        }
+
+        r_old <- r_i
+
+        val_losses_idx <- sort(unlist(val_losses), index.return=TRUE)
+        val_top_idx <- val_losses_idx$ix[0:as.integer(n_i / eta)]
+        allConfigs <- allConfigs[val_top_idx, ]
+        val_models <- val_models[val_top_idx]
+        gc()
+        rownames(allConfigs) <- 1:nrow(allConfigs)
+
+        if (verbose) {
+          print(paste(length(val_losses_idx$ix) - nrow(allConfigs),
+                      "configurations have been eliminated."))
+        }
+
+      }
+
+    }
+    # End finite horizon successive halving with (n,r)
+    best_OOB <- getOOB(val_models[[1]], noWarning=TRUE)
+    if (verbose) {
+      print(paste(">>> Successive halving ends and the best model is saved."))
+      print(paste(">>> OOB:", best_OOB))
+    }
+
+    models[[s+1]] <- val_models[[1]]
+    models_OOB[[s+1]] <- best_OOB
+
+  }
+
+  # End finite horizon hyperband outlerloop and sort by performance
+  model_losses_idx <- sort(unlist(models_OOB), index.return=TRUE)
+
+  if (verbose) {
+    print(paste("Best model is selected from best-performed model in",
+                s_max, "successive halving, with OOB",
+                models_OOB[model_losses_idx$ix[1]]))
+  }
+
+  return(models[[model_losses_idx$ix[1]]])
+
+}
 
