@@ -65,8 +65,7 @@ tuningsettings_outcomes <- rbind(
   cbind(tuning_settings[["S-learner"]][, 9:19], estimator = "S-learner"),
   cbind(tuning_settings[["T-learner"]][, 9:19], estimator = "T-learner"),
   cbind(tuning_settings[["X-learner"]][, 15:25], estimator = "X-learner")
-)
-
+) %>% tbl_df()
 
 # Searching for good settings:
 colnames(tuningsettings_outcomes)
@@ -88,9 +87,32 @@ tuningsettings_outcomes %>%
 
 
 
+tuningsettings_outcomes_X <- tuningsettings_outcomes %>% filter(estimator == "X-learner", !is.na(Wager1))
+
+tuningsettings_outcomes_X[
+  rbinom(nrow(tuningsettings_outcomes_X), 1, tuningsettings_outcomes_X$Wager1) == 1, ]
 
 #### creation of the final plot:
-tuningsettings_outcomes %>% mutate(Estimator = estimator) %>%
+rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
+      tuningsettings_outcomes %>% filter(estimator == "X-learner", Wager1 <.003) %>%
+        sample_n(1000))
+
+rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
+        tuningsettings_outcomes_X[
+          rbinom(nrow(tuningsettings_outcomes_X), 1, 20*tuningsettings_outcomes_X$Wager1 + .001) == 1, ]) %>%
+  mutate(Estimator = estimator) %>%
+  filter(Wager1 < .04) %>%
+  ggplot(aes(x = complexTau, y = Wager1, color = Estimator)) +
+  geom_point(alpha = .5) +
+  scale_color_manual(values = c("green", "chocolate", "blue")) +
+  theme_minimal() +
+  xlab("MSE for Complex Treatment Effect and no Confounding") +
+  ylab("MSE for Simple Treatment Effect with Confounding")
+# + coord_cartesian(xlim = c(1000, 3500), ylim = c(0,0.028), expand = TRUE)
+rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
+      tuningsettings_outcomes_X[
+        rbinom(nrow(tuningsettings_outcomes_X), 1, 20*tuningsettings_outcomes_X$Wager1 + .001) == 1, ]) %>%
+  mutate(Estimator = estimator) %>%
   filter(Wager1 < .04) %>%
   ggplot(aes(x = complexTau, y = Wager1, color = Estimator)) +
   geom_point(alpha = .5) +
@@ -99,8 +121,25 @@ tuningsettings_outcomes %>% mutate(Estimator = estimator) %>%
   xlab("MSE for Complex Treatment Effect and no Confounding") +
   ylab("MSE for Simple Treatment Effect with Confounding")
 
+
+
+rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
+      tuningsettings_outcomes %>% filter(estimator == "X-learner") %>%
+        sample_n(4000)) %>%
+  mutate(Estimator = estimator) %>%
+  filter(Wager1 < .04) %>%
+  ggplot(aes(x = complexTau, y = Wager1, color = Estimator)) +
+  geom_point(alpha = .5) +
+  scale_color_manual(values = c("green", "chocolate", "blue")) +
+  theme_minimal() +
+  xlab("MSE for Complex Treatment Effect and no Confounding") +
+  ylab("MSE for Simple Treatment Effect with Confounding")
+
+
 ggsave(
-  paste0("Tune/adaptivityfigue.pdf"),
+  paste0("Tune/adaptivityfigue",
+         Sys.Date(),
+         ".pdf"),
   height = 5,
   width = 6
 )
