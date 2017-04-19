@@ -19,9 +19,9 @@
 #' The default value is set to be one third of total number of features of the
 #' training data.
 #' @param nodesizeSpl The minimum observations contained in terminal nodes. The
-#' default value is 5.
+#' default value is 3.
 #' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset.
-#' The default value is 5.
+#' The default value is 3.
 #' @param splitratio Proportion of the training data used as the splitting
 #' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
 #' splitting dataset becomes the total entire sampled set and the averaging
@@ -200,9 +200,9 @@ testing_data_checker <- function(
 #' The default value is set to be one third of total number of features of the
 #' training data.
 #' @slot nodesizeSpl The minimum observations contained in terminal nodes. The
-#' default value is 5.
+#' default value is 3.
 #' @slot nodesizeAvg Minimum size of terminal nodes for averaging dataset.
-#' The default value is 5.
+#' The default value is 3.
 #' @slot splitratio Proportion of the training data used as the splitting
 #' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
 #' splitting dataset becomes the total entire sampled set and the averaging
@@ -250,9 +250,9 @@ setClass(
 #' The default value is set to be one third of total number of features of the
 #' training data.
 #' @param nodesizeSpl The minimum observations contained in terminal nodes. The
-#' default value is 5.
+#' default value is 3.
 #' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset.
-#' The default value is 5.
+#' The default value is 3.
 #' @param splitratio Proportion of the training data used as the splitting
 #' dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
 #' splitting dataset becomes the total entire sampled set and the averaging
@@ -305,8 +305,8 @@ honestRF <- function(
   replace=TRUE,
   sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x)),
   mtry=max(floor(ncol(x)/3), 1),
-  nodesizeSpl=5,
-  nodesizeAvg=5,
+  nodesizeSpl=3,
+  nodesizeAvg=3,
   splitratio=1,
   seed=as.integer(runif(1)*1000),
   verbose=FALSE,

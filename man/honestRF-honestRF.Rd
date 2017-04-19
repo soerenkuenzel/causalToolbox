@@ -11,7 +11,7 @@
 \usage{
 honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
   nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
-  nodesizeSpl = 5, nodesizeAvg = 5, splitratio = 1,
+  nodesizeSpl = 3, nodesizeAvg = 3, splitratio = 1,
   seed = as.integer(runif(1) * 1000), verbose = FALSE, nthread = 0,
   splitrule = "variance", middleSplit = FALSE)
 }
@@ -36,10 +36,10 @@ The default value is set to be one third of total number of features of the
 training data.}
 
 \item{nodesizeSpl}{The minimum observations contained in terminal nodes. The
-default value is 5.}
+default value is 3.}
 
 \item{nodesizeAvg}{Minimum size of terminal nodes for averaging dataset.
-The default value is 5.}
+The default value is 3.}
 
 \item{splitratio}{Proportion of the training data used as the splitting
 dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially

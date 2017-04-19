@@ -29,10 +29,10 @@ The default value is set to be one third of total number of features of the
 training data.}
 
 \item{nodesizeSpl}{The minimum observations contained in terminal nodes. The
-default value is 5.}
+default value is 3.}
 
 \item{nodesizeAvg}{Minimum size of terminal nodes for averaging dataset.
-The default value is 5.}
+The default value is 3.}
 
 \item{splitratio}{Proportion of the training data used as the splitting
 dataset. It is a ratio between 0 and 1. If the ratio is 1, then essentially
