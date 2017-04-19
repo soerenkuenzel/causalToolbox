@@ -1,0 +1,34 @@
+---
+title: "hte -- Heterogeneous Treatment Effect Estimation"
+author: "Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{hte -- Heterogeneous Treatment Effect Estimation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+This package implements several tools for the analysis of 'heterogeneous treatment effects'. 
+
+## Random Forest
+
+We implement a fast, memory efficient and very adaptive version of random forest 
+fore regression. 
+
+```{r, warning=FALSE}
+library(hte)
+x <- iris[, -1]; y <- iris[, 1]
+# train random forest
+forest <- honestRF(x, y, ntree=500, replace=TRUE, sampsize=nrow(x), mtry=3, 
+                   nodesizeSpl=5, nthread=4, splitrule="variance", splitratio=.8,
+                   nodesizeAvg=5)
+# Test predict
+y_pred <- predict(forest, x)
+```
+
+![optional caption text](../tests/performance/honestRF/nfeatures5.pdf)
+
+
+
+## Meta--learners
+
