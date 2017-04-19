@@ -10,7 +10,8 @@ test_that("Tests that XhRF is working correctly", {
     feat = feat,
     tr = tr,
     yobs = yobs,
-    nthread = 8
+    nthread = 8,
+    verbose = FALSE
   ),
   "honestRF is used as adaptive random forest."
 )
