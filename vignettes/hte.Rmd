@@ -26,7 +26,12 @@ forest <- honestRF(x, y, ntree=500, replace=TRUE, sampsize=nrow(x), mtry=3,
 y_pred <- predict(forest, x)
 ```
 
-![optional caption text](../tests/performance/honestRF/nfeatures5.pdf)
+The following image compares our new implementation (hte) with the Breiman's original 
+implemenation (randomForest) and the very popular and fast implemenation from the
+ranger package. 
+
+<img src="../tests/performance/honestRF/nfeatures5.pdf" alt="some text"  width="650" height="400">
+
 
 
 
