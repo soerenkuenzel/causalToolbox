@@ -50,5 +50,5 @@ test_that("Tests if OOB calculation is working correctly", {
     "Samples are drawn without replacement and sample size is too big!"
   )
 
-  expect_equal(testOOB, NA, tolerance=1e-4)
+  expect_equal(testOOB, Inf, tolerance=1e-4)
 })

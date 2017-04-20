@@ -427,7 +427,7 @@ setGeneric(
   name="getOOB",
   def=function(
     object,
-    noWarning=TRUE
+    noWarning=FALSE
   ){
     standardGeneric("getOOB")
   }
