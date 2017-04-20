@@ -38,7 +38,7 @@ preprocess_training <- function(x, y){
   # save the encoding mapping
   categoricalFeatureMapping <- list()
   dummyIndex = 1
-  for (categoricalFeatureCol in categoricalFeatureCols) {
+  for (categoricalFeatureCol in unlist(categoricalFeatureCols)) {
     uniqueFeatureValues <- unique(x[,categoricalFeatureCol])
     numericFeatureValues <- 1:length(uniqueFeatureValues)
     x[,categoricalFeatureCol] <- mapvalues(
