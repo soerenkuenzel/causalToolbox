@@ -249,9 +249,10 @@ X_RF <-
       honestRF(
         x = feat,
         y = tr,
-        ntree = 50,
+        ntree = 500,
         nthread = nthread,
-        splitratio = .5
+        splitratio = .5,
+        nodesizeAvg = 10
       )
     if (verbose) {
       print("Done with the propensity score estimation.")
