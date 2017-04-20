@@ -250,7 +250,8 @@ X_RF <-
         x = feat,
         y = tr,
         ntree = 50,
-        nthread = nthread
+        nthread = nthread,
+        splitratio = .5
       )
     if (verbose) {
       print("Done with the propensity score estimation.")

@@ -26,7 +26,7 @@ cols <- c(
   # "X_RF_sRF" = "blue3"
 )
 
-# all estimators:
+# Summary plots:
 for (this_setup in unique(Results$setup)) {
   plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
   Results %>% filter(setup == this_setup) %>%
@@ -71,6 +71,44 @@ for (this_setup in unique(Results$setup)) {
     width = 15
   )
 }
+
+
+# individual plots:
+for (this_setup in unique(Results$setup)) {
+  plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
+  Results %>% filter(setup == this_setup) %>%
+    group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
+    summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
+    filter(dim == 20, alpha == 0) %>%
+    mutate(dima = factor(
+      paste0("d=", dim, ", a=", alpha),
+      levels = apply(
+        expand.grid("d=", as.character(unique(dim)), ", a=",
+                    as.character(unique(alpha))),
+        1,
+        paste0,
+        collapse = ''
+      )
+    )) %>%
+    ggplot(aes(x = ntrain, y = MSE, color = estimator)) +
+    geom_line() +
+    geom_point(aes(shape = estimator), size = 1) +
+    scale_y_log10() +
+    ggtitle(this_setup) +
+    theme_minimal()
+
+  ggsave(
+    paste0(
+      "tests/performance/CATEestimators/sim_figures/singleplot_",
+      this_setup,
+      "dim20a0.png"
+    ),
+    height =4,
+    width = 8
+  )
+}
+
+
 
 
 # plotSetup1 <-

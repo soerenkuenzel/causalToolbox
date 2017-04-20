@@ -143,3 +143,11 @@ ggsave(
   height = 5,
   width = 6
 )
+
+ggsave(
+  paste0("Tune/adaptivityfigue",
+         Sys.Date(),
+         ".png"),
+  height = 5,
+  width = 6
+)
