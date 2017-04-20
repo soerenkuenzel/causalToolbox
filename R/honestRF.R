@@ -519,10 +519,9 @@ setMethod(
 #################
 ### Auto-Tune ###
 #################
-#' @title autotune-honestRF
-#' @name autotune-honestRF
-#' @rdname autotune-honestRF
-#' @aliases autotune, honestRF-method
+#' @title autohonestRF-honestRF
+#' @name autohonestRF-honestRF
+#' @rdname autohonestRF-honestRF
 #' @description Autotune a honestRF based on the input dataset. The methodology
 #' is based on paper `Hyperband: A Novel Bandit-Based Approach to
 #' Hyperparameter Optimization` by Lisha Li, et al.
@@ -535,12 +534,30 @@ setMethod(
 #' @param seed random seed
 #' @param nthread Number of threads to train and predict thre forest. The
 #' default number is 0 which represents using all cores.
+setGeneric(
+  name="autohonestRF",
+  def=function(
+    x,
+    y,
+    sampsize,
+    num_iter,
+    eta,
+    verbose,
+    seed,
+    nthread
+  ){
+    standardGeneric("autohonestRF")
+  }
+)
+
+#' @title autohonestRF-honestRF
+#' @aliases autohonestRF, honestRF-method
 #' @return A `honestRF` object
-#' @exportMethod autotune
-autotune <- function(
+#' @export autohonestRF
+autohonestRF <- function(
   x, y,
   sampsize=as.integer(nrow(x)*0.75),
-  num_iter=81, eta=3, verbose=TRUE, seed=24750371,
+  num_iter=81, eta=3, verbose=FALSE, seed=24750371,
   nthread=0
 ) {
 
@@ -669,7 +686,11 @@ autotune <- function(
 
     }
     # End finite horizon successive halving with (n,r)
-    best_OOB <- getOOB(val_models[[1]], noWarning=TRUE)
+    if (!is.null(val_models[[1]])) {
+      best_OOB <- getOOB(val_models[[1]], noWarning=TRUE)
+    } else {
+      best_OOB <- Inf
+    }
     if (verbose) {
       print(paste(">>> Successive halving ends and the best model is saved."))
       print(paste(">>> OOB:", best_OOB))

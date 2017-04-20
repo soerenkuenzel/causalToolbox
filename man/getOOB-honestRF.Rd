@@ -4,10 +4,12 @@
 \alias{getOOB-honestRF}
 \title{getOOB-honestRF}
 \usage{
-getOOB(object)
+getOOB(object, noWarning = TRUE)
 }
 \arguments{
 \item{object}{A `honestRF` object.}
+
+\item{noWarning}{flag to not display warnings}
 }
 \description{
 Calculate the out-of-bag error of a given forest.
