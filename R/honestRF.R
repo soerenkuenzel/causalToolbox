@@ -314,7 +314,7 @@ honestRF <- function(
   splitrule="variance",
   middleSplit=FALSE
   ){
-
+  x <- as.data.frame(x)
   # Preprocess the data
   training_data_checker(x, y, ntree,replace, sampsize, mtry, nodesizeSpl,
                         nodesizeAvg, splitratio, nthread, middleSplit)
