@@ -7,7 +7,7 @@
 \alias{honestRF-method}
 \title{getOOB-honestRF}
 \usage{
-\S4method{getOOB}{honestRF}(object, noWarning = TRUE)
+\S4method{getOOB}{honestRF}(object, noWarning = FALSE)
 }
 \value{
 The OOB error of the forest.

@@ -4,7 +4,7 @@
 \alias{getOOB-honestRF}
 \title{getOOB-honestRF}
 \usage{
-getOOB(object, noWarning = TRUE)
+getOOB(object, noWarning = FALSE)
 }
 \arguments{
 \item{object}{A `honestRF` object.}

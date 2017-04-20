@@ -17,14 +17,14 @@ LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 SystemRequirements: C++11
 Collate: 
-    'CATE_estimators.R'
+    'honestRF.R'
     'EstimateCate.R'
+    'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
     'RF.R'
     'RFNode.R'
     'RFTree.R'
     'RcppExports.R'
-    'honestRF.R'
     'Shrf.R'
     'Thrf.R'
     'Xhrf.R'
