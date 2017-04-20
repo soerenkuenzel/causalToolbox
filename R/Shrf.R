@@ -1,5 +1,5 @@
-#' @include EstimateCate.R
-#' @include honestRF.R
+#' @include CATE_estimators.R
+
 
 
 ############################
@@ -19,6 +19,7 @@
 #' @exportClass S_RF
 setClass(
   "S_RF",
+  contains = "Meta-learner",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",
@@ -128,13 +129,13 @@ S_RF <-
           tr,
           yobs,
           mtry = mtry,
-          nodesize = nodesize,
+          nodesizeSpl = nodesizeSpl,
+          nodesizeAvg = nodesizeAvg,
           replace = replace,
           ntree = ntree,
           sample_fraction = sample_fraction,
           nthread = nthread,
           splitratio = splitratio,
-          nodesizeAvg = nodesizeAvg,
           alwaysTr = alwaysTr
         )
       }
