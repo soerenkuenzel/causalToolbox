@@ -1,5 +1,5 @@
-#' @include EstimateCate.R
-#' @include honestRF.R
+#' @include CATE_estimators.R
+
 
 
 ############################
@@ -19,6 +19,7 @@
 #' @exportClass T_RF
 setClass(
   "T_RF",
+  contains = "Meta-learner",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",
