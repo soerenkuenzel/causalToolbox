@@ -65,7 +65,7 @@ X_RF_autotune_hyperband <-
       sampsize = sampsize,
       num_iter = num_iter,
       eta = eta,
-      verbose = verbose,
+      verbose = FALSE,
       seed = seed,
       nthread = nthread
     )
@@ -76,7 +76,7 @@ X_RF_autotune_hyperband <-
       sampsize = sampsize,
       num_iter = num_iter,
       eta = eta,
-      verbose = verbose,
+      verbose = FALSE,
       seed = seed,
       nthread = nthread
     )
@@ -93,7 +93,7 @@ X_RF_autotune_hyperband <-
       sampsize = sampsize,
       num_iter = num_iter,
       eta = eta,
-      verbose = verbose,
+      verbose = FALSE,
       seed = seed,
       nthread = nthread
     )
@@ -105,7 +105,7 @@ X_RF_autotune_hyperband <-
         sampsize = sampsize,
         num_iter = num_iter,
         eta = eta,
-        verbose = verbose,
+        verbose = FALSE,
         seed = seed,
         nthread = nthread
       )
@@ -137,7 +137,7 @@ X_RF_autotune_hyperband <-
         m_tau_0 = m_tau_0,
         m_tau_1 = m_tau_1,
         m_prop = m_prop,
-        predmode = predmode,
+        predmode = "propmean",
         firststageVar = firststageVar,
         secondstageVar = secondstageVar,
         creator = function(feat, tr, yobs) {
