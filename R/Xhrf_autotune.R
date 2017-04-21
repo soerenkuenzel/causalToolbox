@@ -1,3 +1,31 @@
+#' @include CATE_estimators.R
+
+############################
+### Xlearner - hRF - hRF ###
+############################
+#' @title XhRF constructor
+#' @name X_RF_fully_specified-class
+#' @rdname X_RF_fully_specified-class
+#' @description The `X_RF_fully_specified` object is X-learner combined with honest random
+#' forest used for the propensity score estimate, the first stage and the second
+#' stage.
+#' @slot feature_train A data frame of all training features.
+#' @slot tr_train A vector contain 0 for control and 1 for treated variables.
+#' @slot yobs_train A vector containing the observed outcomes.
+#' @exportClass X_RF
+setClass(
+  "X_RF_fully_specified",
+  contains = "Meta-learner",
+  slots = list(
+    feature_train = "data.frame",
+    tr_train = "numeric",
+    yobs_train = "numeric",
+    bas_learners = "list",
+    predmode = "character",
+    creator = "function"
+  )
+)
+
 #' @title Autotuning for X-Learner with honest RF for both stages
 #' @name X_RF_autotune_hyperband
 #' @rdname X_RF_autotune_hyperband
@@ -13,7 +41,7 @@ setGeneric(
                  tr,
                  yobs,
                  sampsize = as.integer(nrow(feat) * 0.75),
-                 num_iter = 3^7,
+                 num_iter = 3 ^ 7,
                  eta = 3,
                  firststageVar = NULL,
                  secondstageVar = NULL,
@@ -29,14 +57,13 @@ X_RF_autotune_hyperband <-
            tr,
            yobs,
            sampsize = as.integer(nrow(feat) * 0.75),
-           num_iter = 3^7,
+           num_iter = 3 ^ 7,
            eta = 3,
            firststageVar = NULL,
            secondstageVar = NULL,
            verbose = TRUE,
            seed = 24750371,
            nthread = 0) {
-
     if (is.null(firststageVar)) {
       firststageVar <- 1:ncol(feat)
     } else{
@@ -55,8 +82,8 @@ X_RF_autotune_hyperband <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
 
     m_0 <- autohonestRF(
       x = X_0[, firststageVar],
@@ -114,14 +141,17 @@ X_RF_autotune_hyperband <-
     }
 
     m_prop <-
-      honestRF(
+      autohonestRF(
         x = feat,
         y = tr,
-        ntree = 500,
-        nthread = nthread,
-        splitratio = .5,
-        nodesizeAvg = 10
+        sampsize = sampsize,
+        num_iter = num_iter,
+        eta = eta,
+        verbose = FALSE,
+        seed = seed,
+        nthread = nthread
       )
+
     if (verbose) {
       print("Done with the propensity score estimation.")
     }
@@ -168,6 +198,91 @@ X_RF_autotune_hyperband <-
       )
     )
   }
+
+
+X_RF_fully_specified <-
+  function(feat,
+           tr,
+           yobs,
+           hyperparameter_list,
+           verbose) {
+
+    bas_learners <- list()
+
+    # train the bas_learners of the first stage:
+
+    for (this_learner in c("l_first_0", "l_first_1", "l_second_0", "l_second_1", "m_prop")) {
+      if (this_learner == "l_first_0") {
+        yobs_0 <- yobs[tr == 0]
+        X_0 <- feat[tr == 0, ]
+
+        x = X_0[, hyperparameter_list[["general"]]$firststageVar]
+        y = yobs_0
+      } else if (this_learner == "l_first_1") {
+        yobs_1 <- yobs[tr == 1]
+        X_1 <- feat[tr == 1, ]
+
+        x = X_1[, hyperparameter_list[["general"]]$firststageVar]
+        y = yobs_1
+      } else if (this_learner == "l_second_0") {
+        if (verbose) {
+          print("Done with the first stage.")
+        }
+        r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
+        x = X_0[, hyperparameter_list[["general"]]$secondstageVar]
+        y = r_0
+      } else if (this_learner == "l_second_1") {
+        r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
+        x = X_0[, hyperparameter_list[["general"]]$secondstageVar]
+        y = r_1
+      }else{
+        if (verbose) {
+          print("Done with the second stage.")
+        }
+        # must be propensity learner
+        x = feat
+        y = tr
+      }
+
+      bas_learners[[m_first]] <-
+        honestRF(
+          x = X_0[, firststageVar],
+          y = yobs_0,
+          ntree = hyperparameter_list[[this_learner]]$ntree_first,
+          replace = hyperparameter_list[[this_learner]]$replace_first,
+          sampsize = hyperparameter_list[[this_learner]]$sampsize,
+          mtry = hyperparameter_list[[this_learner]]$mtry_first,
+          nodesizeSpl = hyperparameter_list[[this_learner]]$min_node_size_spl_first,
+          nthread = hyperparameter_list[[this_learner]]$nthread,
+          splitrule = hyperparameter_list[[this_learner]]$splitrule,
+          splitratio = hyperparameter_list[[this_learner]]$splitratio_first,
+          nodesizeAvg = hyperparameter_list[[this_learner]]$min_node_size_ave_first
+        )
+    }
+    if (verbose) {
+      print("Done with the propensity score estimation.")
+    }
+
+    return(
+      new(
+        "X_RF_fully_specified",
+        feature_train = feat,
+        tr_train = tr,
+        yobs_train = yobs,
+        bas_learners,
+        predmode = hyperparameter_list[["general"]]$predmode,
+        creator = function(feat, tr, yobs) {
+          X_RF_fully_specified(feat = feat,
+                               tr = tr,
+                               yobs = yobs,
+                               hyperparameter_list = hyperparameter_list,
+                               verbose = verbose)
+        }
+      )
+    )
+  }
+
+
 
 
 # # @title X_RF_autotune Constructor
