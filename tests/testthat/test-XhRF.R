@@ -9,11 +9,11 @@ test_that("Tests that XhRF is working correctly", {
     feat = feat,
     tr = tr,
     yobs = yobs,
-    nthread = 8,
+    nthread = 0,
     verbose = FALSE
   )
 
-  expect_equal(EstimateCate(xl, feat)[1], 0.1292386, tolerance=1e-7)
+  expect_equal(EstimateCate(xl, feat)[1], 0.1292386, tolerance=1e-3)
 
   CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
 

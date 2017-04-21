@@ -14,7 +14,8 @@
 
 \item{num_iter}{Maximum iterations/epochs per configuration. Default is 81.}
 
-\item{eta}{Downsampling rate. Default value is 3.}
+\item{eta}{Downsampling rate. Default value is 3. Which means we throw away
+2/3 of the data per iteration.}
 
 \item{verbose}{if tuning process in verbose mode}
 
