@@ -700,7 +700,7 @@ autohonestRF <- function(
       print(paste(">>> OOB:", best_OOB))
     }
 
-    models[[s+1]] <- val_models[[1]]
+    if(! is.null(val_models[[1]])) models[[s+1]] <- val_models[[1]]
     models_OOB[[s+1]] <- best_OOB
 
   }
