@@ -77,6 +77,10 @@ training_data_checker <- function(
     stop("sampsize must be a positive integer.")
   }
 
+  if (!replace && sampsize > nrow(x)) {
+    stop("You cannot sample without replacement with size more than total
+         number of oberservations.")
+  }
   if (mtry <= 0 || mtry %% 1 != 0) {
     stop("mtry must be a positive integer.")
   }
@@ -339,7 +343,7 @@ honestRF <- function(
   # Create a forest object
   forest <- tryCatch({
     rcppForest <- rcpp_cppBuildInterface(
-      x, y,
+      processed_x, y,
       categoricalFeatureCols_cpp,
       nObservations,
       numColumns, ntree, replace, sampsize, mtry,
@@ -350,7 +354,7 @@ honestRF <- function(
       new(
         "honestRF",
         forest=rcppForest,
-        x=as.data.frame(x),
+        x=processed_x,
         y=y,
         categoricalFeatureCols=categoricalFeatureCols,
         categoricalFeatureMapping=categoricalFeatureMapping,
@@ -427,7 +431,7 @@ setGeneric(
   name="getOOB",
   def=function(
     object,
-    noWarning=FALSE
+    noWarning=TRUE
   ){
     standardGeneric("getOOB")
   }
@@ -529,8 +533,7 @@ setMethod(
 #' @param y A vector of all training responses.
 #' @param sampsize The size of total samples to draw for the training data.
 #' @param num_iter Maximum iterations/epochs per configuration. Default is 81.
-#' @param eta Downsampling rate. Default value is 3. Which means we throw away
-#' 2/3 of the data per iteration.
+#' @param eta Downsampling rate. Default value is 3.
 #' @param verbose if tuning process in verbose mode
 #' @param seed random seed
 #' @param nthread Number of threads to train and predict thre forest. The
@@ -556,13 +559,9 @@ setGeneric(
 #' @return A `honestRF` object
 #' @export autohonestRF
 autohonestRF <- function(
-  x,
-  y,
+  x, y,
   sampsize=as.integer(nrow(x)*0.75),
-  num_iter=81,
-  eta=3,
-  verbose=FALSE,
-  seed=24750371,
+  num_iter=81, eta=3, verbose=FALSE, seed=24750371,
   nthread=0
 ) {
 
