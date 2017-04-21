@@ -88,6 +88,8 @@ T_RF <-
            sample_fraction = 0.9,
            nthread = 4,
            splitratio = .5) {
+    feat <- as.data.frame(feat)
+
     if ((!is.null(mtry)) && (mtry > ncol(feat))) {
       warning(
         "mtry is chosen bigger than number of features. It will be set
@@ -175,6 +177,8 @@ setMethod(
   signature = "T_RF",
   definition = function(theObject, feature_new)
   {
+    feature_new <- as.data.frame(feature_new)
+
     return(
       predict(theObject@m_y_t, feature_new) -
         predict(theObject@m_y_c, feature_new)
