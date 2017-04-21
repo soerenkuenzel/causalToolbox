@@ -77,6 +77,10 @@ training_data_checker <- function(
     stop("sampsize must be a positive integer.")
   }
 
+  if (!replace && sampsize > nrow(x)) {
+    stop("You cannot sample without replacement with size more than total
+         number of oberservations.")
+  }
   if (mtry <= 0 || mtry %% 1 != 0) {
     stop("mtry must be a positive integer.")
   }
@@ -339,7 +343,7 @@ honestRF <- function(
   # Create a forest object
   forest <- tryCatch({
     rcppForest <- rcpp_cppBuildInterface(
-      x, y,
+      processed_x, y,
       categoricalFeatureCols_cpp,
       nObservations,
       numColumns, ntree, replace, sampsize, mtry,
@@ -350,7 +354,7 @@ honestRF <- function(
       new(
         "honestRF",
         forest=rcppForest,
-        x=as.data.frame(x),
+        x=processed_x,
         y=y,
         categoricalFeatureCols=categoricalFeatureCols,
         categoricalFeatureMapping=categoricalFeatureMapping,
@@ -427,7 +431,7 @@ setGeneric(
   name="getOOB",
   def=function(
     object,
-    noWarning=FALSE
+    noWarning=TRUE
   ){
     standardGeneric("getOOB")
   }

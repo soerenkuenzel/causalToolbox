@@ -1,7 +1,7 @@
 Package: hte
 Type: Package
 Title: Heterogeneous Treatment Effect Estimator Using Random Forests
-Version: 0.1.0.002
+Version: 0.1.0.003
 Author: Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
 Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
@@ -28,6 +28,7 @@ Collate:
     'Shrf.R'
     'Thrf.R'
     'Xhrf.R'
+    'Xhrf_autotune.R'
     'honestRFTree.R'
     'honestRF_R.R'
 Suggests: testthat,
