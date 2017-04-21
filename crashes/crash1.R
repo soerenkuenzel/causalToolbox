@@ -1,31 +1,28 @@
+load("crashes/crash1.RData")
+set.seed(1234)
 library(hte)
-experiment <- simulate_causal_experiment(
-  ntrain = 10000,
-  ntest = 10000,
-  dim = 20,
-  alpha = 0.01,
-  feat_distribution = "normal",
-  setup = "RespSparseTau1strong",
-  testseed = 293901,
-  trainseed = 93007
+(x = x)
+(y = y)
+(ntree = r_old)
+(mtry = allConfigs$mtry[j])
+(nodesizeSpl = allConfigs$min_node_size_spl[j])
+(nodesizeAvg = allConfigs$min_node_size_ave[j])
+(splitratio = allConfigs$splitratio[j])
+(replace = allConfigs$replace[j])
+(sampsize = sampsize)
+(nthread = nthread)
+(middleSplit = allConfigs$middleSplit[j])
+
+honestRF(
+  x = x,
+  y = y,
+  ntree = r_old,
+  mtry = allConfigs$mtry[j],
+  nodesizeSpl = allConfigs$min_node_size_spl[j],
+  nodesizeAvg = allConfigs$min_node_size_ave[j],
+  splitratio = allConfigs$splitratio[j],
+  replace = allConfigs$replace[j],
+  sampsize = sampsize,
+  nthread = nthread,
+  middleSplit = allConfigs$middleSplit[j]
 )
-
-yobs_1 <- experiment$Yobs_tr[experiment$W_tr == 1]
-X_1 <- experiment$feat_tr[experiment$W_tr == 1, ]
-
-set.seed(78136)
-
-m_1 <-
-  honestRF(
-    x = X_1,
-    y = yobs_1,
-    ntree = 500,
-    mtry = 16,
-    nodesizeSpl = 3,
-    nodesizeAvg = 100,
-    splitratio = 0.1,
-    replace = TRUE,
-    sampsize = round(0.9 * length(yobs_1)),
-    nthread = 4,
-    splitrule =  'variance'
-  )
