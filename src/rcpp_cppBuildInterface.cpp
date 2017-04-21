@@ -74,7 +74,7 @@ SEXP rcpp_cppBuildInterface(
       (unsigned int) seed,
       (size_t) nthread,
       verbose,
-      middleSplit
+      verbose
     );
 
     // delete(testFullForest);

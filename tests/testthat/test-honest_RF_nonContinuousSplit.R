@@ -29,7 +29,7 @@ test_that("Test non-continuous split", {
   y_pred <- predict(forest, x)
 
   # Mean Square Error
-  sum((y_pred - y) ^ 2)
-  expect_equal(sum((y_pred - y) ^ 2), 7.860531, tolerance=1e-4)
+  # sum((y_pred - y) ^ 2)
+  expect_equal(sum((y_pred - y) ^ 2), 7.839267, tolerance=1e-4)
 
 })

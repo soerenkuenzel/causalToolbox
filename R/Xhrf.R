@@ -140,6 +140,7 @@ X_RF <-
            nthread = 4,
            verbose = TRUE) {
     # if firststageVar is not set, then set it to select all:
+    feat <- as.data.frame(feat)
     if (is.null(firststageVar)) {
       firststageVar <- 1:ncol(feat)
     } else{
@@ -328,6 +329,8 @@ setMethod(
   signature = "X_RF",
   definition = function(theObject, feature_new)
   {
+    feature_new <- as.data.frame(feature_new)
+
     prop_scores <- predict(theObject@m_prop, feature_new)
     if (theObject@predmode == "propmean") {
       return(

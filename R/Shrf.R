@@ -91,6 +91,8 @@ S_RF <-
            nthread = 4,
            splitratio = .5,
            alwaysTr = FALSE) {
+    feat <- as.data.frame(feat)
+
     if ((!is.null(mtry)) && (mtry > ncol(feat) + 1)) {
       warning(
         "mtry is chosen bigger than number of features. It will be set
@@ -159,6 +161,8 @@ setMethod(
   signature = "S_RF",
   definition = function(theObject, feature_new)
   {
+    feature_new <- as.data.frame(feature_new)
+
     return(
       predict(theObject@forest, cbind(feature_new, tr = 1)) -
         predict(theObject@forest, cbind(feature_new, tr = 0))
