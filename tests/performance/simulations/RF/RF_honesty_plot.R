@@ -57,12 +57,13 @@ for (setup_i in setup_loop) {
       splitratio = factor(splitratio)) %>%
       ggplot(aes(x = ntrain,
                  y = MSE_mean,
-                 # shape = splitratio,
+                 shape = splitratio,
                  color = splitratio)) +
       geom_line() +
-      geom_errorbar(aes(
-        ymin=MSE_mean - 1.96 * MSE_sd, ymax=MSE_mean + 1.96 * MSE_sd
-      )) +
+      geom_point() +
+      # geom_errorbar(aes(
+      #   ymin=MSE_mean - 1.96 * MSE_sd, ymax=MSE_mean + 1.96 * MSE_sd
+      # )) +
       scale_x_log10() +
       facet_wrap( ~ dimalpha, scales = "free_y") +
       ylab(field) +
@@ -74,12 +75,12 @@ for (setup_i in setup_loop) {
         breaks = c(0.2, 0.4, 0.6, 0.8, 1),
         labels = c("20%", "40%", "60%", "80%", "adaptive")
       ) +
-      # scale_shape_manual(
-      #   values = 1:5,
-      #   name = "Fraction of\nSplitting Samples",
-      #   breaks = c(0.2, 0.4, 0.6, 0.8, 1),
-      #   labels = c("20%", "40%", "60%", "80%", "adaptive")
-      # ) +
+      scale_shape_manual(
+        values = 1:5,
+        name = "Fraction of\nSplitting Samples",
+        breaks = c(0.2, 0.4, 0.6, 0.8, 1),
+        labels = c("20%", "40%", "60%", "80%", "adaptive")
+      ) +
       ggtitle(title[substr(file_name[setup_i], 9, 11)])
 
     ggsave(
