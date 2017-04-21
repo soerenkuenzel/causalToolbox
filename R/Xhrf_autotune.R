@@ -12,8 +12,8 @@ setGeneric(
   def = function(feat,
                  tr,
                  yobs,
-                 sampsize = as.integer(nrow(x) * 0.75),
-                 num_iter = 81,
+                 sampsize = as.integer(nrow(feat) * 0.75),
+                 num_iter = 3^7,
                  eta = 3,
                  firststageVar = NULL,
                  secondstageVar = NULL,
@@ -24,13 +24,12 @@ setGeneric(
   }
 )
 
-
 X_RF_autotune_hyperband <-
   function(feat,
            tr,
            yobs,
-           sampsize = as.integer(nrow(x) * 0.75),
-           num_iter = 81,
+           sampsize = as.integer(nrow(feat) * 0.75),
+           num_iter = 3^7,
            eta = 3,
            firststageVar = NULL,
            secondstageVar = NULL,

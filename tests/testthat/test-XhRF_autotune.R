@@ -5,7 +5,7 @@ test_that("Tests that XhRF is working correctly", {
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
   sampsize <- as.integer(nrow(feat) * 0.75)
-  num_iter <- 3^2
+  num_iter <- 3 ^ 2
   eta <- 3
   firststageVar <- NULL
   secondstageVar <- NULL
@@ -28,9 +28,37 @@ test_that("Tests that XhRF is working correctly", {
   )
 
 
-  expect_equal(
-    EstimateCate(xl, feat)[1],
-    3.268899,
-    tolerance=1e-3)
+  expect_equal(EstimateCate(xl, feat)[1],
+               3.268899,
+               tolerance = 1e-3)
+
+
+  #### real example ####
+  set.seed(432)
+  cate_problem <-
+    simulate_causal_experiment(
+      ntrain = 400,
+      ntest = 10000,
+      dim = 20,
+      alpha = .1,
+      feat_distribution = "normal",
+      setup = "RespSparseTau1strong",
+      testseed = 543,
+      trainseed = 234
+    )
+
+  xl_tuned <- X_RF_autotune_hyperband(
+    feat = cate_problem$feat_tr,
+    yobs = cate_problem$Yobs_tr,
+    tr = cate_problem$W_tr,
+    num_iter = 3^2,
+    verbose = FALSE
+  )
+
+  expect_equal(mean((
+    EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
+  ) ^ 2),
+  929.7663,
+  tolerance = 1e-5)
 
 })
