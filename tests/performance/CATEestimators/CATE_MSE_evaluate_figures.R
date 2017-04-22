@@ -27,7 +27,8 @@ cols <- c(
   # "X_RF_sRF" = "blue3"
 )
 
-estimator_subset <- c("X_RF", "X_RF0.1.0.3", "X_RF_autotune0.1.0.3")
+unique(Results$estimator)
+estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_autotune0.1.0.3")
 
 # Summary plots:
 for (this_setup in unique(Results$setup)) {
