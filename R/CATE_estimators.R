@@ -1,4 +1,3 @@
-#' @include EstimateCate.R
 #' @include honestRF.R
 
 setClass("CATE-estimators")
@@ -12,6 +11,15 @@ setClass(
     forest = "honestRF",
     creator = "function"
   )
+)
+
+
+setGeneric(
+  name = "EstimateCate",
+  def = function(theObject, feature_new)
+  {
+    standardGeneric("EstimateCate")
+  }
 )
 
 

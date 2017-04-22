@@ -18,7 +18,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
     sampsize = sampsize,
     num_iter = num_iter,
     eta = eta,
-    verbose = FALSE,
+    verbose = verbose,
     seed = seed,
     nthread = nthread
   )

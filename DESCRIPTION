@@ -18,7 +18,6 @@ RoxygenNote: 6.0.1
 SystemRequirements: C++11
 Collate: 
     'honestRF.R'
-    'EstimateCate.R'
     'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
     'RF.R'
@@ -28,6 +27,7 @@ Collate:
     'Shrf.R'
     'Thrf.R'
     'Xhrf.R'
+    'Xhrf_autotune_hyperband.R'
     'honestRFTree.R'
     'honestRF_R.R'
 Suggests: testthat,

@@ -651,11 +651,11 @@ autohonestRF <- function(
         r_i <- as.integer(r * eta ^ i)
         r_new <- r_i - r_old
 
-        if (verbose) {
-          print(paste("Iterations", i))
-          print(paste("Total number of configurations:", n_i))
-          print(paste("Number of iterations per configuration:", r_i))
-        }
+        # if (verbose) {
+        #   print(paste("Iterations", i))
+        #   print(paste("Total number of configurations:", n_i))
+        #   print(paste("Number of iterations per configuration:", r_i))
+        # }
 
         val_losses <- vector("list", nrow(allConfigs))
 
@@ -681,10 +681,10 @@ autohonestRF <- function(
         gc()
         rownames(allConfigs) <- 1:nrow(allConfigs)
 
-        if (verbose) {
-          print(paste(length(val_losses_idx$ix) - nrow(allConfigs),
-                      "configurations have been eliminated."))
-        }
+        # if (verbose) {
+        #   print(paste(length(val_losses_idx$ix) - nrow(allConfigs),
+        #               "configurations have been eliminated."))
+        # }
 
       }
 
