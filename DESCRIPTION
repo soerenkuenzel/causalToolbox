@@ -28,7 +28,6 @@ Collate:
     'Shrf.R'
     'Thrf.R'
     'Xhrf.R'
-    'Xhrf_autotune.R'
     'honestRFTree.R'
     'honestRF_R.R'
 Suggests: testthat,

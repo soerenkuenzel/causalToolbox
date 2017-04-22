@@ -1,4 +1,4 @@
-test_that("Tests that XhRF is working correctly", {
+test_that("Tests that X_RF_autotune_hyperband is working correctly", {
   set.seed(1423614230)
 
   feat <- iris[, -1]
@@ -7,8 +7,6 @@ test_that("Tests that XhRF is working correctly", {
   sampsize <- as.integer(nrow(feat) * 0.75)
   num_iter <- 3 ^ 2
   eta <- 3
-  firststageVar <- NULL
-  secondstageVar <- NULL
   verbose <- TRUE
   seed <- 24750371
   nthread <- 0
@@ -20,8 +18,6 @@ test_that("Tests that XhRF is working correctly", {
     sampsize = sampsize,
     num_iter = num_iter,
     eta = eta,
-    firststageVar = firststageVar,
-    secondstageVar = secondstageVar,
     verbose = FALSE,
     seed = seed,
     nthread = nthread
@@ -29,7 +25,7 @@ test_that("Tests that XhRF is working correctly", {
 
 
   expect_equal(EstimateCate(xl, feat)[1],
-               3.268899,
+               0.2394491,
                tolerance = 1e-3)
 
 
@@ -51,14 +47,14 @@ test_that("Tests that XhRF is working correctly", {
     feat = cate_problem$feat_tr,
     yobs = cate_problem$Yobs_tr,
     tr = cate_problem$W_tr,
-    num_iter = 3^2,
+    num_iter = 3 ^ 2,
     verbose = FALSE
   )
 
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  929.7663,
+  922.1623,
   tolerance = 1e-5)
 
 })
