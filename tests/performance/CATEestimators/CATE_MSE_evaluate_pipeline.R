@@ -41,7 +41,7 @@ ntrain_grid <- round(10 ^ seq(from = 2, to = 4, by = .5))
 # }
 ntest <- 10000
 seed_grid <- 1:100
-alpha_grid <- c(0, .01, .1, 10)
+alpha_grid <- c(0, .1)
 
 estimator_grid <- list(
   # "S_RF" = function(feat, W, Yobs)
