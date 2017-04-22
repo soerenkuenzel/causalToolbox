@@ -55,6 +55,7 @@ estimator_grid <- list(
       feat = feat,
       tr = W,
       yobs = Yobs,
+      num_iter = max(6561 * 1000 / length(W), 3 ^ 8),
       verbose = FALSE
     )
   # "CF_p" = function(feat, W, Yobs) {

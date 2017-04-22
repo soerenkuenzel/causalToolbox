@@ -609,8 +609,8 @@ autohonestRF <- function(
     # Generate parameters:
     allConfigs <- data.frame(
       mtry = sample(1:ncol(x), n, replace = TRUE),
-      min_node_size_spl = sample(1:min(30, nrow(x)), n, replace = TRUE),
-      min_node_size_ave = sample(1:min(30, nrow(x)), n, replace = TRUE),
+      min_node_size_spl = sample(1:min(60, nrow(x)), n, replace = TRUE),
+      min_node_size_ave = sample(1:min(60, nrow(x)), n, replace = TRUE),
       splitratio = runif(n, min = 0.1, max = 1),
       replace = sample(c(TRUE, FALSE), n, replace = TRUE),
       middleSplit = sample(c(TRUE, FALSE), n, replace = TRUE)
