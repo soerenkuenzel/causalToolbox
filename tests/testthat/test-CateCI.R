@@ -50,6 +50,6 @@ test_that("Tests CateCI", {
   CIs <- CateCI(xl_at, feat, B = 5, verbose = FALSE)
 
   expect_equal(as.numeric(CIs[1, ]),
-               c(0.06023353, -0.12896392, 0.24943098),
+               c(0.1233837, -0.3876998, 0.6344671),
                tolerance=1e-7)
 })
