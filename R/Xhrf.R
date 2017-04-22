@@ -13,7 +13,11 @@ setClass(
   )
 )
 
-## the most basic constructor of X-RF:
+#' @title X_RF_most_basic Constructor
+#' @rdname X_RF_fully_specified
+#' @aliases X_RF_fully_specified
+#' @return A `X_RF_fully_specified` object.
+#' @export X_RF_fully_specified
 X_RF_fully_specified <-
   function(feat,
            tr,
@@ -211,12 +215,22 @@ X_RF <-
       "splitratio" = splitratio_prop,
       "middleSplit" = middleSplit_prop
     )
+
+    first_stage_hyperpara_0 <- first_stage_hyperpara
+    first_stage_hyperpara_1 <- first_stage_hyperpara
+    second_stage_hyperpara_0 <- second_stage_hyperpara
+    second_stage_hyperpara_1 <- second_stage_hyperpara
+    first_stage_hyperpara_0[["sampsize"]] <- round(sample_fraction_first * sum(1 - tr))
+    first_stage_hyperpara_1[["sampsize"]] <- round(sample_fraction_first * sum(tr))
+    second_stage_hyperpara_0[["sampsize"]] <- round(sample_fraction_first * sum(1 - tr))
+    second_stage_hyperpara_1[["sampsize"]] <- round(sample_fraction_first * sum(tr))
+
     hyperparameter_list <- list(
       "general" = general_hyperpara,
-      "l_first_0" = first_stage_hyperpara,
-      "l_first_1" = first_stage_hyperpara,
-      "l_second_0" = second_stage_hyperpara,
-      "l_second_1" = second_stage_hyperpara,
+      "l_first_0" = first_stage_hyperpara_0,
+      "l_first_1" = first_stage_hyperpara_1,
+      "l_second_0" = second_stage_hyperpara_0,
+      "l_second_1" = second_stage_hyperpara_1,
       "l_prop" = prop_hyperpara
     )
 
