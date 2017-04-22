@@ -609,8 +609,8 @@ autohonestRF <- function(
     # Generate parameters:
     allConfigs <- data.frame(
       mtry = sample(1:ncol(x), n, replace = TRUE),
-      min_node_size_spl = sample(1:min(30, nrow(x)), n, replace = TRUE),
-      min_node_size_ave = sample(1:min(30, nrow(x)), n, replace = TRUE),
+      min_node_size_spl = sample(1:min(60, nrow(x)), n, replace = TRUE),
+      min_node_size_ave = sample(1:min(60, nrow(x)), n, replace = TRUE),
       splitratio = runif(n, min = 0.1, max = 1),
       replace = sample(c(TRUE, FALSE), n, replace = TRUE),
       middleSplit = sample(c(TRUE, FALSE), n, replace = TRUE)
@@ -651,11 +651,11 @@ autohonestRF <- function(
         r_i <- as.integer(r * eta ^ i)
         r_new <- r_i - r_old
 
-        if (verbose) {
-          print(paste("Iterations", i))
-          print(paste("Total number of configurations:", n_i))
-          print(paste("Number of iterations per configuration:", r_i))
-        }
+        # if (verbose) {
+        #   print(paste("Iterations", i))
+        #   print(paste("Total number of configurations:", n_i))
+        #   print(paste("Number of iterations per configuration:", r_i))
+        # }
 
         val_losses <- vector("list", nrow(allConfigs))
 
@@ -681,10 +681,10 @@ autohonestRF <- function(
         gc()
         rownames(allConfigs) <- 1:nrow(allConfigs)
 
-        if (verbose) {
-          print(paste(length(val_losses_idx$ix) - nrow(allConfigs),
-                      "configurations have been eliminated."))
-        }
+        # if (verbose) {
+        #   print(paste(length(val_losses_idx$ix) - nrow(allConfigs),
+        #               "configurations have been eliminated."))
+        # }
 
       }
 
@@ -700,7 +700,7 @@ autohonestRF <- function(
       print(paste(">>> OOB:", best_OOB))
     }
 
-    models[[s+1]] <- val_models[[1]]
+    if(! is.null(val_models[[1]])) models[[s+1]] <- val_models[[1]]
     models_OOB[[s+1]] <- best_OOB
 
   }

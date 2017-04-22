@@ -1,4 +1,3 @@
-#' @include EstimateCate.R
 #' @include honestRF.R
 
 setClass("CATE-estimators")
@@ -9,9 +8,17 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    forest = "honestRF",
     creator = "function"
   )
+)
+
+
+setGeneric(
+  name = "EstimateCate",
+  def = function(theObject, feature_new)
+  {
+    standardGeneric("EstimateCate")
+  }
 )
 
 
