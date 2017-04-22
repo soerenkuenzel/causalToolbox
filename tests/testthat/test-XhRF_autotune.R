@@ -9,7 +9,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
   eta <- 3
   verbose <- TRUE
   seed <- 24750371
-  nthread <- 0
+  nthread <- 1
 
   xl <- X_RF_autotune_hyperband(
     feat = feat,
@@ -18,7 +18,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
     sampsize = sampsize,
     num_iter = num_iter,
     eta = eta,
-    verbose = verbose,
+    verbose = FALSE,
     seed = seed,
     nthread = nthread
   )
@@ -26,7 +26,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
 
   expect_equal(EstimateCate(xl, feat)[1],
                0.2394491,
-               tolerance = 1e-3)
+               tolerance = 1e-7)
 
 
   #### real example ####

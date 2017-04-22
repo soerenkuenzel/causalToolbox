@@ -14,7 +14,7 @@ test_that("Tests that XhRF is working correctly", {
   ntree_prop = 500
   mtry_first = round(ncol(feat) / 2)
   mtry_second = ncol(feat)
-  mtry_prop = max(floor(ncol(feat)/3), 1)
+  mtry_prop = max(floor(ncol(feat) / 3), 1)
   min_node_size_spl_first = 1
   min_node_size_ave_first = 5
   min_node_size_spl_second = 5
@@ -30,7 +30,7 @@ test_that("Tests that XhRF is working correctly", {
   sample_fraction_first = 0.8
   sample_fraction_second = 0.9
   sample_fraction_prop = 1
-  nthread = 0
+  nthread = 1
   verbose = FALSE
   middleSplit_first = FALSE
   middleSplit_second = FALSE
@@ -72,38 +72,36 @@ test_that("Tests that XhRF is working correctly", {
     verbose = verbose
   )
   EstimateCate(xl, feat)[1]
-  expect_equal(EstimateCate(xl, feat)[1], 0.07753356, tolerance=1e-3)
+  expect_equal(EstimateCate(xl, feat)[1], 0.07753356, tolerance = 1e-7)
 
-#
-#   set.seed(432)
-#   cate_problem <-
-#     simulate_causal_experiment(
-#       ntrain = 400,
-#       ntest = 100,
-#       dim = 20,
-#       alpha = .1,
-#       feat_distribution = "normal",
-#       setup = "RespSparseTau1strong",
-#       testseed = 543,
-#       trainseed = 234
-#     )
-#   set.seed(432)
-#
-#
-#   xl <- X_RF(feat = cate_problem$feat_tr,
-#              yobs = cate_problem$Yobs_tr,
-#              tr = cate_problem$W_tr,
-#              verbose = TRUE)
-#
-#   predict(xl@base_learners[["l_second_0"]], cate_problem$feat_te)[1]
-#
-#   mean((
-#     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
-#   ) ^ 2)
-#   expect_equal(mean((
-#     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
-#   ) ^ 2),
-#   64.0129,
-#   tolerance = 1e-3)
+  set.seed(432)
+  cate_problem <-
+    simulate_causal_experiment(
+      ntrain = 400,
+      ntest = 100,
+      dim = 20,
+      alpha = .1,
+      feat_distribution = "normal",
+      setup = "RespSparseTau1strong",
+      testseed = 543,
+      trainseed = 234
+    )
+
+  xl <- X_RF(
+    feat = cate_problem$feat_tr,
+    yobs = cate_problem$Yobs_tr,
+    tr = cate_problem$W_tr,
+    ntree_first = 50,
+    ntree_second = 50,
+    ntree_prop = 50,
+    verbose = FALSE,
+    nthread = 1
+  )
+
+  expect_equal(mean((
+    EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
+  ) ^ 2),
+  67.18012,
+  tolerance = 1e-7)
 
 })

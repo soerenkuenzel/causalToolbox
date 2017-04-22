@@ -10,7 +10,7 @@ xl <- X_RF(
   feat = feat,
   tr = tr,
   yobs = yobs,
-  nthread = 8,
+  nthread = 0,
   splitratio_first = .5,
   splitratio_second = .5
 )
@@ -32,7 +32,7 @@ xl <- X_RF(
   feat = feat,
   tr = tr,
   yobs = yobs,
-  nthread = 8
+  nthread = 0
 )
 EstimateCate(xl, feat)
 

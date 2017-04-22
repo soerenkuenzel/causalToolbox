@@ -22,7 +22,7 @@ X_RF_autotune_hyperband <-
            tr,
            yobs,
            sampsize = as.integer(nrow(feat) * 0.75),
-           num_iter = 3 ^ 7,
+           num_iter = 3 ^ 8,
            eta = 3,
            verbose = TRUE,
            seed = 24750371,

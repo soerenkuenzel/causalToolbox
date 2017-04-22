@@ -232,10 +232,6 @@ X_RF <-
   }
 
 
-
-
-
-
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_hRF
 #' @rdname EstimateCate-X_hRF
