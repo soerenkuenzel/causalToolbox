@@ -186,7 +186,7 @@ for (seed in seed_grid) {
             feat_distribution = "normal",
             testseed = 293901,
             trainingseed = seed,
-            estimator = estimator_name,
+            estimator = paste0(estimator_name, packageVersion("hte")),
             MSE = MSE,
             MSE_sd = MSE_sd,
             MAE = MAE,
