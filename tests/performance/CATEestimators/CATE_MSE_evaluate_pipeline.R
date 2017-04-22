@@ -35,7 +35,7 @@ setup <- setup_grid[[setup_i]]
 print(setup)
 
 dim_grid <- c(5, 20, 100)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .5))
+ntrain_grid <- round(10 ^ seq(from = 2, to = 4, by = .5))
 # if (setup == "rare1"){
 #   ntrain_grid <- c(1500, 2000, 4000, 10000, 40000)
 # }
@@ -44,55 +44,64 @@ seed_grid <- 1:100
 alpha_grid <- c(0, .01, .1, 10)
 
 estimator_grid <- list(
-  "S_RF" = function(feat, W, Yobs)
-    S_RF(feat, W, Yobs, nthread = nthread),
-  "T_RF" = function(feat, W, Yobs)
-    T_RF(feat, W, Yobs, nthread = nthread),
+  # "S_RF" = function(feat, W, Yobs)
+  #   S_RF(feat, W, Yobs, nthread = nthread),
+  # "T_RF" = function(feat, W, Yobs)
+  #   T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
-  "CF_p" = function(feat, W, Yobs) {
-    feat <- as.matrix(feat)
-    colnames(feat) <- NULL
-    propensityForest(
-      X = feat,
-      W = W,
-      Y = Yobs,
-      num.trees = 500,
-      sample.size = nrow(feat) / 10,
-      nodesize = 1
+  "X_RF_autotune" = function(feat, W, Yobs)
+    X_RF_autotune_hyperband(
+      feat = feat,
+      tr = W,
+      yobs = Yobs,
+      verbose = FALSE
     )
-  },
-  "CF" = function(feat, W, Yobs) {
-    feat <- as.matrix(feat)
-    colnames(feat) <- NULL
-    causalForest(
-      X = feat,
-      W = W,
-      Y = Yobs,
-      num.trees = 500,
-      sample.size = nrow(feat) / 10,
-      nodesize = 1
-    )
-  }
+  # "CF_p" = function(feat, W, Yobs) {
+  #   feat <- as.matrix(feat)
+  #   colnames(feat) <- NULL
+  #   propensityForest(
+  #     X = feat,
+  #     W = W,
+  #     Y = Yobs,
+  #     num.trees = 500,
+  #     sample.size = nrow(feat) / 10,
+  #     nodesize = 1
+  #   )
+  # },
+  # "CF" = function(feat, W, Yobs) {
+  #   feat <- as.matrix(feat)
+  #   colnames(feat) <- NULL
+  #   causalForest(
+  #     X = feat,
+  #     W = W,
+  #     Y = Yobs,
+  #     num.trees = 500,
+  #     sample.size = nrow(feat) / 10,
+  #     nodesize = 1
+  #   )
+  # }
 )
 
 CATEpredictor_grid <- list(
-  "S_RF" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
-  "T_RF" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+  # "S_RF" = function(estimator, feat_te)
+  #   EstimateCate(estimator, feat_te),
+  # "T_RF" = function(estimator, feat_te)
+  #   EstimateCate(estimator, feat_te),
   "X_RF" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te),
-  "CF_p" = function(estimator, feat_te) {
-    feat_te <- as.matrix(feat_te)
-    colnames(feat_te) <- NULL
-    return(predict(estimator, feat_te))
-  },
-  "CF" = function(estimator, feat_te)  {
-    feat_te <- as.matrix(feat_te)
-    colnames(feat_te) <- NULL
-    return(predict(estimator, feat_te))
-  }
+  "X_RF_autotune" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te)
+  # "CF_p" = function(estimator, feat_te) {
+  #   feat_te <- as.matrix(feat_te)
+  #   colnames(feat_te) <- NULL
+  #   return(predict(estimator, feat_te))
+  # },
+  # "CF" = function(estimator, feat_te)  {
+  #   feat_te <- as.matrix(feat_te)
+  #   colnames(feat_te) <- NULL
+  #   return(predict(estimator, feat_te))
+  # }
 )
 
 
