@@ -2,31 +2,24 @@
 % Please edit documentation in R/Xhrf_autotune_gpp.R
 \name{X_RF_autotune_gpp}
 \alias{X_RF_autotune_gpp}
-\title{#' @title Autotuning for X-Learner with honest RF for both stages
-#' @name X_RF_autotune_gpp
-#' @rdname X_RF_autotune_gpp
-#' @description This function tunes
-#' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
-#' @param yobs A numeric vector containing the observed outcomes.
-#' @param ntree ..
-#' @param Niter ..
-#' @param nthread ..
-#' @export X_RF_autotune_gpp}
+\title{Autotuning for X-Learner with honest RF for both stages}
 \usage{
 X_RF_autotune_gpp(feat, tr, yobs, ntree = 20000, nthread = 0,
   verbose = TRUE)
 }
+\arguments{
+\item{feat}{A data frame of all the features.}
+
+\item{tr}{A numeric vector contain 0 for control and 1 for treated variables.}
+
+\item{yobs}{A numeric vector containing the observed outcomes.}
+
+\item{ntree}{..}
+
+\item{nthread}{..}
+
+\item{Niter}{..}
+}
 \description{
-#' @title Autotuning for X-Learner with honest RF for both stages
-#' @name X_RF_autotune_gpp
-#' @rdname X_RF_autotune_gpp
-#' @description This function tunes
-#' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
-#' @param yobs A numeric vector containing the observed outcomes.
-#' @param ntree ..
-#' @param Niter ..
-#' @param nthread ..
-#' @export X_RF_autotune_gpp
+This function tunes
 }
