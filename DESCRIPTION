@@ -27,9 +27,9 @@ Collate:
     'Shrf.R'
     'Thrf.R'
     'Xhrf.R'
+    'Xhrf_autotune_simple.R'
     'Xhrf_autotune_gpp.R'
     'Xhrf_autotune_hyperband.R'
-    'Xhrf_autotune_simple.R'
     'honestRFTree.R'
     'honestRF_R.R'
 Suggests: testthat,

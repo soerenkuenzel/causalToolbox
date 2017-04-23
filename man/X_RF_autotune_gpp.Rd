@@ -21,5 +21,5 @@ X_RF_autotune_gpp(feat, tr, yobs, ntree = 20000, nthread = 0,
 \item{Niter}{..}
 }
 \description{
-This function tunes
+DO NOT USE YET
 }
