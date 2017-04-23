@@ -250,6 +250,9 @@ setClass(
 #' sampling with replacement, the default value is the length of the training
 #' data. If samplying without replacement, the default value is two-third of
 #' the length of the training data.
+#' @param sample.fraction if this is given, then sampsize is ignored and set to
+#' be round(length(y) * sample.fraction). It must be a real number between 0 and
+#' 1
 #' @param mtry The number of variables randomly selected at each split point.
 #' The default value is set to be one third of total number of features of the
 #' training data.
@@ -282,6 +285,7 @@ setGeneric(
     ntree,
     replace,
     sampsize,
+    sample.fraction,
     mtry,
     nodesizeSpl,
     nodesizeAvg,
@@ -308,6 +312,7 @@ honestRF <- function(
   ntree=500,
   replace=TRUE,
   sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x)),
+  sample.fraction = NULL,
   mtry=max(floor(ncol(x)/3), 1),
   nodesizeSpl=3,
   nodesizeAvg=3,
@@ -318,6 +323,10 @@ honestRF <- function(
   splitrule="variance",
   middleSplit=FALSE
   ){
+  # only if sample.fraction is given, update sampsize
+  if(!is.null(sample.fraction))
+    sampsize <- ceiling(sample.fraction * nrow(x))
+
   x <- as.data.frame(x)
   # Preprocess the data
   training_data_checker(x, y, ntree,replace, sampsize, mtry, nodesizeSpl,
@@ -431,7 +440,7 @@ setGeneric(
   name="getOOB",
   def=function(
     object,
-    noWarning=TRUE
+    noWarning=FALSE
   ){
     standardGeneric("getOOB")
   }
@@ -452,11 +461,11 @@ setMethod(
     # (all) TODO: find a better threshold for throwing such warning. 25 is
     # currently set up arbitrarily.
     if (!object@replace &&
-        object@ntree * (1 - object@sampsize) * nrow(object@x) < 25) {
+        object@ntree * (nrow(object@x) - object@sampsize) < 25) {
       if (!noWarning) {
         warning("Samples are drawn without replacement and sample size is too big!")
       }
-      return(Inf)
+      return(NA)
     }
 
     rcppOOB <- tryCatch({
@@ -558,13 +567,14 @@ setGeneric(
 #' @aliases autohonestRF, honestRF-method
 #' @return A `honestRF` object
 #' @export autohonestRF
-autohonestRF <- function(
-  x, y,
-  sampsize=as.integer(nrow(x)*0.75),
-  num_iter=81, eta=3, verbose=FALSE, seed=24750371,
-  nthread=0
-) {
-
+autohonestRF <- function(x,
+                         y,
+                         sampsize = as.integer(nrow(x) * 0.75),
+                         num_iter = 81,
+                         eta = 3,
+                         verbose = FALSE,
+                         seed = 24750371,
+                         nthread = 0) {
   if (verbose) {
     print("Start auto-tuning.")
   }
@@ -577,19 +587,24 @@ autohonestRF <- function(
   B <- (s_max + 1) * num_iter
 
   if (verbose) {
-    print(paste(
-      "Hyperband will run successive halving in", s_max,
-      "times, with", B, "iterations per execution."
-    ))
+    print(
+      paste(
+        "Hyperband will run successive halving in",
+        s_max,
+        "times, with",
+        B,
+        "iterations per execution."
+      )
+    )
   }
 
   # Begin finite horizon hyperband outlerloop
-  models <- vector("list", s_max+1)
-  models_OOB <- vector("list", s_max+1)
+  models <- vector("list", s_max + 1)
+  models_OOB <- vector("list", s_max + 1)
 
   set.seed(seed)
 
-  for (s in s_max : 0) {
+  for (s in s_max:0) {
     if (verbose) {
       print(paste("Hyperband successive halving round", s_max + 1 - s))
     }
@@ -601,8 +616,11 @@ autohonestRF <- function(
     r <- num_iter * eta ^ (-s)
 
     if (verbose) {
-      print(paste(">>> Total number of configurations:",n))
-      print(paste(">>> Number of iterations per configuration:", as.integer(r)))
+      print(paste(">>> Total number of configurations:", n))
+      print(paste(
+        ">>> Number of iterations per configuration:",
+        as.integer(r)
+      ))
     }
 
     # Begin finite horizon successive halving with (n,r)
@@ -643,8 +661,7 @@ autohonestRF <- function(
     }
 
     if (s != 0) {
-
-      for (i in 0:(s-1)) {
+      for (i in 0:(s - 1)) {
         # Run each of the n_i configs for r_i iterations and keep best
         # n_i/eta
         n_i <- as.integer(n * eta ^ (-i))
@@ -662,11 +679,11 @@ autohonestRF <- function(
         # Iterate to evaluate each parameter combination and cut the
         # parameter pools in half every iteration based on its score
         for (j in 1:nrow(allConfigs)) {
-          if (r_new > 0 && !is.null(val_models[[j]])){
+          if (r_new > 0 && !is.null(val_models[[j]])) {
             val_models[[j]] <- addTrees(val_models[[j]], r_new)
           }
           if (!is.null(val_models[[j]])) {
-            val_losses[[j]] <- getOOB(val_models[[j]], noWarning=TRUE)
+            val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
           } else {
             val_losses[[j]] <- Inf
           }
@@ -674,9 +691,10 @@ autohonestRF <- function(
 
         r_old <- r_i
 
-        val_losses_idx <- sort(unlist(val_losses), index.return=TRUE)
+        val_losses_idx <-
+          sort(unlist(val_losses), index.return = TRUE)
         val_top_idx <- val_losses_idx$ix[0:as.integer(n_i / eta)]
-        allConfigs <- allConfigs[val_top_idx, ]
+        allConfigs <- allConfigs[val_top_idx,]
         val_models <- val_models[val_top_idx]
         gc()
         rownames(allConfigs) <- 1:nrow(allConfigs)
@@ -691,7 +709,7 @@ autohonestRF <- function(
     }
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
-      best_OOB <- getOOB(val_models[[1]], noWarning=TRUE)
+      best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
     } else {
       best_OOB <- Inf
     }
@@ -700,21 +718,26 @@ autohonestRF <- function(
       print(paste(">>> OOB:", best_OOB))
     }
 
-    if(! is.null(val_models[[1]])) models[[s+1]] <- val_models[[1]]
-    models_OOB[[s+1]] <- best_OOB
+    if (!is.null(val_models[[1]]))
+      models[[s + 1]] <- val_models[[1]]
+    models_OOB[[s + 1]] <- best_OOB
 
   }
 
   # End finite horizon hyperband outlerloop and sort by performance
-  model_losses_idx <- sort(unlist(models_OOB), index.return=TRUE)
+  model_losses_idx <- sort(unlist(models_OOB), index.return = TRUE)
 
   if (verbose) {
-    print(paste("Best model is selected from best-performed model in",
-                s_max, "successive halving, with OOB",
-                models_OOB[model_losses_idx$ix[1]]))
+    print(
+      paste(
+        "Best model is selected from best-performed model in",
+        s_max,
+        "successive halving, with OOB",
+        models_OOB[model_losses_idx$ix[1]]
+      )
+    )
   }
 
   return(models[[model_losses_idx$ix[1]]])
 
 }
-

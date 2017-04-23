@@ -11,6 +11,7 @@ Results <- data.frame()
 for (filename in dir(datafolder)) {
   newResults <- read.csv(paste0(datafolder, filename))
   Results <- rbind(Results, newResults)
+  print(filename)
 }
 Results <- tbl_df(Results[, -14])
 
@@ -26,10 +27,14 @@ cols <- c(
   # "X_RF_sRF" = "blue3"
 )
 
+unique(Results$estimator)
+estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_autotune0.1.0.3")
+
 # Summary plots:
 for (this_setup in unique(Results$setup)) {
   plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
   Results %>% filter(setup == this_setup) %>%
+    filter(estimator %in% estimator_subset) %>%
     group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
     summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
     filter(dim %in% c(5, 20, 100), alpha %in% c(0, 0.1, 10)) %>%
@@ -100,7 +105,7 @@ for (this_setup in unique(Results$setup)) {
   ggsave(
     paste0(
       "tests/performance/CATEestimators/sim_figures/singleplot_",
-      this_setup,
+      this_setup, "_", Sys.Date(), "_",
       "dim20a0.png"
     ),
     height =4,

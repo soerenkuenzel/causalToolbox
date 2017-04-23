@@ -12,7 +12,7 @@ test_that("Tests that random forest is working correctly", {
       y,
       ntree = 500,
       replace = TRUE,
-      sampsize = nrow(x),
+      sample.fraction = .8,
       mtry = 3,
       nodesizeSpl = 5,
       nthread = 4,
@@ -28,5 +28,5 @@ test_that("Tests that random forest is working correctly", {
 
   # Mean Square Error
   sum((y_pred - y) ^ 2)
-  expect_equal(sum((y_pred - y) ^ 2), 8.457087156, tolerance=1e-4)
+  expect_equal(sum((y_pred - y) ^ 2), 9.627655, tolerance=1e-4)
 })

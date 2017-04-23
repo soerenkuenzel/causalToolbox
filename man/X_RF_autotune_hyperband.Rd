@@ -5,7 +5,7 @@
 \title{Autotuning for X-Learner with honest RF for both stages}
 \usage{
 X_RF_autotune_hyperband(feat, tr, yobs, sampsize = as.integer(nrow(feat) *
-  0.75), num_iter = 3^7, eta = 3, verbose = TRUE, seed = 24750371,
+  0.75), num_iter = 3^8, eta = 3, verbose = TRUE, seed = 24750371,
   nthread = 0)
 }
 \arguments{

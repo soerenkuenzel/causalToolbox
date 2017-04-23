@@ -10,10 +10,10 @@
 \format{An object of class \code{NULL} of length 0.}
 \usage{
 honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
-  nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
-  nodesizeSpl = 3, nodesizeAvg = 3, splitratio = 1,
-  seed = as.integer(runif(1) * 1000), verbose = FALSE, nthread = 0,
-  splitrule = "variance", middleSplit = FALSE)
+  nrow(x) else ceiling(0.632 * nrow(x)), sample.fraction = NULL,
+  mtry = max(floor(ncol(x)/3), 1), nodesizeSpl = 3, nodesizeAvg = 3,
+  splitratio = 1, seed = as.integer(runif(1) * 1000), verbose = FALSE,
+  nthread = 0, splitrule = "variance", middleSplit = FALSE)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -30,6 +30,10 @@ replacement. The default value is TRUE.}
 sampling with replacement, the default value is the length of the training
 data. If samplying without replacement, the default value is two-third of
 the length of the training data.}
+
+\item{sample.fraction}{if this is given, then sampsize is ignored and set to
+be round(length(y) * sample.fraction). It must be a real number between 0 and
+1}
 
 \item{mtry}{The number of variables randomly selected at each split point.
 The default value is set to be one third of total number of features of the

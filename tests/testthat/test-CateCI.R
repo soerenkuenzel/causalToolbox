@@ -14,7 +14,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[2, ]),
-               c(0.1112299, -0.2054735, 0.4279332),
+               c(0.1412377, -0.1280250, 0.4105004),
                tolerance=1e-7)
 
   sl <- S_RF(feat = feat,
@@ -36,13 +36,13 @@ test_that("Tests CateCI", {
                tolerance=1e-7)
 
 
-  set.seed(342342)
+  set.seed(3421)
   xl_at <- X_RF_autotune_hyperband(
     feat = feat,
     tr = tr,
     yobs = yobs,
-    num_iter = 20,
-    eta = 3,
+    num_iter = 2^3,
+    eta = 2,
     verbose = FALSE,
     nthread = 1
   )
@@ -50,6 +50,6 @@ test_that("Tests CateCI", {
   CIs <- CateCI(xl_at, feat, B = 5, verbose = FALSE)
 
   expect_equal(as.numeric(CIs[1, ]),
-               c(0.06023353, -0.12896392, 0.24943098),
+               c(0.1233837, -0.3876998, 0.6344671),
                tolerance=1e-7)
 })

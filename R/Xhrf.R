@@ -13,7 +13,11 @@ setClass(
   )
 )
 
-## the most basic constructor of X-RF:
+#' @title X_RF_most_basic Constructor
+#' @rdname X_RF_fully_specified
+#' @aliases X_RF_fully_specified
+#' @return A `X_RF_fully_specified` object.
+#' @export X_RF_fully_specified
 X_RF_fully_specified <-
   function(feat,
            tr,
@@ -73,7 +77,7 @@ X_RF_fully_specified <-
           y = y,
           ntree = hyperparameter_list[[this_learner]]$ntree,
           replace = hyperparameter_list[[this_learner]]$replace,
-          sampsize = hyperparameter_list[[this_learner]]$sampsize,
+          sample.fraction = hyperparameter_list[[this_learner]]$sample.fraction,
           mtry = hyperparameter_list[[this_learner]]$mtry,
           nodesizeSpl = hyperparameter_list[[this_learner]]$nodesizeSpl,
           nodesizeAvg = hyperparameter_list[[this_learner]]$nodesizeAvg,
@@ -182,7 +186,7 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_first,
       "ntree" = ntree_first,
       "replace" = replace_first,
-      "sampsize" = sample_fraction_first * length(yobs),
+      "sample.fraction" = sample_fraction_first,
       "mtry" = mtry_first,
       "nodesizeSpl" = min_node_size_spl_first,
       "nodesizeAvg" = min_node_size_ave_first,
@@ -193,7 +197,7 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_second,
       "ntree" = ntree_second,
       "replace" = replace_second,
-      "sampsize" = sample_fraction_second * length(yobs),
+      "sample.fraction" = sample_fraction_second,
       "mtry" = mtry_second,
       "nodesizeSpl" = min_node_size_spl_second,
       "nodesizeAvg" = min_node_size_ave_second,
@@ -204,13 +208,14 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_prop,
       "ntree" = ntree_prop,
       "replace" = replace_prop,
-      "sampsize" = sample_fraction_prop * length(yobs),
+      "sample.fraction" = sample_fraction_prop,
       "mtry" = mtry_prop,
       "nodesizeSpl" = min_node_size_spl_prop,
       "nodesizeAvg" = min_node_size_ave_prop,
       "splitratio" = splitratio_prop,
       "middleSplit" = middleSplit_prop
     )
+
     hyperparameter_list <- list(
       "general" = general_hyperpara,
       "l_first_0" = first_stage_hyperpara,

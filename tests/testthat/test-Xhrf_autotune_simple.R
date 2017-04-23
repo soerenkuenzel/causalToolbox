@@ -1,0 +1,67 @@
+test_that("Tests test-Xhrf_autotune_simple", {
+  set.seed(1423614230)
+
+  feat <- iris[, -1]
+  tr <- rbinom(nrow(iris), 1, .5)
+  yobs <- iris[, 1]
+  ntree = 100
+  nthread = 0
+  verbose = TRUE
+
+  starting_settings <- list(
+    "start_setting_1" = get_setting_strong(feat, tr, ntree, nthread),
+    "start_setting_2" = get_setting_weak(feat, tr, ntree, nthread)
+  )
+
+  expect_equal(
+    check_setups(starting_settings, feat, tr, yobs, ntree, nthread,
+                 verbose = FALSE)[1, 3],
+    14.26671,
+    tolerance = 1e-4
+  )
+  ### Test 2:
+  set.seed(432)
+  cate_problem <-
+    simulate_causal_experiment(
+      ntrain = 400,
+      ntest = 10000,
+      dim = 20,
+      alpha = .1,
+      feat_distribution = "normal",
+      setup = "RespSparseTau1strong",
+      testseed = 543,
+      trainseed = 234
+    )
+
+  starting_settings <- list(
+    "start_setting_1" = get_setting_strong(cate_problem$feat_tr,
+                                           cate_problem$W_tr,
+                                           ntree,
+                                           nthread),
+    "start_setting_2" = get_setting_weak(cate_problem$feat_tr,
+                                         cate_problem$W_tr,
+                                         ntree,
+                                         nthread)
+  )
+
+  mm <- X_RF_autotune_simple(
+    feat = cate_problem$feat_tr,
+    tr = cate_problem$W_tr,
+    yobs = cate_problem$Yobs_tr,
+    ntree = 20,
+    nthread = 1,
+    verbose = FALSE
+  )
+  expect_equal(mean((
+    EstimateCate(mm, cate_problem$feat_te) - cate_problem$tau_te
+  ) ^ 2),
+  162.8941, tolerance = 1e-5)
+
+
+  CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
+
+  expect_equal(CATE_ci[2,2],
+               0.1872042,
+               tolerance = 1e-5)
+
+})

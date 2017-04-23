@@ -55,6 +55,7 @@ estimator_grid <- list(
       feat = feat,
       tr = W,
       yobs = Yobs,
+      num_iter = max(6561 * 1000 / length(W), 3 ^ 8),
       verbose = FALSE
     )
   # "CF_p" = function(feat, W, Yobs) {
@@ -185,7 +186,7 @@ for (seed in seed_grid) {
             feat_distribution = "normal",
             testseed = 293901,
             trainingseed = seed,
-            estimator = estimator_name,
+            estimator = paste0(estimator_name, packageVersion("hte")),
             MSE = MSE,
             MSE_sd = MSE_sd,
             MAE = MAE,
