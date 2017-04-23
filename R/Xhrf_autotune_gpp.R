@@ -4,18 +4,18 @@
 
 library(rBayesianOptimization)
 
-#'
-#' #' @title Autotuning for X-Learner with honest RF for both stages
-#' #' @name X_RF_autotune_gpp
-#' #' @rdname X_RF_autotune_gpp
-#' #' @description This function tunes
-#' #' @param feat A data frame of all the features.
-#' #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
-#' #' @param yobs A numeric vector containing the observed outcomes.
-#' #' @param ntree ..
-#' #' @param Niter ..
-#' #' @param nthread ..
-#' #' @export X_RF_autotune_gpp
+
+#' @title Autotuning for X-Learner with honest RF for both stages
+#' @name X_RF_autotune_gpp
+#' @rdname X_RF_autotune_gpp
+#' @description DO NOT USE YET
+#' @param feat A data frame of all the features.
+#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param yobs A numeric vector containing the observed outcomes.
+#' @param ntree ..
+#' @param Niter ..
+#' @param nthread ..
+#' @export X_RF_autotune_gpp
 X_RF_autotune_gpp <-
   function(feat,
            tr,
