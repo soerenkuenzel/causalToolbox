@@ -1,6 +1,6 @@
-#' #' @include Xhrf.R
-#' #' @include Xhrf_autotune_simple.R
-#'
+#' @include Xhrf.R
+#' @include Xhrf_autotune_simple.R
+
 
 library(rBayesianOptimization)
 
