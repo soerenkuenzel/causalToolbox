@@ -77,7 +77,7 @@ X_RF_fully_specified <-
           y = y,
           ntree = hyperparameter_list[[this_learner]]$ntree,
           replace = hyperparameter_list[[this_learner]]$replace,
-          sampsize = hyperparameter_list[[this_learner]]$sampsize,
+          sample.fraction = hyperparameter_list[[this_learner]]$sample.fraction,
           mtry = hyperparameter_list[[this_learner]]$mtry,
           nodesizeSpl = hyperparameter_list[[this_learner]]$nodesizeSpl,
           nodesizeAvg = hyperparameter_list[[this_learner]]$nodesizeAvg,
@@ -186,7 +186,7 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_first,
       "ntree" = ntree_first,
       "replace" = replace_first,
-      "sampsize" = round(sample_fraction_first * length(yobs)),
+      "sample.fraction" = sample_fraction_first,
       "mtry" = mtry_first,
       "nodesizeSpl" = min_node_size_spl_first,
       "nodesizeAvg" = min_node_size_ave_first,
@@ -197,7 +197,7 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_second,
       "ntree" = ntree_second,
       "replace" = replace_second,
-      "sampsize" = round(sample_fraction_second * length(yobs)),
+      "sample.fraction" = sample_fraction_second,
       "mtry" = mtry_second,
       "nodesizeSpl" = min_node_size_spl_second,
       "nodesizeAvg" = min_node_size_ave_second,
@@ -208,7 +208,7 @@ X_RF <-
       "relevant_Variable" = relevant_Variable_prop,
       "ntree" = ntree_prop,
       "replace" = replace_prop,
-      "sampsize" = round(sample_fraction_prop * length(yobs)),
+      "sample.fraction" = sample_fraction_prop,
       "mtry" = mtry_prop,
       "nodesizeSpl" = min_node_size_spl_prop,
       "nodesizeAvg" = min_node_size_ave_prop,
@@ -216,21 +216,12 @@ X_RF <-
       "middleSplit" = middleSplit_prop
     )
 
-    first_stage_hyperpara_0 <- first_stage_hyperpara
-    first_stage_hyperpara_1 <- first_stage_hyperpara
-    second_stage_hyperpara_0 <- second_stage_hyperpara
-    second_stage_hyperpara_1 <- second_stage_hyperpara
-    first_stage_hyperpara_0[["sampsize"]] <- round(sample_fraction_first * sum(1 - tr))
-    first_stage_hyperpara_1[["sampsize"]] <- round(sample_fraction_first * sum(tr))
-    second_stage_hyperpara_0[["sampsize"]] <- round(sample_fraction_first * sum(1 - tr))
-    second_stage_hyperpara_1[["sampsize"]] <- round(sample_fraction_first * sum(tr))
-
     hyperparameter_list <- list(
       "general" = general_hyperpara,
-      "l_first_0" = first_stage_hyperpara_0,
-      "l_first_1" = first_stage_hyperpara_1,
-      "l_second_0" = second_stage_hyperpara_0,
-      "l_second_1" = second_stage_hyperpara_1,
+      "l_first_0" = first_stage_hyperpara,
+      "l_first_1" = first_stage_hyperpara,
+      "l_second_0" = second_stage_hyperpara,
+      "l_second_1" = second_stage_hyperpara,
       "l_prop" = prop_hyperpara
     )
 

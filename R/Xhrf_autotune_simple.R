@@ -1,200 +1,96 @@
+#' @include Xhrf.R
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @title X_RF_autotune Constructor
-# @rdname X_RF-X_RF_autotune
-# @aliases X_RF_autotune, X_RF-X_RF_autotune
-# @return A `X_RF` object.
-X_RF_autotune <-
+#' @title Autotuning for X-Learner with honest RF for both stages
+#' @name X_RF_autotune_simple
+#' @rdname X_RF_autotune_simple
+#' @description This function tunes
+#' @param feat A data frame of all the features.
+#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param yobs A numeric vector containing the observed outcomes.
+#' @param ntree ..
+#' @param Niter ..
+#' @param nthread ..
+#' @export X_RF_autotune_simple
+X_RF_autotune_simple <-
   function(feat,
            tr,
            yobs,
-           ntree = 500,
-           Niter = 5,
-           K = 5,
-           nthread = 0) {
-    # define starting points 1 and 2
+           ntree = 20000,
+           nthread = 0,
+           verbose = TRUE) {
+    starting_settings <- list(
+      "start_setting_1" = get_setting_strong(feat,  tr, ntree, nthread),
+      "start_setting_2" = get_setting_weak(feat, tr, ntree, nthread)
+    )
 
-
-    start_setting_1 <- get_setting_strong(feat,
-                       tr,
-                       ntree,
-                       nthread,
-                       relevant_Variable_first = 1:ncol(feat),
-                       relevant_Variable_second = 1:ncol(feat),
-                       relevant_Variable_prop = 1:ncol(feat))
-    start_setting_1 <- get_setting_weak(feat,
-                     tr,
-                     ntree,
-                     nthread,
-                     feat,
-                     relevant_Variable_first = 1:ncol(feat),
-                     relevant_Variable_second = 1:ncol(feat),
-                     relevant_Variable_prop = 1:ncol(feat))
-
-    ### tune the models of the first stage
-    yobs_0 <- yobs[tr == 0]
-    yobs_1 <- yobs[tr == 1]
-
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
-
-
-    ## tune the control response model (1a)
-
-    find_best_start_setting <- function(param1,
-                                        param2,
-                                        X,
-                                        Y,
-                                        ntree,
-                                        K,
-                                        nthread) {
-      test_parameter_setting_control <- function(param) {
-        test_firststage(
-          X = X_0,
-          Y = yobs_0,
-          ntree_first = ntree_first,
-          param = param,
-          K = K,
-          nthread = nthread
-        )
-      }
-      if (test_parameter_setting_control(sp_1_firstStage) >
-          test_parameter_setting_control(sp_2_firstStage)) {
-        return(sp_2_firstStage)
-      } else{
-        return(sp_1_firstStage)
-      }
-    }
-
-    tuned_setting_control <- start_setting_control
-
-    ## tune the treated response model (1b)
-    test_parameter_setting_treated <- function(param) {
-      test_firststage(
-        X = X_1,
-        Y = yobs_1,
-        ntree_first = ntree_first,
-        param = param,
-        K = K,
-        nthread = nthread
+    setup_eval <-
+      check_setups(starting_settings, feat, tr, yobs, ntree,
+                   nthread, verbose)
+    if (verbose)
+      print(paste(names(starting_settings)[which.min(setup_eval$comb)],
+                  "is the best."))
+    return(
+      X_RF_fully_specified(
+        feat = feat,
+        tr = tr,
+        yobs = yobs,
+        hyperparameter_list = starting_settings[[which.min(setup_eval$comb)]],
+        verbose = verbose
       )
-    }
-    if (test_parameter_setting_treated(sp_1_firstStage) >
-        test_parameter_setting_treated(sp_2_firstStage)) {
-      start_setting_treated <- sp_2_firstStage
-    } else{
-      start_setting_treated <- sp_1_firstStage
-    }
-
-    tuned_setting_treated <- start_setting_treated
-
-
-    ### fix the first stage and tune the second stage
-    ## Fixing the firs stage estimators
-    m_0 <-
-      honestRF(
-        x = X_0[, firststageVar],
-        y = yobs_0,
-        ntree = ntree_first,
-        replace = tuned_setting_control$replace_first,
-        sampsize = round(
-          tuned_setting_control$sample_fraction_first * length(yobs_0)
-        ),
-        mtry = tuned_setting_control$mtry_first,
-        nodesizeSpl = tuned_setting_control$min_node_size_spl_first,
-        nthread = nthread,
-        splitrule =  'variance',
-        splitratio = tuned_setting_control$splitratio_first,
-        nodesizeAvg = tuned_setting_control$min_node_size_ave_first
-      )
-
-    m_1 <-
-      honestRF(
-        x = X_1[, firststageVar],
-        y = yobs_1,
-        ntree = ntree_first,
-        replace = tuned_setting_treated$replace_first,
-        sampsize = round(
-          tuned_setting_treated$sample_fraction_first * length(yobs_0)
-        ),
-        mtry = tuned_setting_treated$mtry_first,
-        nodesizeSpl = tuned_setting_treated$min_node_size_spl_first,
-        nthread = nthread,
-        splitrule =  'variance',
-        splitratio = tuned_setting_treated$splitratio_first,
-        nodesizeAvg = tuned_setting_treated$min_node_size_ave_first
-      )
-
-    if (verbose) {
-      print("Done with the first stage.")
-    }
-
-    r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
-
-    ## Tuning the second stage
-
-    ## tune the control response model (1a)
-    test_parameter_setting_pseudo_control <- function(param) {
-      test_firststage(
-        X = X_0,
-        Y = r_0,
-        ntree_first = ntree_first,
-        param = param,
-        K = K,
-        nthread = nthread
-      )
-    }
-    if (test_parameter_setting_pseudo_control(sp_1_secondStage) >
-        test_parameter_setting_pseudo_control(sp_2_secondStage)) {
-      start_setting_control <- sp_2_secondStage
-    } else{
-      start_setting_control <- sp_1_secondStage
-    }
-
-    tuned_setting_control <- start_setting_control
-
-
-
-    m_tau_1 <-
-      honestRF(
-        x = X_1[, secondstageVar],
-        y = r_1,
-        ntree = ntree_second,
-        replace = replace_second,
-        sampsize = round(sample_fraction_second * length(r_1)),
-        mtry = mtry_second,
-        nodesizeSpl = min_node_size_spl_second,
-        nthread = nthread,
-        splitrule =  'variance',
-        splitratio = splitratio_second,
-        nodesizeAvg = min_node_size_ave_second
-      )
-
-    if (verbose) {
-      print("Done with the second stage.")
-    }
-
-
-    print("Hallo")
-
+    )
   }
 
+# This function checks the starting_settings using the OOB errors from those
+# It returns a table containing the expected performance of each of the setups
+check_setups <-
+  function(starting_settings,
+           feat,
+           tr,
+           yobs,
+           ntree = 20000,
+           nthread = 0,
+           verbose = TRUE) {
+    # define starting points 1 and 2
+
+    OOB_errors <- data.frame()
+    for (i in 1:length(starting_settings)) {
+      if (verbose)
+        print(paste0("Checking setup ", i, " out of ", length(starting_settings)))
+      starting_setting <- starting_settings[[i]]
+      starting_setting_name <- names(starting_settings)[i]
+      OOB_errors <- rbind(OOB_errors,
+                          evaluate_setting(starting_setting, feat, tr, yobs))
+    }
+    OOB_errors$tau_0 <- OOB_errors$l_first_1 + OOB_errors$l_second_0
+    OOB_errors$tau_1 <- OOB_errors$l_first_0 + OOB_errors$l_second_1
+    OOB_errors$comb <- (OOB_errors$tau_0 + OOB_errors$tau_1) / 2
+    OOB_errors <-
+      cbind(data.frame("name" = names(starting_settings)),
+            OOB_errors)
+
+    return(OOB_errors)
+  }
+
+# This function evaluates a setting by and returns the OOB error of the four
+# base learners.
+evaluate_setting <- function(setting, feat, tr, yobs) {
+  # setting <- starting_setting
+  x_eval <- X_RF_fully_specified(feat,
+                                 tr,
+                                 yobs,
+                                 hyperparameter_list = setting,
+                                 verbose = FALSE)
+
+  return(
+    data.frame(
+      "l_first_0" = getOOB(x_eval@base_learners[["l_first_0"]], noWarning = FALSE),
+      "l_first_1" = getOOB(x_eval@base_learners[["l_first_1"]], noWarning = FALSE),
+      "l_second_0" = getOOB(x_eval@base_learners[["l_second_0"]], noWarning = FALSE),
+      "l_second_1" = getOOB(x_eval@base_learners[["l_second_1"]], noWarning = FALSE)
+    )
+  )
+}
 
 ################################################################################
 ################################################################################
@@ -258,7 +154,7 @@ get_setting_strong <- function(feat,
       "relevant_Variable" = relevant_Variable_prop,
       "ntree" = ntree,
       "replace" = TRUE,
-      "sampsize" = round(0.9 * length(yobs)),
+      "sampsize" = round(0.9 * length(tr)),
       "mtry" = ncol(feat),
       "nodesizeSpl" = 5,
       "nodesizeAvg" = 3,
@@ -328,7 +224,7 @@ get_setting_weak <- function(feat,
       "relevant_Variable" = relevant_Variable_prop,
       "ntree" = ntree,
       "replace" = FALSE,
-      "sampsize" = round(0.8 * length(yobs)),
+      "sampsize" = round(0.8 * length(tr)),
       "mtry" = max(1, round(ncol(feat) / 5)),
       "nodesizeSpl" = 10,
       "nodesizeAvg" = 3,

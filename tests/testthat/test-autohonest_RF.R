@@ -7,10 +7,10 @@ test_that("Tests that autotuning is working correctly", {
 
   tuned_forest <- autohonestRF(x = x,
                                y = y,
-                               num_iter = 100,
+                               num_iter = 9,
                                eta = 3 )
 
   y_pred <- predict(tuned_forest, x)
 
-  expect_equal(sum((y_pred - y) ^ 2), 15.37539, tolerance=1e-4)
+  expect_equal(sum((y_pred - y) ^ 2), 51.02081, tolerance=1e-4)
 })
