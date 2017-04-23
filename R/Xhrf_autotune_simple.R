@@ -7,6 +7,14 @@
 
 
 
+
+
+
+
+
+
+
+
 # @title X_RF_autotune Constructor
 # @rdname X_RF-X_RF_autotune
 # @aliases X_RF_autotune, X_RF-X_RF_autotune
@@ -15,47 +23,28 @@ X_RF_autotune <-
   function(feat,
            tr,
            yobs,
-           ntree_first = 100,
-           ntree_second = 100,
+           ntree = 500,
            Niter = 5,
            K = 5,
-           nthread = 4) {
+           nthread = 0) {
     # define starting points 1 and 2
-    sp_1_firstStage <- data.frame(
-      mtry_first = round(ncol(feat) / 2),
-      min_node_size_spl_first = 1,
-      min_node_size_ave_first = 5,
-      splitratio_first = .5,
-      replace_first = TRUE,
-      sample_fraction_first = 0.8
-    )
-    sp_1_secondStage <- data.frame(
-      predmode = "propmean",
-      mtry_second = ncol(feat),
-      min_node_size_spl_second = 5,
-      min_node_size_ave_second = 3,
-      splitratio_second = .5,
-      replace_second = TRUE,
-      sample_fraction_second = 0.9
-    )
 
-    sp_2_firstStage <- data.frame(
-      mtry_first = round(ncol(feat) / 2),
-      min_node_size_spl_first = 1,
-      min_node_size_ave_first = 1,
-      splitratio_first = .4,
-      replace_first = FALSE,
-      sample_fraction_first = 0.7
-    )
-    sp_2_secondStage <- data.frame(
-      predmode = "propmean",
-      mtry_second = max(1, round(ncol(feat) / 5)),
-      min_node_size_spl_second = 10,
-      min_node_size_ave_second = 3,
-      splitratio_second = .75,
-      replace_second = FALSE,
-      sample_fraction_second = 0.8
-    )
+
+    start_setting_1 <- get_setting_strong(feat,
+                       tr,
+                       ntree,
+                       nthread,
+                       relevant_Variable_first = 1:ncol(feat),
+                       relevant_Variable_second = 1:ncol(feat),
+                       relevant_Variable_prop = 1:ncol(feat))
+    start_setting_1 <- get_setting_weak(feat,
+                     tr,
+                     ntree,
+                     nthread,
+                     feat,
+                     relevant_Variable_first = 1:ncol(feat),
+                     relevant_Variable_second = 1:ncol(feat),
+                     relevant_Variable_prop = 1:ncol(feat))
 
     ### tune the models of the first stage
     yobs_0 <- yobs[tr == 0]
@@ -205,3 +194,147 @@ X_RF_autotune <-
     print("Hallo")
 
   }
+
+
+################################################################################
+################################################################################
+# Define serveral standard settings:
+
+get_setting_strong <- function(feat,
+                               tr,
+                               ntree,
+                               nthread,
+                               relevant_Variable_first = 1:ncol(feat),
+                               relevant_Variable_second = 1:ncol(feat),
+                               relevant_Variable_prop = 1:ncol(feat)) {
+  hyperparameter_list <- list(
+    "general" = list("predmode" = "propmean",
+                     "nthread" = nthread),
+    "l_first_0" = list(
+      "relevant_Variable" = relevant_Variable_first,
+      "ntree" = ntree,
+      "replace" = TRUE,
+      "sampsize" = round(.8 * sum(1 - tr)),
+      "mtry" = round(ncol(feat) / 2),
+      "nodesizeSpl" = 1,
+      "nodesizeAvg" = 5,
+      "splitratio" = .5,
+      "middleSplit" = FALSE
+    ),
+    "l_first_1" = list(
+      "relevant_Variable" = relevant_Variable_first,
+      "ntree" = ntree,
+      "replace" = TRUE,
+      "sampsize" = round(.8 * sum(tr)),
+      "mtry" = round(ncol(feat) / 2),
+      "nodesizeSpl" = 1,
+      "nodesizeAvg" = 5,
+      "splitratio" = .5,
+      "middleSplit" = FALSE
+    ),
+    "l_second_0" = list(
+      "relevant_Variable" = relevant_Variable_second,
+      "ntree" = ntree,
+      "replace" = TRUE,
+      "sampsize" = round(.9 * sum(1 - tr)),
+      "mtry" = ncol(feat),
+      "nodesizeSpl" = 5,
+      "nodesizeAvg" = 3,
+      "splitratio" = .5,
+      "middleSplit" = FALSE
+    ),
+    "l_second_1" = list(
+      "relevant_Variable" = relevant_Variable_second,
+      "ntree" = ntree,
+      "replace" = TRUE,
+      "sampsize" = round(.9 * sum(tr)),
+      "mtry" = ncol(feat),
+      "nodesizeSpl" = 5,
+      "nodesizeAvg" = 3,
+      "splitratio" = .5,
+      "middleSplit" = FALSE
+    ),
+    "l_prop" = list(
+      "relevant_Variable" = relevant_Variable_prop,
+      "ntree" = ntree,
+      "replace" = TRUE,
+      "sampsize" = round(0.9 * length(yobs)),
+      "mtry" = ncol(feat),
+      "nodesizeSpl" = 5,
+      "nodesizeAvg" = 3,
+      "splitratio" = .5,
+      "middleSplit" = FALSE
+    )
+  )
+  return(hyperparameter_list)
+}
+
+
+get_setting_weak <- function(feat,
+                             tr,
+                             ntree,
+                             nthread,
+                             relevant_Variable_first = 1:ncol(feat),
+                             relevant_Variable_second = 1:ncol(feat),
+                             relevant_Variable_prop = 1:ncol(feat)) {
+  hyperparameter_list <- list(
+    "general" = list("predmode" = "propmean",
+                     "nthread" = nthread),
+    "l_first_0" = list(
+      "relevant_Variable" = relevant_Variable_first,
+      "ntree" = ntree,
+      "replace" = FALSE,
+      "sampsize" = round(.7 * sum(1 - tr)),
+      "mtry" = round(ncol(feat) / 2),
+      "nodesizeSpl" = 1,
+      "nodesizeAvg" = 1,
+      "splitratio" = .4,
+      "middleSplit" = FALSE
+    ),
+    "l_first_1" = list(
+      "relevant_Variable" = relevant_Variable_first,
+      "ntree" = ntree,
+      "replace" = FALSE,
+      "sampsize" = round(.7 * sum(tr)),
+      "mtry" = round(ncol(feat) / 2),
+      "nodesizeSpl" = 1,
+      "nodesizeAvg" = 1,
+      "splitratio" = .4,
+      "middleSplit" = FALSE
+    ),
+    "l_second_0" = list(
+      "relevant_Variable" = relevant_Variable_second,
+      "ntree" = ntree,
+      "replace" = FALSE,
+      "sampsize" = round(0.8 * sum(1 - tr)),
+      "mtry" = max(1, round(ncol(feat) / 5)),
+      "nodesizeSpl" = 10,
+      "nodesizeAvg" = 3,
+      "splitratio" = .75,
+      "middleSplit" = FALSE
+    ),
+    "l_second_1" = list(
+      "relevant_Variable" = relevant_Variable_second,
+      "ntree" = ntree,
+      "replace" = FALSE,
+      "sampsize" = round(0.8 * sum(tr)),
+      "mtry" = max(1, round(ncol(feat) / 5)),
+      "nodesizeSpl" = 10,
+      "nodesizeAvg" = 3,
+      "splitratio" = .75,
+      "middleSplit" = FALSE
+    ),
+    "l_prop" = list(
+      "relevant_Variable" = relevant_Variable_prop,
+      "ntree" = ntree,
+      "replace" = FALSE,
+      "sampsize" = round(0.8 * length(yobs)),
+      "mtry" = max(1, round(ncol(feat) / 5)),
+      "nodesizeSpl" = 10,
+      "nodesizeAvg" = 3,
+      "splitratio" = .75,
+      "middleSplit" = FALSE
+    )
+  )
+  return(hyperparameter_list)
+}
