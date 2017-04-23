@@ -94,7 +94,7 @@ for (i in 1:nsamples) {
     "relevant_Variable" = 1:dim,
     "ntree" = 1000,
     "replace" = Rand_tune$replace_first[i],
-    "sampsize" = round(Rand_tune$sampsize_first[i] * ntrain),
+    "sample.fraction" = Rand_tune$sample.fraction_first[i],
     "mtry" = Rand_tune$mtry_first[i],
     "nodesizeSpl" = Rand_tune$nodesizeSpl_first[i],
     "nodesizeAvg" = Rand_tune$nodesizeAvg_first[i],
@@ -105,7 +105,7 @@ for (i in 1:nsamples) {
     "relevant_Variable" = 1:dim,
     "ntree" = 1000,
     "replace" = Rand_tune$replace_second[i],
-    "sampsize" = round(Rand_tune$sampsize_second[i] * ntrain),
+    "sample.fraction" = Rand_tune$sample.fraction_second[i],
     "mtry" = Rand_tune$mtry_second[i],
     "nodesizeSpl" = Rand_tune$nodesizeSpl_second[i],
     "nodesizeAvg" = Rand_tune$nodesizeAvg_second[i],
@@ -116,29 +116,20 @@ for (i in 1:nsamples) {
     "relevant_Variable" = 1:dim,
     "ntree" = 1000,
     "replace" = Rand_tune$replace_prop[i],
-    "sampsize" = round(Rand_tune$sampsize_prop[i] * ntrain),
+    "sample.fraction" = Rand_tune$sample.fraction_prop[i],
     "mtry" = Rand_tune$mtry_prop[i],
     "nodesizeSpl" = Rand_tune$nodesizeSpl_prop[i],
     "nodesizeAvg" = Rand_tune$nodesizeAvg_prop[i],
     "splitratio" = Rand_tune$splitratio_prop[i],
     "middleSplit" = Rand_tune$middleSplit_prop[i]
   )
-  first_stage_hyperpara_0 <- first_stage_hyperpara
-  first_stage_hyperpara_1 <- first_stage_hyperpara
-  second_stage_hyperpara_0 <- second_stage_hyperpara
-  second_stage_hyperpara_1 <- second_stage_hyperpara
-  first_stage_hyperpara_0[["sampsize"]] <- round(Rand_tune$sampsize_first[i] * sum(1 - experiment$W_tr))
-  first_stage_hyperpara_1[["sampsize"]] <- round(Rand_tune$sampsize_first[i] * sum(experiment$W_tr))
-  second_stage_hyperpara_0[["sampsize"]] <- round(Rand_tune$sampsize_second[i] * sum(1 - experiment$W_tr))
-  second_stage_hyperpara_1[["sampsize"]] <- round(Rand_tune$sampsize_second[i] * sum(experiment$W_tr))
-
 
   hyperparameter_list <- list(
     "general" = general_hyperpara,
-    "l_first_0" = first_stage_hyperpara_0,
-    "l_first_1" = first_stage_hyperpara_1,
-    "l_second_0" = second_stage_hyperpara_0,
-    "l_second_1" = second_stage_hyperpara_1,
+    "l_first_0" = first_stage_hyperpara,
+    "l_first_1" = first_stage_hyperpara,
+    "l_second_0" = second_stage_hyperpara,
+    "l_second_1" = second_stage_hyperpara,
     "l_prop" = prop_hyperpara
   )
 
