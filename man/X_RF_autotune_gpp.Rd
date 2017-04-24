@@ -4,8 +4,8 @@
 \alias{X_RF_autotune_gpp}
 \title{Autotuning for X-Learner with honest RF for both stages}
 \usage{
-X_RF_autotune_gpp(feat, tr, yobs, ntree = 20000, nthread = 0,
-  verbose = TRUE)
+X_RF_autotune_gpp(feat, tr, yobs, ntree = 500, nthread = 0,
+  verbose = TRUE, init_points = 5, n_iter = 1, ...)
 }
 \arguments{
 \item{feat}{A data frame of all the features.}

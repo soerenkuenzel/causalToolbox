@@ -21,7 +21,7 @@ X_RF_autotune_hyperband <-
   function(feat,
            tr,
            yobs,
-           sampsize = as.integer(nrow(feat) * 0.75),
+           sample.fraction = 0.75,
            num_iter = 3 ^ 8,
            eta = 3,
            verbose = TRUE,
@@ -71,7 +71,7 @@ X_RF_autotune_hyperband <-
         autohonestRF(
           x = x,
           y = y,
-          sampsize = sampsize,
+          sampsize = floor(nrow(x) * sample.fraction),
           num_iter = num_iter,
           eta = eta,
           verbose = verbose,

@@ -4,8 +4,8 @@
 \alias{X_RF_autotune_hyperband}
 \title{Autotuning for X-Learner with honest RF for both stages}
 \usage{
-X_RF_autotune_hyperband(feat, tr, yobs, sampsize = as.integer(nrow(feat) *
-  0.75), num_iter = 3^8, eta = 3, verbose = TRUE, seed = 24750371,
+X_RF_autotune_hyperband(feat, tr, yobs, sample.fraction = 0.75,
+  num_iter = 3^8, eta = 3, verbose = TRUE, seed = 24750371,
   nthread = 0)
 }
 \arguments{
@@ -14,8 +14,6 @@ X_RF_autotune_hyperband(feat, tr, yobs, sampsize = as.integer(nrow(feat) *
 \item{tr}{A numeric vector contain 0 for control and 1 for treated variables.}
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
-
-\item{sampsize}{..}
 
 \item{num_iter}{number of iterations.}
 
@@ -26,6 +24,8 @@ X_RF_autotune_hyperband(feat, tr, yobs, sampsize = as.integer(nrow(feat) *
 \item{seed}{..}
 
 \item{nthread}{..}
+
+\item{sampsize}{..}
 
 \item{firststageVar}{..}
 

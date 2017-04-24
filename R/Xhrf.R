@@ -49,7 +49,7 @@ X_RF_fully_specified <-
         }
         r_0 <-
           predict(base_learners[["l_first_1"]],
-                  X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) -
+                  X_0) -
           yobs_0
 
         x = X_0
@@ -58,7 +58,7 @@ X_RF_fully_specified <-
         r_1 <-
           yobs_1 -
           predict(base_learners[["l_first_0"]],
-                  X_1[,  hyperparameter_list[["l_first_1"]]$relevant_Variable])
+                  X_1)
 
         x = X_1
         y = r_1
@@ -73,7 +73,7 @@ X_RF_fully_specified <-
 
       base_learners[[this_learner]] <-
         honestRF(
-          x = x[, hyperparameter_list[[this_learner]]$relevant_Variable],
+          x = x,
           y = y,
           ntree = hyperparameter_list[[this_learner]]$ntree,
           replace = hyperparameter_list[[this_learner]]$replace,

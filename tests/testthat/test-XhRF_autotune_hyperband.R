@@ -1,10 +1,10 @@
-test_that("Tests that X_RF_autotune_hyperband is working correctly", {
+test_that("Tests X_RF_autotune_hyperband", {
   set.seed(1423614230)
 
   feat <- iris[, -1]
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
-  sampsize <- as.integer(nrow(feat) * 0.75)
+  sample.fraction <- .75
   num_iter <- 3 ^ 2
   eta <- 3
   verbose <- TRUE
@@ -15,7 +15,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
     feat = feat,
     tr = tr,
     yobs = yobs,
-    sampsize = sampsize,
+    sample.fraction = sample.fraction,
     num_iter = num_iter,
     eta = eta,
     verbose = FALSE,
@@ -25,7 +25,7 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
 
 
   expect_equal(EstimateCate(xl, feat)[1],
-               0.06984127,
+               0.1218615,
                tolerance = 1e-7)
 
 
@@ -54,6 +54,6 @@ test_that("Tests that X_RF_autotune_hyperband is working correctly", {
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  919.1053,
+  923.5349,
   tolerance = 1e-5)
 })

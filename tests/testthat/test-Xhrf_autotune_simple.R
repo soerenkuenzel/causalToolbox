@@ -9,14 +9,19 @@ test_that("Tests test-Xhrf_autotune_simple", {
   verbose = TRUE
 
   starting_settings <- list(
-    "start_setting_1" = get_setting_strong(feat, tr, ntree, nthread),
-    "start_setting_2" = get_setting_weak(feat, tr, ntree, nthread)
+    "start_setting_1" = get_setting_strong(feat, ntree, nthread),
+    "start_setting_2" = get_setting_weak(feat, ntree, nthread)
   )
 
   expect_equal(
-    check_setups(starting_settings, feat, tr, yobs, ntree, nthread,
-                 verbose = FALSE)[1, 3],
-    14.26671,
+    check_setups(starting_settings = starting_settings,
+                 feat = feat,
+                 tr = tr,
+                 yobs = yobs,
+                 ntree = ntree,
+                 nthread = nthread,
+                 verbose = FALSE)[1,2],
+    13.99159,
     tolerance = 1e-4
   )
   ### Test 2:
@@ -35,11 +40,9 @@ test_that("Tests test-Xhrf_autotune_simple", {
 
   starting_settings <- list(
     "start_setting_1" = get_setting_strong(cate_problem$feat_tr,
-                                           cate_problem$W_tr,
                                            ntree,
                                            nthread),
     "start_setting_2" = get_setting_weak(cate_problem$feat_tr,
-                                         cate_problem$W_tr,
                                          ntree,
                                          nthread)
   )
@@ -55,13 +58,13 @@ test_that("Tests test-Xhrf_autotune_simple", {
   expect_equal(mean((
     EstimateCate(mm, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  162.8941, tolerance = 1e-5)
+  193.4993, tolerance = 1e-5)
 
 
   CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
 
   expect_equal(CATE_ci[2,2],
-               0.1872042,
+               10.26688,
                tolerance = 1e-5)
 
 })

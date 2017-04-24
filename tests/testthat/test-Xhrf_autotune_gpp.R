@@ -1,42 +1,68 @@
-test_that("Tests test-Xhrf_gpp_gpp", {
+test_that("Tests test-Xhrf_gpp", {
   set.seed(1423614230)
 
   feat <- iris[, -1]
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
-  ntree = 100
-  nthread = 0
-  verbose = TRUE
+  #  ntree = 100
+  #  nthread = 0
+  #  verbose = TRUE
+  #  init_points = 5
+  #  n_iter = 1
+  #
+  #  starting_settings <- list(
+  #    "start_setting_1" = get_setting_strong(feat, ntree, nthread),
+  #    "start_setting_2" = get_setting_weak(feat, ntree, nthread)
+  #  )
+  #  setup_eval <-
+  #    check_setups(starting_settings, feat, tr, yobs, ntree,
+  #                 nthread, verbose)
+  #
+  #  starting_point <-
+  #    starting_settings[[which.min(setup_eval$comb)]]
+  #
+  #  mean(as.numeric(evaluate_setting(starting_point, feat, tr, yobs)[1,]))
+  #
+  #
+  #  Test_Fun_generic(starting_point,
+  #                   feat,
+  #                   tr,
+  #                   yobs,
+  #                   mtry_first = 1.2,
+  #                   mtry_second = 1.5,
+  #                   nodesizeAvg_first = 3.2,
+  #                   nodesizeAvg_second = 3.3,
+  #                   nodesizeSpl_first = 3.4,
+  #                   nodesizeSpl_second = 3.1)
+  #
+  #
+  #
+  # get_upper_bounds_for_nodesize(starting_point)
+  #
+  # starting_point_optimized <-
+  #   GP_optimize_small(starting_point, feat, tr, yobs)
 
-  starting_settings <- list(
-    "start_setting_1" = get_setting_strong(feat, tr, ntree, nthread),
-    "start_setting_2" = get_setting_weak(feat, tr, ntree, nthread)
+
+
+  capture.output(
+    xl_gpp <- X_RF_autotune_gpp(
+      feat,
+      tr,
+      yobs,
+      ntree = 100,
+      nthread = 0,
+      verbose = FALSE,
+      init_points = 5,
+      n_iter = 1),
+    file='NUL'
   )
 
-  mean(as.numeric(evaluate_setting(starting_point, feat, tr, yobs)[1,]))
+  expect_equal(EstimateCate(xl_gpp, feat)[4],
+               0.05209221,
+               tolerance = 1e-5)
 
-
-  Test_Fun_generic(starting_point,
-                   feat, tr, yobs,
-                   mtry_first_0 = 1,
-                   mtry_first_1 = 1,
-                   mtry_second_0 = 1,
-                   mtry_second_1 = 1,
-                   nodesizeAvg_first_0 = 1,
-                   nodesizeAvg_first_1 = 1,
-                   nodesizeAvg_second_0 = 1,
-                   nodesizeAvg_second_1 = 1,
-                   nodesizeSpl_first_0 = 1,
-                   nodesizeSpl_first_1 = 1,
-                   nodesizeSpl_second_0 = 1,
-                   nodesizeSpl_second_1 = 1,
-                   sampsize_first_0 = sum(1 - tr)/3,
-                   sampsize_first_1 = sum(tr)/3,
-                   sampsize_second_0 = sum(1 - tr)/3,
-                   sampsize_second_1 = sum(1 - tr) / 3,
-                   splitratio_second_0 = .5,
-                   splitratio_second_1 = .5)
-
-
-}
-)
+  CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
+  expect_equal(CI[2, 3],
+               0.11167,
+               tolerance = 1e-5)
+})

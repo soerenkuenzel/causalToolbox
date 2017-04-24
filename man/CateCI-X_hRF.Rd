@@ -7,8 +7,9 @@
 \alias{X_hRF-method}
 \title{CateCI-X_hRF}
 \usage{
-\S4method{CateCI}{`Meta-learner`}(theObject, feature_new, method = "n2TBS",
-  B = 200, nthread = 8, verbose = TRUE)
+\S4method{CateCI}{`Meta-learner`}(theObject, feature_new,
+  method = "maintain_group_ratios", B = 200, nthread = 8,
+  verbose = TRUE)
 }
 \arguments{
 \item{feature_new}{A data frame.}
