@@ -2,7 +2,7 @@
 % Please edit documentation in R/Xhrf_autotune_simple.R
 \name{X_RF_autotune_simple}
 \alias{X_RF_autotune_simple}
-\title{Autotuning for X-Learner with honest RF for both stages}
+\title{Simple Autotuning for X-Learner with honest RF}
 \usage{
 X_RF_autotune_simple(feat, tr, yobs, ntree = 20000, nthread = 0,
   verbose = TRUE)
@@ -14,12 +14,30 @@ X_RF_autotune_simple(feat, tr, yobs, ntree = 20000, nthread = 0,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
-\item{ntree}{..}
+\item{ntree}{Number of trees used}
 
-\item{nthread}{..}
-
-\item{Niter}{..}
+\item{nthread}{Number of threads which can run in parallel. If set 0, then
+the maximum amount of possible threads is determined automatically. If set to
+1 then the algorithm is absolutely deterministic (after specifying a seed).}
 }
 \description{
-This function tunes
+This function tunes the X-Learner with honest random forest by
+testing which of 11 prespecified settings seems to be the best
+}
+\examples{
+  set.seed(14236142)
+  feat <- iris[, -1]
+  tr <- rbinom(nrow(iris), 1, .5)
+  yobs <- iris[, 1]
+  # train a
+  xl_gpp <- X_RF_autotune_simple(feat, tr, yobs, ntree = 100, nthread = 0,
+  verbose = FALSE, init_points = 5, n_iter = 1)
+  # computes the CATE and confidence intervals for CATE
+  EstimateCate(xl_gpp, feat)
+  CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
+
+}
+\seealso{
+\code{\link{X_RF_autotune_gpp}},
+\code{\link{X_RF_autotune_hyperband}}
 }

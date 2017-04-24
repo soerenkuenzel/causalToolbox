@@ -15,8 +15,16 @@ setClass(
 
 #' @title X_RF_most_basic Constructor
 #' @rdname X_RF_fully_specified
-#' @aliases X_RF_fully_specified
-#' @return A `X_RF_fully_specified` object.
+#' @description This is the most basic X-learner with honest random forest
+#' constructor. It should not be called by the user, since the list of
+#' parameters is too big. Instead call the simpler version XhRF or one of the
+#' self tuning versions
+#' @param feat feature data.frame.
+#' @param tr treatment assignment 0 for control and 1 for treatment.
+#' @param yobs the observed outcome.
+#' @param hyperparameter_list A list of lists of hyper parameters
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @return A `X_RF` object.
 #' @export X_RF_fully_specified
 X_RF_fully_specified <-
   function(feat,
@@ -112,9 +120,15 @@ X_RF_fully_specified <-
   }
 
 #' @title X_RF Constructor
+#' @description This is the recommended function to implement the X-learner with
+#' honest random forest. However, due to the vast amount of parameters, we
+#' recommend using one of the self tuning versions such as
+#' \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+#' \code{\link{X_RF_autotune_hyperband}}
 #' @rdname X_RF-X_RF
-#' @aliases X_RF, X_RF-X_RF
 #' @return A `X_RF` object.
+#' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+#' \code{\link{X_RF_autotune_hyperband}}
 #' @export X_RF
 X_RF <-
   function(feat,
@@ -124,9 +138,9 @@ X_RF <-
            relevant_Variable_first = 1:ncol(feat),
            relevant_Variable_second = 1:ncol(feat),
            relevant_Variable_prop = 1:ncol(feat),
-           ntree_first = 500,
-           ntree_second = 500,
-           ntree_prop = 500,
+           ntree_first = 1000,
+           ntree_second = 1000,
+           ntree_prop = 1000,
            mtry_first = round(ncol(feat) / 2),
            mtry_second = ncol(feat),
            mtry_prop = max(floor(ncol(feat) / 3), 1),

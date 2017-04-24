@@ -34,3 +34,18 @@ X_RF_autotune_hyperband(feat, tr, yobs, sample.fraction = 0.75,
 \description{
 This function tunes
 }
+\examples{
+  set.seed(14236142)
+  feat <- iris[, -1]
+  tr <- rbinom(nrow(iris), 1, .5)
+  yobs <- iris[, 1]
+  # train a
+  xl_gpp <- X_RF_autotune_hyperband(feat, tr, yobs, ntree = 100, nthread = 0,
+  verbose = FALSE, init_points = 5, n_iter = 1)
+  # computes the CATE and confidence intervals for CATE
+  EstimateCate(xl_gpp, feat)
+  CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
+}
+\seealso{
+\code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+}

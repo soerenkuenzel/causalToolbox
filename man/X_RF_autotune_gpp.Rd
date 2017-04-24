@@ -29,11 +29,11 @@ but absolute deterministic behavior.}
 A tuned X learner object.
 }
 \description{
-\code{X_RF_autotune_gpp} will first go through 11 example setups which have
-  proven to be very good parameters in some cases we have studied before.
-  After that 'init_points' many points completely at random and evaluates
-  those. After that it uses the previous observations to initialize a
-  gaussian process prior and it makes n_iter many updates using this GP
+\code{X_RF_autotune_gpp} will first go through 11 example setups
+  which have proven to be very good parameters in some cases we have studied
+  before. After that 'init_points' many points completely at random and
+  evaluates those. After that it uses the previous observations to initialize
+  a gaussian process prior and it makes n_iter many updates using this GP
   potimization
 }
 \details{
@@ -52,4 +52,8 @@ This function uses the rBayesianOptimization package to do the
   EstimateCate(xl_gpp, feat)
   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
 
+}
+\seealso{
+\code{\link{X_RF_autotune_simple}},
+\code{\link{X_RF_autotune_hyperband}},
 }

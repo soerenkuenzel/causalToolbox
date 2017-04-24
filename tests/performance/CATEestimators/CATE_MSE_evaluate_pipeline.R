@@ -44,18 +44,34 @@ seed_grid <- 1:100
 alpha_grid <- c(0, .1)
 
 estimator_grid <- list(
-  # "S_RF" = function(feat, W, Yobs)
-  #   S_RF(feat, W, Yobs, nthread = nthread),
-  # "T_RF" = function(feat, W, Yobs)
-  #   T_RF(feat, W, Yobs, nthread = nthread),
+  "S_RF" = function(feat, W, Yobs)
+    S_RF(feat, W, Yobs, nthread = nthread),
+  "T_RF" = function(feat, W, Yobs)
+    T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
-  "X_RF_autotune" = function(feat, W, Yobs)
+  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
     X_RF_autotune_hyperband(
       feat = feat,
       tr = W,
       yobs = Yobs,
-      num_iter = max(6561 * 1000 / length(W), 3 ^ 8),
+      num_iter = 3 ^ 8,
+      verbose = FALSE
+    ),
+  "X_RF_autotune_simple" = function(feat, W, Yobs)
+    X_RF_autotune_simple(
+      feat = feat,
+      tr = W,
+      yobs = Yobs,
+      verbose = FALSE
+    ),
+  "X_RF_autotune_gpp" = function(feat, W, Yobs)
+    X_RF_autotune_gpp(
+      feat = feat,
+      tr = W,
+      yobs = Yobs,
+      init_points = 20,
+      n_iter = 20,
       verbose = FALSE
     )
   # "CF_p" = function(feat, W, Yobs) {
@@ -85,13 +101,17 @@ estimator_grid <- list(
 )
 
 CATEpredictor_grid <- list(
-  # "S_RF" = function(estimator, feat_te)
-  #   EstimateCate(estimator, feat_te),
-  # "T_RF" = function(estimator, feat_te)
-  #   EstimateCate(estimator, feat_te),
+  "S_RF" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "T_RF" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
   "X_RF" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te),
-  "X_RF_autotune" = function(estimator, feat_te)
+  "X_RF_autotune_hyperband" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "X_RF_autotune_simple" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "X_RF_autotune_gpp" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te)
   # "CF_p" = function(estimator, feat_te) {
   #   feat_te <- as.matrix(feat_te)

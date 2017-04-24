@@ -24,6 +24,8 @@
 #' @return A tuned X learner object.
 #' @details This function uses the rBayesianOptimization package to do the
 #'   baysian optimization
+#' @seealso \code{\link{X_RF_autotune_simple}},
+#' \code{\link{X_RF_autotune_hyperband}},
 #' @examples
 #'   set.seed(14236142)
 #'   feat <- iris[, -1]

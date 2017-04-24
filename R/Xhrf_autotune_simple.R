@@ -1,16 +1,32 @@
 #' @include Xhrf.R
 
 
-#' @title Autotuning for X-Learner with honest RF for both stages
+#' @title Simple Autotuning for X-Learner with honest RF
 #' @name X_RF_autotune_simple
 #' @rdname X_RF_autotune_simple
-#' @description This function tunes
+#' @description This function tunes the X-Learner with honest random forest by
+#' testing which of 11 prespecified settings seems to be the best
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param ntree ..
-#' @param Niter ..
-#' @param nthread ..
+#' @param ntree Number of trees used
+#' @param nthread Number of threads which can run in parallel. If set 0, then
+#' the maximum amount of possible threads is determined automatically. If set to
+#' 1 then the algorithm is absolutely deterministic (after specifying a seed).
+#' @seealso \code{\link{X_RF_autotune_gpp}},
+#' \code{\link{X_RF_autotune_hyperband}}
+#' @examples
+#'   set.seed(14236142)
+#'   feat <- iris[, -1]
+#'   tr <- rbinom(nrow(iris), 1, .5)
+#'   yobs <- iris[, 1]
+#'   # train a
+#'   xl_gpp <- X_RF_autotune_simple(feat, tr, yobs, ntree = 100, nthread = 0,
+#'   verbose = FALSE, init_points = 5, n_iter = 1)
+#'   # computes the CATE and confidence intervals for CATE
+#'   EstimateCate(xl_gpp, feat)
+#'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
+#'
 #' @export X_RF_autotune_simple
 X_RF_autotune_simple <-
   function(feat,
@@ -350,7 +366,7 @@ get_starting_settings <- function(feat,
           floor(length(tr) * hyperparameter_list$l_prop$sample.fraction *
                   hyperparameter_list$l_prop$splitratio))
 
-    hyperparameter_list_list[[starting_values[i,1]]] <- hyperparameter_list
+    hyperparameter_list_list[[as.data.frame(starting_values)[i,1]]] <- hyperparameter_list
   }
   return(hyperparameter_list_list)
 }

@@ -14,7 +14,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[2, ]),
-               c(0.1412377, 0.0316794, 0.2507960),
+               c(0.14112163, 0.02522049, 0.25702278),
                tolerance=1e-7)
 
   sl <- S_RF(feat = feat,
