@@ -333,7 +333,8 @@ get_starting_settings <- function(feat,
     )
 
     # make sure that the nodesizes are not too large:
-    nodesizebounds <- get_upper_bounds_for_nodesize(hyperparameter_list, tr)
+    nodesizebounds <- get_upper_bounds_for_nodesize(
+      starting_point = hyperparameter_list, tr)
 
     hyperparameter_list$l_first_0$nodesizeAvg <-
       hyperparameter_list$l_first_1$nodesizeAvg <- min(
@@ -364,7 +365,8 @@ get_starting_settings <- function(feat,
     hyperparameter_list$l_prop$nodesizeSpl <-
       min(hyperparameter_list$l_prop$nodesizeSpl,
           floor(length(tr) * hyperparameter_list$l_prop$sample.fraction *
-                  hyperparameter_list$l_prop$splitratio))
+                  ifelse(hyperparameter_list$l_prop$splitratio == 0, 1,
+                  hyperparameter_list$l_prop$splitratio)))
 
     hyperparameter_list_list[[as.data.frame(starting_values)[i,1]]] <- hyperparameter_list
   }
@@ -393,15 +395,15 @@ get_upper_bounds_for_nodesize <- function(starting_point, tr) {
                    data.frame(
                      learner = this_learner,
                      n_avg = floor(n_pertree * ifelse(sr == 1, 1, (1 - sr))),
-                     n_spl = floor(n_pertree * sr)
+                     n_spl = floor(n_pertree * ifelse(sr == 0, 1, sr))
                    ))
   }
   return(
     c(
-      nodesizeAvg_first_upper =  min(n_obs$n_avg[1:2]),
-      nodesizeAvg_second_upper = min(n_obs$n_avg[3:4]),
-      nodesizeSpl_first_upper =  min(n_obs$n_spl[1:2]),
-      nodesizeSpl_second_upper = min(n_obs$n_spl[3:4])
+      nodesizeAvg_first_upper =  max(1, min(n_obs$n_avg[1:2])),
+      nodesizeAvg_second_upper = max(1, min(n_obs$n_avg[3:4])),
+      nodesizeSpl_first_upper =  max(1, min(n_obs$n_spl[1:2])),
+      nodesizeSpl_second_upper = max(1, min(n_obs$n_spl[3:4]))
     )
   )
 }

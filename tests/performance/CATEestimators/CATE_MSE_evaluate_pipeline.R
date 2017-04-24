@@ -3,9 +3,11 @@
 
 ## Setting up what to loop over: This will be given to the file and we will
 #execude it for i raning from 1 to 11 to go thorough all settings:
-args <- commandArgs(TRUE)
-setup_i <- -as.numeric(args[1])
-print(setup_i) #setup_i <- 1
+
+# args <- commandArgs(TRUE)
+# setup_i <- -as.numeric(args[1])
+# print(setup_i) #
+setup_i <- 1
 
 set.seed(1145)
 nthread = 8

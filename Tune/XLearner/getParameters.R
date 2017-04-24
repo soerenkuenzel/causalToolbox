@@ -17,7 +17,7 @@ for(file in file_list){
   file <- file[order(as.numeric(as.data.frame(file)[,25])), ]
   best_setups <- rbind(best_setups, file[1, -25])
 }
-starting_values <- best_setups
+starting_values <- as.data.frame(best_setups)
 devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
 # This will save the data in R/sysdata.rda and will only be available for our
 # function
