@@ -11,8 +11,21 @@ for(file in dir(file_folder)){
   i <- i + 1
 }
 
+## output for each file the two best settings:
+best_setups <- data.frame()
+for(file in file_list){
+  file <- file[order(as.numeric(as.data.frame(file)[,25])), ]
+  best_setups <- rbind(best_setups, file[1, -25])
+}
+starting_values <- best_setups
+devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
+# This will save the data in R/sysdata.rda and will only be available for our
+# function
+
+
+
 ## see which setting is similar to which by looking at correlations:
-tuning_settings <- file_list[[1]][,-c(1,16)] # tuning_setting = all settings
+tuning_settings <- file_list[[1]][,-c(1,25)] # tuning_setting = all settings
 mergingvars <- names(tuning_settings)
 for(file in file_list){
   file <- file[ ,-1]

@@ -25,10 +25,8 @@ X_RF_autotune_gpp <-
            ...) {
 
     # Exploring which of the starting settings is the best:
-    starting_settings <- list(
-      "start_setting_1" = get_setting_strong(feat, ntree, nthread),
-      "start_setting_2" = get_setting_weak(feat, ntree, nthread)
-    )
+    starting_settings <- get_starting_settings(feat = feat, tr = tr,
+                                               ntree = ntree, nthread = nthread)
     setup_eval <-
       check_setups(starting_settings, feat, tr, yobs, ntree,
                    nthread, verbose)
@@ -83,6 +81,14 @@ GP_optimize_small <- function(starting_point, feat, tr, yobs, init_points, n_ite
   OPT_Res <- rBayesianOptimization::BayesianOptimization(
     Test_Fun,
     bounds = bounds,
+    init_grid_dt = data.frame(
+      mtry_first = starting_point$l_first_0$mtry,
+      mtry_second = starting_point$l_second_0$mtry,
+      nodesizeAvg_first = starting_point$l_first_0$nodesizeAvg,
+      nodesizeAvg_second = starting_point$l_second_0$nodesizeAvg,
+      nodesizeSpl_first = starting_point$l_first_0$nodesizeSpl,
+      nodesizeSpl_second = starting_point$l_second_0$nodesizeSpl
+    ),
     init_points = init_points,
     n_iter = n_iter,
     acq = "ucb",
@@ -158,39 +164,4 @@ change_setting <- function(this_setting,
   this_setting$l_second_0$nodesizeSpl <- nodesizeSpl_second
   this_setting$l_second_1$nodesizeSpl <- nodesizeSpl_second
   return(this_setting)
-}
-
-
-get_upper_bounds_for_nodesize <- function(starting_point, tr) {
-  n_obs <- data.frame()
-  for (this_learner in c("l_first_0",  "l_first_1", "l_second_0",
-                         "l_second_1")) {
-    # total amount of data possible for the tree:
-    if (this_learner %in% c("l_first_0", "l_second_0")) {
-      n <- sum(1 - tr)
-    } else if (this_learner %in% c("l_first_1", "l_second_1")) {
-      n <- sum(tr)
-    }
-    # fraction of observations per tree:
-    sff <- starting_point[[this_learner]]$sample.fraction
-    # ratio of those in the splitting set:
-    sr <- starting_point[[this_learner]]$splitratio
-    # amount of data for tree
-    n_pertree <- floor(n * sff)
-    # amount of data in the spl and avg set for m
-    n_obs <- rbind(n_obs,
-                   data.frame(
-                     learner = this_learner,
-                     n_avg = floor(n_pertree * (1 - sr)),
-                     n_spl = floor(n_pertree * sr)
-                   ))
-  }
-  return(
-    c(
-      nodesizeAvg_first_upper =  min(n_obs$n_avg[1:2]),
-      nodesizeAvg_second_upper = min(n_obs$n_avg[3:4]),
-      nodesizeSpl_first_upper =  min(n_obs$n_spl[1:2]),
-      nodesizeSpl_second_upper = min(n_obs$n_spl[3:4])
-    )
-  )
 }

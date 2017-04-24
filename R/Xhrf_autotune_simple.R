@@ -19,10 +19,12 @@ X_RF_autotune_simple <-
            ntree = 20000,
            nthread = 0,
            verbose = TRUE) {
-    starting_settings <- list(
-      "start_setting_1" = get_setting_strong(feat, ntree, nthread),
-      "start_setting_2" = get_setting_weak(feat, ntree, nthread)
-    )
+    starting_settings <- get_starting_settings(feat = feat, tr = tr,
+                                               ntree = ntree, nthread = nthread)
+    #   list(
+    #   "start_setting_1" = get_setting_strong(feat, ntree, nthread),
+    #   "start_setting_2" = get_setting_weak(feat, ntree, nthread)
+    # )
 
     setup_eval <-
       check_setups(starting_settings = starting_settings,
@@ -237,3 +239,156 @@ get_setting_weak <- function(feat,
   )
   return(hyperparameter_list)
 }
+
+
+
+get_starting_settings <- function(feat,
+                                  tr,
+                                  ntree,
+                                  nthread,
+                                  relevant_Variable_first = 1:ncol(feat),
+                                  relevant_Variable_second = 1:ncol(feat),
+                                  relevant_Variable_prop = 1:ncol(feat)) {
+
+  # this will contain the list of good parameter settings:
+  hyperparameter_list_list <- list()
+  for(i in 1:nrow(starting_values)){
+    # read in setting i
+    this_setting <- starting_values[i,]
+
+    hyperparameter_list <- list(
+      "general" = list("predmode" = "propmean",
+                       "nthread" = nthread),
+      "l_first_0" = list(
+        "relevant_Variable" = relevant_Variable_first,
+        "ntree" = ntree,
+        "replace" = this_setting$replace_first,
+        "sample.fraction" = .8,
+        "mtry" = max(1, round(ncol(feat) * this_setting$mtry_first / 20)),
+        "nodesizeSpl" = this_setting$nodesizeSpl_first,
+        "nodesizeAvg" = this_setting$nodesizeAvg_first,
+        "splitratio" = this_setting$splitratio_first,
+        "middleSplit" = this_setting$middleSplit_first
+      ),
+      "l_first_1" = list(
+        "relevant_Variable" = relevant_Variable_first,
+        "ntree" = ntree,
+        "replace" = this_setting$replace_first,
+        "sample.fraction" = .8,
+        "mtry" = max(1, round(ncol(feat) * this_setting$mtry_first / 20)),
+        "nodesizeSpl" = this_setting$nodesizeSpl_first,
+        "nodesizeAvg" = this_setting$nodesizeAvg_first,
+        "splitratio" = this_setting$splitratio_first,
+        "middleSplit" = this_setting$middleSplit_first
+      ),
+      "l_second_0" = list(
+        "relevant_Variable" = relevant_Variable_second,
+        "ntree" = ntree,
+        "replace" = this_setting$replace_second,
+        "sample.fraction" = .8,
+        "mtry" = max(1, round(ncol(feat) * this_setting$mtry_second / 20)),
+        "nodesizeSpl" = this_setting$nodesizeSpl_second,
+        "nodesizeAvg" = this_setting$nodesizeAvg_second,
+        "splitratio" = this_setting$splitratio_second,
+        "middleSplit" = this_setting$middleSplit_second
+      ),
+      "l_second_1" = list(
+        "relevant_Variable" = relevant_Variable_second,
+        "ntree" = ntree,
+        "replace" = this_setting$replace_second,
+        "sample.fraction" = .8,
+        "mtry" = max(1, round(ncol(feat) * this_setting$mtry_second / 20)),
+        "nodesizeSpl" = this_setting$nodesizeSpl_second,
+        "nodesizeAvg" = this_setting$nodesizeAvg_second,
+        "splitratio" = this_setting$splitratio_second,
+        "middleSplit" = this_setting$middleSplit_second
+      ),
+      "l_prop" = list(
+        "relevant_Variable" = relevant_Variable_prop,
+        "ntree" = ntree,
+        "replace" = this_setting$replace_prop,
+        "sample.fraction" = .8,
+        "mtry" = max(1, round(ncol(feat) * this_setting$mtry_prop / 20)),
+        "nodesizeSpl" = this_setting$nodesizeSpl_prop,
+        "nodesizeAvg" = this_setting$nodesizeAvg_prop,
+        "splitratio" = this_setting$splitratio_prop,
+        "middleSplit" = this_setting$middleSplit_prop
+      )
+    )
+
+    # make sure that the nodesizes are not too large:
+    nodesizebounds <- get_upper_bounds_for_nodesize(hyperparameter_list, tr)
+
+    hyperparameter_list$l_first_0$nodesizeAvg <-
+      hyperparameter_list$l_first_1$nodesizeAvg <- min(
+        hyperparameter_list$l_first_0$nodesizeAvg,
+        nodesizebounds["nodesizeAvg_first_upper"])
+
+    hyperparameter_list$l_first_0$nodesizeSpl <-
+      hyperparameter_list$l_first_1$nodesizeSpl <- min(
+        hyperparameter_list$l_first_0$nodesizeSpl,
+        nodesizebounds["nodesizeSpl_first_upper"])
+
+    hyperparameter_list$l_second_0$nodesizeAvg <-
+      hyperparameter_list$l_second_1$nodesizeAvg <- min(
+        hyperparameter_list$l_second_0$nodesizeAvg,
+        nodesizebounds["nodesizeAvg_second_upper"])
+
+    hyperparameter_list$l_second_0$nodesizeSpl <-
+      hyperparameter_list$l_second_1$nodesizeSpl <- min(
+        hyperparameter_list$l_second_0$nodesizeSpl,
+        nodesizebounds["nodesizeSpl_second_upper"])
+
+    hyperparameter_list$l_prop$nodesizeAvg <-
+      min(hyperparameter_list$l_prop$nodesizeAvg,
+      floor(length(tr) * hyperparameter_list$l_prop$sample.fraction *
+      ifelse(hyperparameter_list$l_prop$splitratio == 1, 1,
+             (1 - hyperparameter_list$l_prop$splitratio))))
+
+    hyperparameter_list$l_prop$nodesizeSpl <-
+      min(hyperparameter_list$l_prop$nodesizeSpl,
+          floor(length(tr) * hyperparameter_list$l_prop$sample.fraction *
+                  hyperparameter_list$l_prop$splitratio))
+
+    hyperparameter_list_list[[starting_values[i,1]]] <- hyperparameter_list
+  }
+  return(hyperparameter_list_list)
+}
+
+
+get_upper_bounds_for_nodesize <- function(starting_point, tr) {
+  n_obs <- data.frame()
+  for (this_learner in c("l_first_0",  "l_first_1", "l_second_0",
+                         "l_second_1")) {
+    # total amount of data possible for the tree:
+    if (this_learner %in% c("l_first_0", "l_second_0")) {
+      n <- sum(1 - tr)
+    } else if (this_learner %in% c("l_first_1", "l_second_1")) {
+      n <- sum(tr)
+    }
+    # fraction of observations per tree:
+    sff <- starting_point[[this_learner]]$sample.fraction
+    # ratio of those in the splitting set:
+    sr <- starting_point[[this_learner]]$splitratio
+    # amount of data for tree
+    n_pertree <- floor(n * sff)
+    # amount of data in the spl and avg set for m
+    n_obs <- rbind(n_obs,
+                   data.frame(
+                     learner = this_learner,
+                     n_avg = floor(n_pertree * ifelse(sr == 1, 1, (1 - sr))),
+                     n_spl = floor(n_pertree * sr)
+                   ))
+  }
+  return(
+    c(
+      nodesizeAvg_first_upper =  min(n_obs$n_avg[1:2]),
+      nodesizeAvg_second_upper = min(n_obs$n_avg[3:4]),
+      nodesizeSpl_first_upper =  min(n_obs$n_spl[1:2]),
+      nodesizeSpl_second_upper = min(n_obs$n_spl[3:4])
+    )
+  )
+}
+
+
+
