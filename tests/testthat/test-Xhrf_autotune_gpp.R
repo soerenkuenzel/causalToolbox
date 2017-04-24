@@ -64,7 +64,7 @@ test_that("Tests test-Xhrf_gpp", {
   )
 
   expect_equal(EstimateCate(xl_gpp, feat)[4],
-               -0.01029703,
+               -0.008362525,
                tolerance = 1e-5)
 
   expect_warning(
@@ -72,6 +72,6 @@ test_that("Tests test-Xhrf_gpp", {
     "honestRF is used as adaptive random forest."
   )
   expect_equal(CI[2, 3],
-               0.06228658,
+               0.1555463,
                tolerance = 1e-5)
 })

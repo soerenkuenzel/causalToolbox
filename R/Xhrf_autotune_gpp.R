@@ -2,26 +2,50 @@
 #' @include Xhrf_autotune_simple.R
 
 
-#' @title Autotuning for X-Learner with honest RF for both stages
+#' @title Gaussian Process optimization for the X-Learner with honest RF for
+#'   both stages
 #' @name X_RF_autotune_gpp
 #' @rdname X_RF_autotune_gpp
-#' @description DO NOT USE YET
+#' @description \code{X_RF_autotune_gpp} will first go through 11 example setups
+#'   which have proven to be very good parameters in some cases we have studied
+#'   before. After that 'init_points' many points completely at random and
+#'   evaluates those. After that it uses the previous observations to initialize
+#'   a gaussian process prior and it makes n_iter many updates using this GP
+#'   potimization
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param ntree ..
-#' @param Niter ..
-#' @param nthread ..
+#' @param ntree Number of trees for each of the base learners.
+#' @param init_points Number of completely randomly selected tuning settings.
+#' @param n_iter Number of updates updates to optimize the GPP.
+#' @param nthread Number of threads used. Set it is 0, to automatically select
+#'   the maximum amount of possible threads. Set it 1 for slowest performance
+#'   but absolute deterministic behavior.
+#' @return A tuned X learner object.
+#' @details This function uses the rBayesianOptimization package to do the
+#'   baysian optimization
+#' @examples
+#'   set.seed(14236142)
+#'   feat <- iris[, -1]
+#'   tr <- rbinom(nrow(iris), 1, .5)
+#'   yobs <- iris[, 1]
+#'   # train a
+#'   xl_gpp <- X_RF_autotune_gpp(feat, tr, yobs, ntree = 100, nthread = 0,
+#'   verbose = FALSE, init_points = 5, n_iter = 1)
+#'   # computes
+#'   EstimateCate(xl_gpp, feat)
+#'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
+#'
 #' @export X_RF_autotune_gpp
 X_RF_autotune_gpp <-
   function(feat,
            tr,
            yobs,
-           ntree = 500,
+           ntree = 10000,
+           init_points = 20,
+           n_iter = 100,
            nthread = 0,
            verbose = TRUE,
-           init_points = 5,
-           n_iter = 1,
            ...) {
 
     # Exploring which of the starting settings is the best:
@@ -95,9 +119,9 @@ GP_optimize_small <- function(starting_point, feat, tr, yobs, init_points, n_ite
     kappa = 2.576,
     eps = 0.0,
     verbose = verbose,
-    control = c(20, 8, 2),
-    nug_thres = 10,
-    maxit = 10,
+    # control = c(20, 8, 2),
+    # nug_thres = 10,
+    # maxit = 10,
     ...
   )
 

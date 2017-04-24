@@ -34,7 +34,7 @@ for(file in file_list){
 
 ## look at pairwise correlations:
 library(gpairs)
-tuning_settings$STMpp[tuning_settings$STMpp >400] <- NA
+tuning_settings$STMpp[tuning_settings$STMpp > 400] <- NA
 if(FALSE) gpairs(tuning_settings[ ,15:25])
 
 # important groups are : "complexTau", "Conf1", "rare1", "STMpp", "Wager1", "Wager3"
