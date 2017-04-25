@@ -87,7 +87,8 @@ check_setups <-
     }
     OOB_errors$tau_0 <- OOB_errors$l_first_1 + OOB_errors$l_second_0
     OOB_errors$tau_1 <- OOB_errors$l_first_0 + OOB_errors$l_second_1
-    OOB_errors$comb <- (OOB_errors$tau_0 + OOB_errors$tau_1) / 2
+    OOB_errors$comb <- best_MSE_constant(OOB_errors$tau_0, OOB_errors$tau_1)
+      # (OOB_errors$tau_0 + OOB_errors$tau_1) / 2
     OOB_errors <-
       cbind(data.frame("name" = names(starting_settings)),
             OOB_errors)
@@ -408,5 +409,23 @@ get_upper_bounds_for_nodesize <- function(starting_point, tr) {
   )
 }
 
+best_MSE_constant <- function(MSE_1, MSE_2){
+  # Given two independent and unbiased estimators for theta with MSE_1 and
+  # MSE_2, this function computes the MSE of the optimally combined estimator
+  # which was combined in the following way:
+  # alpha <- best_average_constant(MSE_1, MSE_2)
+  # combined_estimator <- alpha theta_1 + (1 - alpha) theta_2
+  alpha <- best_average_constant(MSE_1, MSE_2)
+  return(alpha ^ 2 * MSE_1 + (1 - alpha) ^ 2 * MSE_2)
+}
 
+best_average_constant <- function(MSE_1, MSE_2){
+  # Given two independent and unbiased estimators for theta with MSE_1 and
+  # MSE_2, this function computes the optimal coefficient for combining those two
+  # estimators in the following way:
+  # alpha <- best_average_constant(MSE_1, MSE_2)
+  # combined_estimator <- alpha theta_1 + (1 - alpha) theta_2
+  alpha <- MSE_2 / (MSE_1 + MSE_2)
+  return(alpha)
+}
 
