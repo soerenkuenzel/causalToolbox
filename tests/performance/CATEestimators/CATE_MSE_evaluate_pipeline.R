@@ -4,10 +4,10 @@
 ## Setting up what to loop over: This will be given to the file and we will
 #execude it for i raning from 1 to 11 to go thorough all settings:
 
-# args <- commandArgs(TRUE)
-# setup_i <- -as.numeric(args[1])
-# print(setup_i) #
-setup_i <- 1
+args <- commandArgs(TRUE)
+setup_i <- -as.numeric(args[1])
+print(setup_i) #
+# setup_i <- 1
 
 set.seed(1145)
 nthread = 8
@@ -77,11 +77,11 @@ estimator_grid <- list(
 #      verbose = FALSE
 #    ),
   "S_BART" = function(feat, W, Yobs)
-    S_BART(feat, W, Yobs, nthread = nthread),
+    S_BART(feat, W, Yobs),
   "T_BART" = function(feat, W, Yobs)
-    T_BART(feat, W, Yobs, nthread = nthread),
+    T_BART(feat, W, Yobs),
   "X_BART" = function(feat, W, Yobs)
-    X_BART(feat, W, Yobs, verbose = FALSE, nthread = nthread)
+    X_BART(feat, W, Yobs)
   # "CF_p" = function(feat, W, Yobs) {
   #   feat <- as.matrix(feat)
   #   colnames(feat) <- NULL
@@ -110,23 +110,23 @@ estimator_grid <- list(
 
 CATEpredictor_grid <- list(
   "S_RF" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "T_RF" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "X_RF" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "X_RF_autotune_hyperband" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "X_RF_autotune_simple" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
  # "X_RF_autotune_gpp" = function(estimator, feat_te)
  #   EstimateCate(estimator, feat_te),
   "S_BART" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    CATEestimators::EstimateCate(estimator, feat_te),
   "T_BART" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te),
+    CATEestimators::EstimateCate(estimator, feat_te),
   "X_BART" = function(estimator, feat_te)
-    EstimateCate(estimator, feat_te)
+    CATEestimators::EstimateCate(estimator, feat_te)
   # "CF_p" = function(estimator, feat_te) {
   #   feat_te <- as.matrix(feat_te)
   #   colnames(feat_te) <- NULL
