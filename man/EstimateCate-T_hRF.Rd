@@ -2,8 +2,8 @@
 % Please edit documentation in R/Thrf.R
 \docType{methods}
 \name{EstimateCate-T_hRF}
-\alias{EstimateCate-T_hRF}
 \alias{EstimateCate,}
+\alias{EstimateCate-T_hRF}
 \alias{T_hRF-method}
 \title{EstimateCate-T_hRF}
 \usage{
@@ -20,3 +20,4 @@ A vector of predicted CATE
 \description{
 Return the estimated CATE
 }
+

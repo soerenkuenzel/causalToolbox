@@ -2,8 +2,8 @@
 % Please edit documentation in R/Xhrf.R
 \docType{methods}
 \name{EstimateCate-X_hRF}
-\alias{EstimateCate-X_hRF}
 \alias{EstimateCate,}
+\alias{EstimateCate-X_hRF}
 \alias{X_hRF-method}
 \title{EstimateCate-X_hRF}
 \usage{
@@ -20,3 +20,4 @@ A vector of predicted CATE
 \description{
 Return the estimated CATE
 }
+

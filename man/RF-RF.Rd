@@ -2,9 +2,9 @@
 % Please edit documentation in R/RF.R
 \docType{data}
 \name{RF-RF}
-\alias{RF-RF}
 \alias{RF}
 \alias{RF,}
+\alias{RF-RF}
 \alias{RF-method}
 \title{RF-Constructor}
 \format{An object of class \code{NULL} of length 0.}
@@ -55,3 +55,4 @@ A `RF` object.
 Initialize a `RF` object.
 }
 \keyword{datasets}
+

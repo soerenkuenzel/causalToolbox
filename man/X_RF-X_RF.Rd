@@ -9,16 +9,17 @@ X_RF(feat, tr, yobs, predmode = "propmean",
   relevant_Variable_second = 1:ncol(feat),
   relevant_Variable_prop = 1:ncol(feat), ntree_first = 5000,
   ntree_second = 5000, ntree_prop = 5000,
-  mtry_first = round(ncol(feat)/2), mtry_second = ncol(feat),
-  mtry_prop = max(floor(ncol(feat)/3), 1), min_node_size_spl_first = 1,
-  min_node_size_ave_first = 5, min_node_size_spl_second = 5,
+  mtry_first = round(ncol(feat)/2), mtry_second = round(ncol(feat) * 2/3),
+  mtry_prop = max(floor(ncol(feat)/3), 1), min_node_size_spl_first = 3,
+  min_node_size_ave_first = 3, min_node_size_spl_second = 5,
   min_node_size_ave_second = 3, min_node_size_spl_prop = 3,
   min_node_size_ave_prop = 10, splitratio_first = 0.5,
   splitratio_second = 0.5, splitratio_prop = 0.5, replace_first = TRUE,
-  replace_second = TRUE, replace_prop = TRUE, sample_fraction_first = 0.8,
-  sample_fraction_second = 0.9, sample_fraction_prop = 1, nthread = 0,
-  verbose = FALSE, middleSplit_first = FALSE, middleSplit_second = FALSE,
-  middleSplit_prop = FALSE)
+  replace_second = FALSE, replace_prop = TRUE,
+  sample_fraction_first = 0.8, sample_fraction_second = 0.9,
+  sample_fraction_prop = 0.9, nthread = 0, verbose = FALSE,
+  middleSplit_first = FALSE, middleSplit_second = FALSE,
+  middleSplit_prop = TRUE)
 }
 \value{
 A `X_RF` object.
@@ -34,3 +35,4 @@ recommend using one of the self tuning versions such as
 \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 \code{\link{X_RF_autotune_hyperband}}
 }
+

@@ -12,11 +12,11 @@ setup_i <- 1
 set.seed(1145)
 nthread = 8
 
-
+library(CATEestimators)
 library(hte)
 library(dplyr)
 library(reshape)
-library(causalForest)
+#library(causalForest)
 
 setup_grid <-
   c(
@@ -67,15 +67,21 @@ estimator_grid <- list(
       yobs = Yobs,
       verbose = FALSE
     ),
-  "X_RF_autotune_gpp" = function(feat, W, Yobs)
-    X_RF_autotune_gpp(
-      feat = feat,
-      tr = W,
-      yobs = Yobs,
-      init_points = 20,
-      n_iter = 20,
-      verbose = FALSE
-    )
+#  "X_RF_autotune_gpp" = function(feat, W, Yobs)
+#    X_RF_autotune_gpp(
+#      feat = feat,
+#      tr = W,
+#      yobs = Yobs,
+#      init_points = 20,
+#      n_iter = 20,
+#      verbose = FALSE
+#    ),
+  "S_BART" = function(feat, W, Yobs)
+    S_BART(feat, W, Yobs, nthread = nthread),
+  "T_BART" = function(feat, W, Yobs)
+    T_BART(feat, W, Yobs, nthread = nthread),
+  "X_BART" = function(feat, W, Yobs)
+    X_BART(feat, W, Yobs, verbose = FALSE, nthread = nthread)
   # "CF_p" = function(feat, W, Yobs) {
   #   feat <- as.matrix(feat)
   #   colnames(feat) <- NULL
@@ -113,7 +119,13 @@ CATEpredictor_grid <- list(
     EstimateCate(estimator, feat_te),
   "X_RF_autotune_simple" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te),
-  "X_RF_autotune_gpp" = function(estimator, feat_te)
+ # "X_RF_autotune_gpp" = function(estimator, feat_te)
+ #   EstimateCate(estimator, feat_te),
+  "S_BART" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "T_BART" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
+  "X_BART" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te)
   # "CF_p" = function(estimator, feat_te) {
   #   feat_te <- as.matrix(feat_te)

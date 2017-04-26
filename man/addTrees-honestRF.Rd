@@ -14,3 +14,4 @@ addTrees(object, ntree)
 \description{
 Add more trees to the existing forest.
 }
+

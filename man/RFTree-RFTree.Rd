@@ -13,3 +13,4 @@ RFTree(x, y, mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
 \value{
 a `RFTree` object
 }
+

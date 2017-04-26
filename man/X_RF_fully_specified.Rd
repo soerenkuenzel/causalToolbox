@@ -26,3 +26,4 @@ constructor. It should not be called by the user, since the list of
 parameters is too big. Instead call the simpler version XhRF or one of the
 self tuning versions
 }
+

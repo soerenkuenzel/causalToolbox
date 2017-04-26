@@ -2,10 +2,10 @@
 % Please edit documentation in R/RFTree.R
 \docType{methods}
 \name{showTree-RFTree}
-\alias{showTree-RFTree}
-\alias{showTree,RFTree-method}
-\alias{showTree,}
 \alias{RFTree-method}
+\alias{showTree,}
+\alias{showTree,RFTree-method}
+\alias{showTree-RFTree}
 \title{showTree-RFTree}
 \usage{
 showTree(object)
@@ -18,3 +18,4 @@ showTree(object)
 \description{
 Print the entire tree starting from the root node
 }
+

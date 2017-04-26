@@ -2,13 +2,13 @@
 % Please edit documentation in R/CATE_estimators.R
 \docType{methods}
 \name{CateCI-X_hRF}
-\alias{CateCI-X_hRF}
 \alias{CateCI,}
+\alias{CateCI-X_hRF}
 \alias{X_hRF-method}
 \title{CateCI-X_hRF}
 \usage{
 \S4method{CateCI}{`Meta-learner`}(theObject, feature_new,
-  method = "maintain_group_ratios", B = 200, nthread = 8,
+  method = "maintain_group_ratios", B = 200, nthread = 0,
   verbose = TRUE)
 }
 \arguments{
@@ -28,3 +28,4 @@ A data frame of estimated CATE Confidence Intervals
 \description{
 Return the estimated confidence intervals for the CATE
 }
+

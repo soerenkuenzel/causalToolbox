@@ -14,3 +14,4 @@ getOOB(object, noWarning = FALSE)
 \description{
 Calculate the out-of-bag error of a given forest.
 }
+

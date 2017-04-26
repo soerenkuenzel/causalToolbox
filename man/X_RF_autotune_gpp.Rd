@@ -57,3 +57,4 @@ This function uses the rBayesianOptimization package to do the
 \code{\link{X_RF_autotune_simple}},
 \code{\link{X_RF_autotune_hyperband}},
 }
+

@@ -12,3 +12,4 @@ autohonestRF(x, y, sampsize = as.integer(nrow(x) * 0.75), num_iter = 81,
 \value{
 A `honestRF` object
 }
+

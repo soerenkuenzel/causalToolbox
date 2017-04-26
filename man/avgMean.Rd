@@ -18,3 +18,4 @@ The averaging metrics of the data
 A default function to average the observations in each tree leaf
 by taking the mean of the outcomes.
 }
+

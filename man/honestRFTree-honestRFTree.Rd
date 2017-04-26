@@ -14,3 +14,4 @@ honestRFTree(x, y, mtry = max(floor(ncol(x)/3), 1),
 \value{
 a `honestRFTree` object
 }
+

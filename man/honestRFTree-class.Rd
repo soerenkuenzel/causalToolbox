@@ -2,8 +2,8 @@
 % Please edit documentation in R/honestRFTree.R
 \docType{class}
 \name{honestRFTree-class}
-\alias{honestRFTree-class}
 \alias{honestRFTree}
+\alias{honestRFTree-class}
 \title{honstRFTree Constructor}
 \format{An object of class \code{NULL} of length 0.}
 \arguments{
@@ -40,3 +40,4 @@ Create a honestRFTree by making specifc observatios as splitting
 and averaging dataset.
 }
 \keyword{datasets}
+

@@ -2,9 +2,9 @@
 % Please edit documentation in R/RF.R
 \docType{methods}
 \name{predict-RF}
-\alias{predict-RF}
-\alias{predict,}
 \alias{RF-method}
+\alias{predict,}
+\alias{predict-RF}
 \title{predict-RF}
 \usage{
 \S4method{predict}{RF}(object, feature.new)
@@ -20,3 +20,4 @@ A vector of predicted responses.
 \description{
 Return the prediction from the forest.
 }
+

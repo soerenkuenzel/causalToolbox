@@ -46,3 +46,4 @@ This function simulates a RCT or observational data for causal
 effect estimation to test different heterogenuous treatment effect estimation
 strategies.
 }
+
