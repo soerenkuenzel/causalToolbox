@@ -101,7 +101,7 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  190.6584,
+  275.9658,
   tolerance = 1e-7)
 
 })

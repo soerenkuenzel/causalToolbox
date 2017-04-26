@@ -26,9 +26,9 @@ setGeneric(
   name = "CateCI",
   def = function(theObject,
                  feature_new,
-                 method = "n2TBS",
+                 method = "maintain_group_ratios",
                  B = 200,
-                 nthread = 8,
+                 nthread = 0,
                  verbose = TRUE)
   {
     standardGeneric("CateCI")
@@ -63,11 +63,17 @@ setMethod(
     yobs <- theObject@yobs_train
     creator <- theObject@creator
     ntrain <- length(tr)
-    if (method == "n2TBS") {
+    if (method == "maintain_group_ratios") {
       createbootstrappedData <- function() {
-        smpl <- sample(1:ntrain,
+
+        smpl_0 <- sample((1:ntrain)[tr == 0],
                        replace = TRUE,
-                       size = round(ntrain / 2))
+                       size = sum(1-tr))
+        smpl_1 <- sample((1:ntrain)[tr == 1],
+                         replace = TRUE,
+                         size = sum(tr))
+        smpl <- sample(c(smpl_0, smpl_1))
+
         return(list(
           feat_b = feat[smpl, ],
           tr_b = tr[smpl],

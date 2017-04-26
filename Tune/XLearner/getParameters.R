@@ -11,8 +11,28 @@ for(file in dir(file_folder)){
   i <- i + 1
 }
 
+## output for each file the two best settings:
+best_setups <- data.frame()
+for(file in file_list){
+  file <- file[order(as.numeric(as.data.frame(file)[,25])), ]
+  best_setups <- rbind(best_setups, file[1, -25])
+
+  # add at least one honest setup:
+  file_only_honest <- file %>% filter(splitratio_first < 1, splitratio_second < 1)
+  file_only_honest <- file_only_honest[order(as.numeric(as.data.frame(file_only_honest)[,25])), ]
+
+  best_setups <- rbind(best_setups, file_only_honest[1, -25])
+
+  }
+starting_values <- as.data.frame(best_setups)
+devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
+# This will save the data in R/sysdata.rda and will only be available for our
+# function
+
+
+
 ## see which setting is similar to which by looking at correlations:
-tuning_settings <- file_list[[1]][,-c(1,16)] # tuning_setting = all settings
+tuning_settings <- file_list[[1]][,-c(1,25)] # tuning_setting = all settings
 mergingvars <- names(tuning_settings)
 for(file in file_list){
   file <- file[ ,-1]
@@ -21,7 +41,7 @@ for(file in file_list){
 
 ## look at pairwise correlations:
 library(gpairs)
-tuning_settings$STMpp[tuning_settings$STMpp >400] <- NA
+tuning_settings$STMpp[tuning_settings$STMpp > 400] <- NA
 if(FALSE) gpairs(tuning_settings[ ,15:25])
 
 # important groups are : "complexTau", "Conf1", "rare1", "STMpp", "Wager1", "Wager3"

@@ -15,8 +15,16 @@ setClass(
 
 #' @title X_RF_most_basic Constructor
 #' @rdname X_RF_fully_specified
-#' @aliases X_RF_fully_specified
-#' @return A `X_RF_fully_specified` object.
+#' @description This is the most basic X-learner with honest random forest
+#' constructor. It should not be called by the user, since the list of
+#' parameters is too big. Instead call the simpler version XhRF or one of the
+#' self tuning versions
+#' @param feat feature data.frame.
+#' @param tr treatment assignment 0 for control and 1 for treatment.
+#' @param yobs the observed outcome.
+#' @param hyperparameter_list A list of lists of hyper parameters
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @return A `X_RF` object.
 #' @export X_RF_fully_specified
 X_RF_fully_specified <-
   function(feat,
@@ -49,7 +57,7 @@ X_RF_fully_specified <-
         }
         r_0 <-
           predict(base_learners[["l_first_1"]],
-                  X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) -
+                  X_0) -
           yobs_0
 
         x = X_0
@@ -58,7 +66,7 @@ X_RF_fully_specified <-
         r_1 <-
           yobs_1 -
           predict(base_learners[["l_first_0"]],
-                  X_1[,  hyperparameter_list[["l_first_1"]]$relevant_Variable])
+                  X_1)
 
         x = X_1
         y = r_1
@@ -73,7 +81,7 @@ X_RF_fully_specified <-
 
       base_learners[[this_learner]] <-
         honestRF(
-          x = x[, hyperparameter_list[[this_learner]]$relevant_Variable],
+          x = x,
           y = y,
           ntree = hyperparameter_list[[this_learner]]$ntree,
           replace = hyperparameter_list[[this_learner]]$replace,
@@ -112,9 +120,15 @@ X_RF_fully_specified <-
   }
 
 #' @title X_RF Constructor
+#' @description This is the recommended function to implement the X-learner with
+#' honest random forest. However, due to the vast amount of parameters, we
+#' recommend using one of the self tuning versions such as
+#' \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+#' \code{\link{X_RF_autotune_hyperband}}
 #' @rdname X_RF-X_RF
-#' @aliases X_RF, X_RF-X_RF
 #' @return A `X_RF` object.
+#' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+#' \code{\link{X_RF_autotune_hyperband}}
 #' @export X_RF
 X_RF <-
   function(feat,
@@ -124,14 +138,14 @@ X_RF <-
            relevant_Variable_first = 1:ncol(feat),
            relevant_Variable_second = 1:ncol(feat),
            relevant_Variable_prop = 1:ncol(feat),
-           ntree_first = 500,
-           ntree_second = 500,
-           ntree_prop = 500,
+           ntree_first = 5000,
+           ntree_second = 5000,
+           ntree_prop = 5000,
            mtry_first = round(ncol(feat) / 2),
-           mtry_second = ncol(feat),
+           mtry_second = round(ncol(feat) * 2 / 3),
            mtry_prop = max(floor(ncol(feat) / 3), 1),
-           min_node_size_spl_first = 1,
-           min_node_size_ave_first = 5,
+           min_node_size_spl_first = 3,
+           min_node_size_ave_first = 3,
            min_node_size_spl_second = 5,
            min_node_size_ave_second = 3,
            min_node_size_spl_prop = 3,
@@ -140,16 +154,16 @@ X_RF <-
            splitratio_second = .5,
            splitratio_prop = .5,
            replace_first = TRUE,
-           replace_second = TRUE,
+           replace_second = FALSE,
            replace_prop = TRUE,
            sample_fraction_first = 0.8,
            sample_fraction_second = 0.9,
-           sample_fraction_prop = 1,
+           sample_fraction_prop = 0.9,
            nthread = 0,
            verbose = FALSE,
            middleSplit_first = FALSE,
            middleSplit_second = FALSE,
-           middleSplit_prop = FALSE) {
+           middleSplit_prop = TRUE) {
     # if relevant_Variable_first is not set, then set it to select all:
     feat <- as.data.frame(feat)
 

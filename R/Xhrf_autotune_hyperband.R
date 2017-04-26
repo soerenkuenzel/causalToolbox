@@ -16,12 +16,24 @@
 #' @param verbose ..
 #' @param seed ..
 #' @param nthread ..
+#' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
+#' @examples
+#'   set.seed(14236142)
+#'   feat <- iris[, -1]
+#'   tr <- rbinom(nrow(iris), 1, .5)
+#'   yobs <- iris[, 1]
+#'   # train a
+#'   xl_gpp <- X_RF_autotune_hyperband(feat, tr, yobs, ntree = 100, nthread = 0,
+#'   verbose = FALSE, init_points = 5, n_iter = 1)
+#'   # computes the CATE and confidence intervals for CATE
+#'   EstimateCate(xl_gpp, feat)
+#'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
 #' @export X_RF_autotune_hyperband
 X_RF_autotune_hyperband <-
   function(feat,
            tr,
            yobs,
-           sampsize = as.integer(nrow(feat) * 0.75),
+           sample.fraction = 0.75,
            num_iter = 3 ^ 8,
            eta = 3,
            verbose = TRUE,
@@ -71,7 +83,7 @@ X_RF_autotune_hyperband <-
         autohonestRF(
           x = x,
           y = y,
-          sampsize = sampsize,
+          sampsize = floor(nrow(x) * sample.fraction),
           num_iter = num_iter,
           eta = eta,
           verbose = verbose,
