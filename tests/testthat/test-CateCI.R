@@ -23,7 +23,7 @@ test_that("Tests CateCI", {
              nthread = 1)
   CIs <- CateCI(sl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1, ]),
-               c(0.022837778, -0.007604193, 0.053279749),
+               c(0.01633633, -0.00774704, 0.04041970),
                tolerance=1e-7)
 
   tl <- T_RF(feat = feat,
@@ -32,7 +32,7 @@ test_that("Tests CateCI", {
              nthread = 1)
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1, ]),
-               c(0.03268183, -0.03974874, 0.10511239),
+               c(0.04387417, -0.03828391, 0.12603225),
                tolerance=1e-7)
 
 
@@ -50,6 +50,6 @@ test_that("Tests CateCI", {
   CIs <- CateCI(xl_at, feat, B = 5, verbose = FALSE)
 
   expect_equal(as.numeric(CIs[1, ]),
-               c(0.03268183, -0.03974874, 0.10511239),
+               c(0.04387417, -0.03828391, 0.12603225),
                tolerance=1e-7)
 })
