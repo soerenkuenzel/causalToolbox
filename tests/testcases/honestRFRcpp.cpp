@@ -160,13 +160,13 @@ int main() {
   );
   #endif
 
-  std::unique_ptr< DataFrame > test_df (new DataFrame(
+  DataFrame* test_df = new DataFrame(
     std::move(featureData),
     std::move(outcomeData),
     std::move(categoricalFeatureCols),
     numRows,
     numColumns
-  ));
+  );
 
   // Test Prep
   struct IncGenerator {
@@ -269,9 +269,9 @@ int main() {
       std::vector<double> leafPrediction(numRows);
 
       (*leafNode1).predict(leafPrediction, &leftPartitionIndex,
-                           (*test_df).getAllFeatureData(), test_df.get());
+                           (*test_df).getAllFeatureData(), test_df);
       (*leafNode2).predict(leafPrediction, &rightPartitionIndex,
-                           (*test_df).getAllFeatureData(), test_df.get());
+                           (*test_df).getAllFeatureData(), test_df);
 
       for (auto i = leafPrediction.begin(); i != leafPrediction.end(); ++i) {
         std::cout << *i << ' ';
@@ -294,7 +294,7 @@ int main() {
       std::vector<double> splitPrediction(numRows);
 
       (*splitNode).predict(splitPrediction, &testAllSampleIndex,
-                           (*test_df).getAllFeatureData(), test_df.get());
+                           (*test_df).getAllFeatureData(), test_df);
 
       for (auto i = splitPrediction.begin(); i != splitPrediction.end(); ++i) {
         std::cout << *i << ' ';
@@ -331,7 +331,7 @@ int main() {
         &testFeatureList,
         &testAllSampleIndex,
         &testAllSampleIndex,
-        test_df.get(),
+        test_df,
         24750371,
         false
       );
@@ -350,7 +350,7 @@ int main() {
         &testFeatureList,
         &testAllSampleIndex,
         &testAllSampleIndex,
-        test_df.get(),
+        test_df,
         24750371,
         false
       );
@@ -369,7 +369,7 @@ int main() {
         new std::vector<size_t>(testAllSampleIndex));
 
       std::unique_ptr< honestRFTree > testFullTree( new honestRFTree(
-        test_df.get(), 4, 5, 5,
+        test_df, 4, 5, 5,
         std::move(averagingSampleIndex__),
         std::move(splittingSampleIndex__),
         24750371,
@@ -384,7 +384,7 @@ int main() {
       (*testFullTree.get()).predict(
         testTreePrediction,
         (*test_df).getAllFeatureData(),
-        test_df.get()
+        test_df
       );
 
       for (
@@ -414,7 +414,7 @@ int main() {
     try {
       // Test RF
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df), 500, true, 150, 1, 3, 5, 5, 24750371, 0, false, false
+        test_df, 500, true, 150, 1, 3, 5, 5, 24750371, 0, false, false
       ));
 
       // Print first two trees
@@ -452,7 +452,7 @@ int main() {
     try {
       // Test RF
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df), 500, true, 929, 0.1, 16, 3, 100, 24750371, 1, true, false
+        test_df, 1, false, 112, 0.57, 4, 18, 27, 113, 0, true, false
       ));
 
     } catch (std::runtime_error &err) {
@@ -480,7 +480,7 @@ int main() {
               new std::vector<size_t>(secondHalfIndex));
 
       std::unique_ptr< honestRFTree > testFullTree( new honestRFTree(
-        test_df.get(), 4, 5, 5,
+        test_df, 4, 5, 5,
         std::move(averagingSampleIndex__),
         std::move(splittingSampleIndex__),
         24750371,
@@ -497,7 +497,7 @@ int main() {
       (*testFullTree).getOOBPrediction(
         outputOOBPrediction,
         outputOOBCount,
-        test_df.get()
+        test_df
       );
 
       for (size_t i=0; i<numRows; i++) {
@@ -511,7 +511,7 @@ int main() {
       std::cout << std::endl;
 
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df), 500, true, 929, 1, 16, 100, 100, 24750371, 4, true, false
+        test_df, 500, true, 929, 1, 16, 100, 100, 24750371, 4, true, false
       ));
 
       std::cout << (*testFullForest).getOOBError() << std::endl;
@@ -526,7 +526,7 @@ int main() {
 
       // Test original RF still works
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df), 20, true, numRows, 1, 16, 5, 5, 24750371, 4, true, false
+        test_df, 20, true, numRows, 1, 16, 5, 5, 24750371, 4, true, false
       ));
 
       std::cout << (*testFullForest).getNtree() << std::endl;
@@ -565,7 +565,7 @@ int main() {
 
       // Test original RF still works
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df),
+        test_df,
         10,
         true,
         numRows,
@@ -601,7 +601,7 @@ int main() {
         new std::vector<size_t>(testAllSampleIndex));
 
       std::unique_ptr< honestRFTree > testFullTree( new honestRFTree(
-        test_df.get(), 4, 5, 5,
+        test_df, 4, 5, 5,
         std::move(averagingSampleIndex__),
         std::move(splittingSampleIndex__),
         24750371,
@@ -613,7 +613,7 @@ int main() {
 
       // Test RF still works
       std::unique_ptr<honestRF> testFullForest( new honestRF(
-        std::move(test_df),
+        test_df,
         10,
         true,
         numRows,
