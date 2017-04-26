@@ -11,9 +11,9 @@ a random forest.
 \section{Slots}{
 
 \describe{
-\item{\code{forest}}{A list of `RFTree` objects in the forest. If the class is}
+\item{\code{forest}}{An external pointer pointing to a C++ honestRF object}
 
-\item{\code{x}}{A data frame of all training predictors.}
+\item{\code{dataframe}}{An external pointer pointing to a C++ DataFrame object}
 
 \item{\code{y}}{A vector of all training responses.}
 

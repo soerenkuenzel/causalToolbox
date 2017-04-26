@@ -13,7 +13,8 @@ honestRF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace)
   nrow(x) else ceiling(0.632 * nrow(x)), sample.fraction = NULL,
   mtry = max(floor(ncol(x)/3), 1), nodesizeSpl = 3, nodesizeAvg = 3,
   splitratio = 1, seed = as.integer(runif(1) * 1000), verbose = FALSE,
-  nthread = 0, splitrule = "variance", middleSplit = FALSE)
+  nthread = 0, splitrule = "variance", middleSplit = FALSE,
+  reuseHonestRF = NULL)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
@@ -66,6 +67,10 @@ should be made}
 \item{middleSplit}{if the split value is taking the average of two feature
 values. If false, it will take a point based on a uniform distribution
 between two feature values. (Default = FALSE)}
+
+\item{reuseHonestRF}{pass in an `honestRF` object which will recycle the
+dataframe the old object created. It will save some space working on the same
+dataset.}
 }
 \value{
 A `honestRF` object.

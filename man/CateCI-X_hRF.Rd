@@ -8,7 +8,7 @@
 \title{CateCI-X_hRF}
 \usage{
 \S4method{CateCI}{`Meta-learner`}(theObject, feature_new,
-  method = "maintain_group_ratios", B = 200, nthread = 8,
+  method = "maintain_group_ratios", B = 200, nthread = 0,
   verbose = TRUE)
 }
 \arguments{

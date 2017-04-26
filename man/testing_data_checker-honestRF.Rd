@@ -5,11 +5,9 @@
 \alias{testing_data_checker}
 \title{testing_data_checker-hoenstRF}
 \usage{
-testing_data_checker(x, feature.new)
+testing_data_checker(feature.new)
 }
 \arguments{
-\item{x}{A data frame of all training predictors.}
-
 \item{feature.new}{A data frame of testing predictors.}
 }
 \description{

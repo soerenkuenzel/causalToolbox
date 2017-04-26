@@ -515,14 +515,14 @@ setMethod(
       if (!noWarning) {
         warning("Samples are drawn without replacement and sample size is too big!")
       }
-      return(Inf)
+      return(NA)
     }
 
     rcppOOB <- tryCatch({
       return(rcpp_OBBPredictInterface(object@forest))
     }, error = function(err) {
       print(err)
-      return(Inf)
+      return(NA)
     })
 
     return(rcppOOB)
@@ -738,6 +738,9 @@ autohonestRF <- function(x,
           }
           if (!is.null(val_models[[j]])) {
             val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
+            if (is.na(val_losses[[j]])) {
+              val_losses[[j]] <- Inf
+            }
           } else {
             val_losses[[j]] <- Inf
           }
@@ -764,6 +767,9 @@ autohonestRF <- function(x,
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
       best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
+      if (is.na(best_OOB)) {
+        best_OOB <- Inf
+      }
     } else {
       best_OOB <- Inf
     }
