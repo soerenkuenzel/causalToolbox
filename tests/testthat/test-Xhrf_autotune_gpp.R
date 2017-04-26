@@ -65,15 +65,13 @@ test_that("Tests test-Xhrf_gpp", {
   )
 
   expect_equal(EstimateCate(xl_gpp, feat)[4],
-               -0.008362525,
+               0.1265767,
                tolerance = 1e-5)
 
-  expect_warning(
-    CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE),
-    "honestRF is used as adaptive random forest."
-  )
+
+  CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
   expect_equal(CI[2, 3],
-               0.1555463,
+               0.2659216,
                tolerance = 1e-5)
 
   ## Example for changing internal parameters of GPfit::GP_fit and

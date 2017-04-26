@@ -16,7 +16,14 @@ best_setups <- data.frame()
 for(file in file_list){
   file <- file[order(as.numeric(as.data.frame(file)[,25])), ]
   best_setups <- rbind(best_setups, file[1, -25])
-}
+
+  # add at least one honest setup:
+  file_only_honest <- file %>% filter(splitratio_first < 1, splitratio_second < 1)
+  file_only_honest <- file_only_honest[order(as.numeric(as.data.frame(file_only_honest)[,25])), ]
+
+  best_setups <- rbind(best_setups, file_only_honest[1, -25])
+
+  }
 starting_values <- as.data.frame(best_setups)
 devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
 # This will save the data in R/sysdata.rda and will only be available for our
