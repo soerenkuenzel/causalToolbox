@@ -36,11 +36,11 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- c(5, 20, 100)
+dim_grid <- c(20, 100)
 ntrain_grid <- round(10 ^ seq(from = 2, to = 4, by = .5))
-# if (setup == "rare1"){
-#   ntrain_grid <- c(1500, 2000, 4000, 10000, 40000)
-# }
+if (setup == "rare1"){
+   ntrain_grid <- round(10 ^ seq(from = 3.5, to = 5, by = .5))
+}
 ntest <- 10000
 seed_grid <- 1:100
 alpha_grid <- c(0, .1)
@@ -152,8 +152,8 @@ if (file.exists(filename))
 
 ## loop through all cases:
 for (seed in seed_grid) {
-  for (dim in dim_grid) {
-    for (alpha in alpha_grid) {
+  for (alpha in alpha_grid) {
+      for (dim in dim_grid) {
       print(paste(
         "Starting with seed = ",
         seed,
