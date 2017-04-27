@@ -1,10 +1,17 @@
 Package: hte
 Type: Package
 Title: Heterogeneous Treatment Effect Estimator Using Random Forests
+<<<<<<< HEAD
 Version: 0.1.5.000
 Author: S<U+FFFD><U+FFFD>ren K<U+FFFD><U+FFFD>nzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
 Maintainer: S<U+FFFD><U+FFFD>ren K<U+FFFD><U+FFFD>nzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and
+=======
+Version: 0.1.5.001
+Author: Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
+Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
+Description: Estimate heterogeneous treatment effects in experimental and 
+>>>>>>> d462b83da33dc1e86f4b9a10de356ef5f642b97c
     observational studies. Implements honest random forest and X-learner
     using honest random forest in the first and second stage to estimate
     the Conditional Average Treatment Effect (CATE) function and provides

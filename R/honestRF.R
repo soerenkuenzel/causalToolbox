@@ -156,22 +156,15 @@ training_data_checker <- function(
 #' @name testing_data_checker-honestRF
 #' @rdname testing_data_checker-honestRF
 #' @description Check the testing data to do prediction
-#' @param x A data frame of all training predictors.
 #' @param feature.new A data frame of testing predictors.
 #' @export honestRF
 testing_data_checker <- function(
-  x,
   feature.new
 ){
   feature.new <- as.data.frame(feature.new)
-  x <- as.data.frame(x)
 
   if (any(is.na(feature.new))) {
     stop("x contains missing data.")
-  }
-
-  if (ncol(feature.new) != ncol(x)) {
-    stop("training data and testing data do not have same dimensionality.")
   }
 
 }
@@ -184,8 +177,8 @@ testing_data_checker <- function(
 #' @rdname honestRF-class
 #' @description `honestRF` object implementing the most basic version of
 #' a random forest.
-#' @slot forest A list of `RFTree` objects in the forest. If the class is
-#' @slot x A data frame of all training predictors.
+#' @slot forest An external pointer pointing to a C++ honestRF object
+#' @slot dataframe An external pointer pointing to a C++ DataFrame object
 #' @slot y A vector of all training responses.
 #' @slot categoricalFeatureCols A list of index for all categorical data. Used
 #' for trees to detect categorical columns.
@@ -221,8 +214,7 @@ setClass(
   Class="honestRF",
   slots=list(
     forest="externalptr",
-    x="data.frame",
-    y="numeric",
+    dataframe="externalptr",
     categoricalFeatureCols="list",
     categoricalFeatureMapping="list",
     ntree="numeric",
@@ -276,6 +268,9 @@ setClass(
 #' @param middleSplit if the split value is taking the average of two feature
 #' values. If false, it will take a point based on a uniform distribution
 #' between two feature values. (Default = FALSE)
+#' @param reuseHonestRF pass in an `honestRF` object which will recycle the
+#' dataframe the old object created. It will save some space working on the same
+#' dataset.
 #' @export honestRF
 setGeneric(
   name="honestRF",
@@ -294,7 +289,8 @@ setGeneric(
     verbose,
     nthread,
     splitrule,
-    middleSplit
+    middleSplit,
+    reuseHonestRF
     ){
     standardGeneric("honestRF")
   }
@@ -321,7 +317,8 @@ honestRF <- function(
   verbose=FALSE,
   nthread=0,
   splitrule="variance",
-  middleSplit=FALSE
+  middleSplit=FALSE,
+  reuseHonestRF=NULL
   ){
   # only if sample.fraction is given, update sampsize
   if(!is.null(sample.fraction))
@@ -331,56 +328,109 @@ honestRF <- function(
   # Preprocess the data
   training_data_checker(x, y, ntree,replace, sampsize, mtry, nodesizeSpl,
                         nodesizeAvg, splitratio, nthread, middleSplit)
-
-  preprocessedData <- preprocess_training(x, y)
-  processed_x <- preprocessedData$x
-  categoricalFeatureCols <- preprocessedData$categoricalFeatureCols
-  categoricalFeatureMapping <- preprocessedData$categoricalFeatureMapping
-
   # Total number of obervations
   nObservations <- length(y)
   numColumns <- ncol(x)
 
-  categoricalFeatureCols_cpp <- unlist(categoricalFeatureCols)
-  if (is.null(categoricalFeatureCols_cpp)){
-    categoricalFeatureCols_cpp <- vector(mode="numeric", length=0)
-  } else {
-    categoricalFeatureCols_cpp <- categoricalFeatureCols_cpp - 1
-  }
+  if (is.null(reuseHonestRF)) {
+    preprocessedData <- preprocess_training(x, y)
+    processed_x <- preprocessedData$x
+    categoricalFeatureCols <- preprocessedData$categoricalFeatureCols
+    categoricalFeatureMapping <- preprocessedData$categoricalFeatureMapping
 
-  # Create rcpp object
-  # Create a forest object
-  forest <- tryCatch({
-    rcppForest <- rcpp_cppBuildInterface(
-      processed_x, y,
-      categoricalFeatureCols_cpp,
-      nObservations,
-      numColumns, ntree, replace, sampsize, mtry,
-      splitratio, nodesizeSpl, nodesizeAvg, seed,
-      nthread, verbose, middleSplit
-    )
-    return(
-      new(
-        "honestRF",
-        forest=rcppForest,
-        x=processed_x,
-        y=y,
-        categoricalFeatureCols=categoricalFeatureCols,
-        categoricalFeatureMapping=categoricalFeatureMapping,
-        ntree=ntree,
-        replace=replace,
-        sampsize=sampsize,
-        mtry=mtry,
-        nodesizeSpl=nodesizeSpl,
-        nodesizeAvg=nodesizeAvg,
-        splitratio=splitratio,
-        middleSplit=middleSplit
+    categoricalFeatureCols_cpp <- unlist(categoricalFeatureCols)
+    if (is.null(categoricalFeatureCols_cpp)){
+      categoricalFeatureCols_cpp <- vector(mode="numeric", length=0)
+    } else {
+      categoricalFeatureCols_cpp <- categoricalFeatureCols_cpp - 1
+    }
+
+    # Create rcpp object
+    # Create a forest object
+    forest <- tryCatch({
+      rcppDataFrame <- rcpp_cppDataFrameInterface(
+        processed_x, y,
+        categoricalFeatureCols_cpp,
+        nObservations,
+        numColumns
       )
-    )
-  }, error = function(err) {
-    print(err)
-    return(NULL)
-  })
+
+      rcppForest <- rcpp_cppBuildInterface(
+        processed_x, y,
+        categoricalFeatureCols_cpp,
+        nObservations,
+        numColumns, ntree, replace, sampsize, mtry,
+        splitratio, nodesizeSpl, nodesizeAvg, seed,
+        nthread, verbose, middleSplit, TRUE, rcppDataFrame
+      )
+      return(
+        new(
+          "honestRF",
+          forest=rcppForest,
+          dataframe=rcppDataFrame,
+          categoricalFeatureCols=categoricalFeatureCols,
+          categoricalFeatureMapping=categoricalFeatureMapping,
+          ntree=ntree,
+          replace=replace,
+          sampsize=sampsize,
+          mtry=mtry,
+          nodesizeSpl=nodesizeSpl,
+          nodesizeAvg=nodesizeAvg,
+          splitratio=splitratio,
+          middleSplit=middleSplit
+        )
+      )
+    }, error = function(err) {
+      print(err)
+      return(NULL)
+    })
+
+  } else {
+
+    categoricalFeatureCols_cpp <- unlist(reuseHonestRF@categoricalFeatureCols)
+    if (is.null(categoricalFeatureCols_cpp)){
+      categoricalFeatureCols_cpp <- vector(mode="numeric", length=0)
+    } else {
+      categoricalFeatureCols_cpp <- categoricalFeatureCols_cpp - 1
+    }
+
+    categoricalFeatureMapping <- reuseHonestRF@categoricalFeatureMapping
+
+    # Create rcpp object
+    # Create a forest object
+    forest <- tryCatch({
+      rcppForest <- rcpp_cppBuildInterface(
+        x, y,
+        categoricalFeatureCols_cpp,
+        nObservations,
+        numColumns, ntree, replace, sampsize, mtry,
+        splitratio, nodesizeSpl, nodesizeAvg, seed,
+        nthread, verbose, middleSplit, TRUE, reuseHonestRF@dataframe
+      )
+
+      return(
+        new(
+          "honestRF",
+          forest=rcppForest,
+          dataframe=reuseHonestRF@dataframe,
+          categoricalFeatureCols=reuseHonestRF@categoricalFeatureCols,
+          categoricalFeatureMapping=categoricalFeatureMapping,
+          ntree=ntree,
+          replace=replace,
+          sampsize=sampsize,
+          mtry=mtry,
+          nodesizeSpl=nodesizeSpl,
+          nodesizeAvg=nodesizeAvg,
+          splitratio=splitratio,
+          middleSplit=middleSplit
+        )
+      )
+    }, error = function(err) {
+      print(err)
+      return(NULL)
+    })
+
+  }
 
   return(forest)
 }
@@ -407,7 +457,7 @@ setMethod(
   ){
 
     # Preprocess the data
-    testing_data_checker(object@x, feature.new)
+    testing_data_checker(feature.new)
 
     processed_x <- preprocess_testing(
       feature.new,
@@ -461,7 +511,7 @@ setMethod(
     # (all) TODO: find a better threshold for throwing such warning. 25 is
     # currently set up arbitrarily.
     if (!object@replace &&
-        object@ntree * (nrow(object@x) - object@sampsize) < 25) {
+        object@ntree * (rcpp_getObservationSizeInterface(object@dataframe) - object@sampsize) < 25) {
       if (!noWarning) {
         warning("Samples are drawn without replacement and sample size is too big!")
       }
@@ -541,8 +591,8 @@ setMethod(
 #' @param x A data frame of all training predictors.
 #' @param y A vector of all training responses.
 #' @param sampsize The size of total samples to draw for the training data.
-#' @param num_iter Maximum iterations/epochs per configuration. Default is 81.
-#' @param eta Downsampling rate. Default value is 3.
+#' @param num_iter Maximum iterations/epochs per configuration. Default is 1024.
+#' @param eta Downsampling rate. Default value is 2.
 #' @param verbose if tuning process in verbose mode
 #' @param seed random seed
 #' @param nthread Number of threads to train and predict thre forest. The
@@ -570,14 +620,17 @@ setGeneric(
 autohonestRF <- function(x,
                          y,
                          sampsize = as.integer(nrow(x) * 0.75),
-                         num_iter = 81,
-                         eta = 3,
+                         num_iter = 1024,
+                         eta = 2,
                          verbose = FALSE,
                          seed = 24750371,
                          nthread = 0) {
   if (verbose) {
     print("Start auto-tuning.")
   }
+
+  # Creat a dummy tree just to reuse its data.
+  dummy_tree <- honestRF(x, y, ntree=1, nodesizeSpl=nrow(x), nodesizeAvg=nrow(x))
 
   # Number of unique executions of Successive Halving (minus one)
   s_max <- as.integer(log(num_iter) / log(eta))
@@ -653,7 +706,8 @@ autohonestRF <- function(x,
           replace = allConfigs$replace[j],
           sampsize = sampsize,
           nthread = nthread,
-          middleSplit = allConfigs$middleSplit[j]
+          middleSplit = allConfigs$middleSplit[j],
+          reuseHonestRF=dummy_tree
         )
       }, error = function(err) {
         val_models[[j]] <- NULL
@@ -684,6 +738,9 @@ autohonestRF <- function(x,
           }
           if (!is.null(val_models[[j]])) {
             val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
+            if (is.na(val_losses[[j]])) {
+              val_losses[[j]] <- Inf
+            }
           } else {
             val_losses[[j]] <- Inf
           }
@@ -710,6 +767,9 @@ autohonestRF <- function(x,
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
       best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
+      if (is.na(best_OOB)) {
+        best_OOB <- Inf
+      }
     } else {
       best_OOB <- Inf
     }

@@ -6,8 +6,8 @@
 \alias{honestRF-method}
 \title{autohonestRF-honestRF}
 \usage{
-autohonestRF(x, y, sampsize = as.integer(nrow(x) * 0.75), num_iter = 81,
-  eta = 3, verbose = FALSE, seed = 24750371, nthread = 0)
+autohonestRF(x, y, sampsize = as.integer(nrow(x) * 0.75), num_iter = 1024,
+  eta = 2, verbose = FALSE, seed = 24750371, nthread = 0)
 }
 \value{
 A `honestRF` object

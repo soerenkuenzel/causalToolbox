@@ -20,7 +20,7 @@ honestRF::~honestRF(){
 };
 
 honestRF::honestRF(
-  std::unique_ptr<DataFrame> trainingData,
+  DataFrame* trainingData,
   size_t ntree,
   bool replace,
   size_t sampSize,
@@ -33,7 +33,7 @@ honestRF::honestRF(
   bool verbose,
   bool splitMiddle
 ){
-  this->_trainingData = std::move(trainingData);
+  this->_trainingData = trainingData;
   this->_ntree = 0;
   this->_replace = replace;
   this->_sampSize = sampSize;

@@ -14,7 +14,7 @@ public:
   virtual ~honestRF();
 
   honestRF(
-    std::unique_ptr<DataFrame> trainingData,
+    DataFrame* trainingData,
     size_t ntree,
     bool replace,
     size_t sampSize,
@@ -42,7 +42,7 @@ public:
   void addTrees(size_t ntree);
 
   DataFrame* getTrainingData() {
-    return _trainingData.get();
+    return _trainingData;
   }
 
   size_t getMtry() {
@@ -94,7 +94,7 @@ public:
   }
 
 private:
-  std::unique_ptr<DataFrame> _trainingData;
+  DataFrame* _trainingData;
   size_t _ntree;
   bool _replace;
   size_t _sampSize;

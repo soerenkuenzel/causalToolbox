@@ -12,9 +12,9 @@
 
 \item{sampsize}{The size of total samples to draw for the training data.}
 
-\item{num_iter}{Maximum iterations/epochs per configuration. Default is 81.}
+\item{num_iter}{Maximum iterations/epochs per configuration. Default is 1024.}
 
-\item{eta}{Downsampling rate. Default value is 3.}
+\item{eta}{Downsampling rate. Default value is 2.}
 
 \item{verbose}{if tuning process in verbose mode}
 
