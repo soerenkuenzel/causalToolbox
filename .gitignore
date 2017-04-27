@@ -22,3 +22,5 @@ inst/doc
 tests/memory/free_memory_Problem.R
 
 crashes/currentWS.RData
+
+DESCRIPTION.orig
