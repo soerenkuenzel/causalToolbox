@@ -10,7 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread = 8
+nthread = 0
 
 library(CATEestimators)
 library(hte)
@@ -145,10 +145,18 @@ data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
-  paste0(data_folder_name, "MSE_rates_", setup, "_", Sys.Date(), ".csv")
-if (file.exists(filename))
-  file.remove(filename)
+  paste0(data_folder_name, "MSE_rates_", setup, ".csv")
+# if (file.exists(filename))
+#   file.remove(filename)
 
+if (file.exists(filename)){
+  already_ran <- read.csv(filename)
+  #already_ran <- already_ran[!is.na(already_ran[,"MSE"]), ] #only if not NA
+  already_ran <- already_ran[ , c("seed", "alpha", "dim", "ntrain", "estimator")]
+  for(i in 1:ncol(already_ran)){
+    already_ran[ ,i] <- as.character(already_ran[ ,i])
+  }
+}
 
 ## loop through all cases:
 for (seed in seed_grid) {
@@ -184,6 +192,16 @@ for (seed in seed_grid) {
           CATEpredictor <- CATEpredictor_grid[[estimator_i]]
           estimator_name <- names(estimator_grid)[estimator_i]
 
+          #### check if entry already exists, if yes, do next:
+          if(exists("already_ran") &&
+             (paste(c(seed, alpha, dim, ntrain, paste0(estimator_name, packageVersion("hte"))), collapse = ",") %in%
+              apply(already_ran, 1, function(x) paste(x, collapse =",")))){
+            print(paste(c(seed, alpha, dim, ntrain, estimator_name),
+                        "already existed. Running next setting."))
+            next
+          }
+
+
           start_time <- Sys.time()
 
           tryCatch({
@@ -213,6 +231,7 @@ for (seed in seed_grid) {
             as.numeric(difftime(Sys.time(), start_time, tz, units = "mins"))
 
           Residuals <- data.frame(
+            seed = seed,
             ntrain = ntrain,
             dim = dim,
             setup = setup,
