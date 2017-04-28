@@ -7,10 +7,9 @@
 \title{T_RF Constructor}
 \usage{
 T_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
-  replace = TRUE, ntree = 5000, sample_fraction = 0.9, nthread = 4,
+  replace = TRUE, ntree = 500, sample_fraction = 0.9, nthread = 4,
   splitratio = 0.5)
 }
 \value{
 A `T_RF` object.
 }
-

@@ -3,6 +3,7 @@
 \docType{data}
 \name{selectBestFeature}
 \alias{selectBestFeature}
+\alias{selectBestFeature}
 \alias{selectBestFeature,}
 \alias{selectBestFeature-method}
 \title{selectBestFeature}
@@ -63,4 +64,3 @@ exactly the same.
 Update the oldFeature value before proceeding
 }
 \keyword{datasets}
-

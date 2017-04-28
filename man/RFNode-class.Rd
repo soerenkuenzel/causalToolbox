@@ -2,8 +2,8 @@
 % Please edit documentation in R/RFNode.R
 \docType{class}
 \name{RFNode-class}
-\alias{RFNode}
 \alias{RFNode-class}
+\alias{RFNode}
 \title{RFNode Constructor}
 \format{An object of class \code{NULL} of length 0.}
 \arguments{
@@ -62,5 +62,5 @@ node.}
 
 \item{\code{nAverage}}{Number of observations in the averaging dataset in this node.}
 }}
-\keyword{datasets}
 
+\keyword{datasets}

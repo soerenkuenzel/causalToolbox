@@ -355,7 +355,7 @@ simulate_causal_experiment <- function(ntrain,
 
     current_seed <- .Random.seed  # saves the current random stage
     set.seed(1444)                # introduces a new seed to stay consistent
-    beat_raw <- runif(dim, 1, 30)
+    beat_raw <- runif(dim, 1, 5)
     .Random.seed <-
       current_seed  # sets back the current random stage
 

@@ -2,8 +2,8 @@
 % Please edit documentation in R/honestRF.R
 \docType{methods}
 \name{addTrees,honestRF-method}
-\alias{addTrees,}
 \alias{addTrees,honestRF-method}
+\alias{addTrees,}
 \alias{honestRF-method}
 \title{addTrees-honestRF}
 \usage{
@@ -12,4 +12,3 @@
 \value{
 A `honestRF` object
 }
-

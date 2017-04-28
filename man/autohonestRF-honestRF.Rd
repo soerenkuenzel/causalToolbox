@@ -29,4 +29,3 @@ is based on paper `Hyperband: A Novel Bandit-Based Approach to
 Hyperparameter Optimization` by Lisha Li, et al.
 }
 \keyword{datasets}
-

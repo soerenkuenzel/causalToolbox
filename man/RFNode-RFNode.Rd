@@ -13,4 +13,3 @@ RFNode(sampleIndex = list(averagingSampleIndex = vector(),
 \value{
 a `RFNode` object
 }
-

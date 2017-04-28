@@ -2,8 +2,8 @@
 % Please edit documentation in R/Shrf.R
 \docType{methods}
 \name{EstimateCate-S_hRF}
-\alias{EstimateCate,}
 \alias{EstimateCate-S_hRF}
+\alias{EstimateCate,}
 \alias{S_hRF-method}
 \title{EstimateCate-S_hRF}
 \usage{
@@ -20,4 +20,3 @@ A vector of predicted CATE
 \description{
 Return the estimated CATE
 }
-

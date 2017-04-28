@@ -6,9 +6,11 @@ library(reshape)
 library(dplyr)
 
 # read in the data
-datafolder <- "tests/performance/CATEestimators/sim_data/"
+datafolder <- "tests/performance/CATEestimators/sim_data/all/"
 Results <- data.frame()
 for (filename in dir(datafolder)) {
+  # l_filename <- nchar(filename)
+  # if(substr(filename, l_filename-6, l_filename-4) != "ggr") next
   newResults <- read.csv(paste0(datafolder, filename))
   Results <- rbind(Results, newResults)
   print(filename)
@@ -34,7 +36,7 @@ estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_
 for (this_setup in unique(Results$setup)) {
   plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
   Results %>% filter(setup == this_setup) %>%
-    filter(estimator %in% estimator_subset) %>%
+    # filter(estimator %in% estimator_subset) %>%
     group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
     summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
     filter(dim %in% c(5, 20, 100), alpha %in% c(0, 0.1, 10)) %>%
@@ -54,7 +56,9 @@ for (this_setup in unique(Results$setup)) {
     facet_wrap( ~ dima, scales = "free", ncol = plot_ncol) +
     scale_y_log10() +
     ggtitle(this_setup) +
-    theme_minimal()
+    theme_minimal() +
+    geom_text(aes(label = estimator))
+
 
   # scale_shape_manual(values = LETTERS[1:26]) +
   # coord_cartesian(xlim = NULL, ylim = NULL) +
@@ -99,9 +103,7 @@ for (this_setup in unique(Results$setup)) {
     geom_line() +
     geom_point(aes(shape = estimator), size = 1) +
     scale_y_log10() +
-    ggtitle(this_setup) +
-    theme_minimal()
-
+    ggtitle(this_setup)
   ggsave(
     paste0(
       "tests/performance/CATEestimators/sim_figures/singleplot_",

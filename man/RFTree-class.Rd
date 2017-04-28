@@ -2,8 +2,8 @@
 % Please edit documentation in R/RFTree.R
 \docType{class}
 \name{RFTree-class}
-\alias{RFTree}
 \alias{RFTree-class}
+\alias{RFTree}
 \title{RFTree Constructor}
 \format{An object of class \code{NULL} of length 0.}
 \arguments{
@@ -54,5 +54,5 @@ dataset.}
 \item{\code{root}}{A `RFNode` object which is the root of the tree. If the class is
 extended, the list may contain the corresponding extended `RFNode` object.}
 }}
-\keyword{datasets}
 
+\keyword{datasets}

@@ -2,10 +2,10 @@
 % Please edit documentation in R/RFNode.R
 \docType{methods}
 \name{printnode-RFNode}
-\alias{RFNode-method}
-\alias{printnode,}
-\alias{printnode,RFNode-method}
 \alias{printnode-RFNode}
+\alias{printnode,RFNode-method}
+\alias{printnode,}
+\alias{RFNode-method}
 \title{printnode-RFNode}
 \usage{
 printnode(object, indentSpace = 0)
@@ -22,4 +22,3 @@ output. The initial value is 0. Once the tree grows, it increments by 2.}
 Print the type of the node and its prediction. If it is a tree
 node, it will recursively print all its children.
 }
-

@@ -2,8 +2,8 @@
 % Please edit documentation in R/honestRF.R
 \docType{methods}
 \name{getOOB,honestRF-method}
-\alias{getOOB,}
 \alias{getOOB,honestRF-method}
+\alias{getOOB,}
 \alias{honestRF-method}
 \title{getOOB-honestRF}
 \usage{
@@ -12,4 +12,3 @@
 \value{
 The OOB error of the forest.
 }
-
