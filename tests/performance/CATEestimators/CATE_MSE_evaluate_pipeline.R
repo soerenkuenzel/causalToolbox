@@ -36,14 +36,18 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- c(20, 100)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 4, by = .5))
+dim_grid <- c(5, 20, 100)
+ntrain_grid <- round(10 ^ seq(from = 4.5, to = 6, by = .5))
 if (setup == "rare1"){
-   ntrain_grid <- round(10 ^ seq(from = 3.5, to = 5, by = .5))
+   ntrain_grid <- round(10 ^ seq(from = 3.5, to = 5.5, by = .5))
 }
+if (setup == "Ufail"){
+   dim_grid[dim_grid < 6] <- 6
+}
+
 ntest <- 10000
 seed_grid <- 1:100
-alpha_grid <- c(0, .1)
+alpha_grid <- c(0, .1, 1)
 
 estimator_grid <- list(
   "S_RF" = function(feat, W, Yobs)
@@ -51,22 +55,22 @@ estimator_grid <- list(
   "T_RF" = function(feat, W, Yobs)
     T_RF(feat, W, Yobs, nthread = nthread),
   "X_RF" = function(feat, W, Yobs)
-    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
-  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
-    X_RF_autotune_hyperband(
-      feat = feat,
-      tr = W,
-      yobs = Yobs,
-      num_iter = 3 ^ 8,
-      verbose = FALSE
-    ),
-  "X_RF_autotune_simple" = function(feat, W, Yobs)
-    X_RF_autotune_simple(
-      feat = feat,
-      tr = W,
-      yobs = Yobs,
-      verbose = FALSE
-    ),
+    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)#,
+#  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
+#    X_RF_autotune_hyperband(
+#      feat = feat,
+#      tr = W,
+#      yobs = Yobs,
+#      num_iter = 3 ^ 8,
+#      verbose = FALSE
+#    ),
+#  "X_RF_autotune_simple" = function(feat, W, Yobs)
+#    X_RF_autotune_simple(
+#      feat = feat,
+#      tr = W,
+#      yobs = Yobs,
+#      verbose = FALSE
+#    ),
 #  "X_RF_autotune_gpp" = function(feat, W, Yobs)
 #    X_RF_autotune_gpp(
 #      feat = feat,
@@ -76,12 +80,12 @@ estimator_grid <- list(
 #      n_iter = 20,
 #      verbose = FALSE
 #    ),
-  "S_BART" = function(feat, W, Yobs)
-    S_BART(feat, W, Yobs),
-  "T_BART" = function(feat, W, Yobs)
-    T_BART(feat, W, Yobs),
-  "X_BART" = function(feat, W, Yobs)
-    X_BART(feat, W, Yobs)
+#  "S_BART" = function(feat, W, Yobs)
+#    S_BART(feat, W, Yobs),
+#  "T_BART" = function(feat, W, Yobs)
+#    T_BART(feat, W, Yobs),
+#  "X_BART" = function(feat, W, Yobs)
+#    X_BART(feat, W, Yobs)
   # "CF_p" = function(feat, W, Yobs) {
   #   feat <- as.matrix(feat)
   #   colnames(feat) <- NULL
