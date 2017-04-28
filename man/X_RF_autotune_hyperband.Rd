@@ -49,4 +49,3 @@ This function tunes
 \seealso{
 \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 }
-

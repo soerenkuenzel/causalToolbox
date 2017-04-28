@@ -32,7 +32,7 @@ X_RF_autotune_simple <-
   function(feat,
            tr,
            yobs,
-           ntree = 20000,
+           ntree = 2000,
            nthread = 0,
            verbose = TRUE) {
     starting_settings <- get_starting_settings(feat = feat, tr = tr,
@@ -71,7 +71,7 @@ check_setups <-
            feat,
            tr,
            yobs,
-           ntree = 20000,
+           ntree = 2000,
            nthread = 0,
            verbose = TRUE) {
     # define starting points 1 and 2

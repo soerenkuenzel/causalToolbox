@@ -2,9 +2,9 @@
 % Please edit documentation in R/RFTree.R
 \docType{methods}
 \name{predict-RFTree}
-\alias{RFTree-method}
-\alias{predict,}
 \alias{predict-RFTree}
+\alias{predict,}
+\alias{RFTree-method}
 \title{predict-RFTree}
 \usage{
 \S4method{predict}{RFTree}(object, feature.new, x, y, avgfunc,
@@ -33,4 +33,3 @@ A vector of predicted responses.
 \description{
 Return the prediction from the current tree.
 }
-

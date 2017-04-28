@@ -2,9 +2,9 @@
 % Please edit documentation in R/RFNode.R
 \docType{methods}
 \name{predict-RFNode}
-\alias{RFNode-method}
-\alias{predict,}
 \alias{predict-RFNode}
+\alias{predict,}
+\alias{RFNode-method}
 \title{predict-RFNode}
 \usage{
 \S4method{predict}{RFNode}(object, feature.new, x, y, avgfunc,
@@ -35,4 +35,3 @@ Return the prediction from the current node if it is a leaf
 node, otherwise it will recursively call its children according to the
 `splitFeature` and `splitValue`.
 }
-

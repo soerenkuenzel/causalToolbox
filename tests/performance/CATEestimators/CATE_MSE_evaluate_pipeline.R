@@ -200,7 +200,7 @@ for (seed in seed_grid) {
           if(exists("already_ran") &&
              (paste(c(seed, alpha, dim, ntrain, paste0(estimator_name, packageVersion("hte"))), collapse = ",") %in%
               apply(already_ran, 1, function(x) paste(x, collapse =",")))){
-            print(paste(c(seed, alpha, dim, ntrain, estimator_name),
+            print(paste(paste(c(seed, alpha, dim, ntrain, estimator_name), collapse = ","),
                         "already existed. Running next setting."))
             next
           }

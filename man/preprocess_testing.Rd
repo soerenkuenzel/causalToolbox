@@ -25,4 +25,3 @@ converting data to dataframe, and testing if the columns are consistent
 with the training data and encoding categorical data into numerical
 representation in the same way as training data.
 }
-

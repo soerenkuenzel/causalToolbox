@@ -23,4 +23,3 @@ This function uses the C-vine method for simulating correlation
   vines and extended onion method" by Daniel Lewandowskia, Dorota Kurowickaa,
   Harry Joe
 }
-

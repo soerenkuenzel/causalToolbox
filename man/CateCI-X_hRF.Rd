@@ -2,8 +2,8 @@
 % Please edit documentation in R/CATE_estimators.R
 \docType{methods}
 \name{CateCI-X_hRF}
-\alias{CateCI,}
 \alias{CateCI-X_hRF}
+\alias{CateCI,}
 \alias{X_hRF-method}
 \title{CateCI-X_hRF}
 \usage{
@@ -28,4 +28,3 @@ A data frame of estimated CATE Confidence Intervals
 \description{
 Return the estimated confidence intervals for the CATE
 }
-

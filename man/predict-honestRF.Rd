@@ -2,9 +2,9 @@
 % Please edit documentation in R/honestRF.R
 \docType{methods}
 \name{predict-honestRF}
-\alias{honestRF-method}
-\alias{predict,}
 \alias{predict-honestRF}
+\alias{predict,}
+\alias{honestRF-method}
 \title{predict-honestRF}
 \usage{
 \S4method{predict}{honestRF}(object, feature.new)
@@ -20,4 +20,3 @@ A vector of predicted responses.
 \description{
 Return the prediction from the forest.
 }
-

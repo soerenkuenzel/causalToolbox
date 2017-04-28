@@ -43,7 +43,7 @@ X_RF_autotune_gpp <-
   function(feat,
            tr,
            yobs,
-           ntree = 5000,
+           ntree = 2000,
            init_points = 20,
            n_iter = 100,
            nthread = 0,

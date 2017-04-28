@@ -2,9 +2,9 @@
 % Please edit documentation in R/honestRF_R.R
 \docType{data}
 \name{honestRF_R-honestRF_R}
+\alias{honestRF_R-honestRF_R}
 \alias{honestRF_R}
 \alias{honestRF_R,}
-\alias{honestRF_R-honestRF_R}
 \alias{honestRF_R-method}
 \title{honestRF_R Constructor}
 \format{An object of class \code{NULL} of length 0.}
@@ -66,4 +66,3 @@ A `honestRF_R` object.
 Initialize a `honestRF_R` object.
 }
 \keyword{datasets}
-

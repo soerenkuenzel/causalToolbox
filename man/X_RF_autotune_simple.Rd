@@ -4,7 +4,7 @@
 \alias{X_RF_autotune_simple}
 \title{Simple Autotuning for X-Learner with honest RF}
 \usage{
-X_RF_autotune_simple(feat, tr, yobs, ntree = 20000, nthread = 0,
+X_RF_autotune_simple(feat, tr, yobs, ntree = 2000, nthread = 0,
   verbose = TRUE)
 }
 \arguments{
@@ -41,4 +41,3 @@ testing which of 11 prespecified settings seems to be the best
 \code{\link{X_RF_autotune_gpp}},
 \code{\link{X_RF_autotune_hyperband}}
 }
-

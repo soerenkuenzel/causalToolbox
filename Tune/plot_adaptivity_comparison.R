@@ -64,7 +64,7 @@ tuning_settings[["X-learner"]] %>%
 tuningsettings_outcomes <- rbind(
   cbind(tuning_settings[["S-learner"]][, 9:19], estimator = "S-learner"),
   cbind(tuning_settings[["T-learner"]][, 9:19], estimator = "T-learner"),
-  cbind(tuning_settings[["X-learner"]][, 15:25], estimator = "X-learner")
+  cbind(tuning_settings[["X-learner"]][, 24:34], estimator = "X-learner")
 ) %>% tbl_df()
 
 # Searching for good settings:
@@ -123,26 +123,42 @@ rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
 
 
 
-rbind(tuningsettings_outcomes %>% filter(estimator != "X-learner"),
-      tuningsettings_outcomes %>% filter(estimator == "X-learner") %>%
-        sample_n(4000)) %>%
+tuningsettings_outcomes_chosen <- tuningsettings_outcomes %>%
+  filter(Wager1 < .04)
+
+n <- 5
+set.seed(10)
+rbind(tuningsettings_outcomes_chosen %>% filter(estimator == "T-learner") %>%
+        filter((!is.na(Wager1)) & (!is.na(complexTau))) %>%
+       mutate(complexTau = complexTau + 200),
+      tuningsettings_outcomes_chosen %>% filter(estimator == "S-learner") %>%
+        filter((!is.na(Wager1)) & (!is.na(complexTau))),
+      tuningsettings_outcomes_chosen %>% filter(estimator == "X-learner") %>%
+        filter((!is.na(Wager1)) & (!is.na(complexTau)))) %>%
+  group_by(estimator) %>% sample_n(5) %>% ungroup -> subsample
+
+  subsample[1,] %>%
   mutate(Estimator = estimator) %>%
-  filter(Wager1 < .04) %>%
   ggplot(aes(x = complexTau, y = Wager1, color = Estimator)) +
   geom_point(alpha = .5) +
   scale_color_manual(values = c("green", "chocolate", "blue")) +
   theme_minimal() +
   xlab("MSE for Complex Treatment Effect and no Confounding") +
-  ylab("MSE for Simple Treatment Effect with Confounding")
-
+  ylab("MSE for Simple Treatment Effect with Confounding") +
+  xlim(c(1300, 4000)) +
+  ylim(c(0, 0.04))
 
 ggsave(
   paste0("Tune/adaptivityfigue",
-         Sys.Date(),
+         "OnlyS",
          ".pdf"),
   height = 5,
   width = 6
 )
+
+
+
+
 
 ggsave(
   paste0("Tune/adaptivityfigue",

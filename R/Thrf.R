@@ -84,7 +84,7 @@ T_RF <-
            nodesizeSpl = 1,
            nodesizeAvg = 3,
            replace = TRUE,
-           ntree = 5000,
+           ntree = 500,
            sample_fraction = 0.9,
            nthread = 4,
            splitratio = .5) {
