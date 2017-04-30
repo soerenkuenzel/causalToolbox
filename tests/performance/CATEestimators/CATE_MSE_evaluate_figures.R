@@ -9,6 +9,8 @@ library(dplyr)
 datafolder <- "tests/performance/CATEestimators/sim_data/"
 Results <- data.frame()
 for (filename in dir(datafolder)) {
+  l_filename <- nchar(filename)
+  if(substr(filename, l_filename - 5, l_filename- 4) != "26") next
   newResults <- read.csv(paste0(datafolder, filename))
   Results <- rbind(Results, newResults)
   print(filename)
@@ -29,12 +31,13 @@ cols <- c(
 
 unique(Results$estimator)
 estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_autotune0.1.0.3")
+estimator_subset <- c("S_BART0.1.5.0", "T_BART0.1.5.0", "X_BART0.1.5.0")
 
 # Summary plots:
 for (this_setup in unique(Results$setup)) {
   plot_ncol <- length(unique(Results$dim[Results$setup == this_setup]))
   Results %>% filter(setup == this_setup) %>%
-    filter(estimator %in% estimator_subset) %>%
+    # filter(estimator %in% estimator_subset) %>%
     group_by(ntrain, dim, setup, alpha, feat_distribution, estimator) %>%
     summarize(n = n(), MSE = mean(MSE)) %>% filter(!is.na(MSE)) %>% ungroup() %>%
     filter(dim %in% c(5, 20, 100), alpha %in% c(0, 0.1, 10)) %>%
@@ -54,7 +57,8 @@ for (this_setup in unique(Results$setup)) {
     facet_wrap( ~ dima, scales = "free", ncol = plot_ncol) +
     scale_y_log10() +
     ggtitle(this_setup) +
-    theme_minimal()
+    theme_minimal() +
+    geom_text(aes(label = estimator))
 
   # scale_shape_manual(values = LETTERS[1:26]) +
   # coord_cartesian(xlim = NULL, ylim = NULL) +
