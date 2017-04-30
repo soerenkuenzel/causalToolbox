@@ -36,18 +36,18 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- c(5, 20, 100)
-ntrain_grid <- round(10 ^ seq(from = 4.5, to = 6, by = .5))
+dim_grid <- 20
+ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .5))
 if (setup == "rare1"){
-   ntrain_grid <- round(10 ^ seq(from = 3.5, to = 5.5, by = .5))
+   ntrain_grid <- round(10 ^ seq(from = 4, to = 6, by = .5))
 }
 if (setup == "Ufail"){
    dim_grid[dim_grid < 6] <- 6
 }
 
 ntest <- 10000
-seed_grid <- 1:100
-alpha_grid <- c(0, .1, 1)
+seed_grid <- 1:5
+alpha_grid <- .1
 
 estimator_grid <- list(
   "S_RF" = function(feat, W, Yobs)
