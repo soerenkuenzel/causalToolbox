@@ -5,7 +5,7 @@
 \title{Gaussian Process optimization for the X-Learner with honest RF for
   both stages}
 \usage{
-X_RF_autotune_gpp(feat, tr, yobs, ntree = 5000, init_points = 20,
+X_RF_autotune_gpp(feat, tr, yobs, ntree = 2000, init_points = 20,
   n_iter = 100, nthread = 0, verbose = TRUE, ...)
 }
 \arguments{

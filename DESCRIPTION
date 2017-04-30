@@ -12,11 +12,18 @@ Description: Estimate heterogeneous treatment effects in experimental and
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 0.12.9), foreach, doParallel, parallel, plyr, MASS (>= 7.3.0), rBayesianOptimization
+Imports:
+    Rcpp (>= 0.12.9),
+    foreach,
+    doParallel,
+    parallel,
+    plyr,
+    MASS (>= 7.3.0),
+    rBayesianOptimization
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 SystemRequirements: C++11
-Collate: 
+Collate:
     'honestRF.R'
     'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
@@ -32,7 +39,8 @@ Collate:
     'Xhrf_autotune_hyperband.R'
     'honestRFTree.R'
     'honestRF_R.R'
-Suggests: testthat,
+Suggests:
+    testthat,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
