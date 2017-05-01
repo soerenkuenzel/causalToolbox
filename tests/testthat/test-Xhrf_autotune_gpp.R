@@ -1,3 +1,5 @@
+library(testthat)
+
 test_that("Tests test-Xhrf_gpp", {
   set.seed(1423614230)
 
@@ -68,11 +70,11 @@ test_that("Tests test-Xhrf_gpp", {
                0.1265767,
                tolerance = 1e-5)
 
-
+  set.seed(11122)
   CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
   expect_equal(CI[2, 3],
-               0.2659216,
-               tolerance = 1e-5)
+               0.2554263,
+               tolerance = 1e-3)
 
   ## Example for changing internal parameters of GPfit::GP_fit and
   ## rBayesianOptimization::BayesianOptimization

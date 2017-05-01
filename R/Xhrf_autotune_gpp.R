@@ -161,10 +161,17 @@ Test_Fun_generic <- function(starting_point,
     round(nodesizeSpl_second)
   )
 
-  evalval <-
-    mean(as.numeric(evaluate_setting(current_setting, feat, tr, yobs)[1, ]))
+  OOB_errors <- as.numeric(evaluate_setting(current_setting, feat, tr, yobs)[1, ])
 
-  return(list(Score = -evalval,
+  error_tau_0 <- OOB_errors[2] + OOB_errors[3]
+  error_tau_1 <- OOB_errors[1] + OOB_errors[4]
+  total_error <- best_MSE_constant(error_tau_0, error_tau_1)
+
+
+  # evalval <-
+  #   mean(as.numeric(evaluate_setting(current_setting, feat, tr, yobs)[1, ]))
+
+  return(list(Score = - total_error,
               Pred = 0))
 }
 
