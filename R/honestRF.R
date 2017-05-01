@@ -511,7 +511,7 @@ setMethod(
     # (all) TODO: find a better threshold for throwing such warning. 25 is
     # currently set up arbitrarily.
     if (!object@replace &&
-        object@ntree * (rcpp_getObservationSizeInterface(object@dataframe) - object@sampsize) < 25) {
+        object@ntree * (rcpp_getObservationSizeInterface(object@dataframe) - object@sampsize) < 10) {
       if (!noWarning) {
         warning("Samples are drawn without replacement and sample size is too big!")
       }
@@ -680,12 +680,21 @@ autohonestRF <- function(x,
     # Generate parameters:
     allConfigs <- data.frame(
       mtry = sample(1:ncol(x), n, replace = TRUE),
-      min_node_size_spl = sample(1:min(30, nrow(x)), n, replace = TRUE),
-      min_node_size_ave = sample(1:min(30, nrow(x)), n, replace = TRUE),
+      min_node_size_spl = NA, #sample(1:min(30, nrow(x)), n, replace = TRUE),
+      min_node_size_ave = NA, #sample(1:min(30, nrow(x)), n, replace = TRUE),
       splitratio = runif(n, min = 0.1, max = 1),
       replace = sample(c(TRUE, FALSE), n, replace = TRUE),
       middleSplit = sample(c(TRUE, FALSE), n, replace = TRUE)
     )
+
+    min_node_size_spl_raw <- floor(allConfigs$splitratio * sampsize *
+                                     rbeta(n, 1, 3))
+    allConfigs$min_node_size_spl <- ifelse(min_node_size_spl_raw == 0, 1,
+                                           min_node_size_spl_raw)
+    min_node_size_ave <- floor((1 - allConfigs$splitratio) * sampsize *
+                                     rbeta(n, 1, 3))
+    allConfigs$min_node_size_ave <- ifelse(min_node_size_ave == 0, 1,
+                                           min_node_size_ave)
 
     if (verbose) {
       print(paste(">>>", n, " configurations have been generated."))
@@ -768,9 +777,11 @@ autohonestRF <- function(x,
     if (!is.null(val_models[[1]])) {
       best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
       if (is.na(best_OOB)) {
+        stop()
         best_OOB <- Inf
       }
     } else {
+      stop()
       best_OOB <- Inf
     }
     if (verbose) {

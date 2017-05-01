@@ -1,3 +1,4 @@
+library(testthat)
 test_that("Tests X_RF_autotune_hyperband", {
   set.seed(1423614230)
 
@@ -11,21 +12,25 @@ test_that("Tests X_RF_autotune_hyperband", {
   seed <- 24750371
   nthread <- 1
 
-  xl <- X_RF_autotune_hyperband(
-    feat = feat,
-    tr = tr,
-    yobs = yobs,
-    sample.fraction = sample.fraction,
-    num_iter = num_iter,
-    eta = eta,
-    verbose = FALSE,
-    seed = seed,
-    nthread = nthread
+  expect_warning(
+    xl <- X_RF_autotune_hyperband(
+      feat = feat,
+      tr = tr,
+      yobs = yobs,
+      sample.fraction = sample.fraction,
+      num_iter = num_iter,
+      eta = eta,
+      verbose = FALSE,
+      seed = seed,
+      nthread = nthread
+    ),
+    "honestRF is used as adaptive random forest."
   )
 
 
+
   expect_equal(EstimateCate(xl, feat)[1],
-               0.1218615,
+               0.3294971,
                tolerance = 1e-7)
 
 
@@ -54,6 +59,6 @@ test_that("Tests X_RF_autotune_hyperband", {
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  923.5349,
+  196.7121,
   tolerance = 1e-5)
 })
