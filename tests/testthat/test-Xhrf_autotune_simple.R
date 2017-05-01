@@ -1,3 +1,4 @@
+library(testthat)
 test_that("Tests test-Xhrf_autotune_simple", {
   set.seed(1423614230)
 
@@ -35,7 +36,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
     "honestRF is used as adaptive random forest."
   )
 
-  expect_equal(setup_check[1, 2], 13.0549, tolerance = 1e-4)
+  expect_equal(setup_check[1, 2], 13.0549, tolerance = 1e-5)
   ### Test 2:
   set.seed(432)
   cate_problem <-
@@ -68,7 +69,8 @@ test_that("Tests test-Xhrf_autotune_simple", {
   383.9136, tolerance = 1e-5)
 
 
-    CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
+  CATE_ci <-
+    CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
 
   expect_equal(CATE_ci[2, 2],
                -6.518795,
