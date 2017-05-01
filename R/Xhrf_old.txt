@@ -21,9 +21,9 @@
 #' @slot m_tau_1 contains an honest random forest predictor for the treated
 #' group of the second stage.
 #' @slot m_prop contains an honest random forest predictor the propensity score.
-#' @slot relevant_Variable_first contains the indices of variables, which are only used in
+#' @slot firststageVar contains the indices of variables, which are only used in
 #' the first stage.
-#' @slot relevant_Variable_second contains the numbers of variables, which are only used
+#' @slot secondstageVar contains the numbers of variables, which are only used
 #' in the second stage.
 #' @exportClass X_RF
 setClass(
@@ -39,8 +39,8 @@ setClass(
     m_tau_1 = "honestRF",
     m_prop = "honestRF",
     predmode = "character",
-    relevant_Variable_first = "numeric",
-    relevant_Variable_second = "numeric",
+    firststageVar = "numeric",
+    secondstageVar = "numeric",
     creator = "function"
   )
 )
@@ -57,8 +57,8 @@ setClass(
 #' @param predmode One of propmean, control, treated, extreme. It specifies how
 #' the two estimators of the second stage should be aggregated. The default is
 #' propmean which refers to propensity score weighting.
-#' @param relevant_Variable_first Variables which are only used in the first stage.
-#' @param relevant_Variable_second Variables which are only used in the second stage.
+#' @param firststageVar Variables which are only used in the first stage.
+#' @param secondstageVar Variables which are only used in the second stage.
 #' @param ntree_first Numbers of trees in the first stage.
 #' @param ntree_second Numbers of trees in the second stage.
 #' @param mtry_first Numbers of trees in the second stage.
@@ -86,41 +86,28 @@ setClass(
 #' @export X_RF
 setGeneric(
   name = "X_RF",
-  def = function(
-    feat,
-    tr,
-    yobs,
-    predmode,
-    relevant_Variable_first,
-    relevant_Variable_second,
-    relevant_Variable_prop,
-    ntree_first,
-    ntree_second,
-    ntree_prop,
-    mtry_first,
-    mtry_second,
-    mtry_prop,
-    min_node_size_spl_first,
-    min_node_size_ave_first,
-    min_node_size_spl_second,
-    min_node_size_ave_second,
-    min_node_size_spl_prop,
-    min_node_size_ave_prop,
-    splitratio_first,
-    splitratio_second,
-    splitratio_prop,
-    replace_first,
-    replace_second,
-    replace_prop,
-    sample_fraction_first,
-    sample_fraction_second,
-    sample_fraction_prop,
-    nthread,
-    middleSplit_first,
-    middleSplit_second,
-    middleSplit_prop,
-    verbose
-  ) {
+  def = function(feat,
+                 tr,
+                 yobs,
+                 predmode,
+                 firststageVar,
+                 secondstageVar,
+                 ntree_first,
+                 ntree_second,
+                 mtry_first,
+                 mtry_second,
+                 min_node_size_spl_first,
+                 min_node_size_ave_first,
+                 min_node_size_spl_second,
+                 min_node_size_ave_second,
+                 splitratio_first,
+                 splitratio_second,
+                 replace_first,
+                 replace_second,
+                 sample_fraction_first,
+                 sample_fraction_second,
+                 nthread,
+                 verbose) {
     standardGeneric("X_RF")
   }
 )
@@ -134,50 +121,39 @@ X_RF <-
            tr,
            yobs,
            predmode = "propmean",
-           relevant_Variable_first = 1:ncol(feat),
-           relevant_Variable_second = 1:ncol(feat),
-           relevant_Variable_prop = 1:ncol(feat),
+           firststageVar = NULL,
+           secondstageVar = NULL,
            ntree_first = 500,
            ntree_second = 500,
-           ntree_prop = 500,
            mtry_first = round(ncol(feat) / 2),
            mtry_second = ncol(feat),
-           mtry_prop = max(floor(ncol(feat) / 3), 1),
            min_node_size_spl_first = 1,
            min_node_size_ave_first = 5,
            min_node_size_spl_second = 5,
            min_node_size_ave_second = 3,
-           min_node_size_spl_prop = 3,
-           min_node_size_ave_prop = 10,
            splitratio_first = .5,
            splitratio_second = .5,
-           splitratio_prop = .5,
            replace_first = TRUE,
            replace_second = TRUE,
-           replace_prop = TRUE,
            sample_fraction_first = 0.8,
            sample_fraction_second = 0.9,
-           sample_fraction_prop = 1,
            nthread = 4,
-           verbose = TRUE,
-           middleSplit_first = FALSE,
-           middleSplit_second = FALSE,
-           middleSplit_prop = FALSE) {
-    # if relevant_Variable_first is not set, then set it to select all:
+           verbose = TRUE) {
+    # if firststageVar is not set, then set it to select all:
     feat <- as.data.frame(feat)
-    if (is.null(relevant_Variable_first)) {
-      relevant_Variable_first <- 1:ncol(feat)
+    if (is.null(firststageVar)) {
+      firststageVar <- 1:ncol(feat)
     } else{
-      if (is.character(relevant_Variable_first))
-        relevant_Variable_first <-
-          which(colnames(feat) %in% relevant_Variable_first)
+      if (is.character(firststageVar))
+        firststageVar <-
+          which(colnames(feat) %in% firststageVar)
     }
-    if (is.null(relevant_Variable_second)) {
-      relevant_Variable_second <- 1:ncol(feat)
+    if (is.null(secondstageVar)) {
+      secondstageVar <- 1:ncol(feat)
     } else{
-      if (is.character(relevant_Variable_second))
-        relevant_Variable_second <-
-          which(colnames(feat) %in% relevant_Variable_second)
+      if (is.character(secondstageVar))
+        secondstageVar <-
+          which(colnames(feat) %in% secondstageVar)
     }
     if ((!is.null(mtry_first)) &&
         (mtry_first > ncol(feat))) {
@@ -199,81 +175,73 @@ X_RF <-
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
 
     m_0 <-
       honestRF(
-        x = X_0[, relevant_Variable_first],
+        x = X_0[, firststageVar],
         y = yobs_0,
         ntree = ntree_first,
         replace = replace_first,
-        # sampsize = ceiling(sample_fraction_first * length(yobs_0)),
-        sample.fraction = sample_fraction_first,
+        sampsize = round(sample_fraction_first * length(yobs_0)),
         mtry = mtry_first,
         nodesizeSpl = min_node_size_spl_first,
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_first,
-        nodesizeAvg = min_node_size_ave_first,
-        middleSplit = middleSplit_first
+        nodesizeAvg = min_node_size_ave_first
       )
 
     m_1 <-
       honestRF(
-        x = X_1[, relevant_Variable_first],
+        x = X_1[, firststageVar],
         y = yobs_1,
         ntree = ntree_first,
         replace = replace_first,
-        # sampsize = ceiling(sample_fraction_first * length(yobs_1)),
-        sample.fraction = sample_fraction_first,
+        sampsize = round(sample_fraction_first * length(yobs_1)),
         mtry = mtry_first,
         nodesizeSpl = min_node_size_spl_first,
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_first,
-        nodesizeAvg = min_node_size_ave_first,
-        middleSplit = middleSplit_first
+        nodesizeAvg = min_node_size_ave_first
       )
 
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- predict(m_1, X_0[, relevant_Variable_first]) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1[, relevant_Variable_first])
+    r_0 <- predict(m_1, X_0[, firststageVar]) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1[, firststageVar])
 
     m_tau_0 <-
       honestRF(
-        x = X_0[, relevant_Variable_second],
+        x = X_0[, secondstageVar],
         y = r_0,
         ntree = ntree_second,
         replace = replace_second,
-        # sampsize = ceiling(sample_fraction_second * length(r_0)),
-        sample.fraction = sample_fraction_second,
+        sampsize = round(sample_fraction_second * length(r_0)),
         mtry = mtry_second,
         nodesizeSpl = min_node_size_spl_second,
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_second,
-        nodesizeAvg = min_node_size_ave_second,
-        middleSplit = middleSplit_second
+        nodesizeAvg = min_node_size_ave_second
       )
 
     m_tau_1 <-
       honestRF(
-        x = X_1[, relevant_Variable_second],
+        x = X_1[, secondstageVar],
         y = r_1,
         ntree = ntree_second,
         replace = replace_second,
-        # sampsize = ceiling(sample_fraction_second * length(r_1)),
-        sample.fraction = sample_fraction_second,
+        sampsize = round(sample_fraction_second * length(r_1)),
         mtry = mtry_second,
         nodesizeSpl = min_node_size_spl_second,
         nthread = nthread,
         splitrule =  'variance',
         splitratio = splitratio_second,
-        nodesizeAvg = min_node_size_ave_second,
-        middleSplit = middleSplit_second
+        nodesizeAvg = min_node_size_ave_second
       )
     if (verbose) {
       print("Done with the second stage.")
@@ -281,19 +249,13 @@ X_RF <-
 
     m_prop <-
       honestRF(
-        x = feat[ , relevant_Variable_prop],
+        x = feat,
         y = tr,
-        mtry = mtry_prop,
-        nodesizeSpl = min_node_size_spl_prop,
-        nodesizeAvg = min_node_size_ave_prop,
-        splitratio = splitratio_prop,
-        replace = replace_prop,
-        # sampsize = ceiling(sample_fraction_prop * length(tr)),
-        sample.fraction = sample_fraction_prop,
-        ntree = ntree_prop,
+        ntree = 500,
         nthread = nthread,
-        middleSplit = middleSplit_prop
-        )
+        splitratio = .5,
+        nodesizeAvg = 10
+      )
     if (verbose) {
       print("Done with the propensity score estimation.")
     }
@@ -309,33 +271,31 @@ X_RF <-
         m_tau_1 = m_tau_1,
         m_prop = m_prop,
         predmode = predmode,
-        relevant_Variable_first = relevant_Variable_first,
-        relevant_Variable_second = relevant_Variable_second,
+        firststageVar = firststageVar,
+        secondstageVar = secondstageVar,
         creator = function(feat, tr, yobs) {
-          X_RF(
-            feat,
-            tr,
-            yobs,
-            predmode = predmode,
-            relevant_Variable_first = relevant_Variable_first,
-            relevant_Variable_second = relevant_Variable_second,
-            ntree_first = ntree_first,
-            ntree_second = ntree_second,
-            mtry_first = mtry_first,
-            mtry_second = mtry_second,
-            min_node_size_spl_first = min_node_size_spl_first,
-            min_node_size_ave_first = min_node_size_ave_first,
-            min_node_size_spl_second = min_node_size_spl_second,
-            min_node_size_ave_second = min_node_size_ave_second,
-            splitratio_first = splitratio_first,
-            splitratio_second = splitratio_second,
-            replace_first = replace_first,
-            replace_second = replace_second,
-            sample_fraction_first = sample_fraction_first,
-            sample_fraction_second = sample_fraction_second,
-            nthread = nthread,
-            verbose = FALSE
-          )
+          X_RF(feat,
+               tr,
+               yobs,
+               predmode = predmode,
+               firststageVar = firststageVar,
+               secondstageVar = secondstageVar,
+               ntree_first = ntree_first,
+               ntree_second = ntree_second,
+               mtry_first = mtry_first,
+               mtry_second = mtry_second,
+               min_node_size_spl_first = min_node_size_spl_first,
+               min_node_size_ave_first = min_node_size_ave_first,
+               min_node_size_spl_second = min_node_size_spl_second,
+               min_node_size_ave_second = min_node_size_ave_second,
+               splitratio_first = splitratio_first,
+               splitratio_second = splitratio_second,
+               replace_first = replace_first,
+               replace_second = replace_second,
+               sample_fraction_first = sample_fraction_first,
+               sample_fraction_second = sample_fraction_second,
+               nthread = nthread,
+               verbose = FALSE)
         }
       )
     )
