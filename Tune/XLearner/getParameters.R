@@ -36,6 +36,7 @@ best_setups <- data.frame()
 for (file in file_list_MSE) {
   # file = file_list_MSE[[1]]
   file <- file[order(as.numeric(as.data.frame(file)[, 25])),]
+  file$setup <- paste0(file$setup, "_MSE")
   best_setups <- rbind(best_setups, file[1, -25])
 }
 
@@ -43,6 +44,7 @@ for (file in file_list_CI) {
   # file = file_list_CI[[11]]
   file <- file[order(as.numeric(as.data.frame(file)[, 26]), decreasing = TRUE),]
   # file %>% as.data.frame() %>% head(5)
+  file$setup <- paste0(file$setup, "_CI")
 
   best_setups <- rbind(best_setups, file[1, -c(25, 26) ])
 }
