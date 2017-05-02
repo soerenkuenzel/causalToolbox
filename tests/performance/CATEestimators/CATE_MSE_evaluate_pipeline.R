@@ -168,7 +168,7 @@ if (file.exists(filename)){
 
 ## loop through all cases:
 foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
-#for (seed in seed_grid) {
+# for (seed in seed_grid) {
   for (alpha in alpha_grid) {
       for (dim in dim_grid) {
       print(paste(
@@ -198,8 +198,9 @@ foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
         # go through all estimators we want to compare:
         for (estimator_i in 1:length(estimator_grid)) {
           estimator <- estimator_grid[[estimator_i]]
-          CATEpredictor <- CATEpredictor_grid[[estimator_i]]
           estimator_name <- names(estimator_grid)[estimator_i]
+          CATEpredictor <- CATEpredictor_grid[[estimator_name]]
+
 
           #### check if entry already exists, if yes, do next:
           if(exists("already_ran") &&
@@ -211,30 +212,26 @@ foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
           }
 
 
-          start_time <- Sys.time()
 
-          tryCatch({
-            L <- estimator(
-              feat = dt$feat_tr,
-              W = dt$W_tr,
-              Yobs = dt$Yobs_tr
-            )
-            estimates <- CATEpredictor(L, dt$feat_te)
-            MSE    <<- mean((dt$tau_te - estimates) ^ 2)
-            MSE_sd <<-
-              sd((dt$tau_te - estimates) ^ 2) / sqrt(length(dt$tau_te))
-            MAE    <<- mean(abs(dt$tau_te - estimates))
-            MAE_sd <<-
-              sd(abs(dt$tau_te - estimates)) / sqrt(length(dt$tau_te))
-          },
-          error = function(e) {
-            print(e)
-            warning(paste("Something went wrong with", setup))
-            MSE    <<- NA
-            MSE_sd <<- NA
-            MAE    <<- NA
-            MAE_sd <<- NA
-          })
+          start_time <- Sys.time()
+          estimates <-
+            tryCatch({
+              L <- estimator(feat = dt$feat_tr,
+                             W = dt$W_tr,
+                             Yobs = dt$Yobs_tr)
+              CATEpredictor(L, dt$feat_te)
+            },
+            error = function(e) {
+              print(e)
+              warning(paste("Something went wrong with", setup))
+              return(NA)
+            })
+          MSE    <- mean((dt$tau_te - estimates) ^ 2)
+          MSE_sd <-
+            sd((dt$tau_te - estimates) ^ 2) / sqrt(length(dt$tau_te))
+          MAE    <- mean(abs(dt$tau_te - estimates))
+          MAE_sd <-
+            sd(abs(dt$tau_te - estimates)) / sqrt(length(dt$tau_te))
 
           min_taken <-
             as.numeric(difftime(Sys.time(), start_time, tz, units = "mins"))
