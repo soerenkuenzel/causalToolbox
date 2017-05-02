@@ -9,8 +9,8 @@ library(dplyr)
 datafolder <- "tests/performance/CATEestimators/sim_data/all/"
 Results <- data.frame()
 for (filename in dir(datafolder)) {
-  l_filename <- nchar(filename)
-  if(substr(filename, l_filename - 5, l_filename- 4) != "26") next
+  # l_filename <- nchar(filename)
+  # if(substr(filename, l_filename-6, l_filename-4) != "ggr") next
   newResults <- read.csv(paste0(datafolder, filename))
   Results <- rbind(Results, newResults)
   print(filename)

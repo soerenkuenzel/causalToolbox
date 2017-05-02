@@ -43,89 +43,131 @@ X_RF_autotune_hyperband <-
 
     hyperparameter_list <- list()
     base_learners <- list()
-    # this_learner <- "l_first_0"
-    for (this_learner in c("l_first_0",
-                           "l_first_1",
-                           "l_second_0",
-                           "l_second_1",
-                           "l_prop")) {
-      if (this_learner == "l_first_0") {
-        yobs_0 <- yobs[tr == 0]
-        X_0 <- feat[tr == 0,]
-        x = X_0
-        y = yobs_0
-      } else if (this_learner == "l_first_1") {
-        yobs_1 <- yobs[tr == 1]
-        X_1 <- feat[tr == 1,]
-        x = X_1
-        y = yobs_1
-      } else if (this_learner == "l_second_0") {
-        if (verbose) {
-          print("Done with the first stage.")
-        }
-        r_0 <- predict(base_learners[["l_first_1"]], X_0) - yobs_0
-        x = X_0
-        y = r_0
-      } else if (this_learner == "l_second_1") {
-        r_1 <- yobs_1 - predict(base_learners[["l_first_0"]], X_1)
-        x = X_1
-        y = r_1
-      } else{
-        if (verbose) {
-          print("Done with the second stage.")
-        }
-        # must be propensity learner
-        x = feat
-        y = tr
-      }
 
-      base_learners[[this_learner]] <-
-        autohonestRF(
-          x = x,
-          y = y,
-          sampsize = floor(nrow(x) * sample.fraction),
-          num_iter = num_iter,
-          eta = eta,
-          verbose = verbose,
-          seed = seed,
-          nthread = nthread
-        )
+    yobs_0 <- yobs[tr == 0]
+    yobs_1 <- yobs[tr == 1]
 
-      hyperparameter_list[[this_learner]] <- list(
-        "relevant_Variable" = 1:ncol(feat) ,
-        "ntree" = base_learners[[this_learner]]@ntree,
-        "replace" = base_learners[[this_learner]]@replace,
-        "sampsize" = base_learners[[this_learner]]@sampsize,
-        "mtry" = base_learners[[this_learner]]@mtry,
-        "nodesizeSpl" = base_learners[[this_learner]]@nodesizeSpl,
-        "nodesizeAvg" = base_learners[[this_learner]]@nodesizeAvg,
-        "splitratio" = base_learners[[this_learner]]@splitratio,
-        "middleSplit" = base_learners[[this_learner]]@middleSplit
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
+
+    m_0 <-
+      autohonestRF(
+        x = X_0,
+        y = yobs_0,
+        sampsize = floor(nrow(X_0) * sample.fraction),
+        num_iter = num_iter,
+        eta = eta,
+        verbose = verbose,
+        seed = seed,
+        nthread = nthread
       )
+
+    m_1 <-
+      autohonestRF(
+        x = X_1,
+        y = yobs_1,
+        sampsize = floor(nrow(X_1) * sample.fraction),
+        num_iter = num_iter,
+        eta = eta,
+        verbose = verbose,
+        seed = seed,
+        nthread = nthread
+      )
+
+    if (verbose) {
+      print("Done with the first stage.")
     }
+    r_0 <- predict(m_1, X_0) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1)
+
+    m_tau_0 <-
+      autohonestRF(
+        x = X_0,
+        y = r_0,
+        sampsize = floor(nrow(X_0) * sample.fraction),
+        num_iter = num_iter,
+        eta = eta,
+        verbose = verbose,
+        seed = seed,
+        nthread = nthread
+      )
+
+    m_tau_1 <-
+      autohonestRF(
+        x = X_1,
+        y = r_1,
+        sampsize = floor(nrow(X_1) * sample.fraction),
+        num_iter = num_iter,
+        eta = eta,
+        verbose = verbose,
+        seed = seed,
+        nthread = nthread
+      )
+
+    if (verbose) {
+      print("Done with the second stage.")
+    }
+
+    m_prop <-
+      honestRF(x = feat,
+               y = tr,
+               ntree = 500)
     if (verbose) {
       print("Done with the propensity score estimation.")
     }
-    hyperparameter_list[["general"]] <- list("predmode" = "propmean",
-                                             "nthread" = nthread)
-
     return(
       new(
         "X_RF",
         feature_train = feat,
         tr_train = tr,
         yobs_train = yobs,
-        base_learners = base_learners,
-        predmode = hyperparameter_list[["general"]]$predmode,
+        m_0 = m_0,
+        m_1 = m_1,
+        m_tau_0 = m_tau_0,
+        m_tau_1 = m_tau_1,
+        m_prop = m_prop,
+        hyperparameter_list = get_hyper_parameter_list(m_0, m_1, m_tau_0,
+                                                       m_tau_1, m_prop, feat,
+                                                       nthread),
         creator = function(feat, tr, yobs) {
-          X_RF_fully_specified(
-            feat = feat,
-            tr = tr,
-            yobs = yobs,
-            hyperparameter_list = hyperparameter_list,
-            verbose = verbose
-          )
+          X_RF_fully_specified(feat,
+                               tr,
+                               yobs,
+                               hyperparameter_list,
+                               verbose)
         }
+      )
+    )
+  }
+
+
+
+get_hyper_parameter_list <-
+  function(m_0, m_1, m_tau_0, m_tau_1, m_prop, feat, nthread) {
+    hyperparameter_list <- list(
+      "general" = list("predmode" = "propmean", "nthread" = nthread),
+      "l_first_0" = get_hyper_parameter_list_for_this_learner(m_0, feat),
+      "l_first_1" = get_hyper_parameter_list_for_this_learner(m_1, feat),
+      "l_second_0" = get_hyper_parameter_list_for_this_learner(m_tau_0, feat),
+      "l_second_1" = get_hyper_parameter_list_for_this_learner(m_tau_1, feat),
+      "l_prop" = get_hyper_parameter_list_for_this_learner(m_prop, feat)
+    )
+    return(hyperparameter_list)
+  }
+
+get_hyper_parameter_list_for_this_learner <-
+  function(rfm, feat) {
+    return(
+      list(
+        "relevant_Variable" = 1:ncol(feat),
+        "ntree" = rfm@ntree,
+        "replace" = rfm@replace,
+        "sampsize" = rfm@sampsize,
+        "mtry" = rfm@mtry,
+        "nodesizeSpl" = rfm@nodesizeSpl,
+        "nodesizeAvg" = rfm@nodesizeAvg,
+        "splitratio" = rfm@splitratio,
+        "middleSplit" = rfm@middleSplit
       )
     )
   }

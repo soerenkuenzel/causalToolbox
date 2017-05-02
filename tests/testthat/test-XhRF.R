@@ -1,3 +1,4 @@
+library(testthat)
 test_that("Tests that XhRF is working correctly", {
   set.seed(1423614230)
 
@@ -30,11 +31,13 @@ test_that("Tests that XhRF is working correctly", {
   sample_fraction_first = 0.8
   sample_fraction_second = 0.9
   sample_fraction_prop = 1
-  nthread = 1
+  nthread = 0
   verbose = FALSE
   middleSplit_first = FALSE
   middleSplit_second = FALSE
   middleSplit_prop = FALSE
+
+
 
   xl <- X_RF(
     feat = feat,
@@ -93,7 +96,7 @@ test_that("Tests that XhRF is working correctly", {
     tr = cate_problem$W_tr,
     ntree_first = 50,
     ntree_second = 50,
-    ntree_prop = 50,
+    # ntree_prop = 50,
     verbose = FALSE,
     nthread = 1
   )
@@ -101,7 +104,7 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  275.9658,
+  190.8844,
   tolerance = 1e-7)
 
 })

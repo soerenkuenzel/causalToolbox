@@ -1,5 +1,31 @@
 #' @include CATE_estimators.R
-## the standard Xlearner object with random forest
+
+############################
+### Xlearner - hRF - hRF ###
+############################
+#' @title XhRF constructor
+#' @name X_RF-class
+#' @rdname X_RF-class
+#' @description The `X_RF` object is X-learner combined with honest random
+#' forest used for the propensity score estimate, the first stage and the second
+#' stage.
+#' @slot feature_train A data frame of all training features.
+#' @slot tr_train A vector contain 0 for control and 1 for treated variables.
+#' @slot yobs_train A vector containing the observed outcomes.
+#' @slot m_0 contains an honest random forest predictor for the control group of
+#' the first stage.
+#' @slot m_1 contains an honest random forest predictor for the treated group of
+#' the first stage.
+#' @slot m_tau_0 contains an honest random forest predictor for the control
+#' group of the second stage.
+#' @slot m_tau_1 contains an honest random forest predictor for the treated
+#' group of the second stage.
+#' @slot m_prop contains an honest random forest predictor the propensity score.
+#' @slot relevant_Variable_first contains the indices of variables, which are only used in
+#' the first stage.
+#' @slot relevant_Variable_second contains the numbers of variables, which are only used
+#' in the second stage.
+#' @exportClass X_RF
 setClass(
   "X_RF",
   contains = "Meta-learner",
@@ -7,129 +33,100 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    base_learners = "list",
-    predmode = "character",
+    m_0 = "honestRF",
+    m_1 = "honestRF",
+    m_tau_0 = "honestRF",
+    m_tau_1 = "honestRF",
+    m_prop = "honestRF",
+    hyperparameter_list = "list",
     creator = "function"
   )
 )
 
-#' @title X_RF_most_basic Constructor
-#' @rdname X_RF_fully_specified
-#' @description This is the most basic X-learner with honest random forest
-#' constructor. It should not be called by the user, since the list of
-#' parameters is too big. Instead call the simpler version XhRF or one of the
-#' self tuning versions
-#' @param feat feature data.frame.
-#' @param tr treatment assignment 0 for control and 1 for treatment.
-#' @param yobs the observed outcome.
-#' @param hyperparameter_list A list of lists of hyper parameters
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `X_RF` object.
-#' @export X_RF_fully_specified
-X_RF_fully_specified <-
-  function(feat,
-           tr,
-           yobs,
-           hyperparameter_list,
-           verbose) {
-    # train the base_learners of the first stage:
-    base_learners <- list()
-    for (this_learner in c("l_first_0",
-                           "l_first_1",
-                           "l_second_0",
-                           "l_second_1",
-                           "l_prop")) {
-      if (this_learner == "l_first_0") {
-        yobs_0 <- yobs[tr == 0]
-        X_0 <- feat[tr == 0,]
 
-        x = X_0
-        y = yobs_0
-      } else if (this_learner == "l_first_1") {
-        yobs_1 <- yobs[tr == 1]
-        X_1 <- feat[tr == 1,]
-
-        x = X_1
-        y = yobs_1
-      } else if (this_learner == "l_second_0") {
-        if (verbose) {
-          print("Done with the first stage.")
-        }
-        r_0 <-
-          predict(base_learners[["l_first_1"]],
-                  X_0) -
-          yobs_0
-
-        x = X_0
-        y = r_0
-      } else if (this_learner == "l_second_1") {
-        r_1 <-
-          yobs_1 -
-          predict(base_learners[["l_first_0"]],
-                  X_1)
-
-        x = X_1
-        y = r_1
-      } else{
-        if (verbose) {
-          print("Done with the second stage.")
-        }
-        # must be propensity learner
-        x = feat
-        y = tr
-      }
-
-      base_learners[[this_learner]] <-
-        honestRF(
-          x = x,
-          y = y,
-          ntree = hyperparameter_list[[this_learner]]$ntree,
-          replace = hyperparameter_list[[this_learner]]$replace,
-          sample.fraction = hyperparameter_list[[this_learner]]$sample.fraction,
-          mtry = hyperparameter_list[[this_learner]]$mtry,
-          nodesizeSpl = hyperparameter_list[[this_learner]]$nodesizeSpl,
-          nodesizeAvg = hyperparameter_list[[this_learner]]$nodesizeAvg,
-          nthread = hyperparameter_list[["general"]]$nthread,
-          splitrule = "variance",
-          splitratio = hyperparameter_list[[this_learner]]$splitratio
-        )
-    }
-    if (verbose) {
-      print("Done with the propensity score estimation.")
-    }
-
-    return(
-      new(
-        "X_RF",
-        feature_train = feat,
-        tr_train = tr,
-        yobs_train = yobs,
-        base_learners = base_learners,
-        predmode = hyperparameter_list[["general"]]$predmode,
-        creator = function(feat, tr, yobs) {
-          X_RF_fully_specified(
-            feat = feat,
-            tr = tr,
-            yobs = yobs,
-            hyperparameter_list = hyperparameter_list,
-            verbose = verbose
-          )
-        }
-      )
-    )
+#' @title X-Learner with honest RF for both stages
+#' @name X_RF-X_RF
+#' @rdname X_RF-X_RF
+#' @description This is an implementation of the X-learner with honest random
+#' forest in the first and second stage. The function returns an X-RF object.
+#' @param feat A data frame of all the features.
+#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param yobs A numeric vector containing the observed outcomes.
+#' @param predmode One of propmean, control, treated, extreme. It specifies how
+#' the two estimators of the second stage should be aggregated. The default is
+#' propmean which refers to propensity score weighting.
+#' @param relevant_Variable_first Variables which are only used in the first stage.
+#' @param relevant_Variable_second Variables which are only used in the second stage.
+#' @param ntree_first Numbers of trees in the first stage.
+#' @param ntree_second Numbers of trees in the second stage.
+#' @param mtry_first Numbers of trees in the second stage.
+#' @param mtry_second Numbers of trees in the second stage.
+#' @param min_node_size_spl_first minimum nodesize in the first stage for the
+#' observations in the splitting set.
+#' @param min_node_size_ave_first minimum nodesize in the first stage for the
+#' observations in the average set.
+#' @param min_node_size_spl_second minimum nodesize in the second stage for the
+#' observations in the splitting set.
+#' @param min_node_size_ave_second minimum nodesize in the second stage for the
+#' observations in the averaging set.
+#' @param splitratio_first Proportion of the training data used as the splitting
+#' dataset in the first stage.
+#' @param splitratio_second Proportion of the training data used as the
+#' splitting dataset in the second stage.
+#' @param replace_first Sample with or without replacement in the first stage.
+#' @param replace_second Sample with or without replacement in the first stage.
+#' @param sample_fraction_first The size of total samples to draw for the
+#' training data in the first stage.
+#' @param sample_fraction_second The size of total samples to draw for the
+#' training data in the second stage.
+#' @param nthread number of threats which should be used to work in parallel.
+#' @param verbose whether or not to print messages of the training procedure.
+#' @export X_RF
+setGeneric(
+  name = "X_RF",
+  def = function(
+    feat,
+    tr,
+    yobs,
+    predmode,
+    relevant_Variable_first,
+    relevant_Variable_second,
+    relevant_Variable_prop,
+    ntree_first,
+    ntree_second,
+    ntree_prop,
+    mtry_first,
+    mtry_second,
+    mtry_prop,
+    min_node_size_spl_first,
+    min_node_size_ave_first,
+    min_node_size_spl_second,
+    min_node_size_ave_second,
+    min_node_size_spl_prop,
+    min_node_size_ave_prop,
+    splitratio_first,
+    splitratio_second,
+    splitratio_prop,
+    replace_first,
+    replace_second,
+    replace_prop,
+    sample_fraction_first,
+    sample_fraction_second,
+    sample_fraction_prop,
+    nthread,
+    middleSplit_first,
+    middleSplit_second,
+    middleSplit_prop,
+    verbose
+  ) {
+    standardGeneric("X_RF")
   }
+)
 
 #' @title X_RF Constructor
-#' @description This is the recommended function to implement the X-learner with
-#' honest random forest. However, due to the vast amount of parameters, we
-#' recommend using one of the self tuning versions such as
-#' \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
-#' \code{\link{X_RF_autotune_hyperband}}
 #' @rdname X_RF-X_RF
+#' @aliases X_RF, X_RF-X_RF
 #' @return A `X_RF` object.
-#' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
-#' \code{\link{X_RF_autotune_hyperband}}
-#' @export X_RF
 X_RF <-
   function(feat,
            tr,
@@ -138,14 +135,14 @@ X_RF <-
            relevant_Variable_first = 1:ncol(feat),
            relevant_Variable_second = 1:ncol(feat),
            relevant_Variable_prop = 1:ncol(feat),
-           ntree_first = 500,
-           ntree_second = 500,
-           ntree_prop = 100,
+           ntree_first = 1000,
+           ntree_second = 1000,
+           ntree_prop = 500,
            mtry_first = round(ncol(feat) / 2),
-           mtry_second = round(ncol(feat) * 2 / 3),
+           mtry_second = ncol(feat),
            mtry_prop = max(floor(ncol(feat) / 3), 1),
-           min_node_size_spl_first = 3,
-           min_node_size_ave_first = 3,
+           min_node_size_spl_first = 1,
+           min_node_size_ave_first = 5,
            min_node_size_spl_second = 5,
            min_node_size_ave_second = 3,
            min_node_size_spl_prop = 3,
@@ -154,29 +151,32 @@ X_RF <-
            splitratio_second = .5,
            splitratio_prop = .5,
            replace_first = TRUE,
-           replace_second = FALSE,
+           replace_second = TRUE,
            replace_prop = TRUE,
            sample_fraction_first = 0.8,
            sample_fraction_second = 0.9,
-           sample_fraction_prop = 0.9,
-           nthread = 0,
-           verbose = FALSE,
+           sample_fraction_prop = 1,
+           nthread = 4,
+           verbose = TRUE,
            middleSplit_first = FALSE,
            middleSplit_second = FALSE,
-           middleSplit_prop = TRUE) {
+           middleSplit_prop = FALSE) {
     # if relevant_Variable_first is not set, then set it to select all:
     feat <- as.data.frame(feat)
-
-    if(is.character(relevant_Variable_first))
-      relevant_Variable_first <-
-        which(colnames(feat) %in% relevant_Variable_first)
-    if(is.character(relevant_Variable_second))
-    relevant_Variable_second <-
-        which(colnames(feat) %in% relevant_Variable_second)
-    if(is.character(relevant_Variable_prop))
-      relevant_Variable_prop <-
-        which(colnames(feat) %in% relevant_Variable_prop)
-
+    if (is.null(relevant_Variable_first)) {
+      relevant_Variable_first <- 1:ncol(feat)
+    } else{
+      if (is.character(relevant_Variable_first))
+        relevant_Variable_first <-
+          which(colnames(feat) %in% relevant_Variable_first)
+    }
+    if (is.null(relevant_Variable_second)) {
+      relevant_Variable_second <- 1:ncol(feat)
+    } else{
+      if (is.character(relevant_Variable_second))
+        relevant_Variable_second <-
+          which(colnames(feat) %in% relevant_Variable_second)
+    }
     if ((!is.null(mtry_first)) &&
         (mtry_first > ncol(feat))) {
       warning(
@@ -194,6 +194,9 @@ X_RF <-
       mtry_second <- ncol(feat)
     }
 
+    ############################################################################
+    # Translate the settings to a feature list
+    ############################################################################
     general_hyperpara <- list("predmode" = predmode,
                               "nthread" = nthread)
     first_stage_hyperpara <- list(
@@ -239,18 +242,151 @@ X_RF <-
       "l_prop" = prop_hyperpara
     )
 
+    return(X_RF_fully_specified(feat = feat,
+                                tr = tr,
+                                yobs = yobs,
+                                hyperparameter_list = hyperparameter_list,
+                                verbose = verbose))
+  }
+
+#' @title X_RF_most_basic Constructor
+#' @rdname X_RF_fully_specified
+#' @description This is the most basic X-learner with honest random forest
+#' constructor. It should not be called by the user, since the list of
+#' parameters is too big. Instead call the simpler version XhRF or one of the
+#' self tuning versions
+#' @param feat feature data.frame.
+#' @param tr treatment assignment 0 for control and 1 for treatment.
+#' @param yobs the observed outcome.
+#' @param hyperparameter_list A list of lists of hyper parameters
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @return A `X_RF` object.
+#' @export X_RF_fully_specified
+X_RF_fully_specified <-
+  function(feat,
+           tr,
+           yobs,
+           hyperparameter_list,
+           verbose) {
+    yobs_0 <- yobs[tr == 0]
+    yobs_1 <- yobs[tr == 1]
+
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
+
+    m_0 <-
+      honestRF(
+        x = X_0[ , hyperparameter_list[["l_first_0"]]$relevant_Variable],
+        y = yobs_0,
+        ntree = hyperparameter_list[["l_first_0"]]$ntree,
+        replace = hyperparameter_list[["l_first_0"]]$replace,
+        sample.fraction = hyperparameter_list[["l_first_0"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_first_0"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_first_0"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_first_0"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_first_0"]]$splitratio
+      )
+
+    m_1 <-
+      honestRF(
+        x = X_1[ , hyperparameter_list[["l_first_1"]]$relevant_Variable],
+        y = yobs_1,
+        ntree = hyperparameter_list[["l_first_1"]]$ntree,
+        replace = hyperparameter_list[["l_first_1"]]$replace,
+        sample.fraction = hyperparameter_list[["l_first_1"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_first_1"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_first_1"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_first_1"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_first_1"]]$splitratio
+      )
+
+    if (verbose) {
+      print("Done with the first stage.")
+    }
+    r_0 <- predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
+
+    m_tau_0 <-
+      honestRF(
+        x = X_0[, hyperparameter_list[["l_second_0"]]$relevant_Variable],
+        y = r_0,
+        ntree = hyperparameter_list[["l_second_0"]]$ntree,
+        replace = hyperparameter_list[["l_second_0"]]$replace,
+        sample.fraction = hyperparameter_list[["l_second_0"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_second_0"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_second_0"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_second_0"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_second_0"]]$splitratio
+      )
+
+    m_tau_1 <-
+      honestRF(
+        x = X_1[, hyperparameter_list[["l_second_1"]]$relevant_Variable],
+        y = r_1,
+        ntree = hyperparameter_list[["l_second_1"]]$ntree,
+        replace = hyperparameter_list[["l_second_1"]]$replace,
+        sample.fraction = hyperparameter_list[["l_second_1"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_second_1"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_second_1"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_second_1"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_second_1"]]$splitratio
+      )
+    if (verbose) {
+      print("Done with the second stage.")
+    }
+
+    m_prop <-
+      honestRF(
+        x = feat[, hyperparameter_list[["l_prop"]]$relevant_Variable],
+        y = tr,
+        ntree = hyperparameter_list[["l_prop"]]$ntree,
+        replace = hyperparameter_list[["l_prop"]]$replace,
+        sample.fraction = hyperparameter_list[["l_prop"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_prop"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_prop"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_prop"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_prop"]]$splitratio
+      )
+    if (verbose) {
+      print("Done with the propensity score estimation.")
+    }
     return(
-      X_RF_fully_specified(
-        feat = feat,
-        tr = tr,
-        yobs = yobs,
-        hyperparameter_list = hyperparameter_list ,
-        verbose = verbose
+      new(
+        "X_RF",
+        feature_train = feat,
+        tr_train = tr,
+        yobs_train = yobs,
+        m_0 = m_0,
+        m_1 = m_1,
+        m_tau_0 = m_tau_0,
+        m_tau_1 = m_tau_1,
+        m_prop = m_prop,
+        hyperparameter_list = hyperparameter_list,
+        creator = function(feat, tr, yobs) {
+          X_RF_fully_specified(feat,
+               tr,
+               yobs,
+               hyperparameter_list,
+               verbose)
+        }
       )
     )
   }
 
 
+############################
+### Estimate CATE Method ###
+############################
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_hRF
 #' @rdname EstimateCate-X_hRF
@@ -267,26 +403,26 @@ setMethod(
   {
     feature_new <- as.data.frame(feature_new)
 
-    prop_scores <-
-      predict(theObject@base_learners[["l_prop"]], feature_new)
-    if (theObject@predmode == "propmean") {
+    predmode <- theObject@hyperparameter_list[["general"]]$predmode
+    prop_scores <- predict(theObject@m_prop, feature_new)
+    if (predmode == "propmean") {
       return(
-        prop_scores        * predict(theObject@base_learners[["l_second_0"]], feature_new) +
-          (1 - prop_scores)  * predict(theObject@base_learners[["l_second_1"]], feature_new)
+        prop_scores        * predict(theObject@m_tau_0, feature_new) +
+          (1 - prop_scores)  * predict(theObject@m_tau_1, feature_new)
       )
     }
-    if (theObject@predmode == "extreme") {
+    if (predmode == "extreme") {
       return(ifelse(
         prop_scores > .5,
-        predict(theObject@base_learners[["l_second_0"]], feature_new),
-        predict(theObject@base_learners[["l_second_1"]], feature_new)
+        predict(theObject@m_tau_0, feature_new),
+        predict(theObject@m_tau_1, feature_new)
       ))
     }
-    if (theObject@predmode == "control") {
-      return(predict(theObject@base_learners[["l_second_0"]], feature_new))
+    if (predmode == "control") {
+      return(predict(theObject@m_tau_0, feature_new))
     }
-    if (theObject@predmode == "treated") {
-      return(predict(theObject@base_learners[["l_second_1"]], feature_new))
+    if (predmode == "treated") {
+      return(predict(theObject@m_tau_1, feature_new))
     }
   }
 )

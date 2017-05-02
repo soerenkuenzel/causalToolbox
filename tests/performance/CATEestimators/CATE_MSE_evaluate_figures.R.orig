@@ -9,8 +9,13 @@ library(dplyr)
 datafolder <- "tests/performance/CATEestimators/sim_data/all/"
 Results <- data.frame()
 for (filename in dir(datafolder)) {
+<<<<<<< HEAD
   l_filename <- nchar(filename)
   if(substr(filename, l_filename - 5, l_filename- 4) != "26") next
+=======
+  # l_filename <- nchar(filename)
+  # if(substr(filename, l_filename-6, l_filename-4) != "ggr") next
+>>>>>>> runOnBRC
   newResults <- read.csv(paste0(datafolder, filename))
   Results <- rbind(Results, newResults)
   print(filename)
@@ -31,6 +36,7 @@ cols <- c(
 
 unique(Results$estimator)
 estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_autotune0.1.0.3")
+estimator_subset <- c("S_BART0.1.5.0", "T_BART0.1.5.0", "X_BART0.1.5.0")
 
 # Summary plots:
 for (this_setup in unique(Results$setup)) {
@@ -58,7 +64,10 @@ for (this_setup in unique(Results$setup)) {
     ggtitle(this_setup) +
     theme_minimal() +
     geom_text(aes(label = estimator))
+<<<<<<< HEAD
+=======
 
+>>>>>>> runOnBRC
 
   # scale_shape_manual(values = LETTERS[1:26]) +
   # coord_cartesian(xlim = NULL, ylim = NULL) +

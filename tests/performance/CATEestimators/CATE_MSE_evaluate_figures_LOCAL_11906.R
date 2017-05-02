@@ -6,7 +6,7 @@ library(reshape)
 library(dplyr)
 
 # read in the data
-datafolder <- "tests/performance/CATEestimators/sim_data/all/"
+datafolder <- "tests/performance/CATEestimators/sim_data/"
 Results <- data.frame()
 for (filename in dir(datafolder)) {
   l_filename <- nchar(filename)
@@ -31,6 +31,7 @@ cols <- c(
 
 unique(Results$estimator)
 estimator_subset <- c("X_RF0.1.0.00.1.0.0", "X_RF0.1.0.3", "X_RF0.1.0.0", "X_RF_autotune0.1.0.3")
+estimator_subset <- c("S_BART0.1.5.0", "T_BART0.1.5.0", "X_BART0.1.5.0")
 
 # Summary plots:
 for (this_setup in unique(Results$setup)) {
@@ -58,7 +59,6 @@ for (this_setup in unique(Results$setup)) {
     ggtitle(this_setup) +
     theme_minimal() +
     geom_text(aes(label = estimator))
-
 
   # scale_shape_manual(values = LETTERS[1:26]) +
   # coord_cartesian(xlim = NULL, ylim = NULL) +
@@ -103,7 +103,9 @@ for (this_setup in unique(Results$setup)) {
     geom_line() +
     geom_point(aes(shape = estimator), size = 1) +
     scale_y_log10() +
-    ggtitle(this_setup)
+    ggtitle(this_setup) +
+    theme_minimal()
+
   ggsave(
     paste0(
       "tests/performance/CATEestimators/sim_figures/singleplot_",

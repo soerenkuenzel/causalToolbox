@@ -82,8 +82,23 @@ check_setups <-
         print(paste0("Checking setup ", i, " out of ", length(starting_settings)))
       starting_setting <- starting_settings[[i]]
       starting_setting_name <- names(starting_settings)[i]
-      OOB_errors <- rbind(OOB_errors,
-                          evaluate_setting(starting_setting, feat, tr, yobs))
+      OOB_errors <-
+        tryCatch({
+          rbind(OOB_errors,
+                evaluate_setting(starting_setting, feat, tr, yobs))
+        },
+        error = function(e) {
+          warning(
+            paste(
+              "Setting",
+              starting_setting_name,
+              "cannot be checked,",
+              "since an error occured:"
+            )
+          )
+          print(e)
+          OOB_errors
+        })
     }
     OOB_errors$tau_0 <- OOB_errors$l_first_1 + OOB_errors$l_second_0
     OOB_errors$tau_1 <- OOB_errors$l_first_0 + OOB_errors$l_second_1
@@ -108,10 +123,10 @@ evaluate_setting <- function(setting, feat, tr, yobs) {
 
   return(
     data.frame(
-      "l_first_0" = getOOB(x_eval@base_learners[["l_first_0"]], noWarning = FALSE),
-      "l_first_1" = getOOB(x_eval@base_learners[["l_first_1"]], noWarning = FALSE),
-      "l_second_0" = getOOB(x_eval@base_learners[["l_second_0"]], noWarning = FALSE),
-      "l_second_1" = getOOB(x_eval@base_learners[["l_second_1"]], noWarning = FALSE)
+      "l_first_0" = getOOB(x_eval@m_0, noWarning = FALSE),
+      "l_first_1" = getOOB(x_eval@m_1, noWarning = FALSE),
+      "l_second_0" = getOOB(x_eval@m_tau_0, noWarning = FALSE),
+      "l_second_1" = getOOB(x_eval@m_tau_1, noWarning = FALSE)
     )
   )
 }
