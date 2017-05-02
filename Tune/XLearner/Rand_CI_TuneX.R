@@ -30,7 +30,7 @@ dim <- 20
 ntrain <- 2000
 ntest <- 10000
 alpha <- .01
-B <- 3
+B <- 50
 
 
 # Sample each parameter
