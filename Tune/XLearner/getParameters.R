@@ -1,36 +1,62 @@
 # this file gets the best tunring parameters from our simulations
 
+################################################################################
+# READ IN MSE AND CI DATA --> file_list_MSE, file_list_CI
+################################################################################
 library(dplyr)
-## read in the data as list:
-file_folder <- "Tune/XLearner/sim_data/"
-file_list <- list()
+## read in the data as list for MSE
+file_folder_MSE <- "Tune/XLearner/sim_data/"
+file_list_MSE <- list()
 i <- 1
-for(file in dir(file_folder)){
+for(file in dir(file_folder_MSE)){
   print(file)
-  file_list[[i]] <- tbl_df(read.csv(paste0(file_folder, file), as.is = TRUE))
+  if(substr(file, 1,3) == "old") next
+  file_list_MSE[[i]] <- tbl_df(read.csv(paste0(file_folder_MSE, file), as.is = TRUE))
+  i <- i + 1
+}
+## read in the data as list for CI
+file_folder_CI <- "Tune/XLearner/sim_data_CI/"
+file_list_CI <- list()
+i <- 1
+for(file in dir(file_folder_CI)){
+  print(file)
+  if(substr(file, 1,3) == "old") next
+  file_list_CI[[i]] <- tbl_df(read.csv(paste0(file_folder_CI, file), as.is = TRUE))
   i <- i + 1
 }
 
-## output for each file the two best settings:
+
+################################################################################
+# SAVE BEST SETTING IN --> starting_values
+################################################################################
+
+## output for each file the two best settings for CI and MSE
 best_setups <- data.frame()
-for(file in file_list){
-  file <- file[order(as.numeric(as.data.frame(file)[,25])), ]
+
+for (file in file_list_MSE) {
+  # file = file_list_MSE[[1]]
+  file <- file[order(as.numeric(as.data.frame(file)[, 25])),]
+  file$setup <- paste0(file$setup, "_MSE")
   best_setups <- rbind(best_setups, file[1, -25])
+}
 
-  # add at least one honest setup:
-  file_only_honest <- file %>% filter(splitratio_first < 1, splitratio_second < 1)
-  file_only_honest <- file_only_honest[order(as.numeric(as.data.frame(file_only_honest)[,25])), ]
+for (file in file_list_CI) {
+  # file = file_list_CI[[11]]
+  file <- file[order(as.numeric(as.data.frame(file)[, 26]), decreasing = TRUE),]
+  # file %>% as.data.frame() %>% head(5)
+  file$setup <- paste0(file$setup, "_CI")
 
-  best_setups <- rbind(best_setups, file_only_honest[1, -25])
-
-  }
+  best_setups <- rbind(best_setups, file[1, -c(25, 26) ])
+}
 starting_values <- as.data.frame(best_setups)
 devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
 # This will save the data in R/sysdata.rda and will only be available for our
 # function
 
 
-
+################################################################################
+# FIND GLOBALLY BEST STARTING SETTINGS:
+################################################################################
 ## see which setting is similar to which by looking at correlations:
 tuning_settings <- file_list[[1]][,-c(1,25)] # tuning_setting = all settings
 mergingvars <- names(tuning_settings)
