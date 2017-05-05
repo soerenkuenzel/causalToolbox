@@ -48,12 +48,15 @@ test_that("Tests X_RF_autotune_hyperband", {
       trainseed = 234
     )
 
-  xl_tuned <- X_RF_autotune_hyperband(
-    feat = cate_problem$feat_tr,
-    yobs = cate_problem$Yobs_tr,
-    tr = cate_problem$W_tr,
-    num_iter = 3 ^ 2,
-    verbose = FALSE
+  expect_warning(
+    xl_tuned <- X_RF_autotune_hyperband(
+      feat = cate_problem$feat_tr,
+      yobs = cate_problem$Yobs_tr,
+      tr = cate_problem$W_tr,
+      num_iter = 3 ^ 2,
+      verbose = FALSE
+    ),
+    "honestRF is used as adaptive random forest."
   )
 
   expect_equal(mean((

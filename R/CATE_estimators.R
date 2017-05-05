@@ -15,7 +15,7 @@ setClass(
 
 setGeneric(
   name = "EstimateCate",
-  def = function(theObject, feature_new)
+  def = function(theObject, feature_new, ...)
   {
     standardGeneric("EstimateCate")
   }
@@ -29,11 +29,39 @@ setGeneric(
                  method = "maintain_group_ratios",
                  B = 200,
                  nthread = 0,
-                 verbose = TRUE)
+                 verbose = TRUE,
+                 ...)
   {
     standardGeneric("CateCI")
   }
 )
+
+setGeneric(
+  name = "EstimateATT",
+  def = function(theObject,
+                 feature_new,
+                 method = "maintain_group_ratios",
+                 B = 200,
+                 nthread = 0,
+                 verbose = TRUE,
+                 ...){
+    standardGeneric("EstimateATT")
+  }
+)
+
+setGeneric(
+  name = "EstimateAllSampleStatistics",
+  def = function(theObject,
+                 feature_new,
+                 method = "maintain_group_ratios",
+                 B = 200,
+                 nthread = 0,
+                 verbose = TRUE,
+                 ...){
+    standardGeneric("EstimateAllSampleStatistics")
+  }
+)
+
 
 
 #' CateCI-X_hRF

@@ -36,7 +36,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
     "honestRF is used as adaptive random forest."
   )
 
-  expect_equal(setup_check[1, 2], 13.0549, tolerance = 1e-5)
+  expect_equal(setup_check[1, 2], 12.8145, tolerance = 1e-5)
   ### Test 2:
   set.seed(432)
   cate_problem <-
@@ -66,14 +66,16 @@ test_that("Tests test-Xhrf_autotune_simple", {
   expect_equal(mean((
     EstimateCate(mm, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  383.9136, tolerance = 1e-5)
+  352.6516, tolerance = 1e-5)
 
-
-  CATE_ci <-
-    CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
+  expect_warning(
+    CATE_ci <-
+      CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE),
+    "honestRF is used as adaptive random forest."
+  )
 
   expect_equal(CATE_ci[2, 2],
-               -6.518795,
+               -16.29809,
                tolerance = 1e-5)
 
 })
