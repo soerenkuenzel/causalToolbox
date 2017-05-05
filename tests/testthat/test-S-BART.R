@@ -9,7 +9,7 @@ test_that(
     tr <- rbinom(nrow(iris), 1, .5)
     yobs <- iris[, 1]
 
-    sb <- S_BART(feat, tr, yobs, ndpost = 10)
+    sb <- S_BART(feat, tr, yobs, ndpost = 10, sample_stat =  "all estimated")
     #theObject <- sb;verbose = TRUE
     expect_equal(EstimateCate(sb, feat, verbose = FALSE)[1],
                  0.1082933,

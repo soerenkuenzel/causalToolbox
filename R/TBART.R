@@ -12,6 +12,7 @@ setClass(
     tr_train = "numeric",
     yobs_train = "numeric",
     ndpost = "numeric",
+    sample_stat = "character",
     creator = "function"
   )
 )
@@ -30,6 +31,7 @@ T_BART <-
            tr,
            yobs,
            ndpost = 1200,
+           sample_stat = "counterfactuals estimated",
            verbose) {
     feat <- as.data.frame(feat)
 
@@ -39,10 +41,13 @@ T_BART <-
       tr_train = tr,
       yobs_train = yobs,
       ndpost = ndpost,
+      sample_stat = sample_stat,
       creator = function(feat, tr, yobs) {
         T_BART(feat,
                tr,
-               yobs)
+               yobs,
+               ndpost = ndpost,
+               sample_stat = sample_stat)
       }
     )
   }
@@ -199,6 +204,7 @@ setMethod(
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
+    sample_stat <- theObject@sample_stat
 
 
     yobs_0 <- yobs[tr == 0]
@@ -229,7 +235,8 @@ setMethod(
         ndpost = ndpost,
         feat = feat,
         tr = tr,
-        yobs = yobs
+        yobs = yobs,
+        sample_stat = sample_stat
       )
     )
   }

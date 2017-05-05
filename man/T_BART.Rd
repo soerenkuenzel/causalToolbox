@@ -4,7 +4,8 @@
 \alias{T_BART}
 \title{T_BART}
 \usage{
-T_BART(feat, tr, yobs, ndpost = 1200, verbose)
+T_BART(feat, tr, yobs, ndpost = 1200,
+  sample_stat = "counterfactuals estimated", verbose)
 }
 \arguments{
 \item{feat}{feature data.frame.}

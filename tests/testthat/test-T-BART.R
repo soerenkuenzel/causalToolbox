@@ -8,7 +8,8 @@ test_that("Tests that T-BART is working correctly",
             tr <- rbinom(nrow(iris), 1, .5)
             yobs <- iris[, 1]
 
-            tb <- T_BART(feat, tr, yobs, ndpost = 10)
+            tb <- T_BART(feat, tr, yobs, ndpost = 10,
+                         sample_stat =  "all estimated")
 
 
             cate_estiamte <-

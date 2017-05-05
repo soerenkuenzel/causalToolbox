@@ -10,6 +10,7 @@ setClass(
     tr_train = "numeric",
     yobs_train = "numeric",
     ndpost = "numeric",
+    sample_stat = "character",
     creator = "function"
   )
 )
@@ -28,6 +29,7 @@ S_BART <-
            tr,
            yobs,
            ndpost = 1200,
+           sample_stat = "counterfactuals estimated",
            verbose) {
     feat <- as.data.frame(feat)
 
@@ -37,10 +39,13 @@ S_BART <-
       tr_train = tr,
       yobs_train = yobs,
       ndpost = ndpost,
+      sample_stat = sample_stat,
       creator = function(feat, tr, yobs) {
         S_BART(feat,
                tr,
-               yobs)
+               yobs,
+               ndpost = ndpost,
+               sample_stat = sample_stat)
       }
     )
   }
@@ -126,6 +131,7 @@ setMethod(
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
+    sample_stat <- theObject@sample_stat
 
     pred_matrix <- get_pred_mat(
       theObject = theObject,
@@ -147,7 +153,8 @@ setMethod(
         ndpost = ndpost,
         feat = feat,
         tr = tr,
-        yobs = yobs
+        yobs = yobs,
+        sample_stat = sample_stat
       )
     )
   }
@@ -173,11 +180,12 @@ get_pred_mat <- function(theObject, feature_new, verbose, ndpost) {
 
 
 compute_sample_statistics <- function(mu_hat_0_MCMC_samples,
-                                          mu_hat_1_MCMC_samples,
-                                          ndpost,
-                                          feat,
-                                          tr,
-                                          yobs){
+                                      mu_hat_1_MCMC_samples,
+                                      ndpost,
+                                      feat,
+                                      tr,
+                                      yobs,
+                                      sample_stat) {
 
   tau_hat_MCMC_samples <-
     mu_hat_1_MCMC_samples - mu_hat_0_MCMC_samples
@@ -251,21 +259,26 @@ compute_sample_statistics <- function(mu_hat_0_MCMC_samples,
         "upper" = SATE_CI_alle[2]
       )
     )
-  ATT <-
-    rbind(
-      data.frame(
-        method = "all estimated",
-        estimate = SATT_estimate_alle,
-        "lower" = SATT_CI_alle[1],
-        "upper" = SATT_CI_alle[2]
-      ),
+
+  if(sample_stat == "counterfactuals estimated"){
+    ATT <-
       data.frame(
         method = "counterfactuals estimated",
         estimate = SATT_estimate_cfe,
         "lower" = SATT_CI_cfe[1],
         "upper" = SATT_CI_cfe[2]
       )
-    )
+  }
+  if(sample_stat == "all estimated"){
+  ATT <-
+      data.frame(
+        method = "all estimated",
+        estimate = SATT_estimate_alle,
+        "lower" = SATT_CI_alle[1],
+        "upper" = SATT_CI_alle[2]
+      )
+  }
+
   ATC <-
     rbind(
       data.frame(
