@@ -57,11 +57,44 @@ devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
 
 
 
+# Find CI default setting ------------------------------------------------------
+tuning_settings <- file_list_CI[[1]][,-c(1,25,26)] # tuning_setting = all settings
+mergingvars <- names(tuning_settings)
+for(file in file_list_CI){
+  print(nrow(file))
+  file <- file[ ,-1]
+  tuning_settings <- merge(tuning_settings, file, by = mergingvars)
+}
+tuning_settings <- tbl_df(tuning_settings)
 
 
+names(tuning_settings)
+results <- tuning_settings[ , 24:45]
+perc_na <- apply(results, 2, function(x) mean(is.na(x)))
+results_selected <- results[ , perc_na <.25]
+results_selected_CI <- results_selected[ , (1:7)*2]
+
+table(apply(results_selected_CI >.6,1, mean))
+
+# this has the best coverage:
+good_coverage <- which(apply(results_selected_CI >.6,1, all))
+as.numeric(results_selected_CI[good_coverage, ])
 
 
+# Find best in terms of MSE:
 
+results_selected_MSE <- results_selected[ , (1:7)*2 - 1]
+apply(results_selected_MSE, 2, function(x) quantile(x, probs = c(.05, .1, .2), na.rm = TRUE))
+
+
+results_selected_MSE[good_coverage, ]
+
+good_MSE <- which.min(apply(apply(results_selected_MSE, 2, function(x) rank(x, na.last = TRUE)), 1, sum))
+
+results_selected_MSE[good_MSE, ]
+as.numeric(results_selected_CI[good_MSE, ])
+
+as.data.frame(tuning_settings[good_MSE, 1:23]) #taken
 ################################################################################
 # FIND GLOBALLY BEST STARTING SETTINGS:
 ################################################################################
