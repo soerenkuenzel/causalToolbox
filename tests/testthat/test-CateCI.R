@@ -6,35 +6,45 @@ test_that("Tests CateCI", {
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
 
-  xl <- X_RF(
+  expect_warning(
+    xl <- X_RF(
+      feat = feat,
+      tr = tr,
+      yobs = yobs,
+      nthread = 1,
+      verbose = FALSE
+    ),
+    "honestRF is used as adaptive random forest."
+  )
+  expect_warning(
+    CIs <- CateCI(xl, feat, B = 5, verbose = FALSE),
+    "honestRF is used as adaptive random forest."
+  )
+  expect_equal(as.numeric(CIs[2,]),
+               c(0.04759293, 0.01084847, 0.08433738),
+               tolerance = 1e-7)
+
+  sl <- S_RF(
     feat = feat,
     tr = tr,
     yobs = yobs,
-    nthread = 1,
-    verbose = FALSE
+    nthread = 1
   )
-  CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
-  expect_equal(as.numeric(CIs[2, ]),
-               c(0.14245841, 0.02691597, 0.25800084),
-               tolerance=1e-7)
-
-  sl <- S_RF(feat = feat,
-             tr = tr,
-             yobs = yobs,
-             nthread = 1)
   CIs <- CateCI(sl, feat, B = 5, verbose = FALSE)
-  expect_equal(as.numeric(CIs[1, ]),
+  expect_equal(as.numeric(CIs[1,]),
                c(0.01729103, -0.01133297,  0.04591503),
-               tolerance=1e-7)
+               tolerance = 1e-7)
 
-  tl <- T_RF(feat = feat,
-             tr = tr,
-             yobs = yobs,
-             nthread = 1)
+  tl <- T_RF(
+    feat = feat,
+    tr = tr,
+    yobs = yobs,
+    nthread = 1
+  )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
-  expect_equal(as.numeric(CIs[1, ]),
+  expect_equal(as.numeric(CIs[1,]),
                c(0.04663806, -0.03260194,  0.12587805),
-               tolerance=1e-7)
+               tolerance = 1e-7)
 
 
   set.seed(21)
