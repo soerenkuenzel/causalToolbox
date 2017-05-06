@@ -11,6 +11,8 @@ setClass(
     yobs_train = "numeric",
     ensemble = "character",
     ndpost = "numeric",
+    bart_function = "function",
+    ntree = "numeric",
     creator = "function"
   )
 )
@@ -29,8 +31,23 @@ X_BART <-
            tr,
            yobs,
            ensemble = "pscore",
-           ndpost = 1200) {
+           ndpost = 1200,
+           tree_package = "dbarts",
+           ntree = 200) {
     feat <- as.data.frame(feat)
+
+    if (tree_package == "dbarts") {
+      bart_function <- function(...) {
+        dbarts::bart(...)
+      }
+    } else if (tree_package == "BayesTree") {
+      bart_function <- function(...) {
+        BayesTree::bart(...)
+      }
+    } else{
+      stop("tree_package must be either BayesTree or dbarts")
+    }
+
 
     new(
       "X_BART",
@@ -39,10 +56,16 @@ X_BART <-
       yobs_train = yobs,
       ensemble = ensemble,
       ndpost = ndpost,
+      bart_function = bart_function,
+      ntree = ntree,
       creator = function(feat, tr, yobs) {
         X_BART(feat,
                tr,
-               yobs)
+               yobs,
+               ensemble = ensemble,
+               ndpost = ndpost,
+               tree_package = tree_package,
+               ntree = ntree)
       }
     )
   }
@@ -99,22 +122,24 @@ setMethod(
     }
 
 
-    pred_matrix_f_0 <- dbarts::bart(
+    pred_matrix_f_0 <- theObject@bart_function(
       x.train = X_0,
       y.train = yobs_0,
       x.test =  f_0_test_set,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     mu_hat_1 <- apply(pred_matrix_f_0[ ,1:n_1], 2, mean)
 
-    pred_matrix_f_1 <- dbarts::bart(
+    pred_matrix_f_1 <- theObject@bart_function(
       x.train = X_1,
       y.train = yobs_1,
       x.test =  f_1_test_set,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     mu_hat_0 <- apply(pred_matrix_f_1[ ,1:n_0], 2, mean)
@@ -128,22 +153,24 @@ setMethod(
     D_1 <- yobs_1 - mu_hat_1
     D_0 <- mu_hat_0 - yobs_0
 
-    pred_matrix_s_1 <- dbarts::bart(
+    pred_matrix_s_1 <- theObject@bart_function(
       x.train = X_1,
       y.train = D_1,
       x.test =  feature_new,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     tau_hat_1 <- apply(pred_matrix_s_1, 2, mean)
 
-    pred_matrix_s_0 <- dbarts::bart(
+    pred_matrix_s_0 <- theObject@bart_function(
       x.train = X_0,
       y.train = D_0,
       x.test =  feature_new,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     tau_hat_0 <- apply(pred_matrix_s_0, 2, mean)
@@ -155,12 +182,13 @@ setMethod(
     ############################################################################
 
     if(ensemble == "pscore"){
-      prop_matrix <- dbarts::bart(
+      prop_matrix <- theObject@bart_function(
         x.train = feat,
         y.train = factor(tr),
         x.test =  feature_new,
         verbose = verbose,
-        ndpost = ndpost
+        ndpost = ndpost,
+        ntree = theObject@ntree
       )$yhat.test
 
       g_weights <- pnorm(apply(prop_matrix, 2, mean))
@@ -289,22 +317,24 @@ setMethod(
     f_1_test_set <- rbind(X_0, feat)
 
 
-    pred_matrix_f_0 <- dbarts::bart(
+    pred_matrix_f_0 <- theObject@bart_function(
       x.train = X_0,
       y.train = yobs_0,
       x.test =  f_0_test_set,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     mu_hat_1 <- apply(pred_matrix_f_0[ ,1:n_1], 2, mean)
 
-    pred_matrix_f_1 <- dbarts::bart(
+    pred_matrix_f_1 <- theObject@bart_function(
       x.train = X_1,
       y.train = yobs_1,
       x.test =  f_1_test_set,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     mu_hat_0 <- apply(pred_matrix_f_1[ ,1:n_0], 2, mean)
@@ -318,22 +348,24 @@ setMethod(
     D_1 <- yobs_1 - mu_hat_1
     D_0 <- mu_hat_0 - yobs_0
 
-    pred_matrix_s_1 <- dbarts::bart(
+    pred_matrix_s_1 <- theObject@bart_function(
       x.train = X_1,
       y.train = D_1,
       x.test =  feat,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     tau_hat_1 <- apply(pred_matrix_s_1, 2, mean)
 
-    pred_matrix_s_0 <- dbarts::bart(
+    pred_matrix_s_0 <- theObject@bart_function(
       x.train = X_0,
       y.train = D_0,
       x.test =  feat,
       verbose = verbose,
-      ndpost = ndpost
+      ndpost = ndpost,
+      ntree = theObject@ntree
     )$yhat.test
 
     tau_hat_0 <- apply(pred_matrix_s_0, 2, mean)
@@ -345,12 +377,13 @@ setMethod(
     ############################################################################
 
     if(ensemble == "pscore"){
-      prop_matrix <- dbarts::bart(
+      prop_matrix <- theObject@bart_function(
         x.train = feat,
         y.train = factor(tr),
         x.test =  feat,
         verbose = verbose,
-        ndpost = ndpost
+        ndpost = ndpost,
+        ntree = theObject@ntree
       )$yhat.test
 
       g_weights <- pnorm(apply(prop_matrix, 2, mean))

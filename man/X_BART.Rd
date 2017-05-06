@@ -4,7 +4,8 @@
 \alias{X_BART}
 \title{X_BART}
 \usage{
-X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 1200)
+X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 1200,
+  tree_package = "dbarts", ntree = 200)
 }
 \arguments{
 \item{feat}{feature data.frame.}

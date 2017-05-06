@@ -33,4 +33,21 @@ test_that("Tests that T-BART is working correctly",
             expect_equal(smpleStats$SATC[1,2], 0.0346679)
             expect_equal(smpleStats$CATE[1,2], -0.01047405)
 
+            set.seed(1111)
+            tb <- T_BART(feat, tr, yobs, ndpost = 10,
+                         sample_stat =  "all estimated",
+                         ntree = 200,
+                         tree_package = "BayesTree")
+            smpleStats <- EstimateAllSampleStatistics(tb)
+
+            expect_equal(smpleStats$SATE[1,2], 0.009223561)
+
+            set.seed(1111)
+            tb <- T_BART(feat, tr, yobs, ndpost = 10,
+                         sample_stat =  "all estimated",
+                         ntree = 100,
+                         tree_package = "BayesTree")
+            smpleStats <- EstimateAllSampleStatistics(tb)
+            expect_equal(smpleStats$SATT[1,2], -0.006822898)
+
           })

@@ -1,7 +1,7 @@
 Package: hte
 Type: Package
 Title: Heterogeneous Treatment Effect Estimator Using Random Forests
-Version: 0.3.0.001
+Version: 0.3.1.000
 Author: Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
 Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
@@ -20,7 +20,8 @@ Imports:
     plyr,
     MASS (>= 7.3.0),
     rBayesianOptimization,
-    dbarts (>= 0.8.7)
+    dbarts (>= 0.8.7),
+    BayesTree (>= 0.3.1.4)
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 SystemRequirements: C++11

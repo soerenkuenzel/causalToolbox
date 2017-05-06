@@ -5,7 +5,8 @@
 \title{T_BART}
 \usage{
 T_BART(feat, tr, yobs, ndpost = 1200,
-  sample_stat = "counterfactuals estimated", verbose)
+  sample_stat = "counterfactuals estimated", tree_package = "dbarts",
+  ntree = 200, verbose)
 }
 \arguments{
 \item{feat}{feature data.frame.}

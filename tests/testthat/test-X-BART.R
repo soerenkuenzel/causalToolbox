@@ -47,4 +47,26 @@ test_that("Tests that X-BART is working correctly",
             expect_equal(smpleStats$SATC[1,2], 0.01497213)
             expect_equal(smpleStats$CATE[1,2], 0.1022138)
 
+
+            set.seed(112)
+            xb <- X_BART(feat, tr, yobs,
+                         ensemble = "pscore",
+                         ndpost = 10,
+                         tree_package = "BayesTree",
+                         ntree = 200
+                         )
+            smpleStats <- EstimateAllSampleStatistics(xb)
+            expect_equal(smpleStats$SATE[1,2], -0.003238378)
+
+            set.seed(112)
+            xb <- X_BART(feat, tr, yobs,
+                         ensemble = "pscore",
+                         ndpost = 10,
+                         tree_package = "dbarts",
+                         ntree = 100
+            )
+            smpleStats <- EstimateAllSampleStatistics(xb)
+            expect_equal(smpleStats$SATE[1,2], 0.01730287)
+
+
           })

@@ -1,6 +1,6 @@
 #' @include CATE_estimators.R
 #' @import dbarts
-#'
+
 ## the standard Xlearner object with random forest
 setClass(
   "S_BART",
@@ -11,6 +11,8 @@ setClass(
     yobs_train = "numeric",
     ndpost = "numeric",
     sample_stat = "character",
+    tree_package = "character",
+    ntree = "numeric",
     creator = "function"
   )
 )
@@ -30,6 +32,8 @@ S_BART <-
            yobs,
            ndpost = 1200,
            sample_stat = "counterfactuals estimated",
+           tree_package = "dbarts",
+           ntree = 200,
            verbose) {
     feat <- as.data.frame(feat)
 
@@ -40,12 +44,16 @@ S_BART <-
       yobs_train = yobs,
       ndpost = ndpost,
       sample_stat = sample_stat,
+      tree_package = tree_package,
+      ntree = ntree,
       creator = function(feat, tr, yobs) {
         S_BART(feat,
                tr,
                yobs,
                ndpost = ndpost,
-               sample_stat = sample_stat)
+               sample_stat = sample_stat,
+               tree_package = tree_package,
+               ntree = ntree)
       }
     )
   }
@@ -166,18 +174,40 @@ get_pred_mat <- function(theObject, feature_new, verbose, ndpost) {
   feature_new <- as.data.frame(feature_new)
   n_feature_new <- nrow(feature_new)
 
-  pred_matrix <- dbarts::bart(
-    x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
-    y.train = theObject@yobs_train,
-    x.test = cbind(rbind(feature_new, feature_new),
-                   tr = c(
-                     rep(0, n_feature_new), rep(1, n_feature_new)
-                   )),
-    verbose = verbose,
-    ndpost = ndpost
-  )$yhat.test
-}
 
+
+
+  if (theObject@tree_package == "BayesTree") {
+    pred_matrix <-
+      BayesTree::bart(
+        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
+        y.train = theObject@yobs_train,
+        x.test = cbind(rbind(feature_new, feature_new),
+                       tr = c(
+                         rep(0, n_feature_new), rep(1, n_feature_new)
+                       )),
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+  } else if (theObject@tree_package == "dbarts") {
+    pred_matrix <-
+      dbarts::bart(
+        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
+        y.train = theObject@yobs_train,
+        x.test = cbind(rbind(feature_new, feature_new),
+                       tr = c(
+                         rep(0, n_feature_new), rep(1, n_feature_new)
+                       )),
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+  } else{
+    stop("tree_package must be either BayesTree or dbarts")
+  }
+  return(pred_matrix)
+}
 
 compute_sample_statistics <- function(mu_hat_0_MCMC_samples,
                                       mu_hat_1_MCMC_samples,

@@ -3,6 +3,8 @@
 
 #' @import dbarts
 
+
+
 ## the standard Xlearner object with random forest
 setClass(
   "T_BART",
@@ -13,6 +15,8 @@ setClass(
     yobs_train = "numeric",
     ndpost = "numeric",
     sample_stat = "character",
+    tree_package = "character",
+    ntree = "numeric",
     creator = "function"
   )
 )
@@ -32,6 +36,8 @@ T_BART <-
            yobs,
            ndpost = 1200,
            sample_stat = "counterfactuals estimated",
+           tree_package = "dbarts",
+           ntree = 200,
            verbose) {
     feat <- as.data.frame(feat)
 
@@ -42,12 +48,16 @@ T_BART <-
       yobs_train = yobs,
       ndpost = ndpost,
       sample_stat = sample_stat,
+      tree_package = tree_package,
+      ntree = ntree,
       creator = function(feat, tr, yobs) {
         T_BART(feat,
                tr,
                yobs,
                ndpost = ndpost,
-               sample_stat = sample_stat)
+               sample_stat = sample_stat,
+               tree_package = tree_package,
+               ntree = ntree)
       }
     )
   }
@@ -82,25 +92,54 @@ setMethod(
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
 
-    pred_matrix_f_0 <- dbarts::bart(
-      x.train = X_0,
-      y.train = yobs_0,
-      x.test =  feature_new,
-      verbose = verbose,
-      ndpost = ndpost
-    )$yhat.test
 
-    mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
+    if (theObject@tree_package == "BayesTree") {
+      pred_matrix_f_0 <- BayesTree::bart(
+        x.train = X_0,
+        y.train = yobs_0,
+        x.test =  feature_new,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
 
-    pred_matrix_f_1 <- dbarts::bart(
-      x.train = X_1,
-      y.train = yobs_1,
-      x.test =  feature_new,
-      verbose = verbose,
-      ndpost = ndpost
-    )$yhat.test
+      mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
 
-    mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
+      pred_matrix_f_1 <- BayesTree::bart(
+        x.train = X_1,
+        y.train = yobs_1,
+        x.test =  feature_new,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+      mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
+    } else if (theObject@tree_package == "dbarts") {
+      pred_matrix_f_0 <- dbarts::bart(
+        x.train = X_0,
+        y.train = yobs_0,
+        x.test =  feature_new,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+      mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
+
+      pred_matrix_f_1 <- dbarts::bart(
+        x.train = X_1,
+        y.train = yobs_1,
+        x.test =  feature_new,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+      mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
+    } else{
+      stop("tree_package must be either BayesTree or dbarts")
+    }
 
     ############################################################################
     predictions <- mu_hat_1 - mu_hat_0
@@ -164,13 +203,32 @@ setMethod(
         x_to_predict = feature_new
       }
 
-      pred_matrix <- dbarts::bart(
-        x.train = x,
-        y.train = y,
-        x.test =  x_to_predict,
-        verbose = verbose,
-        ndpost = ndpost
-      )$yhat.test
+
+      if (theObject@tree_package == "BayesTree") {
+
+        pred_matrix <- BayesTree::bart(
+          x.train = x,
+          y.train = y,
+          x.test =  x_to_predict,
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+
+      } else if (theObject@tree_package == "dbarts") {
+
+        pred_matrix <- dbarts::bart(
+          x.train = x,
+          y.train = y,
+          x.test =  x_to_predict,
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+
+      } else{
+        stop("tree_package must be either BayesTree or dbarts")
+      }
 
       output[[this_learner]] <- apply(pred_matrix, 2, mean)
       CI[[this_learner]] <-
@@ -212,21 +270,50 @@ setMethod(
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
 
-    mu_hat_0_MCMC_samples <- dbarts::bart(
-      x.train = X_0,
-      y.train = yobs_0,
-      x.test =  feat,
-      verbose = verbose,
-      ndpost = ndpost
-    )$yhat.test
 
-    mu_hat_1_MCMC_samples <- dbarts::bart(
-      x.train = X_1,
-      y.train = yobs_1,
-      x.test =  feat,
-      verbose = verbose,
-      ndpost = ndpost
-    )$yhat.test
+    if (theObject@tree_package == "BayesTree") {
+
+      mu_hat_0_MCMC_samples <- BayesTree::bart(
+        x.train = X_0,
+        y.train = yobs_0,
+        x.test =  feat,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+      mu_hat_1_MCMC_samples <- BayesTree::bart(
+        x.train = X_1,
+        y.train = yobs_1,
+        x.test =  feat,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+    } else if (theObject@tree_package == "dbarts") {
+
+      mu_hat_0_MCMC_samples <- dbarts::bart(
+        x.train = X_0,
+        y.train = yobs_0,
+        x.test =  feat,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+      mu_hat_1_MCMC_samples <- dbarts::bart(
+        x.train = X_1,
+        y.train = yobs_1,
+        x.test =  feat,
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+
+    } else{
+      stop("tree_package must be either BayesTree or dbarts")
+    }
 
     return(
       compute_sample_statistics(
