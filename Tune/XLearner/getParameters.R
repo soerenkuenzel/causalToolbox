@@ -5,7 +5,9 @@
 ################################################################################
 library(dplyr)
 ## read in the data as list for MSE
-file_folder_MSE <- "Tune/XLearner/sim_data/"
+file_folder_MSE <- "Tune/XLearner/sim_data/sim_data_MSE/"
+file_folder_CI <- "Tune/XLearner/sim_data/sim_data_CI/"
+
 file_list_MSE <- list()
 i <- 1
 for(file in dir(file_folder_MSE)){
@@ -15,11 +17,11 @@ for(file in dir(file_folder_MSE)){
   i <- i + 1
 }
 ## read in the data as list for CI
-file_folder_CI <- "Tune/XLearner/sim_data_CI/"
 file_list_CI <- list()
 i <- 1
 for(file in dir(file_folder_CI)){
   print(file)
+  if(substr(file, 1,3) == "old") next
   if(substr(file, 1,3) == "old") next
   file_list_CI[[i]] <- tbl_df(read.csv(paste0(file_folder_CI, file), as.is = TRUE))
   i <- i + 1
@@ -52,6 +54,12 @@ starting_values <- as.data.frame(best_setups)
 devtools::use_data(starting_values, internal = TRUE, overwrite = TRUE)
 # This will save the data in R/sysdata.rda and will only be available for our
 # function
+
+
+
+
+
+
 
 
 ################################################################################
