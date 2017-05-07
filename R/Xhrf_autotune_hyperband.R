@@ -115,6 +115,10 @@ X_RF_autotune_hyperband <-
     if (verbose) {
       print("Done with the propensity score estimation.")
     }
+
+    hyperparameter_list <- get_hyper_parameter_list(m_0, m_1, m_tau_0,
+                                                   m_tau_1, m_prop, feat,
+                                                   nthread)
     return(
       new(
         "X_RF",
@@ -126,15 +130,13 @@ X_RF_autotune_hyperband <-
         m_tau_0 = m_tau_0,
         m_tau_1 = m_tau_1,
         m_prop = m_prop,
-        hyperparameter_list = get_hyper_parameter_list(m_0, m_1, m_tau_0,
-                                                       m_tau_1, m_prop, feat,
-                                                       nthread),
+        hyperparameter_list = hyperparameter_list,
         creator = function(feat, tr, yobs) {
-          X_RF_fully_specified(feat,
-                               tr,
-                               yobs,
-                               hyperparameter_list,
-                               verbose)
+          X_RF_fully_specified(feat = feat,
+                               tr = tr,
+                               yobs = yobs,
+                               hyperparameter_list = hyperparameter_list,
+                               verbose = verbose)
         }
       )
     )

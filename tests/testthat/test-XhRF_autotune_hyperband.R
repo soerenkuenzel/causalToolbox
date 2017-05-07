@@ -64,4 +64,45 @@ test_that("Tests X_RF_autotune_hyperband", {
   ) ^ 2),
   196.7121,
   tolerance = 1e-5)
+
+  # ----------------------------------------------------------------------------
+  set.seed(21)
+  feat <- iris[, -1]
+  tr <- rbinom(nrow(iris), 1, .5)
+  yobs <- iris[, 1]
+  num_iter <- 2 ^ 3
+  eta <- 2
+  verbose <- TRUE
+  seed <- 24750371
+  nthread <- 1
+
+  expect_warning(
+    xl_at <- X_RF_autotune_hyperband(
+      feat = feat,
+      tr = tr,
+      yobs = yobs,
+      num_iter = num_iter,
+      eta = eta,
+      verbose = FALSE,
+      nthread = 1
+    ),
+    "honestRF is used as adaptive random forest."
+  )
+
+  expect_warning(
+    CIs <- CateCI(
+      theObject = xl_at,
+      feature_new = feat,
+      B = 5,
+      verbose = FALSE
+    ),
+    "honestRF is used as adaptive random forest."
+  )
+
+  #theObject = xl_at; feature_new = feat; B = 5; verbose = FALSE
+
+  expect_equal(as.numeric(CIs[1, ]),
+               c(-0.20387587, -0.50478912,  0.09703738),
+               tolerance=1e-7)
+
 })

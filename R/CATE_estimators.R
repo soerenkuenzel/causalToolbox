@@ -119,7 +119,7 @@ setMethod(
 
     known_warnings <- c()
     # this is needed such that bootstrapped warnings are only printed once
-    for (b in 1:B) {
+    for (b in 1:B) { # b= 1
       if (verbose)
         print(b)
       went_wrong <- 0
