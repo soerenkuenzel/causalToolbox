@@ -151,14 +151,11 @@ tuneStageOne <- function(x,
             res <- predict(val_models[[j]], x) - y
             # Train an honestRF for tau
 
-            if (r_new < 1) {
-              r_new <- 1
-            }
             m_tau <-
               honestRF(
                 x = x,
                 y = res,
-                ntree = r_new,
+                ntree = r_i,
                 replace = m_tau_init@replace,
                 sampsize = m_tau_init@sampsize,
                 mtry = m_tau_init@mtry,
@@ -173,7 +170,8 @@ tuneStageOne <- function(x,
               )
             # If the tau model is valid, adding its OOB to the existing OOB
             if (!is.null(m_tau)) {
-              val_losses[[j]] <- val_losses[[j]] + getOOB(m_tau, noWarning = TRUE)
+              tau_oob <- getOOB(m_tau, noWarning = TRUE)
+              val_losses[[j]] <- val_losses[[j]] + tau_oob
             } else {
               val_losses[[j]] <- NA
             }
@@ -377,7 +375,7 @@ autoJointHonestRF <-
         num_iter = num_iter,
         eta = eta,
         verbose = verbose,
-        seed = seed,
+        seed = seed + i,
         nthread = nthread
       )
 
@@ -389,7 +387,7 @@ autoJointHonestRF <-
         num_iter = num_iter,
         eta = eta,
         verbose = verbose,
-        seed = seed,
+        seed = seed + i,
         nthread = nthread
       )
 
@@ -404,7 +402,7 @@ autoJointHonestRF <-
           num_iter = num_iter,
           eta = eta,
           verbose = verbose,
-          seed = seed,
+          seed = seed + i,
           nthread = nthread
         )
 
@@ -416,7 +414,7 @@ autoJointHonestRF <-
           num_iter = num_iter,
           eta = eta,
           verbose = verbose,
-          seed = seed,
+          seed = seed + i,
           nthread = nthread
         )
 
