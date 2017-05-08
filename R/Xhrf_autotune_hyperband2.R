@@ -148,15 +148,16 @@ tuneStageOne <- function(x,
             # If the model is available, get its OOB error
             val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
             # Calculate residuals
-            r <- predict(val_models[[j]], x) - y
+            res <- predict(val_models[[j]], x) - y
             # Train an honestRF for tau
+
             if (r_new < 1) {
-              r_new = 1
+              r_new <- 1
             }
             m_tau <-
               honestRF(
                 x = x,
-                y = r,
+                y = res,
                 ntree = r_new,
                 replace = m_tau_init@replace,
                 sampsize = m_tau_init@sampsize,
@@ -172,8 +173,7 @@ tuneStageOne <- function(x,
               )
             # If the tau model is valid, adding its OOB to the existing OOB
             if (!is.null(m_tau)) {
-              val_losses[[j]] <- val_losses[[j]] +
-                getOOB(m_tau, noWarning = TRUE)
+              val_losses[[j]] <- val_losses[[j]] + getOOB(m_tau, noWarning = TRUE)
             } else {
               val_losses[[j]] <- NA
             }
@@ -207,6 +207,31 @@ tuneStageOne <- function(x,
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
       best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
+      res <- predict(val_models[[1]], x) - y
+      m_tau <-
+        honestRF(
+          x = x,
+          y = res,
+          ntree = m_tau_init@ntree,
+          replace = m_tau_init@replace,
+          sampsize = m_tau_init@sampsize,
+          mtry = m_tau_init@mtry,
+          nodesizeSpl = m_tau_init@nodesizeSpl,
+          nodesizeAvg = m_tau_init@nodesizeAvg,
+          splitratio = m_tau_init@splitratio,
+          seed = seed,
+          verbose = FALSE,
+          nthread = nthread,
+          splitrule = "variance",
+          middleSplit = m_tau_init@middleSplit
+        )
+
+      # If the tau model is valid, adding its OOB to the existing OOB
+      if (!is.null(m_tau)) {
+        best_OOB <- best_OOB + getOOB(m_tau, noWarning = TRUE)
+      } else {
+        best_OOB <- NA
+      }
       if (is.na(best_OOB)) {
         stop()
         best_OOB <- Inf
