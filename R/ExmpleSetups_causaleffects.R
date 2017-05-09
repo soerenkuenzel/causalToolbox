@@ -94,8 +94,6 @@ simulate_causal_experiment <- function(ntrain,
                                        setup = "RespSparseTau1strong",
                                        testseed = NULL,
                                        trainseed = NULL) {
-  if (!is.null(given_features))
-    stop("We have not implemented this yet.")
 
   ## First we define a base function which will later be called with different
   # setups:
@@ -138,7 +136,7 @@ simulate_causal_experiment <- function(ntrain,
       } else{
         given_features_fkt <- function(n, dim) {
           colnames(given_features) <- paste0("x", 1:(ncol(given_features)))
-          return(given_features)
+          return(given_features[1:n, ])
         }
       }
 
@@ -167,8 +165,16 @@ simulate_causal_experiment <- function(ntrain,
         set.seed(trainseed)           # introduces a new seed to stay consistent
       }
       feat_tr <- given_features_fkt(ntrain, dim)
-      W_tr <- getW(feat_tr)
-      Yobs_tr <- getYobs(feat_tr, W_tr)
+      feat_tr_numeric <- as.data.frame(sapply(feat_tr, function(x) {
+        if (is.numeric(x)) {
+          return(x)
+        } else{
+          as.numeric(as.factor(x))
+        }
+      }))
+
+      W_tr <- getW(feat_tr_numeric)
+      Yobs_tr <- getYobs(feat_tr_numeric, W_tr)
       if (!is.null(trainseed)) {
         .Random.seed <- current_seed  # sets back the current random stage
       }
@@ -177,8 +183,15 @@ simulate_causal_experiment <- function(ntrain,
         set.seed(testseed)          # introduces a new seed to stay consistent
       }
       feat_te <- given_features_fkt(ntest, dim)
-      W_te <- getW(feat_te)
-      Yobs_te <- getYobs(feat_te, W_te)
+      feat_te_numeric <- as.data.frame(sapply(feat_te, function(x) {
+        if (is.numeric(x)) {
+          return(x)
+        } else{
+          as.numeric(as.factor(x))
+        }
+      }))
+      W_te <- getW(feat_te_numeric)
+      Yobs_te <- getYobs(feat_te_numeric, W_te)
       if (!is.null(testseed)) {
         .Random.seed <- current_seed  # sets back the current random stage
       }
@@ -187,11 +200,11 @@ simulate_causal_experiment <- function(ntrain,
           alpha = alpha,
           feat_te = feat_te,
           W_te = W_te,
-          tau_te = tau(feat_te),
+          tau_te = tau(feat_te_numeric),
           Yobs_te = Yobs_te,
           feat_tr = feat_tr,
           W_tr = W_tr,
-          tau_tr = tau(feat_tr),
+          tau_tr = tau(feat_tr_numeric),
           Yobs_tr = Yobs_tr
         )
       )
