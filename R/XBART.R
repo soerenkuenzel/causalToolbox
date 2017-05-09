@@ -454,31 +454,48 @@ setMethod(
       # COMPUTE ATT etc=========================================================
 
 
+      # the following matrices are just used to compute the variablitity of the
+      # two learners:
+      matrix_to_compute_var_0 <- pred_matrix_f_1[, (n_0 + 1):(n_0 + n_new)] + pred_matrix_s_0
+      matrix_to_compute_var_1 <- pred_matrix_f_0[, (n_1 + 1):(n_1 + n_new)] + pred_matrix_s_1
+
+      matrix_to_compute_var_total <- g_weights * matrix_to_compute_var_0 +
+           (1 - g_weights) * matrix_to_compute_var_1
+
+
       pred_MCMC_matrix <- g_weights * pred_matrix_s_0 + (1 - g_weights) * pred_matrix_s_1
 
 
       SATE_MCMC_samples_alle <- apply(pred_MCMC_matrix, 1, mean)
       SATE_estimate_alle <- mean(SATE_MCMC_samples_alle)
-      SATE_CI_alle <-
-        quantile(SATE_MCMC_samples_alle, probs = c(.05, .95))
+      SATE_sd <- sd(apply(matrix_to_compute_var_total, 1, mean))
+      SATE_CI_alle <- data.frame("lower" = SATE_estimate_alle - 2 * SATE_sd,
+                                 "upper" = SATE_estimate_alle + 2 * SATE_sd)
+        # quantile(SATE_MCMC_samples_alle, probs = c(.05, .95))
 
       SATT_MCMC_samples_alle <-
         apply(pred_MCMC_matrix[, tr == 1], 1, mean)
       SATT_estimate_alle <- mean(SATT_MCMC_samples_alle)
-      SATT_CI_alle <- quantile(SATT_MCMC_samples_alle, probs = c(.05, .95))
+      SATT_sd <- sd(apply(matrix_to_compute_var_total[, tr == 1], 1, mean))
+      SATT_CI_alle <- data.frame("lower" = SATT_estimate_alle - 2 * SATT_sd,
+                                 "upper" = SATT_estimate_alle + 2 * SATT_sd)
+        # quantile(SATT_MCMC_samples_alle, probs = c(.05, .95))
 
       SATC_MCMC_samples_alle <-
         apply(pred_MCMC_matrix[, tr == 0], 1, mean)
       SATC_estimate_alle <- mean(SATC_MCMC_samples_alle)
-      SATC_CI_alle <- quantile(SATC_MCMC_samples_alle, probs = c(.05, .95))
+      SATT_sd <- sd(apply(matrix_to_compute_var_total[, tr == 0], 1, mean))
+      SATC_CI_alle <- data.frame("lower" = SATC_estimate_alle - 2 * SATT_sd,
+                                 "upper" = SATC_estimate_alle + 2 * SATT_sd)
+      # quantile(SATC_MCMC_samples_alle, probs = c(.05, .95))
 
       ATE <-
         rbind(
           data.frame(
             method = "all estimated",
             estimate = SATE_estimate_alle,
-            "lower" = SATE_CI_alle[1],
-            "upper" = SATE_CI_alle[2]
+            "lower" = SATE_CI_alle[, 1],
+            "upper" = SATE_CI_alle[, 2]
           )
         )
       ATT <-
@@ -486,8 +503,8 @@ setMethod(
           data.frame(
             method = "all estimated",
             estimate = SATT_estimate_alle,
-            "lower" = SATT_CI_alle[1],
-            "upper" = SATT_CI_alle[2]
+            "lower" = SATT_CI_alle[, 1],
+            "upper" = SATT_CI_alle[, 2]
           )
         )
       ATC <-
@@ -495,8 +512,8 @@ setMethod(
           data.frame(
             method = "all estimated",
             estimate = SATC_estimate_alle,
-            "lower" = SATC_CI_alle[1],
-            "upper" = SATC_CI_alle[2]
+            "lower" = SATC_CI_alle[, 1],
+            "upper" = SATC_CI_alle[, 2]
           )
         )
 
