@@ -155,7 +155,7 @@ tuneStageOne <- function(x,
               honestRF(
                 x = x,
                 y = res,
-                ntree = r_i,
+                ntree = max(r_i, 1),
                 replace = m_tau_init@replace,
                 sampsize = m_tau_init@sampsize,
                 mtry = m_tau_init@mtry,
