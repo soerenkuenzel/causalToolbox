@@ -452,7 +452,7 @@ setMethod(
                         nthread,
                         verbose) {
     ## shortcuts:
-    # theObject = sl; method = "maintain_group_ratios"; B = 4; nthread = 2; verbose = TRUE
+    # theObject = xl; method = "maintain_group_ratios"; B = 4; nthread = 2; verbose = TRUE
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
@@ -486,6 +486,10 @@ setMethod(
 
     known_warnings <- c()
     # this is needed such that bootstrapped warnings are only printed once
+
+    SATE_bootstrap_samples <- rep(NA, B)
+    SATT_bootstrap_samples <- rep(NA, B)
+    SATC_bootstrap_samples <- rep(NA, B)
     for (b in 1:B) {
       if (verbose)
         print(b)
@@ -497,20 +501,16 @@ setMethod(
         if (went_wrong == 100)
           stop("one of the groups might be too small to
                do valid inference.")
-        pred_B[, b] <-
+        learner_bi <-
           tryCatch({
             bs <- createbootstrappedData()
-
             withCallingHandlers(
               # this is needed such that bootstrapped warnings are only
               # printed once
-              EstimateCate(
-                creator(
-                  feat = bs$feat_b,
-                  tr = bs$tr_b,
-                  yobs = bs$yobs_b
-                ),
-                feature_new = feat
+              creator(
+                feat = bs$feat_b,
+                tr = bs$tr_b,
+                yobs = bs$yobs_b
               ),
               warning = function(w) {
                 if (w$message %in% known_warnings) {
@@ -526,27 +526,45 @@ setMethod(
           error = function(e) {
             return(NA)
           })
+
+        CATE_bi <-   tryCatch({
+          EstimateCate(learner_bi, feature_new = bs$feat_b)
+        },
+        error = function(e) {
+          return(NA)
+        })
+
+        SATE_bootstrap_samples[b] <- mean(CATE_bi)
+        SATT_bootstrap_samples[b] <- mean(CATE_bi[bs$tr_b == 1])
+        SATC_bootstrap_samples[b] <- mean(CATE_bi[bs$tr_b == 0])
+        pred_B[, b] <-
+          tryCatch({
+            EstimateCate(learner_bi, feature_new = feat)
+          },
+          error = function(e) {
+            return(NA)
+          })
         went_wrong <- went_wrong + 1
       }
     }
 
     # Compute Sample Statistics ------------------------------------------------
     # pred_B is a matrix each column consist of one bootstrapped prediciton.
-
-    SATE_bootstrap_samples <- apply(pred_B, 2, mean)
-    SATE_estimate <- mean(SATE_bootstrap_samples)
+    CateEstimates_mainlearner <- EstimateCate(theObject, feature_new = feat)
+    # SATE_bootstrap_samples <- apply(pred_B, 2, mean)
+    SATE_estimate <- mean(CateEstimates_mainlearner)
     SATE_sd <- sd(SATE_bootstrap_samples)
     SATE_lower <- SATE_estimate - 2 * SATE_sd
     SATE_upper <- SATE_estimate + 2 * SATE_sd
 
-    SATT_bootstrap_samples <- apply(pred_B[tr == 1, ], 2, mean)
-    SATT_estimate <- mean(SATT_bootstrap_samples)
+    # SATT_bootstrap_samples <- apply(pred_B[tr == 1, ], 2, mean)
+    SATT_estimate <- mean(CateEstimates_mainlearner[tr == 1])
     SATT_sd <- sd(SATT_bootstrap_samples)
     SATT_lower <- SATT_estimate - 2 * SATT_sd
     SATT_upper <- SATT_estimate + 2 * SATT_sd
 
-    SATC_bootstrap_samples <- apply(pred_B[tr == 0, ], 2, mean)
-    SATC_estimate <- mean(SATC_bootstrap_samples)
+    # SATC_bootstrap_samples <- apply(pred_B[tr == 0, ], 2, mean)
+    SATC_estimate <- mean(CateEstimates_mainlearner[tr == 0])
     SATC_sd <- sd(SATC_bootstrap_samples)
     SATC_lower <- SATC_estimate - 2 * SATC_sd
     SATC_upper <- SATC_estimate + 2 * SATC_sd
