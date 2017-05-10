@@ -268,6 +268,17 @@ X_RF_fully_specified <-
            yobs,
            hyperparameter_list,
            verbose) {
+
+    #---------------------------------------------------------------------------
+
+    for(i in 1:ncol(feat)){
+      if(is.character(feat[,i])) {
+        stop(paste("feature", i, "is a character, please first make it a factor"))
+        feat[,i] <- as.factor(feat[,i])
+      }
+    }
+    #---------------------------------------------------------------------------
+
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
 

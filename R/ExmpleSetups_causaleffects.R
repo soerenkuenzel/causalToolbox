@@ -87,7 +87,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' @export simulate_causal_experiment
 simulate_causal_experiment <- function(ntrain,
                                        ntest,
-                                       dim,
+                                       dim = ncol(given_features),
                                        alpha = .1,
                                        feat_distribution = "normal",
                                        given_features = NULL,
