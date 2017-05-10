@@ -4,8 +4,8 @@
 \alias{simulate_causal_experiment}
 \title{simulate a RCT or observational data for causal effect estimation}
 \usage{
-simulate_causal_experiment(ntrain, ntest, dim, alpha = 0.1,
-  feat_distribution = "normal", given_features = NULL,
+simulate_causal_experiment(ntrain, ntest, dim = ncol(given_features),
+  alpha = 0.1, feat_distribution = "normal", given_features = NULL,
   setup = "RespSparseTau1strong", testseed = NULL, trainseed = NULL)
 }
 \arguments{

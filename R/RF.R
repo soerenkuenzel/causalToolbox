@@ -95,11 +95,10 @@ preprocess_testing <- function(x, categoricalFeatureCols,
     testingCategoricalFeatureCols <- list(testingCategoricalFeatureCols)
   }
 
-  # TODO:
-  # if (length(setdiff(categoricalFeatureCols,
-  #                    testingCategoricalFeatureCols)) != 0) {
-  #   stop("Categorical columns are different between testing and training data.")
-  # }
+  if (length(setdiff(categoricalFeatureCols,
+                     testingCategoricalFeatureCols)) != 0) {
+    stop("Categorical columns are different between testing and training data.")
+  }
 
   # For each categorical feature, encode x into numeric representation
   for (categoricalFeatureMapping_ in categoricalFeatureMapping) {
