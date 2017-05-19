@@ -337,19 +337,24 @@ simulate_causal_experiment <- function(ntrain,
     set.seed(1421)                # introduces a new seed to stay consistent
     beatc_raw <- runif(dim, 1, 30)
     beatt_raw <- runif(dim, 1, 30)
+    if(dim >= 20){
+      non_zero_coef <- sample(1:dim, 20)
+      beatc_raw[-non_zero_coef[1:10]] <- 0
+      beatt_raw[-non_zero_coef[11:20]] <- 0
+    }else if(dim >= 10){
+      beatc_raw[-(1:10)] <- 0
+      beatt_raw[-((dim - 9):dim)] <- 0
+    }
     .Random.seed <-
       current_seed  # sets back the current random stage
 
     m_t_truth <- function(feat) {
-      bta_non_zero_size <- min(5,ncol(feat))
-      betac_trunc <- beatc_raw[1:bta_non_zero_size]
-      as.matrix(feat)[ , sample(1:ncol(feat), bta_non_zero_size)] %*% betac_trunc                 # mu^t
+      betac_trunc <- beatc_raw
+      as.matrix(feat) %*% betac_trunc                 # mu^t
     }
     m_c_truth <- function(feat) {
-      bta_non_zero_size <- min(5,ncol(feat))
-
-      beatt_trunc <- beatt_raw[1:bta_non_zero_size]
-      as.matrix(feat)[ , sample(1:ncol(feat), bta_non_zero_size)] %*% beatt_trunc                  # mu^t
+      beatt_trunc <- beatt_raw
+      as.matrix(feat) %*% beatt_trunc                  # mu^t
     }
     propscore <-
       function(feat)
@@ -506,20 +511,18 @@ simulate_causal_experiment <- function(ntrain,
       stop("For WA3 the dimension must be at least 2")
 
     effect <- function(feat) {
-      4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
-             (1 + exp(-12 * (feat$x2 - 0.5))) *
-             (1 + exp(-12 * (feat$x3 - 0.5))) *
-             (1 + exp(-12 * (feat$x4 - 0.5))) *
-             (1 + exp(-12 * (feat$x5 - 0.5)))
-           )
+      sin(feat$x1) *
+      sin(feat$x2) *
+      sin(feat$x3) *
+      sin(feat$x4)
     }
 
     m_c_truth <-
       function(feat)
-        1 / 2 * effect(feat) # mu^c
+        effect(feat) # mu^c
     m_t_truth <-
       function(feat)
-        m_c_truth(feat) + ifelse(feat$x2 > .1, 8, 0)  # mu^t
+        m_c_truth(feat) + ifelse(feat$x2 > .1, .3, 0)  # mu^t
     propscore <-
       function(feat)
         .01 # propensity score
@@ -900,7 +903,7 @@ simulate_causal_experiment <- function(ntrain,
         1 / 2 * effect(feat) # mu^c
     m_t_truth <-
       function(feat)
-        m_c_truth(feat) + ifelse(feat$x2 > .1, 8, 0)  # mu^t
+        - m_c_truth(feat)  # mu^t
     propscore <-
       function(feat)
         .5 # propensity score
