@@ -687,6 +687,61 @@ simulate_causal_experiment <- function(ntrain,
   }
 
   #-----------------------------------------------------------------------------
+  if (setup == "STMpp4") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+    if(dim < 20) stop("dim must be at least 20")
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(112)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, -15, 15)
+    beatt_raw <- runif(dim, -15, 15)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_c_truth <- function(feat) {
+      beta_mdim <- min(ncol(feat), 5)
+      beta_m <- beatc_raw[1:beta_mdim]
+      return(
+        ifelse(
+          feat[, 20] < -0.4,
+          as.matrix(feat)[, 1:beta_mdim] %*% beta_m,
+          ifelse(
+            feat[, 20] < 0.4,
+            as.matrix(feat)[, (beta_mdim + 1):(2 * beta_mdim)] %*% beta_m,
+            as.matrix(feat)[, (2 * beta_mdim + 1): (3 * beta_mdim)] %*% beta_m
+          )
+        )
+      )
+    }
+    m_t_truth <- function(feat) {
+      m_c_truth(feat)                     # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+
 
   # 7.) Ufail
   if (setup == "Ufail") {

@@ -12,4 +12,6 @@ test_that("Test non-continuous split", {
                              setup = "complexTau2")
   simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
                              setup = "WA4")
+  simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 20, alpha = 5,
+                             setup = "STMpp4")
 })
