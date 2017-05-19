@@ -328,6 +328,52 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+
+  if (setup == "complexTau2") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1421)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, 1, 30)
+    beatt_raw <- runif(dim, 1, 30)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      betac_trunc <- beatc_raw[1:min(5,ncol(feat))]
+      as.matrix(feat) %*% betac_trunc                 # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beatt_trunc <- beatt_raw[1:min(5,ncol(feat))]
+      as.matrix(feat) %*% beatt_trunc                  # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+
   # 4.) treatment effect and treatment assignment are dependent
   if (setup == "Conf1") {
     m_t_truth <- function(feat) {
@@ -415,15 +461,15 @@ simulate_causal_experiment <- function(ntrain,
     beat_raw <- runif(dim, -5, 5)
     .Random.seed <-
       current_seed  # sets back the current random stage
-
-    m_t_truth <- function(feat) {
-      beta_m <- beat_raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
-    }
     m_c_truth <- function(feat) {
       beta_m <- beat_raw[1:ncol(feat)]
       as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
     }
+    m_t_truth <- function(feat) {
+      beta_m <- beat_raw[1:ncol(feat)]
+      m_c_truth(feat) + ifelse(feat$x2 > .1, 8, 0)  # mu^t
+    }
+
     propscore <-
       function(feat)
         .01                    # propensity score
@@ -449,6 +495,57 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+
+  #-----------------------------------------------------------------------------
+  # 11.) rare 3
+  if (setup == "rare3") {
+    if (dim < 2)
+      stop("For WA3 the dimension must be at least 2")
+
+    effect <- function(feat) {
+      4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
+             (1 + exp(-12 * (feat$x2 - 0.5))) *
+             (1 + exp(-12 * (feat$x3 - 0.5))) *
+             (1 + exp(-12 * (feat$x4 - 0.5))) *
+             (1 + exp(-12 * (feat$x5 - 0.5)))
+           )
+    }
+
+    m_c_truth <-
+      function(feat)
+        1 / 2 * effect(feat) # mu^c
+    m_t_truth <-
+      function(feat)
+        m_c_truth(feat) + ifelse(feat$x2 > .1, 8, 0)  # mu^t
+    propscore <-
+      function(feat)
+        .01 # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+  #-----------------------------------------------------------------------------
+
+
+
+
   # 6.) no treatment effect
   if (setup == "STMpp") {
     # the following is used so that the seed is fixed for the creation of this
@@ -461,13 +558,12 @@ simulate_causal_experiment <- function(ntrain,
     .Random.seed <-
       current_seed  # sets back the current random stage
 
-    m_t_truth <- function(feat) {
-      beta_m <- beatc_raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta_m                      # mu^t
-    }
     m_c_truth <- function(feat) {
       beta_m <- beatc_raw[1:ncol(feat)]
-      as.matrix(feat) %*% beta_m                      # mu^t
+      as.matrix(feat) %*% beta_m                      # mu^c
+    }
+    m_t_truth <- function(feat) {
+      m_c_truth(feat)                     # mu^t
     }
     propscore <-
       function(feat)
@@ -493,6 +589,97 @@ simulate_causal_experiment <- function(ntrain,
       )
     ))
   }
+
+  # 6.) no treatment effect
+  if (setup == "STMpp2") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(112)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, -15, 15)
+    beatt_raw <- runif(dim, -15, 15)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_c_truth <- function(feat) {
+      beta_m <- beatc_raw[1:min(ncol(feat), 5)]
+      as.matrix(feat) %*% beta_m                      # mu^c
+    }
+    m_t_truth <- function(feat) {
+      m_c_truth(feat)                     # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  #-----------------------------------------------------------------------------
+  if (setup == "STMPP3") {
+    if (dim < 2)
+      stop("For WA3 the dimension must be at least 2")
+
+    effect <- function(feat) {
+      4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
+             (1 + exp(-12 * (feat$x2 - 0.5))) *
+             (1 + exp(-12 * (feat$x3 - 0.5))) *
+             (1 + exp(-12 * (feat$x4 - 0.5))) *
+             (1 + exp(-12 * (feat$x5 - 0.5)))
+      )
+    }
+
+    m_c_truth <-
+      function(feat)
+        1 / 2 * effect(feat) # mu^c
+    m_t_truth <-
+      function(feat)
+        m_c_truth(feat)  # mu^t
+    propscore <-
+      function(feat)
+        .5 # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  #-----------------------------------------------------------------------------
 
   # 7.) Ufail
   if (setup == "Ufail") {
@@ -689,6 +876,53 @@ simulate_causal_experiment <- function(ntrain,
       )
     ))
   }
+
+
+  if (setup == "WA4") {
+    if (dim < 2)
+      stop("For WA3 the dimension must be at least 2")
+
+    effect <- function(feat) {
+      4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
+             (1 + exp(-12 * (feat$x2 - 0.5))) *
+             (1 + exp(-12 * (feat$x3 - 0.5))) *
+             (1 + exp(-12 * (feat$x4 - 0.5))) *
+             (1 + exp(-12 * (feat$x5 - 0.5)))
+      )
+    }
+
+    m_c_truth <-
+      function(feat)
+        1 / 2 * effect(feat) # mu^c
+    m_t_truth <-
+      function(feat)
+        m_c_truth(feat) + ifelse(feat$x2 > .1, 8, 0)  # mu^t
+    propscore <-
+      function(feat)
+        .5 # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+
   ## If nothing was returned by now, then something went wrong and we want to
   # throw an error:
   stop(
