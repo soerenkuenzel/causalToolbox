@@ -77,7 +77,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' @param setup This is used to specify the function form of the potential
 #' outcomes and the treatment assignment. One of
 #' RespSparseTau1strong, RsparseT2weak, complexTau,
-#' Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3.
+#' Conf1, rare1, STMpp, Ufail, Usual1, WA1, WA2, WA3.
 #' @param testseed is the seed used to generate the testing data, if NULL, then
 #' the seed of the main session is used.
 #' @param trainseed is the seed used to generate the training data, if NULL,
@@ -405,6 +405,50 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
+  # 5.) few treated
+  if (setup == "rare2") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1444)                # introduces a new seed to stay consistent
+    beat_raw <- runif(dim, -5, 5)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      beta_m <- beat_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0) + 8  # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beta_m <- beat_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beta_m  + ifelse(feat$x1 > .5, 5, 0)  # mu^c
+    }
+    propscore <-
+      function(feat)
+        .01                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
   # 6.) no treatment effect
   if (setup == "STMpp") {
     # the following is used so that the seed is fixed for the creation of this
@@ -530,10 +574,10 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
-  # 9.) Wager1
-  if (setup == "Wager1") {
+  # 9.) WA1
+  if (setup == "WA1") {
     if (dim < 3)
-      stop("For Wager1 the dimension must be at least 3")
+      stop("For WA1 the dimension must be at least 3")
 
     m_t_truth <-
       function(feat)
@@ -566,10 +610,10 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
-  # 10.) Wager2
-  if (setup == "Wager2") {
+  # 10.) WA2
+  if (setup == "WA2") {
     if (dim < 2)
-      stop("For Wager2 the dimension must be at least 2")
+      stop("For WA2 the dimension must be at least 2")
     effect <- function(feat) {
       (1 + 1 / (1 + exp(-20 * (feat$x1 - 1 / 3)))) *
         (1 + 1 / (1 + exp(-20 * (feat$x2 - 1 / 3))))
@@ -605,10 +649,10 @@ simulate_causal_experiment <- function(ntrain,
     ))
   }
 
-  # 11.) Wager 3
-  if (setup == "Wager3") {
+  # 11.) WA 3
+  if (setup == "WA3") {
     if (dim < 2)
-      stop("For Wager3 the dimension must be at least 2")
+      stop("For WA3 the dimension must be at least 2")
 
     effect <- function(feat) {
       4 / ((1 + exp(-12 * (feat$x1 - 0.5))) *
@@ -649,6 +693,6 @@ simulate_causal_experiment <- function(ntrain,
   # throw an error:
   stop(
     "setup must be one of RespSparseTau1strong, RsparseT2weak, complexTau,
-    Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3"
+    Conf1, rare1, STMpp, Ufail, Usual1, WA1, WA2, WA3"
   )
 }
