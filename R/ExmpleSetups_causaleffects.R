@@ -341,12 +341,15 @@ simulate_causal_experiment <- function(ntrain,
       current_seed  # sets back the current random stage
 
     m_t_truth <- function(feat) {
-      betac_trunc <- beatc_raw[1:min(5,ncol(feat))]
-      as.matrix(feat) %*% betac_trunc                 # mu^t
+      bta_non_zero_size <- min(5,ncol(feat))
+      betac_trunc <- beatc_raw[1:bta_non_zero_size]
+      as.matrix(feat)[ , sample(1:ncol(feat), bta_non_zero_size)] %*% betac_trunc                 # mu^t
     }
     m_c_truth <- function(feat) {
-      beatt_trunc <- beatt_raw[1:min(5,ncol(feat))]
-      as.matrix(feat) %*% beatt_trunc                  # mu^t
+      bta_non_zero_size <- min(5,ncol(feat))
+
+      beatt_trunc <- beatt_raw[1:bta_non_zero_size]
+      as.matrix(feat)[ , sample(1:ncol(feat), bta_non_zero_size)] %*% beatt_trunc                  # mu^t
     }
     propscore <-
       function(feat)
@@ -603,8 +606,9 @@ simulate_causal_experiment <- function(ntrain,
       current_seed  # sets back the current random stage
 
     m_c_truth <- function(feat) {
-      beta_m <- beatc_raw[1:min(ncol(feat), 5)]
-      as.matrix(feat) %*% beta_m                      # mu^c
+      beta_mdim <- min(ncol(feat), 5)
+      beta_m <- beatc_raw[1:beta_mdim]
+      as.matrix(feat)[ , 1:beta_mdim] %*% beta_m                      # mu^c
     }
     m_t_truth <- function(feat) {
       m_c_truth(feat)                     # mu^t
@@ -635,7 +639,7 @@ simulate_causal_experiment <- function(ntrain,
   }
 
   #-----------------------------------------------------------------------------
-  if (setup == "STMPP3") {
+  if (setup == "STMpp3") {
     if (dim < 2)
       stop("For WA3 the dimension must be at least 2")
 
