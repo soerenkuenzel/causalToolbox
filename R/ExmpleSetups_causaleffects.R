@@ -382,6 +382,121 @@ simulate_causal_experiment <- function(ntrain,
   }
 
 
+  if (setup == "complexTau3") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1421)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, -5, 5)
+    beatt_raw <- runif(dim, -5, 5)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      betac_trunc <- beatc_raw[1:ncol(feat)]
+      as.matrix(feat) %*% betac_trunc                 # mu^t
+    }
+    m_c_truth <- function(feat) {
+      beatt_trunc <- beatt_raw[1:ncol(feat)]
+      as.matrix(feat) %*% beatt_trunc                  # mu^t
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+  if (setup == "complexTau4") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(1421)                # introduces a new seed to stay consistent
+    beatc_raw1 <- runif(dim, -5, 5)
+    beatt_raw1 <- runif(dim, -5, 5)
+    beatc_raw2 <- runif(dim, -5, 5)
+    beatt_raw2 <- runif(dim, -5, 5)
+    beatc_raw3 <- runif(dim, -5, 5)
+    beatt_raw3 <- runif(dim, -5, 5)
+    .Random.seed <-
+      current_seed  # sets back the current random stage
+
+    m_t_truth <- function(feat) {
+      betac_trunc1 <- beatc_raw1[1:ncol(feat)]
+      betac_trunc2 <- beatc_raw2[1:ncol(feat)]
+      betac_trunc3 <- beatc_raw3[1:ncol(feat)]
+
+      ifelse(
+        feat[, 20] < -0.4,
+        as.matrix(feat) %*% betac_trunc1,
+        ifelse(
+          feat[, 20] < 0.4,
+          as.matrix(feat) %*% betac_trunc2,
+          as.matrix(feat) %*% betac_trunc3
+        )
+      )
+    }
+    m_c_truth <- function(feat) {
+      betat_trunc1 <- beatc_raw1[1:ncol(feat)]
+      betat_trunc2 <- beatc_raw2[1:ncol(feat)]
+      betat_trunc3 <- beatc_raw3[1:ncol(feat)]
+
+      ifelse(
+        feat[, 20] < -0.4,
+        as.matrix(feat) %*% betat_trunc1,
+        ifelse(
+          feat[, 20] < 0.4,
+          as.matrix(feat) %*% betat_trunc2,
+          as.matrix(feat) %*% betat_trunc3
+        )
+      )
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
+
+
   # 4.) treatment effect and treatment assignment are dependent
   if (setup == "Conf1") {
     m_t_truth <- function(feat) {
