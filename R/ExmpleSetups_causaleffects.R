@@ -457,9 +457,9 @@ simulate_causal_experiment <- function(ntrain,
       )
     }
     m_c_truth <- function(feat) {
-      betat_trunc1 <- beatc_raw1[1:ncol(feat)]
-      betat_trunc2 <- beatc_raw2[1:ncol(feat)]
-      betat_trunc3 <- beatc_raw3[1:ncol(feat)]
+      betat_trunc1 <- beatt_raw1[1:ncol(feat)]
+      betat_trunc2 <- beatt_raw2[1:ncol(feat)]
+      betat_trunc3 <- beatt_raw3[1:ncol(feat)]
 
       ifelse(
         feat[, 20] < -0.4,
