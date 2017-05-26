@@ -57,6 +57,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
       tr = cate_problem$W_tr,
       yobs = cate_problem$Yobs_tr,
       ntree = 20,
+      ntree_testing = 10,
       nthread = 1,
       verbose = FALSE
     ),

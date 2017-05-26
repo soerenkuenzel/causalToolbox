@@ -33,10 +33,11 @@ X_RF_autotune_simple <-
            tr,
            yobs,
            ntree = 2000,
+           ntree_testing = 400,
            nthread = 0,
            verbose = TRUE) {
     starting_settings <- get_starting_settings(feat = feat, tr = tr,
-                                               ntree = ntree, nthread = nthread)
+                    ntree = ntree_testing, nthread = nthread)
     #   list(
     #   "start_setting_1" = get_setting_strong(feat, ntree, nthread),
     #   "start_setting_2" = get_setting_weak(feat, ntree, nthread)
@@ -53,12 +54,21 @@ X_RF_autotune_simple <-
     if (verbose)
       print(paste(names(starting_settings)[which.min(setup_eval$comb)],
                   "is the best."))
+
+    best_setting <- starting_settings[[which.min(setup_eval$comb)]]
+
+    best_setting$l_first_0$ntree <- ntree
+    best_setting$l_first_1$ntree <- ntree
+    best_setting$l_second_0$ntree <- ntree
+    best_setting$l_second_1$ntree <- ntree
+    best_setting$l_prop$ntree <- ntree
+
     return(
       X_RF_fully_specified(
         feat = feat,
         tr = tr,
         yobs = yobs,
-        hyperparameter_list = starting_settings[[which.min(setup_eval$comb)]],
+        hyperparameter_list = best_setting,
         verbose = verbose
       )
     )
