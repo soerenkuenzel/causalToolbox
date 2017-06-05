@@ -14,21 +14,19 @@ The package contains compiled code, and you must have a development environment 
 
 ## Example (this will not execute because there is no data)
 
+```R
 library(hte)
 packageVersion("hte")
 
 #This is the autotune version. Faster version is to simply use X_RF()
 #create the hte object
-```R
+
 xl <- X_RF_autotune_simple(feat = X.train, tr = Tr.train, yobs = Y.train, nthread = ?)
-```
 
 #estimate the CATE
-```R
 xl.cate <- EstimateCate(xl, X.test)
-```
 
 #create confidence intervals via bootstrapping
-```R
+
 xl_ci <- CateCI(xl, X, B=500)
 ```
