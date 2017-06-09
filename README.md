@@ -18,10 +18,9 @@ The package contains compiled code, and you must have a development environment 
 library(hte)
 packageVersion("hte")
 
-#This is the autotune version. Faster version is to simply use X_RF()
 #create the hte object
 
-xl <- X_RF_autotune_simple(feat = X.train, tr = Tr.train, yobs = Y.train, nthread = ?)
+xl <- X_RF(feat = X.train, tr = Tr.train, yobs = Y.train)
 
 #estimate the CATE
 xl.cate <- EstimateCate(xl, X.test)
