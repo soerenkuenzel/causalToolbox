@@ -7,9 +7,22 @@
 #' @param x A dataframe of observations in the current tree leaf
 #' @param y A vector of outcomes in the current tree leaf
 #' @return The averaging metrics of the data
-avgMean <- function(x, y) {
+avgMean <- function(x, y, y_sd = NULL) {
   return(mean(y))
 }
+
+#' @title weightedavgMean
+#' @description A default function to average the observations in each tree leaf
+#' by taking a weighted mean according with minimal variance.
+#' @param x A dataframe of observations in the current tree leaf
+#' @param y A vector of outcomes in the current tree leaf
+#' @param y_sd A vector. The ith position contains the standard deviation of Y_i
+#' @return The weighted averaging of Y
+weightedavgMean <- function(x, y, y_sd) {
+  normalizer <- sum(1 / y_sd^2)
+  return(sum(y / y_sd ^ 2) / normalizer)
+}
+
 
 ######################################
 ### Random Forest Node Constructor ###
@@ -89,15 +102,12 @@ setGeneric(
 #' @rdname RFNode-RFNode
 #' @aliases RFNode, RFNode-method
 #' @return a `RFNode` object
-RFNode <- function(
-  sampleIndex=list(
-    "averagingSampleIndex"=vector(),
-    "splittingSampleIndex"=vector()
-  ),
-  splitFeature=numeric(),
-  splitValue=numeric(),
-  child=list()
-  ){
+RFNode <- function(sampleIndex = list("averagingSampleIndex" = vector(),
+                                      "splittingSampleIndex" = vector()),
+                   splitFeature = numeric(),
+                   splitValue = numeric(),
+                   child = list()) {
+
 
   if (length(child) == 0) {
     # Both children are null, create a leaf node
@@ -154,6 +164,7 @@ setMethod(
     feature.new,
     x,
     y,
+    se = NULL,
     avgfunc,
     categoricalFeatureCols
     ){
@@ -161,7 +172,8 @@ setMethod(
     if (length(object@child) == 0) {
       predicted_value <- avgfunc(
         x[object@sampleIndex$averagingSampleIndex, ],
-        y[object@sampleIndex$averagingSampleIndex]
+        y[object@sampleIndex$averagingSampleIndex],
+        se[object@sampleIndex$averagingSampleIndex]
         )
       prediction <- rep(predicted_value, nrow(feature.new))
       return(prediction)
@@ -186,7 +198,7 @@ setMethod(
         prediction[leftIndicator] <- predict(
           object@child$leftChild,
           feature.new[leftIndicator, ],
-          x, y, avgfunc, categoricalFeatureCols
+          x, y, se, avgfunc, categoricalFeatureCols
           )
       }
 
@@ -195,7 +207,7 @@ setMethod(
         prediction[!leftIndicator] <- predict(
           object@child$rightChild,
           feature.new[!leftIndicator, ],
-          x, y, avgfunc, categoricalFeatureCols
+          x, y, se, avgfunc, categoricalFeatureCols
           )
       }
 

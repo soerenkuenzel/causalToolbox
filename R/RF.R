@@ -41,7 +41,7 @@ preprocess_training <- function(x, y){
   for (categoricalFeatureCol in unlist(categoricalFeatureCols)) {
     uniqueFeatureValues <- unique(x[,categoricalFeatureCol])
     numericFeatureValues <- 1:length(uniqueFeatureValues)
-    x[,categoricalFeatureCol] <- mapvalues(
+    x[,categoricalFeatureCol] <- plyr::mapvalues(
       x=x[,categoricalFeatureCol],
       from=uniqueFeatureValues,
       to=numericFeatureValues
@@ -116,7 +116,7 @@ preprocess_testing <- function(x, categoricalFeatureCols,
       numericFeatureValues <- 1:length(uniqueFeatureValues)
     }
 
-    x[,categoricalFeatureCol] <- mapvalues(
+    x[,categoricalFeatureCol] <- plyr::mapvalues(
       x=x[,categoricalFeatureCol],
       from=uniqueFeatureValues,
       to=numericFeatureValues
@@ -170,6 +170,7 @@ setClass(
   slots=list(
     x="data.frame",
     y="vector",
+    se = "list",
     ntree="numeric",
     replace="logical",
     sampsize="numeric",
@@ -237,6 +238,7 @@ setGeneric(
 RF <- function(
   x,
   y,
+  se = NULL,
   ntree=500,
   replace=TRUE,
   sampsize=if (replace) nrow(x) else ceiling(.632*nrow(x)),
@@ -259,7 +261,7 @@ RF <- function(
   #' @import foreach
   #' @import doParallel
   # Set number of threads for parallelism
-  registerDoParallel(nthread)
+  doParallel::registerDoParallel(nthread)
 
   # nodesize is forest object is actually a list contains both
   # `averagingNodeSize` and `splittingNodeSize`. In naive random forest
@@ -271,6 +273,8 @@ RF <- function(
   )
 
   # Create trees
+  #' @import foreach
+  library(foreach)
   trees <- foreach(i = 1:ntree) %dopar% {
 
     # Bootstrap sample
@@ -285,6 +289,7 @@ RF <- function(
       RFTree(
         x=processed_x,
         y=y,
+        se = se,
         mtry=mtry,
         nodesize=nodesize,
         sampleIndex=sampleIndex,
@@ -299,6 +304,7 @@ RF <- function(
     "RF",
     x=processed_x,
     y=y,
+    se = list(se),
     ntree=ntree,
     replace=replace,
     sampsize=sampsize,
@@ -342,16 +348,20 @@ setMethod(
       )
 
     # Make prediction from each tree
-    predForEachTree <- foreach(i = 1:object@ntree, .combine="rbind") %dopar%{
-      predict(
-        object@forest[[i]],
-        processed_x,
-        object@x,
-        object@y,
-        object@avgfunc,
-        object@categoricalFeatureCols
+    #' @import foreach
+    library(foreach)
+    predForEachTree <-
+      foreach(i = 1:object@ntree, .combine = "rbind") %dopar% {
+        predict(
+          object@forest[[i]],
+          processed_x,
+          object@x,
+          object@y,
+          object@avgfunc,
+          object@categoricalFeatureCols,
+          se = unlist(object@se)
         )
-    }
+      }
 
     # Aggregate responses from each tree
     if (length(predForEachTree) == nrow(feature.new)) {

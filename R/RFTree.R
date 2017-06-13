@@ -73,6 +73,7 @@ setGeneric(
 RFTree <- function(
   x,
   y,
+  se = NULL,
   mtry=max(floor(ncol(x)/3), 1),
   nodesize=5,
   sampleIndex=1:length(y),
@@ -102,6 +103,7 @@ RFTree <- function(
   root <- recursivePartition(
     x=x,
     y=y,
+    se = se,
     mtry=mtry,
     nodesize=aggregateNodeSize,
     sampleIndex=aggregateSampleIndex,
@@ -153,6 +155,7 @@ setGeneric(
   def=function(
     x,
     y,
+    se,
     featureList,
     sampleIndex,
     nodesize,
@@ -174,6 +177,7 @@ setGeneric(
 selectBestFeature <- function(
   x,
   y,
+  se,
   featureList,
   sampleIndex=list(
     "averagingSampleIndex"=1:length(y),
@@ -293,16 +297,29 @@ selectBestFeature <- function(
         oldFeatureValue <- featureValue
         next()
       }
+      # se contains the standard
+      if(is.null(se)){
+        se = rep(1, length(y))
+      }
+      leftPartition_WEIGHTED_CountSplitting <-
+        sum(1 / (se[sampleIndex$splittingSampleIndex][leftPartitionSplitting])^2)
+      rightPartition_WEIGHTED_CountSplitting <-
+        sum(1 / (se[sampleIndex$splittingSampleIndex][!leftPartitionSplitting])^2)
 
       # Calculate sample mean in both splitting partitions
-      leftPartitionMean <-
-        mean(y[sampleIndex$splittingSampleIndex][leftPartitionSplitting])
-      rightPartitionMean <-
-        mean(y[sampleIndex$splittingSampleIndex][!leftPartitionSplitting])
+      leftPartition_WEIGHTED_Mean <-
+        1 / leftPartition_WEIGHTED_CountSplitting *
+        sum((y[sampleIndex$splittingSampleIndex] *
+               1 / (se[sampleIndex$splittingSampleIndex]) ^ 2)[leftPartitionSplitting])
+      rightPartition_WEIGHTED_Mean <-
+        1 / rightPartition_WEIGHTED_CountSplitting *
+        sum((y[sampleIndex$splittingSampleIndex] *
+                1 / (se[sampleIndex$splittingSampleIndex]) ^ 2)[!leftPartitionSplitting])
 
       # Calculate the variance of the splitting
-      muBarSquareSum <- leftPartitionCountSplitting * leftPartitionMean ^ 2 +
-        rightPartitionCountSplitting * rightPartitionMean ^ 2
+      muBarSquareSum <-
+        leftPartition_WEIGHTED_CountSplitting * leftPartition_WEIGHTED_Mean ^ 2 +
+        rightPartition_WEIGHTED_CountSplitting * rightPartition_WEIGHTED_Mean ^ 2
 
       # Update the value if a higher value has been seen
       if (muBarSquareSum > bestSplitLossAll[i]) {
@@ -381,6 +398,7 @@ selectBestFeature <- function(
 recursivePartition <- function(
   x,
   y,
+  se,
   mtry=max(floor(ncol(x)/3), 1),
   sampleIndex=list(
    "averagingSampleIndex"=1:length(y),
@@ -401,9 +419,10 @@ recursivePartition <- function(
   # Tentatively replaced by the C++ function
   # To switch back, replace rcpp_selectBestFeature with selectBestFeature
   list2env(
-    rcpp_selectBestFeature(
+    selectBestFeature(
       x=x,
       y=y,
+      se = se,
       featureList=selectedFeatureIndex,
       sampleIndex=sampleIndex,
       nodesize=nodesize,
@@ -451,14 +470,26 @@ recursivePartition <- function(
 
     # Recursively grow the tree
     leftChild <- recursivePartition(
-      x, y, mtry=mtry, sampleIndex=sampleIndex_left, nodesize=nodesize,
-      splitrule=splitrule, categoricalFeatureCols=categoricalFeatureCols
-      )
+      x = x,
+      y = y,
+      se = se,
+      mtry = mtry,
+      sampleIndex = sampleIndex_left,
+      nodesize = nodesize,
+      splitrule = splitrule,
+      categoricalFeatureCols = categoricalFeatureCols
+    )
 
     rightChild <- recursivePartition(
-      x, y, mtry=mtry, sampleIndex=sampleIndex_right, nodesize=nodesize,
-      splitrule=splitrule, categoricalFeatureCols=categoricalFeatureCols
-      )
+      x = x,
+      y = y,
+      se = se,
+      mtry = mtry,
+      sampleIndex = sampleIndex_right,
+      nodesize = nodesize,
+      splitrule = splitrule,
+      categoricalFeatureCols = categoricalFeatureCols
+    )
 
     # Create the leaf node the connects to both children
     node <- RFNode(
@@ -495,12 +526,26 @@ recursivePartition <- function(
 #' @aliases predict, RFTree-method
 #' @exportMethod predict
 setMethod(
-  f="predict",
-  signature="RFTree",
-  definition=function(object, feature.new, x, y, avgfunc,
-                      categoricalFeatureCols){
-    return(predict(object@root$node, feature.new, x, y, avgfunc,
-                   categoricalFeatureCols))
+  f = "predict",
+  signature = "RFTree",
+  definition = function(object,
+                        feature.new,
+                        x,
+                        y,
+                        avgfunc,
+                        categoricalFeatureCols,
+                        se = NULL) {
+    return(
+      predict(
+        object = object@root$node,
+        feature.new = feature.new,
+        x = x,
+        y = y,
+        se = se,
+        avgfunc = avgfunc,
+        categoricalFeatureCols = categoricalFeatureCols
+      )
+    )
   }
 )
 

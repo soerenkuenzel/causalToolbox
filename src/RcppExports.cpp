@@ -110,3 +110,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"hte_rcpp_cppDataFrameInterface", (DL_FUNC) &hte_rcpp_cppDataFrameInterface, 5},
+    {"hte_rcpp_cppBuildInterface", (DL_FUNC) &hte_rcpp_cppBuildInterface, 18},
+    {"hte_rcpp_cppPredictInterface", (DL_FUNC) &hte_rcpp_cppPredictInterface, 2},
+    {"hte_rcpp_OBBPredictInterface", (DL_FUNC) &hte_rcpp_OBBPredictInterface, 1},
+    {"hte_rcpp_getObservationSizeInterface", (DL_FUNC) &hte_rcpp_getObservationSizeInterface, 1},
+    {"hte_rcpp_AddTreeInterface", (DL_FUNC) &hte_rcpp_AddTreeInterface, 2},
+    {"hte_rcpp_selectBestFeature", (DL_FUNC) &hte_rcpp_selectBestFeature, 7},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_hte(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
