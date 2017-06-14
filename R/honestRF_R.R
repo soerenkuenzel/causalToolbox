@@ -165,7 +165,7 @@ honestRF_R <- function(
 
   # Create a forest object
   forest <- new(
-    "honestRF",
+    "honestRF_R",
     x=x,
     y=y,
     ntree=ntree,
