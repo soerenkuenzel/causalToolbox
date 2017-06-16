@@ -243,7 +243,10 @@ setMethod(
 
     CI_comb <- CI[["l_first_1"]] - CI[["l_first_0"]][, 2:1]
 
-    return(cbind(pred, CI_comb))
+    to_return <- as.data.frame(cbind(pred, CI_comb))
+    row.names(to_return) <- 1:nrow(to_return)
+    colnames(to_return) <- c('pred','X5.','X95.')
+    return(to_return)
   }
 )
 

@@ -245,7 +245,10 @@ setMethod(
         g_weights *       (get_CI_0 - get_CI_mu1[ ,2:1] + mu1_hat_feature_new) +
         (1 - g_weights) * (get_CI_1 - get_CI_mu0[ ,2:1] + mu0_hat_feature_new)
 
-      return(cbind(pred, CI_comb))
+      to_return <- as.data.frame(cbind(pred, CI_comb))
+      row.names(to_return) <- 1:nrow(to_return)
+      colnames(to_return) <- c('pred','X5.','X95.')
+      return(to_return)
     } else{
       return(pred)
     }

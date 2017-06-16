@@ -45,4 +45,14 @@ test_that("Tests CateCI", {
   expect_equal(as.numeric(CIs[1,]),
                c(0.04663806, -0.03260194,  0.12587805),
                tolerance = 1e-7)
+
+  tl <- T_BART(
+    feat = feat,
+    tr = tr,
+    yobs = yobs
+  )
+  CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
+  expect_equal(as.numeric(CIs[1,]),
+               c(0.01734046, -0.36126050,  0.37568245),
+               tolerance = 1e-7)
 })

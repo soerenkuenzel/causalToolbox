@@ -120,7 +120,10 @@ setMethod(
       t(apply(ite_matrix, 2, function(x)
         quantile(x, probs = c(.05, 0.95))))
 
-    return(cbind(pred, CI))
+    to_return <- as.data.frame(cbind(pred,  CI))
+    row.names(to_return) <- 1:nrow(to_return)
+    colnames(to_return) <- c('pred','X5.','X95.')
+    return(to_return)
   }
 )
 
