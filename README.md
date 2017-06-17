@@ -21,11 +21,13 @@ This example will not execute because there is no data.
 library(hte)
 packageVersion("hte")
 
-#create the hte object using honest Random Forests
+#create the hte object using honest Random Forests (RF)
 
 xl <- X_RF(feat = X.train, tr = Tr.train, yobs = Y.train)
 
-#alternatively, use BART instead of honest Random Forests
+#alternatively, use BART instead of honest Random Forests. 
+#If you are not going to be careful about hyperparemeter tuning,
+#we suggest using BART. 
 
 xl <- X_BART(feat = X.train, tr = Tr.train, yobs = Y.train)
 

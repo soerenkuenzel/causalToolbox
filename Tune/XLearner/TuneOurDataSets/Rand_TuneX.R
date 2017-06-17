@@ -25,7 +25,7 @@ print(setup)
 
 set.seed(59906)
 nthread <- 0
-nsamples <- 1e5
+nsamples <- 1e6
 dim <- 20
 ntrain <- 5000
 ntest <- 10000
@@ -40,21 +40,21 @@ Rand_tune <- data.frame(
   replace_first  = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   replace_second = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   replace_prop   = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
-  sample.fraction_first  = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,replace = TRUE),
-  sample.fraction_second = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,replace = TRUE),
-  sample.fraction_prop   = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples,replace = TRUE),
+  sample.fraction_first  = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples,replace = TRUE),
+  sample.fraction_second = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples,replace = TRUE),
+  sample.fraction_prop   = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples,replace = TRUE),
   mtry_first  = sample(1:dim, nsamples, replace = TRUE),
   mtry_second = sample(1:dim, nsamples, replace = TRUE),
   mtry_prop   = sample(1:dim, nsamples, replace = TRUE),
-  nodesizeSpl_first  = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  nodesizeSpl_second = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  nodesizeSpl_prop   = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  nodesizeAvg_first  = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  nodesizeAvg_second = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  nodesizeAvg_prop   = round(rbeta(nsamples, 1, 4) * 100) + 1,
-  splitratio_first  = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
-  splitratio_second = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
-  splitratio_prop   = sample(seq(from = 0.1, to = 1, by = 0.1), nsamples, replace = TRUE),
+  nodesizeSpl_first  = sample(1:200, size = nsamples, replace = TRUE),
+  nodesizeSpl_second = sample(1:200, size = nsamples, replace = TRUE),
+  nodesizeSpl_prop   = sample(1:200, size = nsamples, replace = TRUE),
+  nodesizeAvg_first  = sample(1:200, size = nsamples, replace = TRUE),
+  nodesizeAvg_second = sample(1:200, size = nsamples, replace = TRUE),
+  nodesizeAvg_prop   = sample(1:200, size = nsamples, replace = TRUE),
+  splitratio_first  = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples, replace = TRUE),
+  splitratio_second = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples, replace = TRUE),
+  splitratio_prop   = sample(seq(from = 0.1, to = 1, by = 0.05), nsamples, replace = TRUE),
   middleSplit_first  = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   middleSplit_second = sample(c(TRUE, FALSE), nsamples, replace = TRUE),
   middleSplit_prop   = sample(c(TRUE, FALSE), nsamples, replace = TRUE)
