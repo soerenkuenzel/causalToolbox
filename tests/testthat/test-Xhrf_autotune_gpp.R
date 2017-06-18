@@ -66,7 +66,7 @@ test_that("Tests test-Xhrf_gpp", {
 
 
   expect_equal(EstimateCate(xl_gpp, feat)[4],
-               0.0981727,
+               0.008654714,
                tolerance = 1e-5)
 
   set.seed(11122)
@@ -74,7 +74,7 @@ test_that("Tests test-Xhrf_gpp", {
     CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
   )
   expect_equal(CI[2, 3],
-               0.3085303,
+               0.1233247,
                tolerance = 1e-3)
 
   ## Example for changing internal parameters of GPfit::GP_fit and
@@ -112,3 +112,4 @@ test_that("Tests test-Xhrf_gpp", {
 
 
 })
+

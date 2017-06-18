@@ -41,13 +41,13 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(sl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  813.7427,
+  647.8669,
   tolerance = 1e-7)
 
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
   expect_equal(smp_stats$SATT[1, 3],
-               -7.969987,
+               -9.124237,
                tolerance = 1e-7)
 
 })

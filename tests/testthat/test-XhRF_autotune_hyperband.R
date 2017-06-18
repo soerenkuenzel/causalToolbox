@@ -62,7 +62,7 @@ test_that("Tests X_RF_autotune_hyperband", {
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  196.7121,
+  158.6595,
   tolerance = 1e-5)
 
   # ----------------------------------------------------------------------------
