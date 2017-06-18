@@ -106,10 +106,14 @@ training_data_checker <- function(
   }
 
   if (nodesizeSpl > splitSampleSize) {
-    stop("nodesizeSpl cannot exceed splitting sample size.")
+    warning("nodesizeSpl cannot exceed splitting sample size. We have set
+            nodesizeSpl to be the maximum")
+    nodesizeSpl <<- splitSampleSize
   }
   if (nodesizeAvg > avgSampleSize) {
-    stop("nodesizeAvg cannot exceed averaging sample size.")
+    warning("nodesizeAvg cannot exceed averaging sample size. We have set
+            nodesizeAvg to be the maximum")
+    nodesizeAvg <<- avgSampleSize
   }
 
   if (splitratio < 0 || splitratio > 1){
