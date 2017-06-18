@@ -33,7 +33,7 @@ X_RF_autotune_simple <-
            tr,
            yobs,
            ntree = 2000,
-           ntree_testing = 400,
+           ntree_testing = 600,
            nthread = 0,
            verbose = TRUE) {
     starting_settings <- get_starting_settings(feat = feat, tr = tr,
