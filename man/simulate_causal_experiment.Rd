@@ -29,7 +29,7 @@ the performance of different estimators for a particular set of features.}
 \item{setup}{This is used to specify the function form of the potential
 outcomes and the treatment assignment. One of
 RespSparseTau1strong, RsparseT2weak, complexTau,
-Conf1, rare1, STMpp, Ufail, Usual1, Wager1, Wager2, Wager3.}
+Conf1, rare1, STMpp, Ufail, Usual1, WA1, WA2, WA3.}
 
 \item{testseed}{is the seed used to generate the testing data, if NULL, then
 the seed of the main session is used.}

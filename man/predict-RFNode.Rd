@@ -7,7 +7,7 @@
 \alias{RFNode-method}
 \title{predict-RFNode}
 \usage{
-\S4method{predict}{RFNode}(object, feature.new, x, y, avgfunc,
+\S4method{predict}{RFNode}(object, feature.new, x, y, se = NULL, avgfunc,
   categoricalFeatureCols)
 }
 \arguments{

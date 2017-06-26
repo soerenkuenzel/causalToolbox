@@ -9,10 +9,10 @@
 \title{selectBestFeature}
 \format{An object of class \code{NULL} of length 0.}
 \usage{
-selectBestFeature(x, y, featureList, sampleIndex = list(averagingSampleIndex =
-  1:length(y), splittingSampleIndex = 1:length(y)),
-  nodesize = list(splittingNodeSize = 5, averagingNodeSize = 5),
-  splitrule = "variance", categoricalFeatureCols = list())
+selectBestFeature(x, y, se, featureList,
+  sampleIndex = list(averagingSampleIndex = 1:length(y), splittingSampleIndex
+  = 1:length(y)), nodesize = list(splittingNodeSize = 5, averagingNodeSize =
+  5), splitrule = "variance", categoricalFeatureCols = list())
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}

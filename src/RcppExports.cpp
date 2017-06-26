@@ -110,6 +110,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_rnd
+double test_rnd();
+RcppExport SEXP hte_test_rnd() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_rnd());
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_rnd2
+NumericVector test_rnd2();
+RcppExport SEXP hte_test_rnd2() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_rnd2());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"hte_rcpp_cppDataFrameInterface", (DL_FUNC) &hte_rcpp_cppDataFrameInterface, 5},
@@ -119,6 +139,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"hte_rcpp_getObservationSizeInterface", (DL_FUNC) &hte_rcpp_getObservationSizeInterface, 1},
     {"hte_rcpp_AddTreeInterface", (DL_FUNC) &hte_rcpp_AddTreeInterface, 2},
     {"hte_rcpp_selectBestFeature", (DL_FUNC) &hte_rcpp_selectBestFeature, 7},
+    {"hte_test_rnd", (DL_FUNC) &hte_test_rnd, 0},
+    {"hte_test_rnd2", (DL_FUNC) &hte_test_rnd2, 0},
     {NULL, NULL, 0}
 };
 

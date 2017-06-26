@@ -8,7 +8,7 @@
 \title{predict-RFTree}
 \usage{
 \S4method{predict}{RFTree}(object, feature.new, x, y, avgfunc,
-  categoricalFeatureCols)
+  categoricalFeatureCols, se = NULL)
 }
 \arguments{
 \item{object}{A `RFTree`` object.}

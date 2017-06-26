@@ -6,7 +6,7 @@
 \alias{RFTree-method}
 \title{RFTree-Constructor}
 \usage{
-RFTree(x, y, mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
+RFTree(x, y, se = NULL, mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
   sampleIndex = 1:length(y), splitrule = "variance",
   categoricalFeatureCols = list())
 }

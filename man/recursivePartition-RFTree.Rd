@@ -5,7 +5,7 @@
 \alias{recursivePartition}
 \title{recursivePartition-RFTree}
 \usage{
-recursivePartition(x, y, mtry = max(floor(ncol(x)/3), 1),
+recursivePartition(x, y, se, mtry = max(floor(ncol(x)/3), 1),
   sampleIndex = list(averagingSampleIndex = 1:length(y), splittingSampleIndex
   = 1:length(y)), nodesize = list(splittingNodeSize = 5, averagingNodeSize =
   5), splitrule = "variance", categoricalFeatureCols = list())

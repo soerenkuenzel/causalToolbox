@@ -29,3 +29,11 @@ rcpp_selectBestFeature <- function(x, y, featureList, sampleIndex, nodesize, spl
     .Call('hte_rcpp_selectBestFeature', PACKAGE = 'hte', x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols)
 }
 
+test_rnd <- function() {
+    .Call('hte_test_rnd', PACKAGE = 'hte')
+}
+
+test_rnd2 <- function() {
+    .Call('hte_test_rnd2', PACKAGE = 'hte')
+}
+

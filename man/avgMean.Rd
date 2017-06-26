@@ -4,7 +4,7 @@
 \alias{avgMean}
 \title{avgMean}
 \usage{
-avgMean(x, y)
+avgMean(x, y, y_sd = NULL)
 }
 \arguments{
 \item{x}{A dataframe of observations in the current tree leaf}

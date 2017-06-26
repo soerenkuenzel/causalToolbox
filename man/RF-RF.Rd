@@ -9,9 +9,9 @@
 \title{RF-Constructor}
 \format{An object of class \code{NULL} of length 0.}
 \usage{
-RF(x, y, ntree = 500, replace = TRUE, sampsize = if (replace) nrow(x) else
-  ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1), nodesize = 5,
-  nthread = 1, splitrule = "variance", avgfunc = avgMean)
+RF(x, y, se = NULL, ntree = 500, replace = TRUE, sampsize = if (replace)
+  nrow(x) else ceiling(0.632 * nrow(x)), mtry = max(floor(ncol(x)/3), 1),
+  nodesize = 5, nthread = 1, splitrule = "variance", avgfunc = avgMean)
 }
 \arguments{
 \item{x}{A data frame of all training predictors.}
