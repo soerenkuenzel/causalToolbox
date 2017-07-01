@@ -123,10 +123,13 @@ for (seed in seed_list) {
     data.id <- regression_tasks[i, "data.id"]
     data_set <- getOMLDataSet(data.id = data.id)
 
+    non_missing_rows <- apply(!is.na(data_set$data),1, all) # only take rows which
+    # which don't have missing values
+
     features <-
-      data_set$data[,  colnames(data_set$data) != data_set$target.features]
+      data_set$data[non_missing_rows, colnames(data_set$data) != data_set$target.features]
     target <-
-      data_set$data[,  colnames(data_set$data) == data_set$target.features]
+      data_set$data[non_missing_rows,  colnames(data_set$data) == data_set$target.features]
 
     # split the data into training and test set
     n_smp <- length(target)
