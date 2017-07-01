@@ -143,6 +143,7 @@ for (seed in seed_list) {
 
 
     for (learner in names(estimator_trainer)) {
+      if(length(y_1) < 20) next
       set.seed(seed + 1)
       # train the estimator
       train_time_start <- Sys.time()
