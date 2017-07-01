@@ -114,11 +114,11 @@ filename <-
 
 
 for (seed in seed_list) {
-  for (i in 1:5) { #n_datasets) {
+  for (i in 1:nrow(regression_tasks)) { #n_datasets) {
     # seed <- 123; i <- 1; learner = names(estimator_trainer)[1]
     # skip instances which have more than
-    if (regression_tasks$number.of.instances[i] > 100000)
-      next
+    #if (regression_tasks$number.of.instances[i] > 100000)
+    #  next
 
     data.id <- regression_tasks[i, "data.id"]
     data_set <- getOMLDataSet(data.id = data.id)
