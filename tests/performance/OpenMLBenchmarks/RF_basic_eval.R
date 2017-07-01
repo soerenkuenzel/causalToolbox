@@ -115,13 +115,22 @@ filename <-
 
 for (seed in seed_list) {
   for (i in 1:nrow(regression_tasks)) { #n_datasets) {
-    # seed <- 123; i <- 19; learner = names(estimator_trainer)[1]
+    # seed <- 123; i <- 53; learner = names(estimator_trainer)[1]
     # skip instances which have more than
     #if (regression_tasks$number.of.instances[i] > 100000)
     #  next
 
     data.id <- regression_tasks[i, "data.id"]
-    data_set <- getOMLDataSet(data.id = data.id)
+
+    # the read function sometimes fails. In that case run the next data set
+    data_set <- tryCatch({
+        getOMLDataSet(data.id = data.id)
+      },
+      error = function(e) {
+        print(e)
+        NA
+      })
+    if(is.na(data_set)) next
 
     non_missing_rows <- apply(!is.na(data_set$data),1, all) # only take rows which
     # which don't have missing values
