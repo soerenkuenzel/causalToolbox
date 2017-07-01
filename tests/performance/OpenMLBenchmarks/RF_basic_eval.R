@@ -143,24 +143,39 @@ for (seed in seed_list) {
 
 
     for (learner in names(estimator_trainer)) {
-      if(length(y_1) < 20) next
-      set.seed(seed + 1)
-      # train the estimator
-      train_time_start <- Sys.time()
-      estimator_1 <- estimator_trainer[[learner]](features_1, y_1)
-      estimator_2 <- estimator_trainer[[learner]](features_2, y_2)
-      train_time_diff <- as.numeric(difftime(Sys.time(),
-                                             train_time_start,
-                                             tz,
-                                             units = "mins"))
-      # evaluate the estimator
-      predict_time_start <- Sys.time()
-      MSE_1 <- mean((y_2 - estimator_predictor[[learner]](estimator_1, features_2))^2)
-      MSE_2 <- mean((y_1 - estimator_predictor[[learner]](estimator_2, features_1))^2)
-      predict_time_diff <- as.numeric(difftime(Sys.time(),
-                                               predict_time_start,
+
+      train_time_diff <- NA
+      predict_time_diff <- NA
+      MSE_1 <- NA
+      MSE_2 <- NA
+      error <- ""
+      tryCatch({
+        # train the estimator
+        train_time_start <- Sys.time()
+        estimator_1 <- estimator_trainer[[learner]](features_1, y_1)
+        estimator_2 <- estimator_trainer[[learner]](features_2, y_2)
+        train_time_diff <- as.numeric(difftime(Sys.time(),
+                                               train_time_start,
                                                tz,
                                                units = "mins"))
+        # evaluate the estimator
+        predict_time_start <- Sys.time()
+        MSE_1 <-
+          mean((y_2 - estimator_predictor[[learner]](estimator_1, features_2)) ^
+                 2)
+        MSE_2 <-
+          mean((y_1 - estimator_predictor[[learner]](estimator_2, features_1)) ^
+                 2)
+        predict_time_diff <- as.numeric(difftime(Sys.time(),
+                                                 predict_time_start,
+                                                 tz,
+                                                 units = "mins"))
+      },
+      error = function(e) {
+        print(e)
+        warning(paste("Something went wrong with", setup))
+        error <- paste(e)
+      })
       # save the results
       Residuals <- data.frame(
         seed = seed,
@@ -170,6 +185,7 @@ for (seed in seed_list) {
         MSE_2 = MSE_2,
         train_time = train_time_diff,
         predict_time = predict_time_diff,
+        error = error,
         date = Sys.Date(),
         hte_version = packageVersion('hte'),
         ranger_version = packageVersion('ranger'),
