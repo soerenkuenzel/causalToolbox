@@ -106,7 +106,7 @@ regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)
 
-data_folder_name <- "tests/performance/OpenMLBenchmarks/sim_data/"
+data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
 filename <-
