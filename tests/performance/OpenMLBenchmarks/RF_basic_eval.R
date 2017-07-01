@@ -8,20 +8,76 @@ library(ranger)
 library(randomForest)
 library(hte)
 
-stop("Fix all parameters of all the learners !")
+ntree = 500
+mtry = function(features) max(round(ncol(features) / 3), 1)
+nodesize = 5
+replace = TRUE
+sampsize = function(target) length(target)
 
 estimator_trainer <- list(
   'ranger' = function(features, target) {
-    ranger(y ~ ., data = data.frame(features, y = target))
+    ranger(
+      y ~ .,
+      data = data.frame(features, y = target),
+      num.trees = ntree,
+      mtry = mtry(features),
+      min.node.size = nodesize,
+      replace = replace,
+      sample.fraction = 1
+      )
   },
   'randomForest' = function(features, target) {
-    randomForest(x = features, y = target)
+    randomForest(
+      x = features,
+      y = target,
+      ntree = ntree,
+      mtry = mtry(features),
+      replace = replace,
+      sampsize = sampsize(target),
+      nodesize = nodesize
+    )
   },
-  'hte_adaptive' = function(features, target) {
-    honestRF(x = features, y = target)
+  'hte_adaptive_nomsp' = function(features, target) {
+    honestRF(
+      x = features,
+      y = target,
+      ntree = ntree,
+      replace = replace,
+      sampsize = sampsize(target),
+      mtry = mtry(features),
+      nodesizeSpl = nodesize,
+      nodesizeAvg = nodesize,
+      splitratio = 1,
+      middleSplit = FALSE
+    )
   },
-  'hte_honest' = function(features, target) {
-    honestRF(x = features, y = target)
+  'hte_adaptive_wmsp' = function(features, target) {
+    honestRF(
+      x = features,
+      y = target,
+      ntree = ntree,
+      replace = replace,
+      sampsize = sampsize(target),
+      mtry = mtry(features),
+      nodesizeSpl = nodesize,
+      nodesizeAvg = nodesize,
+      splitratio = 1,
+      middleSplit = TRUE
+    )
+  },
+  'hte_honest_wmsp' = function(features, target) {
+    honestRF(
+      x = features,
+      y = target,
+      ntree = ntree,
+      replace = replace,
+      sampsize = sampsize(target),
+      mtry = mtry(features),
+      nodesizeSpl = nodesize,
+      nodesizeAvg = nodesize,
+      splitratio = .5,
+      middleSplit = TRUE
+    )
   }
 )
 estimator_predictor <- list(
@@ -31,10 +87,13 @@ estimator_predictor <- list(
   'randomForest' = function(object, features_to_predict) {
     predict(object, features_to_predict)
   },
-  'hte_adaptive' = function(object, features_to_predict) {
+  'hte_adaptive_nomsp' = function(object, features_to_predict) {
     predict(object, features_to_predict)
   },
-  'hte_honest' = function(object, features_to_predict) {
+  'hte_adaptive_wmsp' = function(object, features_to_predict) {
+    predict(object, features_to_predict)
+  },
+  'hte_honest_wmsp' = function(object, features_to_predict) {
     predict(object, features_to_predict)
   }
 )
