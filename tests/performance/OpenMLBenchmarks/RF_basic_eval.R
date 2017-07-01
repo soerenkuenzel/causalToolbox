@@ -115,7 +115,7 @@ filename <-
 
 for (seed in seed_list) {
   for (i in 1:nrow(regression_tasks)) { #n_datasets) {
-    # seed <- 123; i <- 1; learner = names(estimator_trainer)[1]
+    # seed <- 123; i <- 19; learner = names(estimator_trainer)[1]
     # skip instances which have more than
     #if (regression_tasks$number.of.instances[i] > 100000)
     #  next
@@ -173,7 +173,7 @@ for (seed in seed_list) {
       },
       error = function(e) {
         print(e)
-        warning(paste("Something went wrong with", setup))
+        warning(paste("Something went wrong with", learner))
         error <- paste(e)
       })
       # save the results
