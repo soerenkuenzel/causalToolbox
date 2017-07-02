@@ -159,6 +159,8 @@ for (seed in seed_list) {
 
     for (learner in names(estimator_trainer)) {
 
+      if (regression_tasks$number.of.instances[i] > 50000 &
+          learner == 'randomForest') next
       train_time_diff <- NA
       predict_time_diff <- NA
       MSE_1 <- NA
