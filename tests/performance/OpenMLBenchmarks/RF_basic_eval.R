@@ -123,6 +123,8 @@ for (seed in seed_list) {
     #  next
 
     data.id <- regression_tasks[i, "data.id"]
+    task.id <- regression_tasks[i, "task.id"]
+
 
     # the read function sometimes fails. In that case run the next data set
     data_set <- tryCatch({

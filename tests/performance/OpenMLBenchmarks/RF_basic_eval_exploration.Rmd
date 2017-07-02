@@ -25,6 +25,7 @@ task_properties <- regression_tasks %>%
   "task.id",
   "data.id",
   "name",
+  "target.feature",
   "tags",
   "majority.class.size",
   "max.nominal.att.distinct.values",
@@ -53,7 +54,7 @@ benchmark_cmb <- merge(benchmark_cmb_pre, data_set_statistics, by = 'data.id')
 
 ## Performance relative to the explained variance
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 benchmark_cmb %>% tbl_df() %>%
   mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
   select(estimator, MSE, task.id) %>%
@@ -208,4 +209,12 @@ have categorical features, we are doing slightly better.
 big data sets
 
 
+# Speed comparison:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+benchmark_tmp2 %>%
+  group_by()
+
+```
 
