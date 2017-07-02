@@ -4,7 +4,7 @@ setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka")
 # ------------------------------------------------------------------------------
 library(dplyr)
 
-tasks = listOMLTasks()
+tasks = listOMLTasks(limit = 100000)
 regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)

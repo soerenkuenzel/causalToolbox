@@ -1,6 +1,7 @@
 library("OpenML")
 ## temporarily set API key to read only key
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
+#setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "farff") # https://www.openml.org/u/3454#!api
 
 # ------------------------------------------------------------------------------
 library(dplyr)
@@ -101,7 +102,7 @@ estimator_predictor <- list(
 seed_list <- c(8543478, 7684240, 7742039, 5772717, 5198406, 841135, 3271857,
                2334580, 3652130, 3227302)
 
-tasks = listOMLTasks()
+tasks = listOMLTasks(limit = 100000)
 regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)
