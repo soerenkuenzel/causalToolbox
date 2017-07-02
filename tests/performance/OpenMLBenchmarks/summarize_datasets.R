@@ -9,12 +9,12 @@ regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)
 
-data_folder_name <- "~/Dropbox (Personal)/CATE/hte/tests/performance/OpenMLBenchmarks/sim_data/"
+data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name)) dir.create(data_folder_name)
 filename <- paste0(data_folder_name, "openML_dataset_summary.csv")
 
 
-for (i in 1:nrow(regression_tasks)) {
+for (i in 770:nrow(regression_tasks)) {
   # i <- 54
 
   data.id <- regression_tasks[i, "data.id"]

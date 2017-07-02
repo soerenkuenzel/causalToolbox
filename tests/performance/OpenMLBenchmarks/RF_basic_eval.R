@@ -117,7 +117,7 @@ filename <-
 
 
 for (seed in seed_list) {
-  for (i in 1:nrow(regression_tasks)) { #n_datasets) {
+  for (i in 1374:nrow(regression_tasks)) { #n_datasets) {
     # seed <- 123; i <- 53; learner = names(estimator_trainer)[1]
     # skip instances which have more than
     #if (regression_tasks$number.of.instances[i] > 100000)
@@ -126,7 +126,7 @@ for (seed in seed_list) {
     data.id <- regression_tasks[i, "data.id"]
     task.id <- regression_tasks[i, "task.id"]
 
-
+    if(i == 1374) next
     # the read function sometimes fails. In that case run the next data set
     data_set <- tryCatch({
         getOMLDataSet(data.id = data.id)
