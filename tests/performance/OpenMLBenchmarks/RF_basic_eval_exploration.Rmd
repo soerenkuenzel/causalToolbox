@@ -96,9 +96,8 @@ benchmark_aggr <- benchmark_aggr_all[benchmark_aggr_all$task.id %in% iscomplete$
 ##### TODOs
 
 1. Update everything with the recent runs on SCF
-2. Try to get data from that fraf formate
-3. Analyze the outliers and try to nail down where we are loosing
-4. Try to find out why we are doing poorly. Is it because ranger is and 
+2. Analyze the outliers and try to nail down where we are loosing
+3. Try to find out why we are doing poorly. Is it because ranger is and 
 randomForest is pooling?
 
 
