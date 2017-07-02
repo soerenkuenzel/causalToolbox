@@ -1,5 +1,5 @@
 library("OpenML")
-setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07") # https://www.openml.org/u/3454#!api
+setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
 
 # ------------------------------------------------------------------------------
 library(dplyr)

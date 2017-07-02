@@ -40,7 +40,7 @@ task_properties <- regression_tasks %>%
 
 
 if ((!all(table(benchmark_results$task.id) <= 5)) |
-    (!all(task_properties$task.id == 1))) {
+    (!all(table(task_properties$task.id) == 1))) {
     stop("Some data is repetitive. We should not merge")
   }
 
@@ -85,8 +85,22 @@ merge(benchmark_tmp1, ave_performance, by = 'task.id') ->
 if(nrow(benchmark_tmp2) != nrow(benchmark_cmb_pre)) stop('we accidentally created new rows')
 
 # get rid of all the dublicated observations:
-benchmark_aggr <- benchmark_tmp2[!duplicated(benchmark_tmp2[, c('data.id', 'target.feature', 'estimator')]), ]
+benchmark_aggr_all <- benchmark_tmp2[!duplicated(benchmark_tmp2[, c('data.id', 'target.feature', 'estimator')]), ]
+
+# remove all runs for which either algorithm failed:
+iscomplete <- benchmark_aggr_all %>% group_by(task.id) %>% summarize(complete = !is.na(sum(MSE)))
+benchmark_aggr <- benchmark_aggr_all[benchmark_aggr_all$task.id %in% iscomplete$task.id[iscomplete$complete], ]
 ```
+
+
+##### TODOs
+
+1. Update everything with the recent runs on SCF
+2. Try to get data from that fraf formate
+3. Analyze the outliers and try to nail down where we are loosing
+4. Try to find out why we are doing poorly. Is it because ranger is and 
+randomForest is pooling?
+
 
 # MSE Performance
 
@@ -289,8 +303,8 @@ benchmark_aggr %>%
 ```
 
 
-** Conclusion:**
+##### Conclusion:
 
 * randomForest is much slower than ranger and our implementation
-* 
+* It is not clear whether we are slower or faster than ranger. 
 
