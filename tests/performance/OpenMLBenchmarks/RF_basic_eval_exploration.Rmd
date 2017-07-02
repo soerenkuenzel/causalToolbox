@@ -1,0 +1,83 @@
+---
+title: "Comparing Different versions of Random Forests"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library("OpenML")
+library("ggplot2")
+library("dplyr")
+
+# read in the data which ran on the cluster:
+benchmark_results <- read.csv('~/Dropbox (Personal)/CATE/hte/tests/performance/OpenMLBenchmarks/sim_data/MSE_openML_basic.csv')
+# read in the data which was saved on OpenML:
+tasks = listOMLTasks()
+regression_tasks <- tasks[tasks$task.type == "Supervised Regression", ]
+
+task_properties <- regression_tasks %>%
+  select(
+  "task.id",
+  "data.id",
+  "name",
+  "tags",
+  "majority.class.size",
+  "max.nominal.att.distinct.values",
+  "minority.class.size",
+  "number.of.classes",
+  "number.of.features",
+  "number.of.instances",
+  "number.of.numeric.features",
+  "number.of.symbolic.features"
+  )
+# merge data sets
+benchmark_cmb <-
+  merge(
+  task_properties,
+  benchmark_results,
+  by = 'data.id',
+  all.x = FALSE,
+  all.y = TRUE
+  )
+```
+
+## R Markdown
+
+```{r cars, echo=FALSE}
+
+
+benchmark_cmb %>% tbl_df() %>%
+  mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
+  select(estimator, MSE, task.id) %>%
+  group_by(task.id) %>%
+  summarize(MSE_ranger = mean(MSE[estimator == 'ranger']),
+            MSE_randomForest = mean(MSE[estimator == 'randomForest']),
+            MSE_ave = mean(MSE)
+            ) -> 
+  ave_performance
+
+benchmark_cmb %>% tbl_df() %>%
+  mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
+  select(estimator, MSE, task.id) ->
+  benchmark_tmp1
+
+merge(benchmark_tmp1, ave_performance, by = 'task.id') %>%
+  mutate(MSE_rel = MSE / MSE_ave) ->
+  benchmark_tmp2
+  
+ggplot(aes(x = MSE_rel, fill = estimator), data = benchmark_tmp2) +
+  geom_density(alpha = .5, position = "identity")+
+  theme_minimal()
+```
+
+
+```{r}
+benchmark_tmp2 %>% 
+  filter(estimator != "randomForest") %>%
+  ggplot(aes(x = MSE_randomForest, y = MSE, color = estimator)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+
+```
