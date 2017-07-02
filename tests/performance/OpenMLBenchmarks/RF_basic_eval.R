@@ -192,6 +192,7 @@ for (seed in seed_list) {
       Residuals <- data.frame(
         seed = seed,
         data.id = data.id,
+        task.id = task.id,
         estimator = learner,
         MSE_1 = MSE_1,
         MSE_2 = MSE_2,

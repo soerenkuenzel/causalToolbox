@@ -9,9 +9,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library("OpenML")
 library("ggplot2")
 library("dplyr")
+setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07") # https://www.openml.org/u/3454#!api
 
 # read in the data which ran on the cluster:
 benchmark_results <- read.csv('~/Dropbox (Personal)/CATE/hte/tests/performance/OpenMLBenchmarks/sim_data/MSE_openML_basic.csv')
+
+data_set_statistics <- read.csv("~/Dropbox (Personal)/CATE/hte/tests/performance/OpenMLBenchmarks/sim_data/openML_dataset_summary.csv")
+
 # read in the data which was saved on OpenML:
 tasks = listOMLTasks()
 regression_tasks <- tasks[tasks$task.type == "Supervised Regression", ]
@@ -32,7 +36,7 @@ task_properties <- regression_tasks %>%
   "number.of.symbolic.features"
   )
 # merge data sets
-benchmark_cmb <-
+benchmark_cmb_pre <-
   merge(
   task_properties,
   benchmark_results,
@@ -40,44 +44,168 @@ benchmark_cmb <-
   all.x = FALSE,
   all.y = TRUE
   )
+
+benchmark_cmb <- merge(benchmark_cmb_pre, data_set_statistics, by = 'data.id')
+
 ```
 
-## R Markdown
+# MSE Performance
 
-```{r cars, echo=FALSE}
+## Performance relative to the explained variance
 
-
+```{r, echo=FALSE, warning=FALSE}
 benchmark_cmb %>% tbl_df() %>%
   mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
   select(estimator, MSE, task.id) %>%
   group_by(task.id) %>%
   summarize(MSE_ranger = mean(MSE[estimator == 'ranger']),
-            MSE_randomForest = mean(MSE[estimator == 'randomForest']),
-            MSE_ave = mean(MSE)
-            ) -> 
+            MSE_randomForest = mean(MSE[estimator == 'randomForest'])) -> 
   ave_performance
 
 benchmark_cmb %>% tbl_df() %>%
-  mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
-  select(estimator, MSE, task.id) ->
+  mutate(MSE = (MSE_1 + MSE_2) / 2) ->
   benchmark_tmp1
 
-merge(benchmark_tmp1, ave_performance, by = 'task.id') %>%
-  mutate(MSE_rel = MSE / MSE_ave) ->
+merge(benchmark_tmp1, ave_performance, by = 'task.id') ->
   benchmark_tmp2
   
-ggplot(aes(x = MSE_rel, fill = estimator), data = benchmark_tmp2) +
-  geom_density(alpha = .5, position = "identity")+
-  theme_minimal()
+benchmark_tmp2 %>% filter(estimator != 'ranger') %>%
+  ggplot(aes(
+  x = MSE_ranger / target_var,
+  y = (MSE - MSE_ranger) / MSE_ranger,
+  color = estimator
+  )) +
+  geom_point() +
+  geom_smooth() +
+  coord_cartesian(ylim = c(-1, 1), xlim = c(0, 1.6)) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
 ```
 
+
+## Performance for data set with and without categorical variables
+
+```{r, echo=FALSE, warning=FALSE}
+benchmark_tmp2 %>%
+  mutate(
+  hasCategoricalFeat = ifelse(
+  number.of.features == number.of.numeric.features,
+  'no cat feat',
+  'categorical features'
+  )
+  ) %>%
+  filter(estimator != 'hte_adaptive_nomsp') %>%
+  ggplot(aes(
+  x = estimator,
+  y = (MSE - target_var) / target_var
+  )) +
+  geom_boxplot(alpha = .5) +
+  theme_minimal() +
+  facet_grid(. ~ hasCategoricalFeat) +
+  theme(legend.position = "bottom", axis.text.x=element_text(angle = 90, hjust = 0))
+
+```
+
+## Performance for data set with high and low signal to noise ratio
+
+```{r, echo=FALSE, warning=FALSE}
+stn <- benchmark_tmp2$MSE_randomForest / benchmark_tmp2$target_var
+# if there is a strong sginal, then stn is small
+
+benchmark_tmp2 %>%
+  mutate(
+    signalstrength = ifelse(
+      benchmark_tmp2$MSE_randomForest / benchmark_tmp2$target_var < .5,
+        'strong signal',
+        'weak signal'
+      )
+    ) %>%
+  filter(!is.na(signalstrength)) %>%
+  filter(estimator != 'hte_adaptive_nomsp') %>%
+  ggplot(aes(x = estimator, y = (MSE - target_var) / target_var )) +
+  geom_boxplot(alpha = .5) +
+  theme_minimal() +
+  facet_grid(. ~ signalstrength) +
+  theme(legend.position = "bottom", axis.text.x=element_text(angle = 90, hjust = 0))
+
+```
+
+## Performance in terms of the size of the data sets
+
+```{r, echo=FALSE, warning=FALSE}
+# if there is a strong sginal, then stn is small
+benchmark_tmp2 %>%
+  mutate(
+    size = ifelse(
+      benchmark_tmp2$number.of.instances <= 209,
+        'tiny',
+        ifelse(
+          benchmark_tmp2$number.of.instances < 500,
+          'small',
+          'large'
+        )
+      )
+    ) %>%
+  filter(!is.na(size)) %>%
+  filter(estimator != 'hte_adaptive_nomsp') %>%
+  ggplot(aes(x = estimator, y = (MSE - target_var) / target_var )) +
+  geom_boxplot(alpha = .5) +
+  theme_minimal() +
+  facet_grid(. ~ size) +
+  theme(legend.position = "bottom", axis.text.x=element_text(angle = 90, hjust = 0))
+
+```
+
+## Run a linear regression to find which data sets are bed for 
 
 ```{r}
-benchmark_tmp2 %>% 
-  filter(estimator != "randomForest") %>%
-  ggplot(aes(x = MSE_randomForest, y = MSE, color = estimator)) +
-  geom_point() +
-  scale_x_log10() +
-  scale_y_log10()
+
+summary(
+    lm(
+      I(MSE > MSE_ranger) ~ size + size:(I(number.of.features == number.of.numeric.features) +
+        number.of.features  +
+        I(1 - MSE_randomForest / target_var)),
+      data = benchmark_tmp2 %>% filter(estimator == 'hte_adaptive_wmsp') %>%
+        mutate(size = ifelse(
+          number.of.instances <= 209,
+          'tiny',
+          ifelse(
+            number.of.instances < 500,
+            'small',
+            'large'
+            )))))
+
+# summary(
+#     lm(
+#       I(MSE > MSE_ranger) ~ I(number.of.features == number.of.numeric.features) +
+#         number.of.features +
+#         I(MSE_randomForest / target_var),
+#       data = benchmark_tmp2 %>% filter(estimator == 'hte_honest_wmsp')
+#     )
+#   )
+
+table(benchmark_tmp2$MSE[benchmark_tmp2$estimator == 'hte_adaptive_wmsp'] > 
+      benchmark_tmp2$MSE_ranger[benchmark_tmp2$estimator == 'hte_adaptive_wmsp']) /
+  sum(benchmark_tmp2$estimator == 'hte_adaptive_wmsp')
+
+table(benchmark_tmp2$MSE[benchmark_tmp2$estimator == 'hte_adaptive_wmsp'] > 
+      benchmark_tmp2$MSE_randomForest[benchmark_tmp2$estimator == 'hte_adaptive_wmsp']) /
+  sum(benchmark_tmp2$estimator == 'hte_adaptive_wmsp')
 
 ```
+
+**Conclusion for our adaptive RF:**  
+
+* For the data sets which ran so far, we suffered only marginally, but other 
+impelementations did outperform us in 30\% of all cases. The difference for the
+MSE however, was rather marginal.
+* It seems to be the case that we are not loosing anything in the way we handle 
+categorical features. In fact, it seems to be the case that in data sets which 
+have categorical features, we are doing slightly better. 
+* We are also doing better in settings with a weak signal 
+* We somehow loose a lot for small data sets, while we are doing pretty good on
+big data sets
+
+
+
