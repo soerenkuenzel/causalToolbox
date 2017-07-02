@@ -105,6 +105,7 @@ tasks = listOMLTasks()
 regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)
+regression_tasks <- regression_tasks[!duplicated(regression_tasks[ , c('target.feature', 'data.id')]), ]
 
 regression_tasks <- regression_tasks[order(regression_tasks$number.of.instances),]
 

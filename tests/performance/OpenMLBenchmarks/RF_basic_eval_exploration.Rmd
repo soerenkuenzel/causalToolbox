@@ -37,30 +37,42 @@ task_properties <- regression_tasks %>%
   "number.of.symbolic.features"
   )
 # merge data sets
+
+
+if ((!all(table(benchmark_results$task.id) <= 5)) |
+    (!all(task_properties$task.id == 1))) {
+    stop("Some data is repetitive. We should not merge")
+  }
+
 benchmark_cmb_pre <-
   merge(
   task_properties,
   benchmark_results,
-  by = 'data.id',
+  by = c('task.id', 'data.id'),
   all.x = FALSE,
   all.y = TRUE
   )
 
+table(data_set_statistics$data.id)
+
+# get rid of dublicated rows:
+data_set_statistics <- data_set_statistics[!duplicated(data_set_statistics), ]
+
 benchmark_cmb <- merge(benchmark_cmb_pre, data_set_statistics, by = 'data.id')
 
-```
+if(nrow(benchmark_cmb) != nrow(benchmark_cmb_pre)) stop('we accidentally created new rows')
 
-# MSE Performance
-
-## Performance relative to the explained variance
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
 benchmark_cmb %>% tbl_df() %>%
   mutate(MSE = (MSE_1 + MSE_2) / 2) %>%
-  select(estimator, MSE, task.id) %>%
+  select(estimator, MSE, task.id, train_time, predict_time) %>%
   group_by(task.id) %>%
   summarize(MSE_ranger = mean(MSE[estimator == 'ranger']),
-            MSE_randomForest = mean(MSE[estimator == 'randomForest'])) -> 
+            MSE_randomForest = mean(MSE[estimator == 'randomForest']),
+            train_time_ranger = mean(train_time[estimator == 'ranger']),
+            train_time_randomForest = mean(train_time[estimator == 'randomForest']),
+            predict_time_ranger = mean(predict_time[estimator == 'ranger']),
+            predict_time_randomForest = mean(predict_time[estimator == 'randomForest'])
+            ) -> 
   ave_performance
 
 benchmark_cmb %>% tbl_df() %>%
@@ -69,8 +81,19 @@ benchmark_cmb %>% tbl_df() %>%
 
 merge(benchmark_tmp1, ave_performance, by = 'task.id') ->
   benchmark_tmp2
-  
-benchmark_tmp2 %>% filter(estimator != 'ranger') %>%
+
+if(nrow(benchmark_tmp2) != nrow(benchmark_cmb_pre)) stop('we accidentally created new rows')
+
+# get rid of all the dublicated observations:
+benchmark_aggr <- benchmark_tmp2[!duplicated(benchmark_tmp2[, c('data.id', 'target.feature', 'estimator')]), ]
+```
+
+# MSE Performance
+
+## Performance relative to the explained variance
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+benchmark_aggr %>% filter(estimator != 'ranger') %>%
   ggplot(aes(
   x = MSE_ranger / target_var,
   y = (MSE - MSE_ranger) / MSE_ranger,
@@ -78,7 +101,7 @@ benchmark_tmp2 %>% filter(estimator != 'ranger') %>%
   )) +
   geom_point() +
   geom_smooth() +
-  coord_cartesian(ylim = c(-1, 1), xlim = c(0, 1.6)) +
+  # coord_cartesian(ylim = c(-1, 1), xlim = c(0, 1.6)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
@@ -88,7 +111,7 @@ benchmark_tmp2 %>% filter(estimator != 'ranger') %>%
 ## Performance for data set with and without categorical variables
 
 ```{r, echo=FALSE, warning=FALSE}
-benchmark_tmp2 %>%
+benchmark_aggr %>%
   mutate(
   hasCategoricalFeat = ifelse(
   number.of.features == number.of.numeric.features,
@@ -111,13 +134,13 @@ benchmark_tmp2 %>%
 ## Performance for data set with high and low signal to noise ratio
 
 ```{r, echo=FALSE, warning=FALSE}
-stn <- benchmark_tmp2$MSE_randomForest / benchmark_tmp2$target_var
+stn <- benchmark_aggr$MSE_randomForest / benchmark_aggr$target_var
 # if there is a strong sginal, then stn is small
 
-benchmark_tmp2 %>%
+benchmark_aggr %>%
   mutate(
     signalstrength = ifelse(
-      benchmark_tmp2$MSE_randomForest / benchmark_tmp2$target_var < .5,
+      benchmark_aggr$MSE_randomForest / benchmark_aggr$target_var < .5,
         'strong signal',
         'weak signal'
       )
@@ -136,13 +159,13 @@ benchmark_tmp2 %>%
 
 ```{r, echo=FALSE, warning=FALSE}
 # if there is a strong sginal, then stn is small
-benchmark_tmp2 %>%
+benchmark_aggr %>%
   mutate(
     size = ifelse(
-      benchmark_tmp2$number.of.instances <= 209,
+      benchmark_aggr$number.of.instances <= 209,
         'tiny',
         ifelse(
-          benchmark_tmp2$number.of.instances < 500,
+          benchmark_aggr$number.of.instances < 500,
           'small',
           'large'
         )
@@ -164,35 +187,39 @@ benchmark_tmp2 %>%
 
 summary(
     lm(
-      I(MSE > MSE_ranger) ~ size + size:(I(number.of.features == number.of.numeric.features) +
-        number.of.features  +
-        I(1 - MSE_randomForest / target_var)),
-      data = benchmark_tmp2 %>% filter(estimator == 'hte_adaptive_wmsp') %>%
-        mutate(size = ifelse(
-          number.of.instances <= 209,
-          'tiny',
-          ifelse(
-            number.of.instances < 500,
-            'small',
-            'large'
-            )))))
+      I(MSE > MSE_ranger) ~ size + 
+        size:(hasCategoricalFeat +
+              number.of.features  +
+              signal_strength),
+      data = benchmark_aggr %>% filter(estimator == 'hte_adaptive_wmsp') %>%
+        mutate(
+          hasCategoricalFeat = number.of.features != number.of.numeric.features,
+          signal_strength = 1 - MSE_randomForest / target_var,
+          size = ifelse(
+            number.of.instances <= 209,
+            'tiny',
+            ifelse(
+              number.of.instances < 500,
+              'small',
+              'large'
+              )))))
 
 # summary(
 #     lm(
 #       I(MSE > MSE_ranger) ~ I(number.of.features == number.of.numeric.features) +
 #         number.of.features +
 #         I(MSE_randomForest / target_var),
-#       data = benchmark_tmp2 %>% filter(estimator == 'hte_honest_wmsp')
+#       data = benchmark_aggr %>% filter(estimator == 'hte_honest_wmsp')
 #     )
 #   )
 
-table(benchmark_tmp2$MSE[benchmark_tmp2$estimator == 'hte_adaptive_wmsp'] > 
-      benchmark_tmp2$MSE_ranger[benchmark_tmp2$estimator == 'hte_adaptive_wmsp']) /
-  sum(benchmark_tmp2$estimator == 'hte_adaptive_wmsp')
+table(benchmark_aggr$MSE[benchmark_aggr$estimator == 'hte_adaptive_wmsp'] > 
+      benchmark_aggr$MSE_ranger[benchmark_aggr$estimator == 'hte_adaptive_wmsp']) /
+  sum(benchmark_aggr$estimator == 'hte_adaptive_wmsp')
 
-table(benchmark_tmp2$MSE[benchmark_tmp2$estimator == 'hte_adaptive_wmsp'] > 
-      benchmark_tmp2$MSE_randomForest[benchmark_tmp2$estimator == 'hte_adaptive_wmsp']) /
-  sum(benchmark_tmp2$estimator == 'hte_adaptive_wmsp')
+table(benchmark_aggr$MSE[benchmark_aggr$estimator == 'hte_adaptive_wmsp'] > 
+      benchmark_aggr$MSE_randomForest[benchmark_aggr$estimator == 'hte_adaptive_wmsp']) /
+  sum(benchmark_aggr$estimator == 'hte_adaptive_wmsp')
 
 ```
 
@@ -211,10 +238,59 @@ big data sets
 
 # Speed comparison:
 
+## Training time:
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
-benchmark_tmp2 %>%
-  group_by()
+benchmark_aggr %>%
+  filter(estimator != 'ranger') %>%
+  ggplot(aes(x = train_time_ranger, y = train_time, color = estimator )) +
+  geom_point() +
+  geom_smooth(method = 'lm') + 
+  geom_abline(slope = 1) +
+  theme_minimal() +
+  theme(legend.position = "bottom") 
+
 
 ```
+
+### Training time without randomForest
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+benchmark_aggr %>%
+  filter(estimator != 'randomForest') %>%
+  filter(estimator != 'ranger') %>%
+  ggplot(aes(x = train_time_ranger, y = train_time, color = estimator )) +
+  geom_point() +
+  geom_smooth(method = 'loess') + 
+  geom_abline(slope = 1) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  scale_x_log10() +
+  scale_y_log10()
+
+```
+
+
+
+## Prediciton time:
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+benchmark_aggr %>%
+  filter(estimator != 'ranger') %>%
+  ggplot(aes(x = predict_time_ranger, y = predict_time, color = estimator )) +
+  geom_point() +
+  geom_smooth(method = 'lm') + 
+  geom_abline(slope = 1) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+
+** Conclusion:**
+
+* randomForest is much slower than ranger and our implementation
+* 
 
