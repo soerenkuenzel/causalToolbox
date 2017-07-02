@@ -106,6 +106,8 @@ regression_tasks <-
   tasks[tasks$task.type == "Supervised Regression", ]
 n_datasets <- nrow(regression_tasks)
 
+regression_tasks <- regression_tasks[order(regression_tasks$number.of.instances),]
+
 data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name))
   dir.create(data_folder_name)
@@ -131,6 +133,7 @@ for (seed in seed_list) {
         NA
       })
     if(is.na(data_set)) next
+    if (is.na(data_set$target.features[1])) next
 
     non_missing_rows <- apply(!is.na(data_set$data),1, all) # only take rows which
     # which don't have missing values

@@ -28,6 +28,7 @@ for (i in 1:nrow(regression_tasks)) {
     NA
   })
   if (is.na(data_set)) next
+  if (is.na(data_set$target.features[1])) next
 
   non_missing_rows <- apply(!is.na(data_set$data), 1, all) # only take rows which
   # which don't have missing values
