@@ -1,4 +1,3 @@
-
 options( java.parameters = "-Xmx1000g")
 library("OpenML")
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
@@ -16,13 +15,16 @@ data_folder_name <- "sim_data/"
 if (!dir.exists(data_folder_name)) dir.create(data_folder_name)
 filename <- paste0(data_folder_name, "openML_dataset_summary.csv")
 
-done_tasks <- unique(read.csv(filename)$task.id)
+if(file.exists(filename)){
+  done_tasks <- unique(read.csv(filename)$data.id)
+}else{
+  done_tasks <- character()
+}
 
 for (i in 1:nrow(regression_tasks)) {
   # i <- 54
 
   data.id <- regression_tasks[i, "data.id"]
-  task.id <- regression_tasks[i, "task.id"]
 
   # the read function sometimes fails. In that case run the next data set
   data_set <- tryCatch({
@@ -35,7 +37,7 @@ for (i in 1:nrow(regression_tasks)) {
   if (is.na(data_set)) next
   if (is.na(data_set$target.features[1])) next
 
-  if(task.id %in% done_tasks){
+  if(data.id %in% done_tasks){
     print("This data set target combination ran before. We will skip it.")
     next
   }
@@ -71,6 +73,6 @@ for (i in 1:nrow(regression_tasks)) {
                " of ",
                n_datasets))
     clearOMLCache()
-    gc(verbose = getOption("verbose"), reset=FALSE) 
+    gc(verbose = getOption("verbose"), reset=FALSE)
 
 }

@@ -122,10 +122,15 @@ filename <-
   paste0(data_folder_name, "MSE_openML_basic_", learner, ".csv")
 
 
-done_tasks <- unique(apply(read.csv(filename)[, c('task.id', 'seed')],
-                           1,
-                           function(x)
-                             paste0(x, collapse = '')))
+if(file.exists(filename)) {
+  done_tasks <-
+    unique(apply(read.csv(filename)[, c('task.id', 'seed')],
+                 1,
+                 function(x)
+                   paste0(x, collapse = '')))
+} else{
+  done_tasks <- character()
+}
 
 
 for (i in 1:nrow(regression_tasks)) {
@@ -261,5 +266,5 @@ for (i in 1:nrow(regression_tasks)) {
     )
   }
     clearOMLCache()
-    gc(verbose = getOption("verbose"), reset=FALSE) 
+    gc(verbose = getOption("verbose"), reset=FALSE)
 }
