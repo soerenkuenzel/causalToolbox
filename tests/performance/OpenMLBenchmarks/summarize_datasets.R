@@ -14,7 +14,7 @@ if (!dir.exists(data_folder_name)) dir.create(data_folder_name)
 filename <- paste0(data_folder_name, "openML_dataset_summary.csv")
 
 
-for (i in 770:nrow(regression_tasks)) {
+for (i in 1856:nrow(regression_tasks)) {
   # i <- 54
 
   data.id <- regression_tasks[i, "data.id"]
