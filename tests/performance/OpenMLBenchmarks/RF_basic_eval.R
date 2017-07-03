@@ -129,7 +129,7 @@ for (seed in seed_list) {
     data.id <- regression_tasks[i, "data.id"]
     task.id <- regression_tasks[i, "task.id"]
 
-
+    if(i == 1374) next
     # the read function sometimes fails. In that case run the next data set
     data_set <- tryCatch({
         getOMLDataSet(data.id = data.id)
