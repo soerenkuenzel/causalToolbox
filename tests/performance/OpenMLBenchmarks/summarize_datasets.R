@@ -1,3 +1,5 @@
+
+options( java.parameters = "-Xmx1000g")
 library("OpenML")
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
 #library("OpenML");setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "farff") # https://www.openml.org/u/3454#!api
@@ -16,7 +18,7 @@ filename <- paste0(data_folder_name, "openML_dataset_summary.csv")
 
 done_tasks <- unique(read.csv(filename)$task.id)
 
-for (i in 1856:nrow(regression_tasks)) {
+for (i in 1:nrow(regression_tasks)) {
   # i <- 54
 
   data.id <- regression_tasks[i, "data.id"]
@@ -68,6 +70,7 @@ for (i in 1856:nrow(regression_tasks)) {
                i,
                " of ",
                n_datasets))
-  clearOMLCache()
+    clearOMLCache()
+    gc(verbose = getOption("verbose"), reset=FALSE) 
 
 }

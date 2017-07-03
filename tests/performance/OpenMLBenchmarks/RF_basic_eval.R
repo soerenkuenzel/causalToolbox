@@ -1,3 +1,4 @@
+options( java.parameters = "-Xmx1000g")
 library("OpenML")
 ## temporarily set API key to read only key
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka")
@@ -259,5 +260,6 @@ for (i in 1:nrow(regression_tasks)) {
       )
     )
   }
-  clearOMLCache()
+    clearOMLCache()
+    gc(verbose = getOption("verbose"), reset=FALSE) 
 }
