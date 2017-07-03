@@ -1,5 +1,6 @@
 library("OpenML")
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
+#library("OpenML");setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "farff") # https://www.openml.org/u/3454#!api
 
 # ------------------------------------------------------------------------------
 library(dplyr)
@@ -19,6 +20,7 @@ for (i in 1856:nrow(regression_tasks)) {
   # i <- 54
 
   data.id <- regression_tasks[i, "data.id"]
+  task.id <- regression_tasks[i, "task.id"]
 
   # the read function sometimes fails. In that case run the next data set
   data_set <- tryCatch({
@@ -30,6 +32,12 @@ for (i in 1856:nrow(regression_tasks)) {
   })
   if (is.na(data_set)) next
   if (is.na(data_set$target.features[1])) next
+
+  if(task.id %in% done_tasks){
+    print("This data set target combination ran before. We will skip it.")
+    next
+  }
+  done_tasks <- c(done_tasks, task.id)
 
   non_missing_rows <- apply(!is.na(data_set$data), 1, all) # only take rows which
   # which don't have missing values
