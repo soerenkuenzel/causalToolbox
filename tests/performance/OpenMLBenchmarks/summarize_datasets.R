@@ -13,6 +13,7 @@ data_folder_name <- "~/Dropbox (Personal)/CATE/hte/tests/performance/OpenMLBench
 if (!dir.exists(data_folder_name)) dir.create(data_folder_name)
 filename <- paste0(data_folder_name, "openML_dataset_summary.csv")
 
+done_tasks <- unique(read.csv(filename)$task.id)
 
 for (i in 1:nrow(regression_tasks)) {
   # i <- 54
@@ -59,4 +60,6 @@ for (i in 1:nrow(regression_tasks)) {
                i,
                " of ",
                n_datasets))
+  clearOMLCache()
+
 }

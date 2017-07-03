@@ -1,7 +1,7 @@
 library("OpenML")
 ## temporarily set API key to read only key
 setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "RWeka") # https://www.openml.org/u/3454#!api
-#setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "farff") # https://www.openml.org/u/3454#!api
+#library("OpenML");setOMLConfig(apikey = "6e7606dcedb2a6810d88dfaa550f7f07", arff.reader = "farff") # https://www.openml.org/u/3454#!api
 
 # ------------------------------------------------------------------------------
 library(dplyr)
@@ -117,9 +117,11 @@ filename <-
   paste0(data_folder_name, "MSE_openML_basic.csv")
 
 
+done_tasks <- unique(read.csv(filename)$task.id)
+
 for (seed in seed_list) {
   for (i in 1:nrow(regression_tasks)) { #n_datasets) {
-    # seed <- 123; i <- 53; learner = names(estimator_trainer)[1]
+    # seed <- 123; i <- 1; learner = names(estimator_trainer)[1]
     # skip instances which have more than
     #if (regression_tasks$number.of.instances[i] > 100000)
     #  next
@@ -139,14 +141,25 @@ for (seed in seed_list) {
     if(is.na(data_set)) next
     if (is.na(data_set$target.features[1])) next
 
+    # Check if the file is already in the data set. If so, skip it and run the
+    # next file
+
+    if(task.id %in% done_tasks){
+      print("This data set target combination ran before. We will skip it.")
+      next
+    }
+    done_tasks <- c(done_tasks, task.id)
+
+
+
     non_missing_rows <- apply(!is.na(data_set$data),1, all) # only take rows which
     # which don't have missing values
 
     features <-
       data_set$data[non_missing_rows, colnames(data_set$data) != data_set$target.features]
-    target <-
+    target <- as.numeric(
       data_set$data[non_missing_rows,  colnames(data_set$data) == data_set$target.features]
-
+    )
     # split the data into training and test set
     n_smp <- length(target)
     set.seed(seed)
@@ -232,5 +245,6 @@ for (seed in seed_list) {
         )
       )
     }
+    clearOMLCache()
   }
 }
