@@ -15,7 +15,7 @@ test_that("Tests that XhRF is working correctly", {
     ntree = ntree
   )
 
-  expect_equal(EstimateCate(sl, feat)[1], -0.02491667, tolerance = 1e-7)
+  expect_equal(EstimateCate(sl, feat)[1], 0.0124, tolerance = 1e-4)
 
   set.seed(432)
   cate_problem <-
@@ -41,13 +41,13 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(sl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  647.8669,
-  tolerance = 1e-7)
+  665,
+  tolerance = 1)
 
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
   expect_equal(smp_stats$SATT[1, 3],
-               -9.124237,
-               tolerance = 1e-7)
+               -9.47,
+               tolerance = 1e-2)
 
 })

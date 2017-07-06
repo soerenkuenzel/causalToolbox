@@ -2,6 +2,7 @@
 #include <random>
 #include <thread>
 #include <mutex>
+#include "utils.h"
 #define DOPARELLEL true
 
 honestRF::honestRF():
@@ -110,26 +111,29 @@ void honestRF::addTrees(size_t ntree) {
   for (int i=newStartingTreeNumber; i<newEndingTreeNumber; i++) {
   #endif
           unsigned int myseed = getSeed() * (i + 1);
+          std::mt19937_64 random_number_generator;
+          random_number_generator.seed(myseed);
 
           // Generate a sample index for each tree
           std::vector<size_t> sampleIndex;
 
           if (isReplacement()) {
-
+            std::uniform_int_distribution<size_t> unif_dist(
+              0, (size_t) (*getTrainingData()).getNumRows() - 1
+            );
             // Generate index with replacement
             while (sampleIndex.size() < getSampleSize()) {
-              size_t randomIndex =
-                (size_t)
-                  (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
+              size_t randomIndex = unif_dist(random_number_generator);
               sampleIndex.push_back(randomIndex);
             }
           } else {
-
+            std::uniform_int_distribution<size_t> unif_dist(
+              0, (size_t) (*getTrainingData()).getNumRows() - 1
+            );
             // Generate index without replacement
             while (sampleIndex.size() < getSampleSize()) {
-              size_t randomIndex =
-                (size_t)
-                  (rand_r(&myseed) % ((int) (*getTrainingData()).getNumRows()));
+              size_t randomIndex = unif_dist(random_number_generator);
+
               if (
                 sampleIndex.size() == 0 ||
                 std::find(
@@ -141,7 +145,6 @@ void honestRF::addTrees(size_t ntree) {
                 sampleIndex.push_back(randomIndex);
               }
             }
-
           }
 
           std::unique_ptr<std::vector<size_t> > splitSampleIndex;
@@ -186,7 +189,7 @@ void honestRF::addTrees(size_t ntree) {
                 getNodeSizeAvg(),
                 std::move(splitSampleIndex),
                 std::move(averageSampleIndex),
-                myseed,
+                random_number_generator,
                 getSplitMiddle()
               )
             );

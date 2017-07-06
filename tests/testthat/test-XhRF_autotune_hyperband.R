@@ -30,8 +30,8 @@ test_that("Tests X_RF_autotune_hyperband", {
 
 
   expect_equal(EstimateCate(xl, feat)[1],
-               0.3294971,
-               tolerance = 1e-7)
+               0.204,
+               tolerance = 1e-3)
 
 
   #### real example ####
@@ -62,8 +62,8 @@ test_that("Tests X_RF_autotune_hyperband", {
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  158.6595,
-  tolerance = 1e-5)
+  201,
+  tolerance = 1)
 
   # ----------------------------------------------------------------------------
   set.seed(21)
@@ -102,7 +102,7 @@ test_that("Tests X_RF_autotune_hyperband", {
   #theObject = xl_at; feature_new = feat; B = 5; verbose = FALSE
 
   expect_equal(as.numeric(CIs[1, ]),
-               c(-0.20387587, -0.50478912,  0.09703738),
-               tolerance=1e-7)
+               c(0.000953, -0.216019,  0.217924),
+               tolerance=1e-4)
 
 })

@@ -33,6 +33,6 @@ test_that("Tests adding more trees", {
 
   # Mean Square Error
   sum((y_pred - y) ^ 2)
-  expect_equal(sum((y_pred - y) ^ 2), 8.453259, tolerance=1e-4)
+  expect_equal(sum((y_pred - y) ^ 2), 8.47, tolerance=1e-3)
 
 })

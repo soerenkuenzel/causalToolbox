@@ -25,7 +25,7 @@ test_that("Tests if OOB calculation is working correctly", {
   )
 
   # Test OOB
-  expect_equal(getOOB(forest), 15.82102, tolerance=1e-4)
+  expect_equal(getOOB(forest), 16, tolerance=1e-2)
 
   # Test a very extreme setting
   expect_warning(

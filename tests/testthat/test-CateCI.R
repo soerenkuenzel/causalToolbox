@@ -21,8 +21,8 @@ test_that("Tests CateCI", {
     "honestRF is used as adaptive random forest."
   )
   expect_equal(as.numeric(CIs[2,]),
-               c(0.04759293, 0.01084847, 0.08433738),
-               tolerance = 1e-7)
+               c(0.04332, 0.00323, 0.08342),
+               tolerance = 1e-4)
 
   sl <- S_RF(
     feat = feat,
@@ -32,8 +32,8 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(sl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.01729103, -0.01133297,  0.04591503),
-               tolerance = 1e-7)
+               c(0.0124, -0.0120,  0.0367),
+               tolerance = 1e-4)
 
   tl <- T_RF(
     feat = feat,
@@ -43,8 +43,8 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.04663806, -0.03260194,  0.12587805),
-               tolerance = 1e-7)
+               c(0.07120, -0.00593,  0.14834),
+               tolerance = 1e-4)
 
   tl <- T_BART(
     feat = feat,
