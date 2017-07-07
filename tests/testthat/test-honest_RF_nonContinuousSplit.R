@@ -31,6 +31,6 @@ test_that("Test non-continuous split", {
 
   # Mean Square Error
   # sum((y_pred - y) ^ 2)
-  expect_equal(sum((y_pred - y) ^ 2), 7.860531, tolerance=1e-4)
+  expect_equal(sum((y_pred - y) ^ 2), 7.81, tolerance=1e-2)
 
 })

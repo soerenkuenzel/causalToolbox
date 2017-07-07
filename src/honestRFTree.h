@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <random>
 #include "DataFrame.h"
 #include "RFNode.h"
 
@@ -20,7 +21,7 @@ public:
     size_t nodeSizeAvg,
     std::unique_ptr< std::vector<size_t> > splittingSampleIndex,
     std::unique_ptr< std::vector<size_t> > averagingSampleIndex,
-    unsigned int myseed,
+    std::mt19937_64& random_number_generator,
     bool splitMiddle
   );
 
@@ -44,7 +45,7 @@ public:
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
     DataFrame* trainingData,
-    unsigned int myseed,
+    std::mt19937_64& random_number_generator,
     bool splitMiddle
   );
 
@@ -56,7 +57,7 @@ public:
     std::vector<size_t>* averagingSampleIndex,
     std::vector<size_t>* splittingSampleIndex,
     DataFrame* trainingData,
-    unsigned int myseed,
+    std::mt19937_64& random_number_generator,
     bool splitMiddle
   );
 
