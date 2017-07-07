@@ -140,8 +140,16 @@ for (i in 1:nrow(regression_tasks)) {
   #if (regression_tasks$number.of.instances[i] > 100000)
   #  next
 
+  print(paste('Starting with', i))
+
   data.id <- regression_tasks[i, "data.id"]
   task.id <- regression_tasks[i, "task.id"]
+
+
+  if (paste0(task.id, seed)  %in% done_tasks) {
+    print("This data set target combination ran before. We will skip it.")
+    next
+  }
 
   if (i == 1374)
     next
@@ -161,10 +169,6 @@ for (i in 1:nrow(regression_tasks)) {
   # Check if the file is already in the data set. If so, skip it and run the
   # next file
 
-  if (paste0(task.id, seed)  %in% done_tasks) {
-    print("This data set target combination ran before. We will skip it.")
-    next
-  }
   done_tasks <- c(done_tasks, paste0(task.id, seed))
 
 
@@ -189,9 +193,6 @@ for (i in 1:nrow(regression_tasks)) {
 
   # for (learner in names(estimator_trainer))
   {
-    if (regression_tasks$number.of.instances[i] > 50000 &
-        learner == 'randomForest')
-      next
     train_time_diff <- NA
     predict_time_diff <- NA
     MSE_1 <- NA
