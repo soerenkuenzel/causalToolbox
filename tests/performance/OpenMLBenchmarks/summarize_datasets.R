@@ -24,6 +24,15 @@ if(file.exists(filename)){
 for (i in 1:nrow(regression_tasks)) {
   # i <- 54
 
+    print(paste0("      Starting with i = ",
+                 i,
+                 " of ",
+                 n_datasets))
+    
+    clearOMLCache()
+    gc(verbose = getOption("verbose"), reset=FALSE)
+        OpenML::clearOMLCache()
+    
   data.id <- regression_tasks[i, "data.id"]
 
   # the read function sometimes fails. In that case run the next data set
@@ -41,7 +50,7 @@ for (i in 1:nrow(regression_tasks)) {
     print("This data set target combination ran before. We will skip it.")
     next
   }
-  done_tasks <- c(done_tasks, task.id)
+  done_tasks <- c(done_tasks, data.id)
 
   non_missing_rows <- apply(!is.na(data_set$data), 1, all) # only take rows which
   # which don't have missing values
@@ -68,11 +77,9 @@ for (i in 1:nrow(regression_tasks)) {
     row.names = FALSE,
     sep = ","
   )
-  print(paste0("      Done with i = ",
-               i,
-               " of ",
-               n_datasets))
     clearOMLCache()
     gc(verbose = getOption("verbose"), reset=FALSE)
+    OpenML::clearOMLCache()
+    print('.....................done.....................')
 
 }
