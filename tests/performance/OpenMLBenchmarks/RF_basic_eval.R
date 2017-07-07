@@ -200,7 +200,7 @@ for (i in 1:nrow(regression_tasks)) {
     error <- ""
     tryCatch({
       # train the estimator
-      evalWithTimeout(
+      R.utils::evalWithTimeout(
         {
           train_time_start <- Sys.time()
           estimator_1 <- estimator_trainer[[learner]](features_1, y_1)
