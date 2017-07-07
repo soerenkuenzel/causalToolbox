@@ -199,25 +199,30 @@ for (i in 1:nrow(regression_tasks)) {
     error <- ""
     tryCatch({
       # train the estimator
-      train_time_start <- Sys.time()
-      estimator_1 <- estimator_trainer[[learner]](features_1, y_1)
-      estimator_2 <- estimator_trainer[[learner]](features_2, y_2)
-      train_time_diff <- as.numeric(difftime(Sys.time(),
-                                             train_time_start,
-                                             tz,
-                                             units = "mins"))
-      # evaluate the estimator
-      predict_time_start <- Sys.time()
-      MSE_1 <-
-        mean((y_2 - estimator_predictor[[learner]](estimator_1, features_2)) ^
-               2)
-      MSE_2 <-
-        mean((y_1 - estimator_predictor[[learner]](estimator_2, features_1)) ^
-               2)
-      predict_time_diff <- as.numeric(difftime(Sys.time(),
-                                               predict_time_start,
-                                               tz,
-                                               units = "mins"))
+      evalWithTimeout(
+        {
+          train_time_start <- Sys.time()
+          estimator_1 <- estimator_trainer[[learner]](features_1, y_1)
+          estimator_2 <- estimator_trainer[[learner]](features_2, y_2)
+          train_time_diff <- as.numeric(difftime(Sys.time(),
+                                                 train_time_start,
+                                                 tz,
+                                                 units = "mins"))
+          # evaluate the estimator
+          predict_time_start <- Sys.time()
+          MSE_1 <-
+            mean((y_2 - estimator_predictor[[learner]](estimator_1, features_2)) ^
+                   2)
+          MSE_2 <-
+            mean((y_1 - estimator_predictor[[learner]](estimator_2, features_1)) ^
+                   2)
+          predict_time_diff <- as.numeric(difftime(Sys.time(),
+                                                   predict_time_start,
+                                                   tz,
+                                                   units = "mins"))
+        },
+        timeout = 1500, # stop if training takes more than 25 min
+        onTimeout = "error")
     },
     error = function(e) {
       print(e)
