@@ -2,38 +2,38 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rcpp_cppDataFrameInterface <- function(x, y, catCols, numRows, numColumns) {
-    .Call('hte_rcpp_cppDataFrameInterface', PACKAGE = 'hte', x, y, catCols, numRows, numColumns)
+    .Call('_hte_rcpp_cppDataFrameInterface', PACKAGE = 'hte', x, y, catCols, numRows, numColumns)
 }
 
 rcpp_cppBuildInterface <- function(x, y, catCols, numRows, numColumns, ntree, replace, sampsize, mtry, splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose, middleSplit, existing_dataframe_flag, existing_dataframe) {
-    .Call('hte_rcpp_cppBuildInterface', PACKAGE = 'hte', x, y, catCols, numRows, numColumns, ntree, replace, sampsize, mtry, splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose, middleSplit, existing_dataframe_flag, existing_dataframe)
+    .Call('_hte_rcpp_cppBuildInterface', PACKAGE = 'hte', x, y, catCols, numRows, numColumns, ntree, replace, sampsize, mtry, splitratio, nodesizeSpl, nodesizeAvg, seed, nthread, verbose, middleSplit, existing_dataframe_flag, existing_dataframe)
 }
 
 rcpp_cppPredictInterface <- function(forest, x) {
-    .Call('hte_rcpp_cppPredictInterface', PACKAGE = 'hte', forest, x)
+    .Call('_hte_rcpp_cppPredictInterface', PACKAGE = 'hte', forest, x)
 }
 
 rcpp_OBBPredictInterface <- function(forest) {
-    .Call('hte_rcpp_OBBPredictInterface', PACKAGE = 'hte', forest)
+    .Call('_hte_rcpp_OBBPredictInterface', PACKAGE = 'hte', forest)
 }
 
 rcpp_getObservationSizeInterface <- function(df) {
-    .Call('hte_rcpp_getObservationSizeInterface', PACKAGE = 'hte', df)
+    .Call('_hte_rcpp_getObservationSizeInterface', PACKAGE = 'hte', df)
 }
 
 rcpp_AddTreeInterface <- function(forest, ntree) {
-    invisible(.Call('hte_rcpp_AddTreeInterface', PACKAGE = 'hte', forest, ntree))
+    invisible(.Call('_hte_rcpp_AddTreeInterface', PACKAGE = 'hte', forest, ntree))
 }
 
 rcpp_selectBestFeature <- function(x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols) {
-    .Call('hte_rcpp_selectBestFeature', PACKAGE = 'hte', x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols)
+    .Call('_hte_rcpp_selectBestFeature', PACKAGE = 'hte', x, y, featureList, sampleIndex, nodesize, splitrule, categoricalFeatureCols)
 }
 
 test_rnd <- function() {
-    .Call('hte_test_rnd', PACKAGE = 'hte')
+    .Call('_hte_test_rnd', PACKAGE = 'hte')
 }
 
 test_rnd2 <- function() {
-    .Call('hte_test_rnd2', PACKAGE = 'hte')
+    .Call('_hte_test_rnd2', PACKAGE = 'hte')
 }
 
