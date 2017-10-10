@@ -12,11 +12,10 @@ print(setup_i) #
 set.seed(1145)
 nthread = 24
 
-library(CATEestimators)
 library(hte)
 library(dplyr)
 library(reshape)
-library(causalForest)
+library(grf)
 
 library(doParallel)
 cl <- makeCluster(nthread)
@@ -40,80 +39,80 @@ setup_grid <-
 setup <- setup_grid[[setup_i]]
 print(setup)
 
-dim_grid <- 20
+dim_grid <- c(5, 20, 100)
 ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .5))
-if (setup == "rare1"){
-   ntrain_grid <- round(10 ^ seq(from = 4, to = 6, by = .5))
+if (setup == "rare1") {
+  ntrain_grid <- round(10 ^ seq(from = 4, to = 6, by = .5))
 }
-if (setup == "Ufail"){
-   dim_grid[dim_grid < 6] <- 6
+if (setup == "Ufail") {
+  dim_grid[dim_grid < 6] <- 6
 }
 
 ntest <- 10000
-seed_grid <- 1:50
+seed_grid <- 1:3
 alpha_grid <- .1
 
 estimator_grid <- list(
-#  "S_RF" = function(feat, W, Yobs)
-#    S_RF(feat, W, Yobs, nthread = nthread),
-#  "T_RF" = function(feat, W, Yobs)
-#    T_RF(feat, W, Yobs, nthread = nthread)#,
-#  "X_RF" = function(feat, W, Yobs)
-#    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)#,
-#  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
-#    X_RF_autotune_hyperband(
-#      feat = feat,
-#      tr = W,
-#      yobs = Yobs,
-#      num_iter = 3 ^ 8,
-#      verbose = FALSE
-#    ),
-#  "X_RF_autotune_simple" = function(feat, W, Yobs)
-#    X_RF_autotune_simple(
-#      feat = feat,
-#      tr = W,
-#      yobs = Yobs,
-#      verbose = FALSE
-#    ),
-#  "X_RF_autotune_gpp" = function(feat, W, Yobs)
-#    X_RF_autotune_gpp(
-#      feat = feat,
-#      tr = W,
-#      yobs = Yobs,
-#      init_points = 20,
-#      n_iter = 20,
-#      verbose = FALSE
-#    ),
-#  "S_BART" = function(feat, W, Yobs)
-#    S_BART(feat, W, Yobs),
-#  "T_BART" = function(feat, W, Yobs)
-#    T_BART(feat, W, Yobs),
-#  "X_BART" = function(feat, W, Yobs)
-#    X_BART(feat, W, Yobs)
-   "CF_p" = function(feat, W, Yobs) {
-     feat <- as.matrix(feat)
-     colnames(feat) <- NULL
-     propensityForest(
-       X = feat,
-       W = W,
-       Y = Yobs,
-       num.trees = 500,
-       sample.size = nrow(feat) / 10,
-       nodesize = 1
-     )
-   },
-   "CF" = function(feat, W, Yobs) {
-     feat <- as.matrix(feat)
-     colnames(feat) <- NULL
-     causalForest(
-       X = feat,
-       W = W,
-       Y = Yobs,
-       num.trees = 500,
-       sample.size = nrow(feat) / 10,
-       nodesize = 1
-     )
-   }
+  #  "S_RF" = function(feat, W, Yobs)
+  #    S_RF(feat, W, Yobs, nthread = nthread),
+  #  "T_RF" = function(feat, W, Yobs)
+  #    T_RF(feat, W, Yobs, nthread = nthread)#,
+  #  "X_RF" = function(feat, W, Yobs)
+  #    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)#,
+  #  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
+  #    X_RF_autotune_hyperband(
+  #      feat = feat,
+  #      tr = W,
+  #      yobs = Yobs,
+  #      num_iter = 3 ^ 8,
+  #      verbose = FALSE
+  #    ),
+  #  "X_RF_autotune_simple" = function(feat, W, Yobs)
+  #    X_RF_autotune_simple(
+  #      feat = feat,
+  #      tr = W,
+  #      yobs = Yobs,
+  #      verbose = FALSE
+  #    ),
+  #  "X_RF_autotune_gpp" = function(feat, W, Yobs)
+  #    X_RF_autotune_gpp(
+  #      feat = feat,
+  #      tr = W,
+  #      yobs = Yobs,
+  #      init_points = 20,
+  #      n_iter = 20,
+  #      verbose = FALSE
+  #    ),
+  #  "S_BART" = function(feat, W, Yobs)
+  #    S_BART(feat, W, Yobs),
+  #  "T_BART" = function(feat, W, Yobs)
+  #    T_BART(feat, W, Yobs),
+  #  "X_BART" = function(feat, W, Yobs)
+  #    X_BART(feat, W, Yobs)
+  "CF_p" = function(feat, W, Yobs) {
+    feat <- as.matrix(feat)
+    colnames(feat) <- NULL
+    propensityForest(
+      X = feat,
+      W = W,
+      Y = Yobs,
+      num.trees = 500,
+      sample.size = nrow(feat) / 10,
+      nodesize = 1
+    )
+  },
+  "CF" = function(feat, W, Yobs) {
+    feat <- as.matrix(feat)
+    colnames(feat) <- NULL
+    causalForest(
+      X = feat,
+      W = W,
+      Y = Yobs,
+      num.trees = 500,
+      sample.size = nrow(feat) / 10,
+      nodesize = 1
+    )
+  }
 )
 
 CATEpredictor_grid <- list(
@@ -127,24 +126,24 @@ CATEpredictor_grid <- list(
     hte::EstimateCate(estimator, feat_te),
   "X_RF_autotune_simple" = function(estimator, feat_te)
     hte::EstimateCate(estimator, feat_te),
- "X_RF_autotune_gpp" = function(estimator, feat_te)
-   EstimateCate(estimator, feat_te),
+  "X_RF_autotune_gpp" = function(estimator, feat_te)
+    EstimateCate(estimator, feat_te),
   "S_BART" = function(estimator, feat_te)
     CATEestimators::EstimateCate(estimator, feat_te),
   "T_BART" = function(estimator, feat_te)
     CATEestimators::EstimateCate(estimator, feat_te),
   "X_BART" = function(estimator, feat_te)
     CATEestimators::EstimateCate(estimator, feat_te),
-   "CF_p" = function(estimator, feat_te) {
-     feat_te <- as.matrix(feat_te)
-     colnames(feat_te) <- NULL
-     return(predict(estimator, feat_te))
-   },
-   "CF" = function(estimator, feat_te)  {
-     feat_te <- as.matrix(feat_te)
-     colnames(feat_te) <- NULL
-     return(predict(estimator, feat_te))
-   }
+  "CF_p" = function(estimator, feat_te) {
+    feat_te <- as.matrix(feat_te)
+    colnames(feat_te) <- NULL
+    return(predict(estimator, feat_te))
+  },
+  "CF" = function(estimator, feat_te)  {
+    feat_te <- as.matrix(feat_te)
+    colnames(feat_te) <- NULL
+    return(predict(estimator, feat_te))
+  }
 )
 
 
@@ -157,20 +156,21 @@ filename <-
 # if (file.exists(filename))
 #   file.remove(filename)
 
-if (file.exists(filename)){
+if (file.exists(filename)) {
   already_ran <- read.csv(filename)
   #already_ran <- already_ran[!is.na(already_ran[,"MSE"]), ] #only if not NA
-  already_ran <- already_ran[ , c("seed", "alpha", "dim", "ntrain", "estimator")]
-  for(i in 1:ncol(already_ran)){
-    already_ran[ ,i] <- as.character(already_ran[ ,i])
+  already_ran <-
+    already_ran[, c("seed", "alpha", "dim", "ntrain", "estimator")]
+  for (i in 1:ncol(already_ran)) {
+    already_ran[, i] <- as.character(already_ran[, i])
   }
 }
 
 ## loop through all cases:
-foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
-# for (seed in seed_grid) {
+foreach(seed = seed_grid, .packages = c('causalForest', 'hte')) %dopar% {
+  # for (seed in seed_grid) {
   for (alpha in alpha_grid) {
-      for (dim in dim_grid) {
+    for (dim in dim_grid) {
       print(paste(
         "Starting with seed = ",
         seed,
@@ -203,11 +203,23 @@ foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
 
 
           #### check if entry already exists, if yes, do next:
-          if(exists("already_ran") &&
-             (paste(c(seed, alpha, dim, ntrain, paste0(estimator_name, packageVersion("hte"))), collapse = ",") %in%
-              apply(already_ran, 1, function(x) paste(x, collapse =",")))){
-            print(paste(paste(c(seed, alpha, dim, ntrain, estimator_name), collapse = ","),
-                        "already existed. Running next setting."))
+          if (exists("already_ran") &&
+              (paste(c(
+                seed,
+                alpha,
+                dim,
+                ntrain,
+                paste0(estimator_name, packageVersion("hte"))
+              ), collapse = ",") %in%
+              apply(already_ran, 1, function(x)
+                paste(x, collapse = ",")))) {
+            print(paste(
+              paste(
+                c(seed, alpha, dim, ntrain, estimator_name),
+                collapse = ","
+              ),
+              "already existed. Running next setting."
+            ))
             next
           }
 
@@ -216,9 +228,11 @@ foreach(seed = seed_grid, .packages=c('causalForest', 'hte')) %dopar% {
           start_time <- Sys.time()
           estimates <-
             tryCatch({
-              L <- estimator(feat = dt$feat_tr,
-                             W = dt$W_tr,
-                             Yobs = dt$Yobs_tr)
+              L <- estimator(
+                feat = dt$feat_tr,
+                W = dt$W_tr,
+                Yobs = dt$Yobs_tr
+              )
               CATEpredictor(L, dt$feat_te)
             },
             error = function(e) {
