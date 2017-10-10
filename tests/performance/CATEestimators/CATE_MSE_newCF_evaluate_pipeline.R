@@ -10,7 +10,8 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread = 24
+nthread = 12
+print(nthread)
 
 # library(CATEestimators)
 library(hte)
