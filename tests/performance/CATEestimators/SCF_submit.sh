@@ -1,4 +1,4 @@
-for i in {3..11}; do
+for i in {1..11}; do
     echo $i;
-    sbatch -p low SCF_CATE_MSE_evaluate_pipeline $i;
+    sbatch -p high SCF_CATE_MSE_evaluate_pipeline.sh $i;
 done

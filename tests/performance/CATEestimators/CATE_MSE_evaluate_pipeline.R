@@ -10,7 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread = 24
+nthread = 8
 
 library(hte)
 library(dplyr)
@@ -167,7 +167,7 @@ if (file.exists(filename)) {
 }
 
 ## loop through all cases:
-foreach(seed = seed_grid, .packages = c('causalForest', 'hte')) %dopar% {
+foreach(seed = seed_grid, .packages = c('grf', 'hte')) %dopar% {
   # for (seed in seed_grid) {
   for (alpha in alpha_grid) {
     for (dim in dim_grid) {
