@@ -53,12 +53,12 @@ seed_grid <- 1:3
 alpha_grid <- .1
 
 estimator_grid <- list(
-  #  "S_RF" = function(feat, W, Yobs)
-  #    S_RF(feat, W, Yobs, nthread = nthread),
-  #  "T_RF" = function(feat, W, Yobs)
-  #    T_RF(feat, W, Yobs, nthread = nthread)#,
-  #  "X_RF" = function(feat, W, Yobs)
-  #    X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread)#,
+   "S_RF" = function(feat, W, Yobs)
+     S_RF(feat, W, Yobs, nthread = nthread),
+   "T_RF" = function(feat, W, Yobs)
+     T_RF(feat, W, Yobs, nthread = nthread),
+   "X_RF" = function(feat, W, Yobs)
+     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
   #  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
   #    X_RF_autotune_hyperband(
   #      feat = feat,
@@ -83,34 +83,32 @@ estimator_grid <- list(
   #      n_iter = 20,
   #      verbose = FALSE
   #    ),
-  #  "S_BART" = function(feat, W, Yobs)
-  #    S_BART(feat, W, Yobs),
-  #  "T_BART" = function(feat, W, Yobs)
-  #    T_BART(feat, W, Yobs),
-  #  "X_BART" = function(feat, W, Yobs)
-  #    X_BART(feat, W, Yobs)
-  "CF_p" = function(feat, W, Yobs) {
-    feat <- as.matrix(feat)
-    colnames(feat) <- NULL
-    propensityForest(
-      X = feat,
-      W = W,
-      Y = Yobs,
-      num.trees = 500,
-      sample.size = nrow(feat) / 10,
-      nodesize = 1
-    )
-  },
+   "S_BART" = function(feat, W, Yobs)
+     S_BART(feat, W, Yobs),
+   "T_BART" = function(feat, W, Yobs)
+     T_BART(feat, W, Yobs),
+   "X_BART" = function(feat, W, Yobs)
+     X_BART(feat, W, Yobs),
+  # "CF_p" = function(feat, W, Yobs) {
+  #   feat <- as.matrix(feat)
+  #   colnames(feat) <- NULL
+  #   propensityForest(
+  #     X = feat,
+  #     W = W,
+  #     Y = Yobs,
+  #     num.trees = 500,
+  #     sample.size = nrow(feat) / 10,
+  #     nodesize = 1
+  #   )
+  # },
   "CF" = function(feat, W, Yobs) {
     feat <- as.matrix(feat)
     colnames(feat) <- NULL
-    causalForest(
+    grf::causal_forest(
       X = feat,
-      W = W,
       Y = Yobs,
-      num.trees = 500,
-      sample.size = nrow(feat) / 10,
-      nodesize = 1
+      W = W,
+      num.trees = 500
     )
   }
 )
@@ -129,11 +127,11 @@ CATEpredictor_grid <- list(
   "X_RF_autotune_gpp" = function(estimator, feat_te)
     EstimateCate(estimator, feat_te),
   "S_BART" = function(estimator, feat_te)
-    CATEestimators::EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "T_BART" = function(estimator, feat_te)
-    CATEestimators::EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "X_BART" = function(estimator, feat_te)
-    CATEestimators::EstimateCate(estimator, feat_te),
+    hte::EstimateCate(estimator, feat_te),
   "CF_p" = function(estimator, feat_te) {
     feat_te <- as.matrix(feat_te)
     colnames(feat_te) <- NULL
@@ -142,7 +140,7 @@ CATEpredictor_grid <- list(
   "CF" = function(estimator, feat_te)  {
     feat_te <- as.matrix(feat_te)
     colnames(feat_te) <- NULL
-    return(predict(estimator, feat_te))
+    return(predict(estimator, feat_te)$predictions)
   }
 )
 
