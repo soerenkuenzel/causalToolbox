@@ -49,8 +49,8 @@ if (setup == "Ufail") {
 }
 
 ntest <- 10000
-seed_grid <- 1:3
-alpha_grid <- .1
+seed_grid <- 1:nthread
+alpha_grid <- c(0, .5)
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
