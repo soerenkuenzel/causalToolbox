@@ -54,11 +54,11 @@ alpha_grid <- .1
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
-     S_RF(feat, W, Yobs, nthread = nthread),
+     S_RF(feat, W, Yobs, nthread = 1),
    "T_RF" = function(feat, W, Yobs)
-     T_RF(feat, W, Yobs, nthread = nthread),
+     T_RF(feat, W, Yobs, nthread = 1),
    "X_RF" = function(feat, W, Yobs)
-     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
+     X_RF(feat, W, Yobs, verbose = FALSE, nthread = 1),
   #  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
   #    X_RF_autotune_hyperband(
   #      feat = feat,
@@ -108,7 +108,8 @@ estimator_grid <- list(
       X = feat,
       Y = Yobs,
       W = W,
-      num.trees = 500
+      num.trees = 500,
+      num.threads = 1
     )
   }
 )
