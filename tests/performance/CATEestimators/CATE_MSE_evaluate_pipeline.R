@@ -11,6 +11,7 @@ print(setup_i) #
 
 set.seed(1145)
 nthread = 8
+parallel::detectCores()
 
 library(hte)
 library(dplyr)
