@@ -134,7 +134,7 @@ training_data_checker <- function(
 #       stop("splitratio is too big such that averaging data cannot even be splitted!")
 #     }
 
-  }
+  # }
 
   if (nthread < 0 || nthread %% 1 != 0) {
     stop("nthread must be a nonegative integer.")
