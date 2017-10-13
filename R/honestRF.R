@@ -122,7 +122,7 @@ training_data_checker <- function(
 
   if (splitratio == 0 || splitratio == 1){
 
-    warning("honestRF is used as adaptive random forest.")
+    print("Note that honestRF is used as adaptive random forest.")
 
 #   } else {
 #
