@@ -18,8 +18,9 @@ library(reshape)
 library(grf)
 
 library(doParallel)
-cl <- makeCluster(nthread)
-registerDoParallel(cl)
+registerDoParallel(nthread)
+# cl <- makeCluster(nthread)
+# registerDoParallel(cl)
 
 setup_grid <-
   c(
