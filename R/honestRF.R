@@ -120,9 +120,9 @@ training_data_checker <- function(
     stop("splitratio must in between 0 and 1.")
   }
 
-  if (splitratio == 0 || splitratio == 1){
-
-    print("Note that honestRF is used as adaptive random forest.")
+  # if (splitratio == 0 || splitratio == 1){
+  #
+  #   print("Note that honestRF is used as adaptive random forest.")
 
 #   } else {
 #
