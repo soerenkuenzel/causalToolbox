@@ -33,9 +33,9 @@ setup_grid <-
     "STMpp",
     "Ufail",
     "Usual1",
-    "Wager1",
-    "Wager2",
-    "Wager3"
+    "WA1",
+    "WA2",
+    "WA3"
   )
 
 setup <- setup_grid[[setup_i]]
