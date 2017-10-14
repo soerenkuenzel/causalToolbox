@@ -143,7 +143,8 @@ training_data_checker <- function(
   if (nthread > 0) {
     #' @import parallel
     library(parallel)
-    if (nthread > parallel::detectCores()) {
+    if (tryCatch(nthread > parallel::detectCores(),
+                 error = function(x) {FALSE})) {
       stop(paste0(
         "nthread cannot exceed total cores in the computer: ", detectCores()
         ))
