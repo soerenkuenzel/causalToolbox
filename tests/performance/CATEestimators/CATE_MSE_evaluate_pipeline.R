@@ -10,7 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread = 8
+nthread <- 8
 parallel::detectCores()
 
 library(hte)

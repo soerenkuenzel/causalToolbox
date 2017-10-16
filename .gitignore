@@ -20,13 +20,10 @@ tests/performance/CATEestimators/sim_figures/
 inst/doc
 tests/performance/CATEestimators/figs/
 tests/memory/free_memory_Problem.R
-
 crashes/currentWS.RData
-
 DESCRIPTION.orig
 NUL
 *.html
-
 *.Rda
-
 *.log
+tests/performance/CATEestimators/create_fig/
