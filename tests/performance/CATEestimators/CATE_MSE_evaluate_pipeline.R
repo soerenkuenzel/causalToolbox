@@ -10,7 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread <- 8
+nthread <- 24
 parallel::detectCores()
 
 library(hte)
@@ -51,16 +51,16 @@ if (setup == "Ufail") {
 }
 
 ntest <- 10000
-seed_grid <- 1:nthread
+seed_grid <- 1:5
 alpha_grid <- c(0, .5)
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
-     S_RF(feat, W, Yobs, nthread = 1),
+     S_RF(feat, W, Yobs, nthread = nthread),
    "T_RF" = function(feat, W, Yobs)
-     T_RF(feat, W, Yobs, nthread = 1),
+     T_RF(feat, W, Yobs, nthread = nthread),
    "X_RF" = function(feat, W, Yobs)
-     X_RF(feat, W, Yobs, verbose = FALSE, nthread = 1),
+     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
   #  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
   #    X_RF_autotune_hyperband(
   #      feat = feat,
@@ -111,7 +111,7 @@ estimator_grid <- list(
       Y = Yobs,
       W = W,
       num.trees = 500,
-      num.threads = 1
+      num.threads = nthread
     )
   }
 )
@@ -168,8 +168,8 @@ if (file.exists(filename)) {
 }
 
 ## loop through all cases:
-foreach(seed = seed_grid, .packages = c('grf', 'hte')) %dopar% {
-  # for (seed in seed_grid) {
+#foreach(seed = seed_grid, .packages = c('grf', 'hte')) %dopar% {
+for (seed in seed_grid) {
   for (alpha in alpha_grid) {
     for (dim in dim_grid) {
       print(paste(
