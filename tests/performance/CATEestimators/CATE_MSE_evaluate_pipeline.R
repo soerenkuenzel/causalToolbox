@@ -10,8 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-nthread <- 8
-parallel::detectCores()
+nthread <- parallel::detectCores()
 
 library(hte)
 library(dplyr)
@@ -28,31 +27,40 @@ setup_grid <-
     "RespSparseTau1strong",
     "RsparseT2weak",
     "complexTau",
+    "complexTau2",
+    "complexTau3",
+    "complexTau4",
     "Conf1",
     "rare1",
+    "rare2",
+    "rare3",
     "STMpp",
+    "STMpp2",
+    "STMpp3",
+    "STMpp4",
     "Ufail",
     "Usual1",
     "WA1",
     "WA2",
-    "WA3"
+    "WA3",
+    "WA4"
   )
 
 setup <- setup_grid[[setup_i]]
 print(setup)
 
 dim_grid <- c(5, 20, 100)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .5))
+ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .25))
 if (setup == "rare1") {
-  ntrain_grid <- round(10 ^ seq(from = 4, to = 6, by = .5))
+  ntrain_grid <- round(10 ^ seq(from = 4, to = 6, by = .25))
 }
 if (setup == "Ufail") {
   dim_grid[dim_grid < 6] <- 6
 }
 
 ntest <- 10000
-seed_grid <- 1:nthread
-alpha_grid <- c(0, .5)
+seed_grid <- 1:100
+alpha_grid <- c(0, .1)
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
