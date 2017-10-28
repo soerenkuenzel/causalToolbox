@@ -10,15 +10,7 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
-<<<<<<< HEAD
-nthread <- parallel::detectCores()
-||||||| merged common ancestors
-nthread <- 8
-parallel::detectCores()
-=======
 nthread <- 24
-parallel::detectCores()
->>>>>>> e9d29cb6d629e0372323054070380ba3ec3ec95e
 
 library(hte)
 library(dplyr)
@@ -66,17 +58,9 @@ if (setup == "Ufail") {
   dim_grid[dim_grid < 6] <- 6
 }
 
-ntest <- 10000
-<<<<<<< HEAD
+ntest <- 100000
 seed_grid <- 1:100
 alpha_grid <- c(0, .1)
-||||||| merged common ancestors
-seed_grid <- 1:nthread
-alpha_grid <- c(0, .5)
-=======
-seed_grid <- 1:5
-alpha_grid <- c(0, .5)
->>>>>>> e9d29cb6d629e0372323054070380ba3ec3ec95e
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
