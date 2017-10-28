@@ -14,7 +14,7 @@ The package contains compiled code, and you must have a development environment 
 
 ## Example 
 
-For details please read our paper: http://sekhon.berkeley.edu/papers/x-learner.pdf
+For details please read our paper: https://arxiv.org/pdf/1706.03461.pdf
 This example will not execute because there is no data. 
 
 ```R

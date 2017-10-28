@@ -10,7 +10,15 @@ print(setup_i) #
 # setup_i <- 1
 
 set.seed(1145)
+<<<<<<< HEAD
 nthread <- parallel::detectCores()
+||||||| merged common ancestors
+nthread <- 8
+parallel::detectCores()
+=======
+nthread <- 24
+parallel::detectCores()
+>>>>>>> e9d29cb6d629e0372323054070380ba3ec3ec95e
 
 library(hte)
 library(dplyr)
@@ -59,16 +67,24 @@ if (setup == "Ufail") {
 }
 
 ntest <- 10000
+<<<<<<< HEAD
 seed_grid <- 1:100
 alpha_grid <- c(0, .1)
+||||||| merged common ancestors
+seed_grid <- 1:nthread
+alpha_grid <- c(0, .5)
+=======
+seed_grid <- 1:5
+alpha_grid <- c(0, .5)
+>>>>>>> e9d29cb6d629e0372323054070380ba3ec3ec95e
 
 estimator_grid <- list(
    "S_RF" = function(feat, W, Yobs)
-     S_RF(feat, W, Yobs, nthread = 1),
+     S_RF(feat, W, Yobs, nthread = nthread),
    "T_RF" = function(feat, W, Yobs)
-     T_RF(feat, W, Yobs, nthread = 1),
+     T_RF(feat, W, Yobs, nthread = nthread),
    "X_RF" = function(feat, W, Yobs)
-     X_RF(feat, W, Yobs, verbose = FALSE, nthread = 1),
+     X_RF(feat, W, Yobs, verbose = FALSE, nthread = nthread),
   #  "X_RF_autotune_hyperband" = function(feat, W, Yobs)
   #    X_RF_autotune_hyperband(
   #      feat = feat,
@@ -119,7 +135,7 @@ estimator_grid <- list(
       Y = Yobs,
       W = W,
       num.trees = 500,
-      num.threads = 1
+      num.threads = nthread
     )
   }
 )
@@ -176,8 +192,8 @@ if (file.exists(filename)) {
 }
 
 ## loop through all cases:
-foreach(seed = seed_grid, .packages = c('grf', 'hte')) %dopar% {
-  # for (seed in seed_grid) {
+#foreach(seed = seed_grid, .packages = c('grf', 'hte')) %dopar% {
+for (seed in seed_grid) {
   for (alpha in alpha_grid) {
     for (dim in dim_grid) {
       print(paste(

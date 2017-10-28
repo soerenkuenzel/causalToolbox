@@ -21,6 +21,6 @@
 #SBATCH --time=72:00:00
 #
 ## Command(s) to run (example):#!/bin/bash
-R CMD BATCH --no-save --args -$1 CATE_MSE_evaluate_pipeline.R CATE_MSE_CF_setup_$1.Rout
+R CMD BATCH --no-save --args -$1 CATE_MSE_evaluate_pipeline.R CATE_MSE_setup_$1.Rout
 
 
