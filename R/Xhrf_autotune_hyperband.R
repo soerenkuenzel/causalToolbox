@@ -77,8 +77,8 @@ X_RF_autotune_hyperband <-
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- predict(m_1, X_0) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1)
+    r_0 <- forestry::predict(m_1, X_0) - yobs_0
+    r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
       autohonestRF(
@@ -109,7 +109,7 @@ X_RF_autotune_hyperband <-
     }
 
     m_prop <-
-      honestRF(x = feat,
+      forestry::honestRF(x = feat,
                y = tr,
                ntree = 500)
     if (verbose) {

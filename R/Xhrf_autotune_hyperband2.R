@@ -28,7 +28,7 @@ tuneStageOne <- function(x,
                          nthread = 0) {
 
   # Creat a dummy tree just to reuse its data.
-  dummy_tree <- honestRF(x, y, ntree=1, nodesizeSpl=nrow(x), nodesizeAvg=nrow(x))
+  dummy_tree <- forestry::honestRF(x, y, ntree=1, nodesizeSpl=nrow(x), nodesizeAvg=nrow(x))
 
   # Number of unique executions of Successive Halving (minus one)
   s_max <- as.integer(log(num_iter) / log(eta))
@@ -102,7 +102,7 @@ tuneStageOne <- function(x,
     r_old <- 1
     for (j in 1:nrow(allConfigs)) {
       tryCatch({
-        val_models[[j]] <- honestRF(
+        val_models[[j]] <- forestry::honestRF(
           x = x,
           y = y,
           ntree = r_old,
@@ -148,7 +148,7 @@ tuneStageOne <- function(x,
             # If the model is available, get its OOB error
             val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
             # Calculate residuals
-            res <- predict(val_models[[j]], x) - y
+            res <- forestry::predict(val_models[[j]], x) - y
             # Train an honestRF for tau
 
             m_tau <-
@@ -205,9 +205,9 @@ tuneStageOne <- function(x,
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
       best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
-      res <- predict(val_models[[1]], x) - y
+      res <- forestry::predict(val_models[[1]], x) - y
       m_tau <-
-        honestRF(
+        forestry::honestRF(
           x = x,
           y = res,
           ntree = m_tau_init@ntree,
@@ -332,8 +332,8 @@ autoJointHonestRF <-
         nthread = nthread
       )
 
-    r_0 <- predict(m_1, X_0) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1)
+    r_0 <- forestry::predict(m_1, X_0) - yobs_0
+    r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
       autohonestRF(
@@ -391,8 +391,8 @@ autoJointHonestRF <-
         nthread = nthread
       )
 
-      r_0 <- predict(m_1, X_0) - yobs_0
-      r_1 <- yobs_1 - predict(m_0, X_1)
+      r_0 <- forestry::predict(m_1, X_0) - yobs_0
+      r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
       m_tau_0 <-
         autohonestRF(
@@ -422,7 +422,7 @@ autoJointHonestRF <-
 
 
     m_prop <-
-      honestRF(x = feat,
+      forestry::honestRF(x = feat,
                y = tr,
                ntree = 500)
     if (verbose) {
