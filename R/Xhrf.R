@@ -286,7 +286,7 @@ X_RF_fully_specified <-
     X_1 <- feat[tr == 1,]
 
     m_0 <-
-      honestRF(
+      forestry::honestRF(
         x = X_0[ , hyperparameter_list[["l_first_0"]]$relevant_Variable],
         y = yobs_0,
         ntree = hyperparameter_list[["l_first_0"]]$ntree,
@@ -301,7 +301,7 @@ X_RF_fully_specified <-
       )
 
     m_1 <-
-      honestRF(
+      forestry::honestRF(
         x = X_1[ , hyperparameter_list[["l_first_1"]]$relevant_Variable],
         y = yobs_1,
         ntree = hyperparameter_list[["l_first_1"]]$ntree,
@@ -318,11 +318,11 @@ X_RF_fully_specified <-
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
+    r_0 <- forestry::predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
+    r_1 <- yobs_1 - forestry::predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
 
     m_tau_0 <-
-      honestRF(
+      forestry::honestRF(
         x = X_0[, hyperparameter_list[["l_second_0"]]$relevant_Variable],
         y = r_0,
         ntree = hyperparameter_list[["l_second_0"]]$ntree,
@@ -337,7 +337,7 @@ X_RF_fully_specified <-
       )
 
     m_tau_1 <-
-      honestRF(
+      forestry::honestRF(
         x = X_1[, hyperparameter_list[["l_second_1"]]$relevant_Variable],
         y = r_1,
         ntree = hyperparameter_list[["l_second_1"]]$ntree,
@@ -355,7 +355,7 @@ X_RF_fully_specified <-
     }
 
     m_prop <-
-      honestRF(
+      forestry::honestRF(
         x = feat[, hyperparameter_list[["l_prop"]]$relevant_Variable],
         y = tr,
         ntree = hyperparameter_list[["l_prop"]]$ntree,
@@ -415,25 +415,25 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     predmode <- theObject@hyperparameter_list[["general"]]$predmode
-    prop_scores <- predict(theObject@m_prop, feature_new)
+    prop_scores <- forestry::predict(theObject@m_prop, feature_new)
     if (predmode == "propmean") {
       return(
-        prop_scores        * predict(theObject@m_tau_0, feature_new) +
-          (1 - prop_scores)  * predict(theObject@m_tau_1, feature_new)
+        prop_scores        * forestry::predict(theObject@m_tau_0, feature_new) +
+          (1 - prop_scores)  * forestry::predict(theObject@m_tau_1, feature_new)
       )
     }
     if (predmode == "extreme") {
       return(ifelse(
         prop_scores > .5,
-        predict(theObject@m_tau_0, feature_new),
-        predict(theObject@m_tau_1, feature_new)
+        forestry::predict(theObject@m_tau_0, feature_new),
+        forestry::predict(theObject@m_tau_1, feature_new)
       ))
     }
     if (predmode == "control") {
-      return(predict(theObject@m_tau_0, feature_new))
+      return(forestry::predict(theObject@m_tau_0, feature_new))
     }
     if (predmode == "treated") {
-      return(predict(theObject@m_tau_1, feature_new))
+      return(forestry::predict(theObject@m_tau_1, feature_new))
     }
   }
 )

@@ -1,4 +1,4 @@
-library(hte)
+devtools::load_all()
 # Example 1: Use Iris dataset
 set.seed(1423614230)
 

@@ -106,7 +106,7 @@ T_RF <-
     X_1 <- feat[tr == 1, ]
 
 
-    m_y_c <- honestRF(
+    m_y_c <- forestry::honestRF(
       x = X_0,
       y = yobs_0,
       ntree = ntree,
@@ -120,7 +120,7 @@ T_RF <-
       splitratio = splitratio
     )
 
-    m_y_t <- honestRF(
+    m_y_t <- forestry::honestRF(
       x = X_1,
       y = yobs_1,
       ntree = ntree,
@@ -180,8 +180,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      predict(theObject@m_y_t, feature_new) -
-        predict(theObject@m_y_c, feature_new)
+      forestry::predict(theObject@m_y_t, feature_new) -
+        forestry::predict(theObject@m_y_c, feature_new)
     )
   }
 )

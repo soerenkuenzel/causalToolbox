@@ -105,7 +105,7 @@ S_RF <-
       stop("always trying to split on the treatment variable is currently not
            implemented")
     } else{
-      m <- honestRF(
+      m <- forestry::honestRF(
         x = cbind(feat, tr),
         y = yobs,
         ntree = ntree,
@@ -164,8 +164,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      predict(theObject@forest, cbind(feature_new, tr = 1)) -
-        predict(theObject@forest, cbind(feature_new, tr = 0))
+      forestry::predict(theObject@forest, cbind(feature_new, tr = 1)) -
+        forestry::predict(theObject@forest, cbind(feature_new, tr = 0))
     )
   }
 )
