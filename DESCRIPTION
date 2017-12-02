@@ -1,4 +1,4 @@
-Package: causalToobox
+Package: causalToolbox
 Type: Package
 Title: Toolbox for Causal Inference with emphasize on Heterogeneous Treatment Effect Estimator
 Version: 0.0.1.000
