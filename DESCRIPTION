@@ -22,7 +22,6 @@ Imports:
 Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
 Collate: 
-    'honestRF.R'
     'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
     'SBART.R'

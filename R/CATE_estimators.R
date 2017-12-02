@@ -1,6 +1,6 @@
-#' @include honestRF.R
-
 setClass("CATE-estimators")
+
+setOldClass("honestRF")
 setClass(
   "Meta-learner",
   contains = "CATE-estimators",
