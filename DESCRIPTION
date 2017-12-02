@@ -1,7 +1,7 @@
 Package: causalToobox
 Type: Package
 Title: Toolbox for Causal Inference with emphasize on Heterogeneous Treatment Effect Estimator
-Version: 0.4.0.000
+Version: 0.0.1.000
 Author: Sören Künzel, Allen Tang, Ling Xie, Theo Saarinen, Peter Bickel, Bin Yu, Jasjeet Sekhon
 Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
