@@ -19,6 +19,7 @@ Imports:
     dbarts (>= 0.8.7),
     BayesTree (>= 0.3.1.4),
     Rcpp (>= 0.12.9),
+Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
 Collate: 
     'honestRF.R'
