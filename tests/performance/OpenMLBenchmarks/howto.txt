@@ -1,9 +1,0 @@
-In thus repo we only have to go into the SCF cluster and do
-
-   sbatch -p high summarize_datasets.sh
-
-and
-
-	bash SCF_submit_multi.sh
-
-to run all the files and get the summaries in sim_data

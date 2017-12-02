@@ -1,19 +1,15 @@
-Package: hte
+Package: causalToobox
 Type: Package
-Title: Heterogeneous Treatment Effect Estimator Using Random Forests
+Title: Toolbox for Causal Inference with emphasize on Heterogeneous Treatment Effect Estimator
 Version: 0.4.0.000
-Author: Sören Künzel, Allen Tang, Peter Bickel, Bin Yu, Jasjeet Sekhon
+Author: Sören Künzel, Allen Tang, Ling Xie, Theo Saarinen, Peter Bickel, Bin Yu, Jasjeet Sekhon
 Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
-    observational studies. Implements honest random forest and X-learner
-    using honest random forest in the first and second stage to estimate
-    the Conditional Average Treatment Effect (CATE) function and provides
-    convidence intervals for it.
+    observational studies. 
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
 Imports:
-    Rcpp (>= 0.12.9),
     foreach,
     doParallel,
     parallel,
@@ -24,15 +20,10 @@ Imports:
     BayesTree (>= 0.3.1.4)
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
-SystemRequirements: C++11
 Collate: 
     'honestRF.R'
     'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
-    'RF.R'
-    'RFNode.R'
-    'RFTree.R'
-    'RcppExports.R'
     'SBART.R'
     'Shrf.R'
     'TBART.R'
@@ -43,8 +34,6 @@ Collate:
     'Xhrf_autotune_gpp.R'
     'Xhrf_autotune_hyperband.R'
     'Xhrf_autotune_hyperband2.R'
-    'honestRFTree.R'
-    'honestRF_R.R'
 Suggests:
     testthat,
     knitr,
