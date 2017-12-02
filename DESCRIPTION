@@ -18,7 +18,6 @@ Imports:
     rBayesianOptimization,
     dbarts (>= 0.8.7),
     BayesTree (>= 0.3.1.4)
-LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 Collate: 
     'honestRF.R'
