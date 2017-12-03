@@ -6,7 +6,7 @@ Author: Sören Künzel, Allen Tang, Ling Xie, Theo Saarinen, Peter Bickel, Bin Y
 Maintainer: Sören Künzel <srk@berkeley.edu>, Allen Tang <actang.me@gmail.com>
 Description: Estimate heterogeneous treatment effects in experimental and 
     observational studies. 
-License: GPL (>=3)
+License: GPL (>=3) | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
