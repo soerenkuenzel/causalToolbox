@@ -24,7 +24,7 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    forest = "honestRF",
+    forest = "forestry::honestRF",
     creator = "function"
   ),
   validity = function(object)
