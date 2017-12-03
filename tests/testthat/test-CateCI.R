@@ -6,22 +6,16 @@ test_that("Tests CateCI", {
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
 
-  expect_warning(
-    xl <- X_RF(
-      feat = feat,
-      tr = tr,
-      yobs = yobs,
-      nthread = 1,
-      verbose = FALSE
-    ),
-    "honestRF is used as adaptive random forest."
+  xl <- X_RF(
+    feat = feat,
+    tr = tr,
+    yobs = yobs,
+    nthread = 1,
+    verbose = FALSE
   )
-  expect_warning(
-    CIs <- CateCI(xl, feat, B = 5, verbose = FALSE),
-    "honestRF is used as adaptive random forest."
-  )
+  CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[2,]),
-               c(0.04332, 0.00323, 0.08342),
+               c(0.04401702, 0.00134515, 0.08668890),
                tolerance = 1e-4)
 
   sl <- S_RF(
@@ -32,7 +26,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(sl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.0124, -0.0120,  0.0367),
+               c(0.008396746, -0.021596981, 0.038390473),
                tolerance = 1e-4)
 
   tl <- T_RF(
@@ -43,7 +37,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.07120, -0.00593,  0.14834),
+               c(0.03722925, -0.04627296, 0.12073145),
                tolerance = 1e-4)
 
   tl <- T_BART(
@@ -53,6 +47,6 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.01734046, -0.36126050,  0.37568245),
+               c(0.01734046, -0.36126050, 0.37568245),
                tolerance = 1e-7)
 })
