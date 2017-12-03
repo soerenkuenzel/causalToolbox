@@ -133,10 +133,10 @@ evaluate_setting <- function(setting, feat, tr, yobs) {
 
   return(
     data.frame(
-      "l_first_0" = getOOB(x_eval@m_0, noWarning = FALSE),
-      "l_first_1" = getOOB(x_eval@m_1, noWarning = FALSE),
-      "l_second_0" = getOOB(x_eval@m_tau_0, noWarning = FALSE),
-      "l_second_1" = getOOB(x_eval@m_tau_1, noWarning = FALSE)
+      "l_first_0" = forestry::getOOB(x_eval@m_0, noWarning = FALSE),
+      "l_first_1" = forestry::getOOB(x_eval@m_1, noWarning = FALSE),
+      "l_second_0" = forestry::getOOB(x_eval@m_tau_0, noWarning = FALSE),
+      "l_second_1" = forestry::getOOB(x_eval@m_tau_1, noWarning = FALSE)
     )
   )
 }

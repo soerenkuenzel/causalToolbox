@@ -12,25 +12,22 @@ test_that("Tests X_RF_autotune_hyperband", {
   seed <- 24750371
   nthread <- 1
 
-  expect_warning(
-    xl <- X_RF_autotune_hyperband(
-      feat = feat,
-      tr = tr,
-      yobs = yobs,
-      sample.fraction = sample.fraction,
-      num_iter = num_iter,
-      eta = eta,
-      verbose = FALSE,
-      seed = seed,
-      nthread = nthread
-    ),
-    "honestRF is used as adaptive random forest."
+  xl <- X_RF_autotune_hyperband(
+    feat = feat,
+    tr = tr,
+    yobs = yobs,
+    sample.fraction = sample.fraction,
+    num_iter = num_iter,
+    eta = eta,
+    verbose = FALSE,
+    seed = seed,
+    nthread = nthread
   )
-
+  
 
 
   expect_equal(EstimateCate(xl, feat)[1],
-               0.204,
+               -0.010998,
                tolerance = 1e-3)
 
 
@@ -47,18 +44,15 @@ test_that("Tests X_RF_autotune_hyperband", {
       testseed = 543,
       trainseed = 234
     )
-
-  expect_warning(
-    xl_tuned <- X_RF_autotune_hyperband(
-      feat = cate_problem$feat_tr,
-      yobs = cate_problem$Yobs_tr,
-      tr = cate_problem$W_tr,
-      num_iter = 3 ^ 2,
-      verbose = FALSE
-    ),
-    "honestRF is used as adaptive random forest."
+  
+  xl_tuned <- X_RF_autotune_hyperband(
+    feat = cate_problem$feat_tr,
+    yobs = cate_problem$Yobs_tr,
+    tr = cate_problem$W_tr,
+    num_iter = 3 ^ 2,
+    verbose = FALSE
   )
-
+  
   expect_equal(mean((
     EstimateCate(xl_tuned, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
@@ -75,34 +69,29 @@ test_that("Tests X_RF_autotune_hyperband", {
   verbose <- TRUE
   seed <- 24750371
   nthread <- 1
-
-  expect_warning(
-    xl_at <- X_RF_autotune_hyperband(
-      feat = feat,
-      tr = tr,
-      yobs = yobs,
-      num_iter = num_iter,
-      eta = eta,
-      verbose = FALSE,
-      nthread = 1
-    ),
-    "honestRF is used as adaptive random forest."
+  
+  xl_at <- X_RF_autotune_hyperband(
+    feat = feat,
+    tr = tr,
+    yobs = yobs,
+    num_iter = num_iter,
+    eta = eta,
+    verbose = FALSE,
+    nthread = 1
   )
-
-  expect_warning(
-    CIs <- CateCI(
-      theObject = xl_at,
-      feature_new = feat,
-      B = 5,
-      verbose = FALSE
-    ),
-    "honestRF is used as adaptive random forest."
+  
+  
+  CIs <- CateCI(
+    theObject = xl_at,
+    feature_new = feat,
+    B = 5,
+    verbose = FALSE
   )
 
   #theObject = xl_at; feature_new = feat; B = 5; verbose = FALSE
-
-  expect_equal(as.numeric(CIs[1, ]),
-               c(0.000953, -0.216019,  0.217924),
-               tolerance=1e-4)
+  
+  expect_equal(as.numeric(CIs[1,]),
+               c(-0.1580288,-0.4326979, 0.1166402),
+               tolerance = 1e-4)
 
 })

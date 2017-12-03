@@ -1,5 +1,5 @@
 library(testthat)
-test_that("Tests that XhRF is working correctly", {
+test_that("Tests that ShRF is working correctly", {
   set.seed(1423614230)
 
   feat <- iris[, -1]

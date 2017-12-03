@@ -1,6 +1,6 @@
 setClass("CATE-estimators")
+setOldClass("honestRF")
 
-setOldClass("forestry::honestRF")
 setClass(
   "Meta-learner",
   contains = "CATE-estimators",

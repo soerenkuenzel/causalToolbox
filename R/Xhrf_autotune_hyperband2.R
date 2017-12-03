@@ -142,17 +142,17 @@ tuneStageOne <- function(x,
         # parameter pools in half every iteration based on its score
         for (j in 1:nrow(allConfigs)) {
           if (r_new > 0 && !is.null(val_models[[j]])) {
-            val_models[[j]] <- addTrees(val_models[[j]], r_new)
+            val_models[[j]] <- forestry::addTrees(val_models[[j]], r_new)
           }
           if (!is.null(val_models[[j]])) {
             # If the model is available, get its OOB error
-            val_losses[[j]] <- getOOB(val_models[[j]], noWarning = TRUE)
+            val_losses[[j]] <- forestry::getOOB(val_models[[j]], noWarning = TRUE)
             # Calculate residuals
             res <- forestry::predict(val_models[[j]], x) - y
             # Train an honestRF for tau
 
             m_tau <-
-              honestRF(
+              forestry::honestRF(
                 x = x,
                 y = res,
                 ntree = max(r_i, 1),
@@ -170,7 +170,7 @@ tuneStageOne <- function(x,
               )
             # If the tau model is valid, adding its OOB to the existing OOB
             if (!is.null(m_tau)) {
-              tau_oob <- getOOB(m_tau, noWarning = TRUE)
+              tau_oob <- forestry::getOOB(m_tau, noWarning = TRUE)
               val_losses[[j]] <- val_losses[[j]] + tau_oob
             } else {
               val_losses[[j]] <- NA
@@ -204,7 +204,7 @@ tuneStageOne <- function(x,
     }
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
-      best_OOB <- getOOB(val_models[[1]], noWarning = TRUE)
+      best_OOB <- forestry::getOOB(val_models[[1]], noWarning = TRUE)
       res <- forestry::predict(val_models[[1]], x) - y
       m_tau <-
         forestry::honestRF(
@@ -226,7 +226,7 @@ tuneStageOne <- function(x,
 
       # If the tau model is valid, adding its OOB to the existing OOB
       if (!is.null(m_tau)) {
-        best_OOB <- best_OOB + getOOB(m_tau, noWarning = TRUE)
+        best_OOB <- best_OOB + forestry::getOOB(m_tau, noWarning = TRUE)
       } else {
         best_OOB <- NA
       }
@@ -309,7 +309,7 @@ autoJointHonestRF <-
 
     # First, find the best configurations for both estimators
     m_0 <-
-      autohonestRF(
+      forestry::autohonestRF(
         x = X_0,
         y = yobs_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -321,7 +321,7 @@ autoJointHonestRF <-
       )
 
     m_1 <-
-      autohonestRF(
+      forestry::autohonestRF(
         x = X_1,
         y = yobs_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -336,7 +336,7 @@ autoJointHonestRF <-
     r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
-      autohonestRF(
+      forestry::autohonestRF(
         x = X_0,
         y = r_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -348,7 +348,7 @@ autoJointHonestRF <-
       )
 
     m_tau_1 <-
-      autohonestRF(
+      forestry::autohonestRF(
         x = X_1,
         y = r_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -395,7 +395,7 @@ autoJointHonestRF <-
       r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
       m_tau_0 <-
-        autohonestRF(
+        forestry::autohonestRF(
           x = X_0,
           y = r_0,
           sampsize = floor(nrow(X_0) * sample.fraction),
@@ -407,7 +407,7 @@ autoJointHonestRF <-
         )
 
       m_tau_1 <-
-        autohonestRF(
+        forestry::autohonestRF(
           x = X_1,
           y = r_1,
           sampsize = floor(nrow(X_1) * sample.fraction),

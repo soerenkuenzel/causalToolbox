@@ -49,32 +49,28 @@ test_that("Tests test-Xhrf_gpp", {
 
 
   expect_output(
-    expect_warning(
-      xl_gpp <- X_RF_autotune_gpp(
-        feat,
-        tr,
-        yobs,
-        ntree = 100,
-        nthread = 0,
-        verbose = FALSE,
-        init_points = 1,
-        n_iter = 1
-      ),
-      "honestRF is used as adaptive random forest."
-    ))
-
+    xl_gpp <- X_RF_autotune_gpp(
+      feat,
+      tr,
+      yobs,
+      ntree = 100,
+      nthread = 0,
+      verbose = FALSE,
+      init_points = 1,
+      n_iter = 1
+    )
+  )
+    
 
 
   expect_equal(EstimateCate(xl_gpp, feat)[4],
-               -0.00206,
+               0.01860789,
                tolerance = 1e-5)
 
   set.seed(11122)
-  expect_warning(
-    CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
-  )
+  CI <- CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
   expect_equal(CI[2, 3],
-               0.126,
+               0.1245352,
                tolerance = 1e-3)
 
   ## Example for changing internal parameters of GPfit::GP_fit and

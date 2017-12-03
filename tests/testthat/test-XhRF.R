@@ -90,28 +90,24 @@ test_that("Tests that XhRF is working correctly", {
       trainseed = 234
     )
 
-  expect_warning(
-    xl <- X_RF(
-      feat = cate_problem$feat_tr,
-      yobs = cate_problem$Yobs_tr,
-      tr = cate_problem$W_tr,
-      ntree_first = 50,
-      ntree_second = 50,
-      # ntree_prop = 50,
-      verbose = FALSE,
-      nthread = 1
-    ),
-    "honestRF is used as adaptive random forest."
+  xl <- X_RF(
+    feat = cate_problem$feat_tr,
+    yobs = cate_problem$Yobs_tr,
+    tr = cate_problem$W_tr,
+    ntree_first = 50,
+    ntree_second = 50,
+    # ntree_prop = 50,
+    verbose = FALSE,
+    nthread = 1
   )
-
+  
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
   684.4214,
   tolerance = 1)
 
-  expect_warning(expect_output(smp_stats <-
-                                 EstimateAllSampleStatistics(xl, B = 2)))
+  expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0; verbose = TRUE
   expect_equal(smp_stats$SATE[1, 2], -1.657256, tolerance = 1e-1)
 })

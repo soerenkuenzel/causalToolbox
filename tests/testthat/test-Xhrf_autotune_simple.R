@@ -1,8 +1,8 @@
 library(testthat)
 test_that("Tests test-Xhrf_autotune_simple", {
   set.seed(1423614230)
-
-  feat <- iris[, -1]
+  
+  feat <- iris[,-1]
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
   ntree = 100
@@ -15,27 +15,25 @@ test_that("Tests test-Xhrf_autotune_simple", {
   #   "start_setting_1" = get_setting_strong(feat, ntree, nthread),
   #   "start_setting_2" = get_setting_weak(feat, ntree, nthread)
   # )
-
+  
   starting_settings <- get_starting_settings(
     feat = feat,
     tr = tr,
     ntree = ntree,
     nthread = nthread
   )
-
-  expect_warning(
-    setup_check <- check_setups(
-      starting_settings = starting_settings,
-      feat = feat,
-      tr = tr,
-      yobs = yobs,
-      ntree = ntree,
-      nthread = nthread,
-      verbose = FALSE
-    ),
-    "honestRF is used as adaptive random forest."
+  
+  
+  setup_check <- check_setups(
+    starting_settings = starting_settings,
+    feat = feat,
+    tr = tr,
+    yobs = yobs,
+    ntree = ntree,
+    nthread = nthread,
+    verbose = FALSE
   )
-
+  
   expect_equal(setup_check[1, 2], 19.4, tolerance = 1e-1)
   ### Test 2:
   set.seed(432)
@@ -50,7 +48,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
       testseed = 543,
       trainseed = 234
     )
-
+  
   expect_warning(
     mm <- X_RF_autotune_simple(
       feat = cate_problem$feat_tr,
@@ -61,22 +59,17 @@ test_that("Tests test-Xhrf_autotune_simple", {
       nthread = 1,
       verbose = FALSE
     ),
-    "honestRF is used as adaptive random forest."
+    paste0("nodesizeAvg cannot exceed averaging sample size. We have set\n", 
+           "            nodesizeAvg to be the maximum")
   )
-
+  
   expect_equal(mean((
     EstimateCate(mm, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
   225, tolerance = 1)
-
-  expect_warning(
-    CATE_ci <-
-      CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE),
-    "honestRF is used as adaptive random forest."
-  )
-
-  expect_equal(CATE_ci[2, 2],
-               -21.4,
+  
+  CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
+  
+  expect_equal(CATE_ci[2, 2],-21.4,
                tolerance = 1e-1)
-
 })

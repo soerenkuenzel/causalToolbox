@@ -13,8 +13,7 @@ test_that("Tests X_RF_autotune_hyperband2", {
   nthread <- 1
   tune_iter <- 1
 
-
-  expect_output(expect_warning(
+  expect_output(
     xl <- autoJointHonestRF(
       feat,
       tr,
@@ -26,12 +25,11 @@ test_that("Tests X_RF_autotune_hyperband2", {
       seed = seed,
       nthread = nthread,
       tune_iter = tune_iter
-    ),
-    "honestRF is used as adaptive random forest."
-  ))
-
+    )
+  )
+  
   expect_equal(EstimateCate(xl, feat)[1],
-               -0.0089,
+               -0.03271978,
                tolerance = 1e-4)
 
 
@@ -50,17 +48,13 @@ test_that("Tests X_RF_autotune_hyperband2", {
     )
 
   expect_output(
-    expect_warning(
       xl_tuned <- autoJointHonestRF(
         feat = cate_problem$feat_tr,
         yobs = cate_problem$Yobs_tr,
         tr = cate_problem$W_tr,
         num_iter = 3 ^ 2,
         verbose = FALSE,
-        tune_iter = 2
-      ),
-      "honestRF is used as adaptive random forest."
-    )
+        tune_iter = 2)
   )
 
   expect_equal(mean((
@@ -81,36 +75,30 @@ test_that("Tests X_RF_autotune_hyperband2", {
   nthread <- 1
 
   expect_output(
-    expect_warning(
-      xl_at <- autoJointHonestRF(
-        feat = feat,
-        tr = tr,
-        yobs = yobs,
-        num_iter = num_iter,
-        eta = eta,
-        verbose = FALSE,
-        nthread = 1,
-        tune_iter = 1
-      ),
-      "honestRF is used as adaptive random forest."
+    xl_at <- autoJointHonestRF(
+      feat = feat,
+      tr = tr,
+      yobs = yobs,
+      num_iter = num_iter,
+      eta = eta,
+      verbose = FALSE,
+      nthread = 1,
+      tune_iter = 1
     ),
     "Start joint tuning, iteration 1"
   )
 
-  expect_warning(
-    CIs <- CateCI(
-      theObject = xl_at,
-      feature_new = feat,
-      B = 5,
-      verbose = FALSE
-    ),
-    "honestRF is used as adaptive random forest."
+  CIs <- CateCI(
+    theObject = xl_at,
+    feature_new = feat,
+    B = 5,
+    verbose = FALSE
   )
-
+  
   #theObject = xl_at; feature_new = feat; B = 5; verbose = FALSE
 
   expect_equal(as.numeric(CIs[1, ]),
-               c(-0.1720, -0.3850,  0.0409),
+               c(0.1342705, -0.2735645,  0.5421054),
                tolerance = 1e-4)
 
 })
