@@ -4,8 +4,7 @@
 \name{X_RF-X_RF}
 \alias{X_RF-X_RF}
 \alias{X_RF}
-\alias{X_RF,}
-\alias{X_RF-X_RF}
+\alias{X_RF,X_RF-X_RF}
 \title{X-Learner with honest RF for both stages}
 \format{An object of class \code{NULL} of length 0.}
 \usage{

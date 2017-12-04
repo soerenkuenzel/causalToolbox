@@ -2,8 +2,7 @@
 % Please edit documentation in R/Thrf.R
 \name{T_RF}
 \alias{T_RF}
-\alias{T_RF,}
-\alias{T_RF-T_RF}
+\alias{T_RF,T_RF-T_RF}
 \title{T_RF Constructor}
 \usage{
 T_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,

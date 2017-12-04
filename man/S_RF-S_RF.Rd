@@ -2,8 +2,7 @@
 % Please edit documentation in R/Shrf.R
 \name{S_RF}
 \alias{S_RF}
-\alias{S_RF,}
-\alias{S_RF-S_RF}
+\alias{S_RF,S_RF-S_RF}
 \title{S_RF Constructor}
 \usage{
 S_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
@@ -12,4 +11,8 @@ S_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 }
 \value{
 A `S_RF` object.
+}
+\description{
+This is an implementation of the T-learner combined with honest
+  random forest for both response functions
 }

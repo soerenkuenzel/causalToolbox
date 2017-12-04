@@ -3,8 +3,7 @@
 \docType{methods}
 \name{EstimateCate-S_BART}
 \alias{EstimateCate-S_BART}
-\alias{EstimateCate,}
-\alias{S_BART-method}
+\alias{EstimateCate,S_BART-method}
 \title{EstimateCate-S_BART}
 \usage{
 \S4method{EstimateCate}{S_BART}(theObject, feature_new, verbose = FALSE)

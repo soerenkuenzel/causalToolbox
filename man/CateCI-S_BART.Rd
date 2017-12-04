@@ -3,8 +3,7 @@
 \docType{methods}
 \name{CateCI-S_BART}
 \alias{CateCI-S_BART}
-\alias{CateCI,}
-\alias{S_BART-method}
+\alias{CateCI,S_BART-method}
 \title{CateCI-S_BART}
 \usage{
 \S4method{CateCI}{S_BART}(theObject, feature_new, verbose = FALSE)

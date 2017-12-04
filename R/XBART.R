@@ -26,6 +26,7 @@ setClass(
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.
 #' @export X_BART
+#' @import methods
 X_BART <-
   function(feat,
            tr,
@@ -82,8 +83,9 @@ X_BART <-
 #' dafault is by the weight of the propensity score, other version is
 #' "variance" which uses the variance of the weighting
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, X_BART-method
+#' @aliases EstimateCate,X_BART-method
 #' @exportMethod EstimateCate
+#' @import stats
 setMethod(
   f = "EstimateCate",
   signature = "X_BART",
@@ -264,7 +266,7 @@ setMethod(
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, X_BART-method
+#' @aliases EstimateCate,X_BART-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "CateCI",
@@ -290,6 +292,7 @@ setMethod(
 #' @rdname EstimateAllSampleStatistics-X_BART
 #' @description Return the estimated CATE
 #' @exportMethod EstimateAllSampleStatistics
+#' @import stats
 setMethod(
   f = "EstimateAllSampleStatistics",
   signature = "X_BART",

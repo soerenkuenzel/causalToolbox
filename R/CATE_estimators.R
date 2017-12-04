@@ -1,5 +1,5 @@
 setClass("CATE-estimators")
-setOldClass("honestRF")
+setOldClass("forestry::honestRF")
 
 setClass(
   "Meta-learner",
@@ -74,7 +74,7 @@ setGeneric(
 #' @param B number of bootstrap samples.
 #' @param nthread number of threats used.
 #' @return A data frame of estimated CATE Confidence Intervals
-#' @aliases CateCI, X_hRF-method
+#' @aliases CateCI,X_hRF-method
 #' @exportMethod CateCI
 setMethod(
   f = "CateCI",

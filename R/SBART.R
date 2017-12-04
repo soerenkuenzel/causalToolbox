@@ -26,6 +26,7 @@ setClass(
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.
 #' @export S_BART
+#' @import methods
 S_BART <-
   function(feat,
            tr,
@@ -67,7 +68,7 @@ S_BART <-
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, S_BART-method
+#' @aliases EstimateCate,S_BART-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
@@ -97,7 +98,7 @@ setMethod(
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases CateCI, S_BART-method
+#' @aliases CateCI,S_BART-method
 #' @exportMethod CateCI
 setMethod(
   f = "CateCI",

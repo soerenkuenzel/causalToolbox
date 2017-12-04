@@ -3,8 +3,7 @@
 \docType{methods}
 \name{EstimateCate-X_hRF}
 \alias{EstimateCate-X_hRF}
-\alias{EstimateCate,}
-\alias{X_hRF-method}
+\alias{EstimateCate,X_hRF-method}
 \title{EstimateCate-X_hRF}
 \usage{
 \S4method{EstimateCate}{X_RF}(theObject, feature_new)

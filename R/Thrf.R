@@ -74,8 +74,9 @@ setGeneric(
 
 #' @title T_RF Constructor
 #' @rdname T_RF-T_RF
-#' @aliases T_RF, T_RF-T_RF
+#' @aliases T_RF,T_RF-T_RF
 #' @return A `T_RF` object.
+#' @import methods
 T_RF <-
   function(feat,
            tr,
@@ -170,7 +171,7 @@ T_RF <-
 #' @param object A `T_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, T_hRF-method
+#' @aliases EstimateCate,T_hRF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",

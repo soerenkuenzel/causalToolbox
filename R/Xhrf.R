@@ -125,7 +125,7 @@ setGeneric(
 
 #' @title X_RF Constructor
 #' @rdname X_RF-X_RF
-#' @aliases X_RF, X_RF-X_RF
+#' @aliases X_RF,X_RF-X_RF
 #' @return A `X_RF` object.
 X_RF <-
   function(feat,
@@ -262,6 +262,7 @@ X_RF <-
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.
 #' @export X_RF_fully_specified
+#' @import methods
 X_RF_fully_specified <-
   function(feat,
            tr,
@@ -405,7 +406,7 @@ X_RF_fully_specified <-
 #' @param object A `X_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate, X_hRF-method
+#' @aliases EstimateCate,X_hRF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
