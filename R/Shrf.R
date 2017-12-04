@@ -38,8 +38,8 @@ setClass(
 
 
 #' @title honstRF Constructor
-#' @name S_RF
-#' @rdname S_RF
+#' @name S_RF-S_RF
+#' @rdname S_RF-S_RF
 #' @description This is an implementation of the T-learner combined with honest
 #'   random forest for both response functions
 #' @param feat A data frame of all the features.
