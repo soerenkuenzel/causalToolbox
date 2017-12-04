@@ -1,6 +1,14 @@
+#' Class CATE-estimators
+#' @name CATE-estimators-class
+#' @rdname CATE-estimators-class
+#' @exportClass CATE-estimators
 setClass("CATE-estimators")
 setOldClass("forestry::honestRF")
 
+#' Class Meta-learner
+#' @name Meta-learner-class
+#' @rdname Meta-learner-class
+#' @exportClass Meta-learner
 setClass(
   "Meta-learner",
   contains = "CATE-estimators",
@@ -11,8 +19,10 @@ setClass(
     creator = "function"
   )
 )
-
-
+#'Method EstimateCate
+#'@name EstimateCate
+#'@rdname EstimateCate
+#'@exportMethod EstimateCate
 setGeneric(
   name = "EstimateCate",
   def = function(theObject, feature_new, ...)
@@ -20,8 +30,10 @@ setGeneric(
     standardGeneric("EstimateCate")
   }
 )
-
-
+#'Method CateCI
+#'@name CateCI
+#'@rdname CateCI
+#'@exportMethod CateCI
 setGeneric(
   name = "CateCI",
   def = function(theObject,
@@ -35,7 +47,10 @@ setGeneric(
     standardGeneric("CateCI")
   }
 )
-
+#'Method EstimateATT
+#'@name EstimateATT
+#'@rdname EstimateATT
+#'@exportMethod EstimateATT
 setGeneric(
   name = "EstimateATT",
   def = function(theObject,
@@ -48,7 +63,10 @@ setGeneric(
     standardGeneric("EstimateATT")
   }
 )
-
+#'Method EstimateAllSampleStatistics
+#'@name EstimateAllSampleStatistics
+#'@rdname EstimateAllSampleStatistics
+#'@exportMethod EstimateAllSampleStatistics
 setGeneric(
   name = "EstimateAllSampleStatistics",
   def = function(theObject,
@@ -74,7 +92,7 @@ setGeneric(
 #' @param B number of bootstrap samples.
 #' @param nthread number of threats used.
 #' @return A data frame of estimated CATE Confidence Intervals
-#' @aliases CateCI,X_hRF-method
+#' @aliases CateCI,Meta-learner-method
 #' @exportMethod CateCI
 setMethod(
   f = "CateCI",
@@ -195,6 +213,7 @@ setMethod(
 #' @name EstimateAllSampleStatistics-Meta-learner
 #' @rdname EstimateAllSampleStatistics-Meta-learner
 #' @description Return the estimated CATE
+#' @aliases EstimateAllSampleStatistics,Meta-learner-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",

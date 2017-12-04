@@ -1,7 +1,11 @@
-#' @include CATE_estimators.R
-#' @import dbarts
-
 ## the standard Xlearner object with random forest
+
+#'@title S_BART Constructor 
+#'@name S_BART-class
+#'@rdname S_BART-class
+#'@exportClass S_BART
+#'@import dbarts
+#'@include CATE_estimators.R
 setClass(
   "S_BART",
   contains = "Meta-learner",
@@ -133,6 +137,7 @@ setMethod(
 #' @name EstimateAllSampleStatistics-S_BART
 #' @rdname EstimateAllSampleStatistics-S_BART
 #' @description Return the estimated CATE
+#' @aliases EstimateAllSampleStatistics,S_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",

@@ -400,13 +400,13 @@ X_RF_fully_specified <-
 ### Estimate CATE Method ###
 ############################
 #' EstimateCate-X_hRF
-#' @name EstimateCate-X_hRF
-#' @rdname EstimateCate-X_hRF
+#' @name EstimateCate-X_RF
+#' @rdname EstimateCate-X_RF
 #' @description Return the estimated CATE
 #' @param object A `X_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate,X_hRF-method
+#' @aliases EstimateCate,X_RF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
@@ -443,6 +443,7 @@ setMethod(
 #' @name EstimateAllSampleStatistics-X_RF
 #' @rdname EstimateAllSampleStatistics-X_RF
 #' @description Return the estimated CATE
+#' @aliases EstimateAllSampleStatistics,X_RF-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",

@@ -12,3 +12,7 @@ T_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 \value{
 A `T_RF` object.
 }
+\description{
+This is an implementation of the T-learner combined with honest
+random forest for both response functions
+}

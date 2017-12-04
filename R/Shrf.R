@@ -151,13 +151,13 @@ S_RF <-
 ### Estimate CATE Method ###
 ############################
 #' EstimateCate-S_hRF
-#' @name EstimateCate-S_hRF
-#' @rdname EstimateCate-S_hRF
+#' @name EstimateCate-S_RF
+#' @rdname EstimateCate-S_RF
 #' @description Return the estimated CATE
 #' @param object A `S_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate,S_hRF-method
+#' @aliases EstimateCate,S_RF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",

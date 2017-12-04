@@ -74,6 +74,8 @@ setGeneric(
 
 #' @title T_RF Constructor
 #' @rdname T_RF-T_RF
+#' @description This is an implementation of the T-learner combined with honest
+#' random forest for both response functions
 #' @aliases T_RF,T_RF-T_RF
 #' @return A `T_RF` object.
 #' @import methods
@@ -165,13 +167,13 @@ T_RF <-
 ### Estimate CATE Method ###
 ############################
 #' EstimateCate-T_hRF
-#' @name EstimateCate-T_hRF
-#' @rdname EstimateCate-T_hRF
+#' @name EstimateCate-T_RF
+#' @rdname EstimateCate-T_RF
 #' @description Return the estimated CATE
 #' @param object A `T_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate,T_hRF-method
+#' @aliases EstimateCate,T_RF-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",

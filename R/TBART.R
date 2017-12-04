@@ -169,7 +169,7 @@ setMethod(
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate,T_BART-method
+#' @aliases CateCI,T_BART-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "CateCI",
@@ -256,6 +256,7 @@ setMethod(
 #' @name EstimateAllSampleStatistics-T_BART
 #' @rdname EstimateAllSampleStatistics-T_BART
 #' @description Return the estimated CATE
+#' @aliases EstimateAllSampleStatistics,T_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",

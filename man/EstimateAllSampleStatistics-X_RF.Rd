@@ -3,6 +3,7 @@
 \docType{methods}
 \name{EstimateAllSampleStatistics-X_RF}
 \alias{EstimateAllSampleStatistics-X_RF}
+\alias{EstimateAllSampleStatistics,X_RF-method}
 \title{EstimateAllSampleStatistics-X_RF}
 \usage{
 \S4method{EstimateAllSampleStatistics}{X_RF}(theObject, method, B, nthread,

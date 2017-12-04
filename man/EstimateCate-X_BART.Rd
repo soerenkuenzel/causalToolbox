@@ -5,7 +5,7 @@
 \alias{EstimateCate-X_BART}
 \alias{EstimateCate,X_BART-method}
 \alias{EstimateCate-X_BART}
-\alias{EstimateCate,X_BART-method}
+\alias{CateCI,X_BART-method}
 \title{EstimateCate-X_BART}
 \usage{
 \S4method{EstimateCate}{X_BART}(theObject, feature_new, verbose = FALSE,

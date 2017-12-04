@@ -3,7 +3,7 @@
 \docType{methods}
 \name{CateCI-X_hRF}
 \alias{CateCI-X_hRF}
-\alias{CateCI,X_hRF-method}
+\alias{CateCI,Meta-learner-method}
 \title{CateCI-X_hRF}
 \usage{
 \S4method{CateCI}{`Meta-learner`}(theObject, feature_new, method, B, nthread,

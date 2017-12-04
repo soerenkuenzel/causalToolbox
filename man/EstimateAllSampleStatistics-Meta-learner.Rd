@@ -3,6 +3,7 @@
 \docType{methods}
 \name{EstimateAllSampleStatistics-Meta-learner}
 \alias{EstimateAllSampleStatistics-Meta-learner}
+\alias{EstimateAllSampleStatistics,Meta-learner-method}
 \title{EstimateAllSampleStatistics-Meta-learner}
 \usage{
 \S4method{EstimateAllSampleStatistics}{`Meta-learner`}(theObject, method, B,

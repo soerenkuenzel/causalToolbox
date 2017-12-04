@@ -3,6 +3,7 @@
 \docType{methods}
 \name{EstimateAllSampleStatistics-X_BART}
 \alias{EstimateAllSampleStatistics-X_BART}
+\alias{EstimateAllSampleStatistics,X_BART-method}
 \title{EstimateAllSampleStatistics-X_BART}
 \usage{
 \S4method{EstimateAllSampleStatistics}{X_BART}(theObject, verbose = FALSE)
