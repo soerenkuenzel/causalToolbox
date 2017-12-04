@@ -22,7 +22,7 @@
 #'   yobs <- iris[, 1]
 #'   # train a
 #'   xl_gpp <- X_RF_autotune_simple(feat, tr, yobs, ntree = 100, nthread = 0,
-#'   verbose = FALSE, init_points = 5, n_iter = 1)
+#'   verbose = FALSE)
 #'   # computes the CATE and confidence intervals for CATE
 #'   EstimateCate(xl_gpp, feat)
 #'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
