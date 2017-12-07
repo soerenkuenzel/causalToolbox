@@ -64,7 +64,7 @@ S_BART <-
 #' @name EstimateCate-S_BART
 #' @rdname EstimateCate-S_BART
 #' @description Return the estimated CATE
-#' @param object A `S_BART` object.
+#' @param theObject A `S_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
@@ -93,7 +93,7 @@ setMethod(
 #' CateCI-S_BART
 #' @rdname CateCI-S_BART
 #' @description Return the estimated CATE
-#' @param object A `S_BART` object.
+#' @param theObject A `S_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE

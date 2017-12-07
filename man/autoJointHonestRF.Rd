@@ -25,6 +25,8 @@ autoJointHonestRF(feat, tr, yobs, sample.fraction = 0.75, num_iter = 3^8,
 
 \item{nthread}{..}
 
+\item{tune_iter}{..}
+
 \item{sampsize}{..}
 
 \item{firststageVar}{..}

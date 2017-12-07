@@ -17,6 +17,7 @@
 #' default number is 0 which represents using all cores.
 #' @return A `honestRF` object
 #' @export tuneStageOne
+#' @importFrom forestry predict
 tuneStageOne <- function(x,
                          y,
                          m_tau_init,
@@ -282,9 +283,10 @@ tuneStageOne <- function(x,
 #' @param verbose ..
 #' @param seed ..
 #' @param nthread ..
-#' @param tune_iter
+#' @param tune_iter ..
 #' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 #' @export autoJointHonestRF
+#' @importFrom forestry predict
 autoJointHonestRF <-
   function(feat,
            tr,
