@@ -21,6 +21,8 @@ forest used for both response functions
 
 \item{\code{m_y_c}}{contains an honest random forest predictor for the control group}
 
+\item{\code{forest}}{TODO: Add Description}
+
 \item{\code{creator}}{function which creates a S_RF}
 }}
 

@@ -26,6 +26,7 @@
 #' @slot relevant_Variable_second contains the numbers of variables, which are only used
 #' in the second stage.
 #' @exportClass X_RF
+#' @importFrom forestry predict
 setClass(
   "X_RF",
   contains = "Meta-learner",
@@ -263,6 +264,7 @@ X_RF <-
 #' @return A `X_RF` object.
 #' @export X_RF_fully_specified
 #' @import methods
+#' @importFrom forestry predict
 X_RF_fully_specified <-
   function(feat,
            tr,
@@ -408,6 +410,7 @@ X_RF_fully_specified <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_RF-method
 #' @exportMethod EstimateCate
+#' @importFrom forestry predict
 setMethod(
   f = "EstimateCate",
   signature = "X_RF",

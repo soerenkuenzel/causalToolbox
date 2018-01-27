@@ -15,8 +15,10 @@
 #' @slot yobs_train A vector containing the observed outcomes.
 #' @slot m_y_t contains an honest random forest predictor for the treated group
 #' @slot m_y_c contains an honest random forest predictor for the control group
+#' @slot forest TODO: Add Description
 #' @slot creator function which creates a S_RF
 #' @exportClass S_RF
+#' @importFrom forestry predict
 setClass(
   "S_RF",
   contains = "Meta-learner",
@@ -159,6 +161,7 @@ S_RF <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_RF-method
 #' @exportMethod EstimateCate
+#' @importFrom forestry predict
 setMethod(
   f = "EstimateCate",
   signature = "S_RF",

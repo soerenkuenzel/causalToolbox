@@ -28,6 +28,7 @@
 #'   EstimateCate(xl_gpp, feat)
 #'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
 #' @export X_RF_autotune_hyperband
+#' @importFrom forestry predict
 X_RF_autotune_hyperband <-
   function(feat,
            tr,
