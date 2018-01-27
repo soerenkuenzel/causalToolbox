@@ -6,7 +6,7 @@ The latest development version can be installed directly from Github using [devt
 
 ```R
 if (!require("devtools")) install.packages("devtools")
-devtools::install_github("soerenkuenzel/hte")
+devtools::install_github("soerenkuenzel/causalToolbox")
 ```
 
 The package contains compiled code, and you must have a development environment to install the development version. (Use `devtools::has_devel()` to check whether you do.) If no development environment exists, Windows users download and install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and macOS users download and install [Xcode](https://itunes.apple.com/us/app/xcode/id497799835).
@@ -18,8 +18,8 @@ For details please read our paper: https://arxiv.org/pdf/1706.03461.pdf
 This example will not execute because there is no data.
 
 ```R
-library(hte)
-packageVersion("hte")
+library(causalToolbox)
+packageVersion("causalToolbox")
 
 # create example data set
 simulated_experiment <- simulate_causal_experiment(
