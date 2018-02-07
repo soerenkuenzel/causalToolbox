@@ -6,8 +6,6 @@
 #' @include Shrf.R
 #' @importFrom ranger
 
-library(ranger)
-
 setClass(
   "GoF_estimator",
   slots = list(
@@ -126,18 +124,18 @@ setMethod(
 )
 
 # Example
-set.seed(1423614230)
-
-feat <- iris[, -1]
-tr <- rbinom(nrow(feat), 1, .5)
-yobs <- iris[, 1]
-
-gof <- GoF_estimator(feat, tr, yobs)
-estimate_propensity(gof)
-transform_yobs(gof)
-GoF_TOT(gof, T_RF)
-GoF_TOT(gof, T_BART)
-GoF_TOT(gof, S_RF)
-GoF_TOT(gof, S_BART)
+# set.seed(1423614230)
+# 
+# feat <- iris[, -1]
+# tr <- rbinom(nrow(feat), 1, .5)
+# yobs <- iris[, 1]
+# 
+# gof <- GoF_estimator(feat, tr, yobs)
+# estimate_propensity(gof)
+# transform_yobs(gof)
+# GoF_TOT(gof, T_RF)
+# GoF_TOT(gof, T_BART)
+# GoF_TOT(gof, S_RF)
+# GoF_TOT(gof, S_BART)
 #GoF_TOT(gof, X_RF)
 #GoF_TOT(gof, X_BART)
