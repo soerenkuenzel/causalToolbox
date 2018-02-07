@@ -78,7 +78,7 @@ setGeneric(
 
 #' @title S_RF Constructor
 #' @rdname S_RF-S_RF
-#' @description This is an implementation of the T-learner combined with honest
+#' @description This is an implementation of the S-learner combined with honest
 #'   random forest for both response functions
 #' @aliases S_RF,S_RF-S_RF
 #' @return A `S_RF` object.

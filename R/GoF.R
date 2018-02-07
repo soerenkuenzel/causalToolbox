@@ -1,10 +1,16 @@
 #' @include TBART.R
+#' @include Thrf.R
+#' @include XBART.R
+#' @include Xhrf.R
+#' @include SBART.R
+#' @include Shrf.R
+#' @importFrom ranger
 
 library(ranger)
 
 setClass(
   "GoF_estimator",
-  representation = representation(
+  slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
@@ -23,6 +29,7 @@ setClass(
 #' @param yobs the observed outcome.
 #' @return A `GoF_estimator` object.
 #' @export GoF_estimator
+# Nameing?
 GoF_estimator <-
   function(feat,
            tr,
@@ -30,11 +37,11 @@ GoF_estimator <-
     split <- as.integer(nrow(feat) * 0.8)
     feat_train <- feat[1:split,]
     tr_train <- rbinom(nrow(feat_train), 1, .5)
-    yobs_train <- iris[, 1][1:split]
+    yobs_train <- feat[, 1][1:split]
     
-    feat_test <- iris[, -1][split:nrow(feat),]
+    feat_test <- feat[, -1][split:nrow(feat),]
     tr_test <- rbinom(nrow(feat_test), 1, .5)
-    yobs_test <- iris[, 1][split:nrow(feat)]
+    yobs_test <- feat[, 1][split:nrow(feat)]
     
     df <- data.frame(feat_train, tr_train)
     df$tr_train <- as.factor(df$tr_train)
@@ -71,7 +78,9 @@ setMethod(
   signature = "GoF_estimator",
   definition = function(theObject, learner_func)
   {
-    learner <- learner_func(feat = theObject@feature_test, tr = theObject@tr_test, yobs = theObject@yobs_test)
+    learner <- learner_func(feat = theObject@feature_test, 
+                            tr = theObject@tr_test, 
+                            yobs = theObject@yobs_test)
     estimate <- EstimateCate(learner, theObject@feature_test)
     y_te_star <- transform_yobs(theObject)
     GoF_estimate <- -sum((y_te_star - estimate)^2) / nrow(theObject@feature_test)
@@ -92,7 +101,8 @@ setMethod(
   definition = function(theObject)
   {
     estimated_e <- estimate_propensity(theObject)
-    y_te_star <- theObject@yobs_test / ((theObject@tr_test * estimated_e) - (1 - theObject@tr_test) * (1 - estimated_e))
+    y_te_star <- theObject@yobs_test / ((theObject@tr_test * estimated_e) 
+                - (1 - theObject@tr_test) * (1 - estimated_e))
     return(y_te_star)
   }
 )
@@ -129,5 +139,5 @@ GoF_TOT(gof, T_RF)
 GoF_TOT(gof, T_BART)
 GoF_TOT(gof, S_RF)
 GoF_TOT(gof, S_BART)
-GoF_TOT(gof, X_RF)
-GoF_TOT(gof, X_BART)
+#GoF_TOT(gof, X_RF)
+#GoF_TOT(gof, X_BART)
