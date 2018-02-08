@@ -4,7 +4,7 @@
 #' @include Xhrf.R
 #' @include SBART.R
 #' @include Shrf.R
-#' @importFrom ranger
+#' @import ranger
 
 setClass(
   "GoF_estimator",
@@ -124,12 +124,12 @@ setMethod(
 )
 
 # Example
-# set.seed(1423614230)
-# 
+# set.seed(123425)
+
 # feat <- iris[, -1]
 # tr <- rbinom(nrow(feat), 1, .5)
 # yobs <- iris[, 1]
-# 
+
 # gof <- GoF_estimator(feat, tr, yobs)
 # estimate_propensity(gof)
 # transform_yobs(gof)
@@ -137,5 +137,5 @@ setMethod(
 # GoF_TOT(gof, T_BART)
 # GoF_TOT(gof, S_RF)
 # GoF_TOT(gof, S_BART)
-#GoF_TOT(gof, X_RF)
-#GoF_TOT(gof, X_BART)
+# GoF_TOT(gof, X_RF)
+# GoF_TOT(gof, X_BART)

@@ -23,6 +23,7 @@ Imports:
     methods,
     stats,
     forestry,
+    ranger
 Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
 Collate: 
@@ -39,6 +40,7 @@ Collate:
     'Xhrf_autotune_gpp.R'
     'Xhrf_autotune_hyperband.R'
     'Xhrf_autotune_hyperband2.R'
+    'selector_transformed.R'
 Suggests:
     testthat,
     knitr,

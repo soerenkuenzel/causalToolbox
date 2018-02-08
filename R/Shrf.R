@@ -8,7 +8,7 @@
 #' @title ThRF constructor
 #' @name S_RF-class
 #' @rdname S_RF-class
-#' @description The `S_RF` object is T-learner combined with honest random
+#' @description The `S_RF` object is S-learner combined with honest random
 #' forest used for both response functions
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector contain 0 for control and 1 for treated variables.
