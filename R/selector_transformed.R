@@ -41,13 +41,13 @@ getCV_indexes <- function(tr, k) {
 # ------------------------------------------------------------------------------
 
 setGeneric(
-  name = "GoF_yStar",
+  name = "gof_transformed",
   def = function(feat, yobs, tr, estimator, seed) {
-    standardGeneric("GoF_yStar")
+    standardGeneric("gof_transformed")
   }
 )
-#' GoF_yStar
-#' @name GoF_yStar
+#' gof_transformed
+#' @name gof_transformed
 #' @param feat a data frame of features
 #' @param obs a vector of observations
 #' @param tr a vector of group assignment (assume entries are integers)
@@ -56,9 +56,9 @@ setGeneric(
 #' @param emin the pscore prediciton will be bounded between emin and 1- emin
 #' to aovid decide by 0 error
 #' @import ranger
-#' @exportMethod GoF_yStar
+#' @exportMethod gof_transformed
 setMethod(
-  "GoF_yStar",
+  "gof_transformed",
   definition = function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
     n <- length(tr)
     # catch nonsensible specifications
