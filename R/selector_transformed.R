@@ -61,17 +61,3 @@ setMethod(
     return(c(mse, sd_err))
   }
 )
-# Example
-# set.seed(123425)
-
-# feat <- iris[, -1]
-# tr <- rbinom(nrow(feat), 1, .5)
-# yobs <- iris[, 1]
-# GoF_yStar(feat, yobs, tr, S_BART, 123425)
-# GoF_yStar(feat, yobs, tr, T_BART, 123425)
-# GoF_yStar(feat, yobs, tr, X_BART, 123425)
-# GoF_yStar(feat, yobs, tr, T_RF, 123425)
-# GoF_yStar(feat, yobs, tr, S_RF, 123425)
-
-# Error
-# GoF_yStar(feat, yobs, tr, X_RF, 123425)
