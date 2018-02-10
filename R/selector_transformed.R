@@ -42,7 +42,7 @@ getCV_indexes <- function(tr, k) {
 
 setGeneric(
   name = "gof_transformed",
-  def = function(feat, yobs, tr, estimator, seed) {
+  def = function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
     standardGeneric("gof_transformed")
   }
 )
@@ -81,6 +81,7 @@ setMethod(
     
     cate_est <- rep(NA, n) # will contain the estimates
     for (i in 1:k) {
+      print(paste("Running", i, "out of", k, "CV fold."))
       # get train and test set -- training set is everything but fold i
       train_idx <- cv_idx != i
       test_idx <- !train_idx
@@ -112,8 +113,8 @@ setMethod(
     y_star <- yobs / (tr * pscore_pred - (1 - tr) * (1 - pscore_pred))
 
     # Calcualte the Goodness-of-Fit
-    mse <- mean((y_star - cate) ^ 2)
-    sd_err <- sd((y_star - cate) ^ 2) / sqrt(n)
+    mse <- mean((y_star - cate_est) ^ 2)
+    sd_err <- sd((y_star - cate_est) ^ 2) / sqrt(n)
 
     # --------------------------------------------------------------------------
     return(c(mse, sd_err))

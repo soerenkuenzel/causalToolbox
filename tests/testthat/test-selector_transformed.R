@@ -19,6 +19,17 @@ test_that("Tests CateCI", {
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
   
-  xb <- X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 10)
-  
+  expect_output(
+    gof_values <- gof_transformed(
+      yobs = yobs,
+      tr = tr,
+      feat = feat,
+      estimator = S_BART,
+      k = 3,
+      emin = 1e-5
+    )
+  )
+  expect_equal(gof_values,
+               c(418.1417, 145.1484), 
+               tolerance = 1e-3)
 })
