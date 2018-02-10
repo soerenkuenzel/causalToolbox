@@ -23,10 +23,9 @@ setMethod(
   "GoF_yStar",
   definition = function(feat, yobs, tr, estimator) {
     # Split the given data frame into train/test data set.
-    sample_idx <-
-      sample.int(n = nrow(feat),
-                 size = floor(0.8 * nrow(feat)),
-                 replace = FALSE)
+    sample_idx <- sample.int(n = nrow(feat),
+                             size = floor(0.8 * nrow(feat)),
+                             replace = FALSE)
     feat_train <- feat[sample_idx,]
     tr_train <- tr[sample_idx]
     yobs_train <- yobs[sample_idx]
