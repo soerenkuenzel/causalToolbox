@@ -20,7 +20,7 @@ get_CV_sizes <- function(n, k){
   return(sizes)
 }
 
-getCV_indexes <- function(tr, k = 2) {
+getCV_indexes <- function(tr, k) {
   # this function splits n = length(tr) units into k folds for a k fold CV and it returns
   # a list with k index sequences
   # tr is the treatment assignment. It makes sure that each CV has the same 
@@ -38,7 +38,6 @@ getCV_indexes <- function(tr, k = 2) {
   
   return(cv_fold_idx)
 }
-
 # ------------------------------------------------------------------------------
 
 setGeneric(
@@ -54,45 +53,69 @@ setGeneric(
 #' @param tr a vector of group assignment (assume entries are integers)
 #' @param estimator a learner constructor
 #' @param k we are doing a k fold cross validation
+#' @param emin the pscore prediciton will be bounded between emin and 1- emin
+#' to aovid decide by 0 error
 #' @import ranger
 #' @exportMethod GoF_yStar
 setMethod(
   "GoF_yStar",
-  definition = function(feat, yobs, tr, estimatorm, k) {
-    # Split the given data frame into train/test data set.
-    sample_idx <- sample.int(n = nrow(feat),
-                             size = floor(0.8 * nrow(feat)),
-                             replace = FALSE)
-    feat_train <- feat[sample_idx, ]
-    tr_train <- tr[sample_idx]
-    yobs_train <- yobs[sample_idx]
+  definition = function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
+    n <- length(tr)
+    # catch nonsensible specifications
+    if (emin <= 0 | emin >= 0.5) {
+      stop("0 < emin < 0.5")
+    }
+    if (sum(tr) == 0 | sum(tr) == length(tr)) {
+      stop("All units are in the treated group or all units are in the
+           treated group")
+    }
+    if (n == 0 | length(yobs) != n | nrow(feat) != n) {
+      stop("Either no data was provided or the sizes of yobs, feat or tr do not
+           match")
+    }
+    # --------------------------------------------------------------------------
+    # Compute the CATE estimates using a k fold CV
     
-    feat_test <- feat[-sample_idx, ]
-    tr_test <- tr[-sample_idx]
-    yobs_test <- yobs[-sample_idx]
+    # Create CV idxes
+    cv_idx <- getCV_indexes(tr = tr, k = k)
     
-    # Calculate propensity score by using ranger
-    pscoreDS <- data.frame(feat_test, tr_test)
-    # Convert integer labels to factors (required in ranger function?)
-    pscoreDS$feat_test <- as.factor(pscoreDS$feat_test)
-    rf <- ranger::ranger(feat_test ~ ., data = pscoreDS, probability = TRUE)
-    propensity_score <- rf$predictions
+    cate_est <- rep(NA, n) # will contain the estimates
+    for (i in 1:k) {
+      # get train and test set -- training set is everything but fold i
+      train_idx <- cv_idx != i
+      test_idx <- !train_idx
+      
+      # Estimate CATE with the given learner function
+      estimator_trained <- estimator(feat = feat[train_idx, ],
+                                     tr = tr[train_idx],
+                                     yobs = yobs[train_idx])
+      cate_est[test_idx] <- EstimateCate(estimator_trained, feat[test_idx, ])
+    }
+
+    # --------------------------------------------------------------------------
+    # Compute the Y star and evaluate the model
+    
+    # Calculate propensity score
+    pscore_estimator <- ranger::ranger(tr ~ ., 
+                                       data = data.frame(feat, 
+                                                         tr = factor(tr)), 
+                                       probability = TRUE)
+    pscore_pred_raw <- pscore_estimator$predictions[ ,2]
+    pscore_pred <- ifelse(
+      pscore_pred_raw < emin,
+      emin,
+      ifelse(pscore_pred_raw > 1 - emin, 1 - emin,
+             pscore_pred_raw)
+    )
     
     # Calculate y_star_te
-    y_star_te <- yobs_test / 
-      (tr_test * propensity_score - (1 - tr_test) * (1 - propensity_score))
-    
-    
-    # Estimate CATE with the given learner function
-    estimator_trained <- estimator(feat = feat_train, 
-                                   tr = tr_train, 
-                                   yobs = yobs_train)
-    cate <- EstimateCate(estimator_trained, feat_test)
-    
+    y_star <- yobs / (tr * pscore_pred - (1 - tr) * (1 - pscore_pred))
+
     # Calcualte the Goodness-of-Fit
-    mse <- mean((y_star_te - cate) ^ 2)
-    sd_err <- sd((y_star_te - cate) ^ 2) / sqrt(nrow(feat_test))
-    
+    mse <- mean((y_star - cate) ^ 2)
+    sd_err <- sd((y_star - cate) ^ 2) / sqrt(n)
+
+    # --------------------------------------------------------------------------
     return(c(mse, sd_err))
   }
 )
