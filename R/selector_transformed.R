@@ -21,8 +21,7 @@ setGeneric(
 #' @exportMethod GoF_yStar
 setMethod(
   "GoF_yStar",
-  definition = function(feat, yobs, tr, estimator, seed) {
-    set.seed(seed)
+  definition = function(feat, yobs, tr, estimator) {
     # Split the given data frame into train/test data set.
     sample_idx <-
       sample.int(n = nrow(feat),
