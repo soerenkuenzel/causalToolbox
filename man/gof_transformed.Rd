@@ -17,10 +17,13 @@
 
 \item{k}{we are doing a k fold cross validation}
 
-\item{emin}{the pscore prediciton will be bounded between emin and 1- emin
+\item{emin}{the pscore prediciton will be bounded between emin and 1 - emin
 to aovid decide by 0 error}
 
 \item{obs}{a vector of observations}
+}
+\value{
+mean(error) and sd(error)
 }
 \description{
 gof_transformed

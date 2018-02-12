@@ -10,10 +10,10 @@
 tr <- rbinom(n = 500, size = 1, prob = .1)
 k <- 4
 
-get_CV_sizes <- function(n, k){
-  # n number of units
-  # k number of folds
-  # returns the CV fold sizes eg. (5,5,4,4,4) for n = 22, k = 5
+get_CV_sizes <- function(n, k) {
+  # n: number of units
+  # k: number of folds
+  # Return: the CV fold sizes eg. (5,5,4,4,4) for n = 22, k = 5
   small_size <- floor(n / k)
   remainder <- n %% k 
   sizes <- rep(small_size, k) + c(rep(1, remainder), rep(0, k - remainder)) 
@@ -21,8 +21,8 @@ get_CV_sizes <- function(n, k){
 }
 
 getCV_indexes <- function(tr, k) {
-  # this function splits n = length(tr) units into k folds for a k fold CV and it returns
-  # a list with k index sequences
+  # Description: this function splits n = length(tr) units into k folds 
+  # for a k fold CV and it returns a list with k index sequences
   # tr is the treatment assignment. It makes sure that each CV has the same 
   # proportion of treatment indicators. 
   n <- length(tr)
@@ -53,8 +53,9 @@ setGeneric(
 #' @param tr a vector of group assignment (assume entries are integers)
 #' @param estimator a learner constructor
 #' @param k we are doing a k fold cross validation
-#' @param emin the pscore prediciton will be bounded between emin and 1- emin
+#' @param emin the pscore prediciton will be bounded between emin and 1 - emin
 #' to aovid decide by 0 error
+#' @return mean(error) and sd(error)
 #' @import ranger
 #' @exportMethod gof_transformed
 setMethod(

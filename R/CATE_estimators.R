@@ -25,8 +25,7 @@ setClass(
 #'@exportMethod EstimateCate
 setGeneric(
   name = "EstimateCate",
-  def = function(theObject, feature_new, ...)
-  {
+  def = function(theObject, feature_new, ...) {
     standardGeneric("EstimateCate")
   }
 )
@@ -42,8 +41,7 @@ setGeneric(
                  B = 200,
                  nthread = 0,
                  verbose = TRUE,
-                 ...)
-  {
+                 ...) {
     standardGeneric("CateCI")
   }
 )
