@@ -74,6 +74,9 @@ setMethod(
       stop("Either no data was provided or the sizes of yobs, feat or tr do not
            match")
     }
+    if (k < 2 | !is.integer(k)){
+      stop("k must be an integer bigger than 1!")
+    }
     # --------------------------------------------------------------------------
     # Compute the CATE estimates using a k fold CV
     
