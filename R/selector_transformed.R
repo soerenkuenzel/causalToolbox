@@ -74,7 +74,7 @@ setMethod(
       stop("Either no data was provided or the sizes of yobs, feat or tr do not
            match")
     }
-    if (k < 2 | !is.integer(k)){
+    if (k < 2 | k%%1 != 0){
       stop("k must be an integer bigger than 1!")
     }
     # --------------------------------------------------------------------------
