@@ -23,7 +23,10 @@ setClass(
 #' @param feat feature data.frame.
 #' @param tr treatment assignment 0 for control and 1 for treatment.
 #' @param yobs the observed outcome.
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @param ensemble ...
+#' @param ndpost ...
+#' @param tree_package Package used to create tree
+#' @param ntree number of trees to grow
 #' @return A `X_RF` object.
 #' @export X_BART
 #' @import methods
@@ -76,12 +79,10 @@ X_BART <-
 #' @name EstimateCate-X_BART
 #' @rdname EstimateCate-X_BART
 #' @description Return the estimated CATE
-#' @param object A `X_BART` object.
+#' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
-#' @param ensemble Specify how tau_hat_1 and tau_hat_2 should be averaged the
-#' dafault is by the weight of the propensity score, other version is
-#' "variance" which uses the variance of the weighting
+#' @param return_CI ...
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_BART-method
 #' @exportMethod EstimateCate
@@ -258,16 +259,16 @@ setMethod(
 )
 
 
-#' EstimateCate-X_BART
-#' @name EstimateCate-X_BART
-#' @rdname EstimateCate-X_BART
+#' CateCI-X_BART
+#' @name CateCI-X_BART
+#' @rdname CateCI-X_BART
 #' @description Return the estimated CATE
-#' @param object A `X_BART` object.
+#' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
 #' @aliases CateCI,X_BART-method
-#' @exportMethod EstimateCate
+#' @exportMethod CateCI
 setMethod(
   f = "CateCI",
   signature = "X_BART",
@@ -291,6 +292,8 @@ setMethod(
 #' @name EstimateAllSampleStatistics-X_BART
 #' @rdname EstimateAllSampleStatistics-X_BART
 #' @description Return the estimated CATE
+#' @param theObject ...
+#' @param verbose ...
 #' @aliases EstimateAllSampleStatistics,X_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 #' @import stats

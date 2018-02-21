@@ -21,6 +21,7 @@
 #' @param nthread Number of threads used. Set it is 0, to automatically select
 #'   the maximum amount of possible threads. Set it 1 for slowest performance
 #'   but absolute deterministic behavior.
+#' @param verbose ...
 #' @return A tuned X learner object.
 #' @details This function uses the rBayesianOptimization package to do the
 #'   baysian optimization

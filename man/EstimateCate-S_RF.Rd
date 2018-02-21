@@ -9,9 +9,9 @@
 \S4method{EstimateCate}{S_RF}(theObject, feature_new)
 }
 \arguments{
-\item{feature_new}{A data frame.}
+\item{theObject}{A `S_hRF` object.}
 
-\item{object}{A `S_hRF` object.}
+\item{feature_new}{A data frame.}
 }
 \value{
 A vector of predicted CATE

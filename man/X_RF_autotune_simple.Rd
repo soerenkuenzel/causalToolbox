@@ -16,9 +16,13 @@ X_RF_autotune_simple(feat, tr, yobs, ntree = 2000, ntree_testing = 600,
 
 \item{ntree}{Number of trees used}
 
+\item{ntree_testing}{...}
+
 \item{nthread}{Number of threads which can run in parallel. If set 0, then
 the maximum amount of possible threads is determined automatically. If set to
 1 then the algorithm is absolutely deterministic (after specifying a seed).}
+
+\item{verbose}{...}
 }
 \description{
 This function tunes the X-Learner with honest random forest by

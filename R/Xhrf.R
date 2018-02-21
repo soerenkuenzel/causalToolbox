@@ -21,10 +21,7 @@
 #' @slot m_tau_1 contains an honest random forest predictor for the treated
 #' group of the second stage.
 #' @slot m_prop contains an honest random forest predictor the propensity score.
-#' @slot relevant_Variable_first contains the indices of variables, which are only used in
-#' the first stage.
-#' @slot relevant_Variable_second contains the numbers of variables, which are only used
-#' in the second stage.
+#' @slot hyperparameter_list A list of lists of hyper parameters
 #' @exportClass X_RF
 #' @importFrom forestry predict
 setClass(
@@ -56,12 +53,17 @@ setClass(
 #' @param predmode One of propmean, control, treated, extreme. It specifies how
 #' the two estimators of the second stage should be aggregated. The default is
 #' propmean which refers to propensity score weighting.
-#' @param relevant_Variable_first Variables which are only used in the first stage.
-#' @param relevant_Variable_second Variables which are only used in the second stage.
+#' @param relevant_Variable_first Variables which are only used 
+#' in the first stage.
+#' @param relevant_Variable_second Variables which are only used 
+#' in the second stage.
+#' @param relevant_Variable_prop ...
 #' @param ntree_first Numbers of trees in the first stage.
 #' @param ntree_second Numbers of trees in the second stage.
+#' @param ntree_prop ... 
 #' @param mtry_first Numbers of trees in the second stage.
 #' @param mtry_second Numbers of trees in the second stage.
+#' @param mtry_prop ...
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
 #' observations in the splitting set.
 #' @param min_node_size_ave_first minimum nodesize in the first stage for the
@@ -70,18 +72,26 @@ setClass(
 #' observations in the splitting set.
 #' @param min_node_size_ave_second minimum nodesize in the second stage for the
 #' observations in the averaging set.
+#' @param min_node_size_spl_prop ...
+#' @param min_node_size_ave_prop ...
 #' @param splitratio_first Proportion of the training data used as the splitting
 #' dataset in the first stage.
 #' @param splitratio_second Proportion of the training data used as the
 #' splitting dataset in the second stage.
+#' @param splitratio_prop ...
 #' @param replace_first Sample with or without replacement in the first stage.
 #' @param replace_second Sample with or without replacement in the first stage.
+#' @param replace_prop ...
 #' @param sample_fraction_first The size of total samples to draw for the
 #' training data in the first stage.
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
+#' @param sample_fraction_prop ...
 #' @param nthread number of threats which should be used to work in parallel.
 #' @param verbose whether or not to print messages of the training procedure.
+#' @param middleSplit_first ...
+#' @param middleSplit_second ...
+#' @param middleSplit_prop ...
 #' @export X_RF
 setGeneric(
   name = "X_RF",
@@ -405,7 +415,7 @@ X_RF_fully_specified <-
 #' @name EstimateCate-X_RF
 #' @rdname EstimateCate-X_RF
 #' @description Return the estimated CATE
-#' @param object A `X_hRF` object.
+#' @param theObject A `X_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_RF-method
@@ -445,6 +455,11 @@ setMethod(
 #' EstimateAllSampleStatistics-X_RF
 #' @name EstimateAllSampleStatistics-X_RF
 #' @rdname EstimateAllSampleStatistics-X_RF
+#' @param theObject ...
+#' @param method ...
+#' @param B ...
+#' @param nthread ...
+#' @param verbose ...
 #' @description Return the estimated CATE
 #' @aliases EstimateAllSampleStatistics,X_RF-method
 #' @exportMethod EstimateAllSampleStatistics

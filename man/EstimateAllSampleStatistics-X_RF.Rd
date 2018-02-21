@@ -9,6 +9,17 @@
 \S4method{EstimateAllSampleStatistics}{X_RF}(theObject, method, B, nthread,
   verbose)
 }
+\arguments{
+\item{theObject}{...}
+
+\item{method}{...}
+
+\item{B}{...}
+
+\item{nthread}{...}
+
+\item{verbose}{...}
+}
 \description{
 Return the estimated CATE
 }

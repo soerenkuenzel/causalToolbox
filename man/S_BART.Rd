@@ -15,10 +15,18 @@ S_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{yobs}{the observed outcome.}
 
+\item{ndpost}{...}
+
+\item{sample_stat}{...}
+
+\item{tree_package}{...}
+
+\item{ntree}{...}
+
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
-A `X_RF` object.
+A `BART` object.
 }
 \description{
 This is an implementation of S_BART

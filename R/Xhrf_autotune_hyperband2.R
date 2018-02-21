@@ -275,11 +275,9 @@ tuneStageOne <- function(x,
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param sampsize ..
+#' @param sample.fraction ..
 #' @param num_iter number of iterations.
 #' @param eta ..
-#' @param firststageVar ..
-#' @param secondstageVar ..
 #' @param verbose ..
 #' @param seed ..
 #' @param nthread ..

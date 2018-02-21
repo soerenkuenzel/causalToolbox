@@ -6,6 +6,11 @@
 \usage{
 EstimateCate(theObject, feature_new, ...)
 }
+\arguments{
+\item{theObject}{...}
+
+\item{feature_new}{...}
+}
 \description{
 Method EstimateCate
 }

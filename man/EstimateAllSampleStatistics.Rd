@@ -6,7 +6,20 @@
 \usage{
 EstimateAllSampleStatistics(theObject, feature_new,
   method = "maintain_group_ratios", B = 200, nthread = 0,
-  verbose = TRUE, ...)
+  verbose = TRUE)
+}
+\arguments{
+\item{theObject}{...}
+
+\item{feature_new}{...}
+
+\item{method}{...}
+
+\item{B}{...}
+
+\item{nthread}{...}
+
+\item{verbose}{...}
 }
 \description{
 Method EstimateAllSampleStatistics

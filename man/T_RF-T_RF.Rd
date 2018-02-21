@@ -21,19 +21,19 @@ T_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 
 \item{mtry}{Number of variables to try at each node.}
 
-\item{nodesizeAvg}{TODO: Add Description}
+\item{nodesizeSpl}{...}
+
+\item{nodesizeAvg}{...}
 
 \item{replace}{TODO: Add Description}
 
-\item{ntree}{TODO: Add Description}
+\item{ntree}{number of trees to grow}
 
 \item{sample_fraction}{TODO: Add Description}
 
 \item{nthread}{TODO: Add Description}
 
 \item{splitratio}{TODO: Add Description}
-
-\item{nodesize}{TODO: Add Description}
 }
 \value{
 A `T_RF` object.

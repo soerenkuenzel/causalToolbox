@@ -13,6 +13,8 @@
 #' @param nthread Number of threads which can run in parallel. If set 0, then
 #' the maximum amount of possible threads is determined automatically. If set to
 #' 1 then the algorithm is absolutely deterministic (after specifying a seed).
+#' @param ntree_testing ...
+#' @param verbose ...
 #' @seealso \code{\link{X_RF_autotune_gpp}},
 #' \code{\link{X_RF_autotune_hyperband}}
 #' @examples

@@ -15,21 +15,17 @@ X_RF_autotune_hyperband(feat, tr, yobs, sample.fraction = 0.75,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
+\item{sample.fraction}{...}
+
 \item{num_iter}{number of iterations.}
 
 \item{eta}{..}
 
 \item{verbose}{..}
 
-\item{seed}{..}
+\item{seed}{...}
 
-\item{nthread}{..}
-
-\item{sampsize}{..}
-
-\item{firststageVar}{..}
-
-\item{secondstageVar}{..}
+\item{nthread}{Number of threads}
 }
 \description{
 This function tunes

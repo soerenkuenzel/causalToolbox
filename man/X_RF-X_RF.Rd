@@ -35,17 +35,25 @@ X_RF(feat, tr, yobs, predmode = "propmean",
 the two estimators of the second stage should be aggregated. The default is
 propmean which refers to propensity score weighting.}
 
-\item{relevant_Variable_first}{Variables which are only used in the first stage.}
+\item{relevant_Variable_first}{Variables which are only used 
+in the first stage.}
 
-\item{relevant_Variable_second}{Variables which are only used in the second stage.}
+\item{relevant_Variable_second}{Variables which are only used 
+in the second stage.}
+
+\item{relevant_Variable_prop}{...}
 
 \item{ntree_first}{Numbers of trees in the first stage.}
 
 \item{ntree_second}{Numbers of trees in the second stage.}
 
+\item{ntree_prop}{...}
+
 \item{mtry_first}{Numbers of trees in the second stage.}
 
 \item{mtry_second}{Numbers of trees in the second stage.}
+
+\item{mtry_prop}{...}
 
 \item{min_node_size_spl_first}{minimum nodesize in the first stage for the
 observations in the splitting set.}
@@ -59,15 +67,23 @@ observations in the splitting set.}
 \item{min_node_size_ave_second}{minimum nodesize in the second stage for the
 observations in the averaging set.}
 
+\item{min_node_size_spl_prop}{...}
+
+\item{min_node_size_ave_prop}{...}
+
 \item{splitratio_first}{Proportion of the training data used as the splitting
 dataset in the first stage.}
 
 \item{splitratio_second}{Proportion of the training data used as the
 splitting dataset in the second stage.}
 
+\item{splitratio_prop}{...}
+
 \item{replace_first}{Sample with or without replacement in the first stage.}
 
 \item{replace_second}{Sample with or without replacement in the first stage.}
+
+\item{replace_prop}{...}
 
 \item{sample_fraction_first}{The size of total samples to draw for the
 training data in the first stage.}
@@ -75,9 +91,17 @@ training data in the first stage.}
 \item{sample_fraction_second}{The size of total samples to draw for the
 training data in the second stage.}
 
+\item{sample_fraction_prop}{...}
+
 \item{nthread}{number of threats which should be used to work in parallel.}
 
 \item{verbose}{whether or not to print messages of the training procedure.}
+
+\item{middleSplit_first}{...}
+
+\item{middleSplit_second}{...}
+
+\item{middleSplit_prop}{...}
 }
 \value{
 A `X_RF` object.

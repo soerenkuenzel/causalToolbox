@@ -28,7 +28,11 @@ setClass(
 #' @param tr treatment assignment 0 for control and 1 for treatment.
 #' @param yobs the observed outcome.
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `X_RF` object.
+#' @param ndpost ...
+#' @param sample_stat ...
+#' @param tree_package Package used to create tree
+#' @param ntree number of trees to grow
+#' @return A `T_BART` object.
 #' @export T_BART
 #' @import methods
 T_BART <-
@@ -68,9 +72,10 @@ T_BART <-
 #' @name EstimateCate-T_BART
 #' @rdname EstimateCate-T_BART
 #' @description Return the estimated CATE
-#' @param object A `T_BART` object.
+#' @param theObject A `T_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
+#' @param return_CI ...
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_BART-method
 #' @exportMethod EstimateCate
@@ -161,16 +166,16 @@ setMethod(
 )
 
 
-#' EstimateCate-T_BART
-#' @name EstimateCate-T_BART
-#' @rdname EstimateCate-T_BART
+#' CateCI-T_BART
+#' @name CateCI-T_BART
+#' @rdname CateCI-T_BART
 #' @description Return the estimated CATE
-#' @param object A `T_BART` object.
+#' @param theObject A `T_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
 #' @aliases CateCI,T_BART-method
-#' @exportMethod EstimateCate
+#' @exportMethod CateCI
 setMethod(
   f = "CateCI",
   signature = "T_BART",
@@ -256,6 +261,8 @@ setMethod(
 #' @name EstimateAllSampleStatistics-T_BART
 #' @rdname EstimateAllSampleStatistics-T_BART
 #' @description Return the estimated CATE
+#' @param theObject ...
+#' @param verbose ...
 #' @aliases EstimateAllSampleStatistics,T_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
