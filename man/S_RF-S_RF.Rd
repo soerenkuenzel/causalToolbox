@@ -21,6 +21,8 @@ S_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 
 \item{mtry}{Number of variables to try at each node.}
 
+\item{nodesizeSpl}{...}
+
 \item{nodesizeAvg}{TODO: Add Description}
 
 \item{replace}{TODO: Add Description}
@@ -35,14 +37,12 @@ S_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 
 \item{alwaysTr}{weather or not we always test weather we should split on the
 treatment assignment. Currently only alwaysTr=FALSE is implemented}
-
-\item{nodesize}{TODO: Add Description}
 }
 \value{
 A `S_RF` object.
 }
 \description{
-This is an implementation of the T-learner combined with honest
+This is an implementation of the S-learner combined with honest
   random forest for both response functions
 
 This is an implementation of the S-learner combined with honest

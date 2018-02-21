@@ -9,6 +9,17 @@
 \S4method{EstimateAllSampleStatistics}{`Meta-learner`}(theObject, method, B,
   nthread, verbose)
 }
+\arguments{
+\item{theObject}{A `Meta-learner` object.}
+
+\item{method}{...}
+
+\item{B}{...}
+
+\item{nthread}{number of threads to be used}
+
+\item{verbose}{...}
+}
 \description{
-Return the estimated CATE
+...
 }

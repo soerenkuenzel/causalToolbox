@@ -24,6 +24,8 @@ X_RF_autotune_gpp(feat, tr, yobs, ntree = 2000, init_points = 20,
 \item{nthread}{Number of threads used. Set it is 0, to automatically select
 the maximum amount of possible threads. Set it 1 for slowest performance
 but absolute deterministic behavior.}
+
+\item{verbose}{...}
 }
 \value{
 A tuned X learner object.

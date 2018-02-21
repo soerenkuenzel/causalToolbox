@@ -48,13 +48,13 @@ setClass(
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param mtry Number of variables to try at each node.
-#' @param nodesize TODO: Add Description
+#' @param nodesizeSpl ...
+#' @param nodesizeAvg ...
 #' @param replace TODO: Add Description
-#' @param ntree TODO: Add Description
+#' @param ntree number of trees to grow
 #' @param sample_fraction TODO: Add Description
 #' @param nthread TODO: Add Description
 #' @param splitratio TODO: Add Description
-#' @param nodesizeAvg TODO: Add Description
 #' @export T_RF
 setGeneric(
   name = "T_RF",
@@ -62,13 +62,13 @@ setGeneric(
                  tr,
                  yobs,
                  mtry,
-                 nodesize,
+                 nodesizeSpl,
+                 nodesizeAvg,
                  replace,
                  ntree,
                  sample_fraction,
                  nthread,
-                 splitratio,
-                 nodesizeAvg) {
+                 splitratio) {
     standardGeneric("T_RF")
   }
 )
@@ -171,7 +171,7 @@ T_RF <-
 #' @name EstimateCate-T_RF
 #' @rdname EstimateCate-T_RF
 #' @description Return the estimated CATE
-#' @param object A `T_hRF` object.
+#' @param theObject A `T_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_RF-method

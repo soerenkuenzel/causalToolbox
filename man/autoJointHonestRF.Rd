@@ -15,6 +15,8 @@ autoJointHonestRF(feat, tr, yobs, sample.fraction = 0.75, num_iter = 3^8,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
+\item{sample.fraction}{..}
+
 \item{num_iter}{number of iterations.}
 
 \item{eta}{..}
@@ -26,12 +28,6 @@ autoJointHonestRF(feat, tr, yobs, sample.fraction = 0.75, num_iter = 3^8,
 \item{nthread}{..}
 
 \item{tune_iter}{..}
-
-\item{sampsize}{..}
-
-\item{firststageVar}{..}
-
-\item{secondstageVar}{..}
 }
 \description{
 [TBD]

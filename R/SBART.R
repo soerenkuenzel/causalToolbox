@@ -23,8 +23,12 @@ setClass(
 #' @param feat feature data.frame.
 #' @param tr treatment assignment 0 for control and 1 for treatment.
 #' @param yobs the observed outcome.
+#' @param ndpost ...
+#' @param sample_stat ...
+#' @param  tree_package ...
+#' @param ntree ...
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `X_RF` object.
+#' @return A `BART` object.
 #' @export S_BART
 #' @import methods
 S_BART <-
@@ -131,6 +135,8 @@ setMethod(
 #' EstimateAllSampleStatistics-S_BART
 #' @rdname EstimateAllSampleStatistics-S_BART
 #' @description Return the estimated CATE
+#' @param theObject ...
+#' @param verbose ...
 #' @aliases EstimateAllSampleStatistics,S_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(

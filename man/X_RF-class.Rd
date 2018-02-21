@@ -32,10 +32,6 @@ group of the second stage.}
 
 \item{\code{m_prop}}{contains an honest random forest predictor the propensity score.}
 
-\item{\code{relevant_Variable_first}}{contains the indices of variables, which are only used in
-the first stage.}
-
-\item{\code{relevant_Variable_second}}{contains the numbers of variables, which are only used
-in the second stage.}
+\item{\code{hyperparameter_list}}{A list of lists of hyper parameters}
 }}
 

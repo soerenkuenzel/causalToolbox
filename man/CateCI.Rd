@@ -5,7 +5,20 @@
 \title{Method CateCI}
 \usage{
 CateCI(theObject, feature_new, method = "maintain_group_ratios", B = 200,
-  nthread = 0, verbose = TRUE, ...)
+  nthread = 0, verbose = TRUE)
+}
+\arguments{
+\item{theObject}{...}
+
+\item{feature_new}{...}
+
+\item{method}{...}
+
+\item{B}{number of bootstrap samples}
+
+\item{nthread}{number of threads to be used in parallel}
+
+\item{verbose}{...}
 }
 \description{
 Method CateCI

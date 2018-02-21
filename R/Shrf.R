@@ -13,8 +13,6 @@
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector contain 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
-#' @slot m_y_t contains an honest random forest predictor for the treated group
-#' @slot m_y_c contains an honest random forest predictor for the control group
 #' @slot forest TODO: Add Description
 #' @slot creator function which creates a S_RF
 #' @exportClass S_RF
@@ -42,19 +40,19 @@ setClass(
 #' @title honstRF Constructor
 #' @name S_RF-S_RF
 #' @rdname S_RF-S_RF
-#' @description This is an implementation of the T-learner combined with honest
+#' @description This is an implementation of the S-learner combined with honest
 #'   random forest for both response functions
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param mtry Number of variables to try at each node.
-#' @param nodesize TODO: Add Description
 #' @param replace TODO: Add Description
 #' @param ntree TODO: Add Description
 #' @param sample_fraction TODO: Add Description
 #' @param nthread TODO: Add Description
 #' @param splitratio TODO: Add Description
 #' @param nodesizeAvg TODO: Add Description
+#' @param nodesizeSpl ...
 #' @param alwaysTr weather or not we always test weather we should split on the
 #'   treatment assignment. Currently only alwaysTr=FALSE is implemented
 #' @export S_RF
@@ -64,13 +62,13 @@ setGeneric(
                  tr,
                  yobs,
                  mtry,
-                 nodesize,
+                 nodesizeSpl,
+                 nodesizeAvg,
                  replace,
                  ntree,
                  sample_fraction,
                  nthread,
                  splitratio,
-                 nodesizeAvg,
                  alwaysTr) {
     standardGeneric("S_RF")
   }
@@ -156,7 +154,7 @@ S_RF <-
 #' @name EstimateCate-S_RF
 #' @rdname EstimateCate-S_RF
 #' @description Return the estimated CATE
-#' @param object A `S_hRF` object.
+#' @param theObject A `S_hRF` object.
 #' @param feature_new A data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_RF-method

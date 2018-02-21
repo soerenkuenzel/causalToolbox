@@ -8,6 +8,11 @@
 \usage{
 \S4method{EstimateAllSampleStatistics}{X_BART}(theObject, verbose = FALSE)
 }
+\arguments{
+\item{theObject}{...}
+
+\item{verbose}{...}
+}
 \description{
 Return the estimated CATE
 }

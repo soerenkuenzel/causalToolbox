@@ -14,7 +14,13 @@ X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 1200,
 
 \item{yobs}{the observed outcome.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{ensemble}{...}
+
+\item{ndpost}{...}
+
+\item{tree_package}{Package used to create tree}
+
+\item{ntree}{number of trees to grow}
 }
 \value{
 A `X_RF` object.

@@ -22,6 +22,8 @@ setClass(
 #'Method EstimateCate
 #'@name EstimateCate
 #'@rdname EstimateCate
+#'@param theObject ...
+#'@param feature_new ...
 #'@exportMethod EstimateCate
 setGeneric(
   name = "EstimateCate",
@@ -32,6 +34,12 @@ setGeneric(
 #'Method CateCI
 #'@name CateCI
 #'@rdname CateCI
+#'@param theObject ...
+#'@param feature_new ...
+#'@param method ...
+#'@param B number of bootstrap samples
+#'@param nthread number of threads to be used in parallel
+#'@param verbose ...
 #'@exportMethod CateCI
 setGeneric(
   name = "CateCI",
@@ -40,13 +48,18 @@ setGeneric(
                  method = "maintain_group_ratios",
                  B = 200,
                  nthread = 0,
-                 verbose = TRUE,
-                 ...) {
+                 verbose = TRUE) {
     standardGeneric("CateCI")
   }
 )
 #'Method EstimateATT
 #'@name EstimateATT
+#'@param theObject ...
+#'@param feature_new ...
+#'@param method ...
+#'@param B number of bootstrap samples.
+#'@param nthread number of threads used in paralle
+#'@param verbose ...
 #'@rdname EstimateATT
 #'@exportMethod EstimateATT
 setGeneric(
@@ -56,14 +69,19 @@ setGeneric(
                  method = "maintain_group_ratios",
                  B = 200,
                  nthread = 0,
-                 verbose = TRUE,
-                 ...){
+                 verbose = TRUE){
     standardGeneric("EstimateATT")
   }
 )
 #'Method EstimateAllSampleStatistics
 #'@name EstimateAllSampleStatistics
 #'@rdname EstimateAllSampleStatistics
+#'@param theObject ...
+#'@param feature_new ...
+#'@param method ...
+#'@param B ...
+#'@param nthread ...
+#'@param verbose ...
 #'@exportMethod EstimateAllSampleStatistics
 setGeneric(
   name = "EstimateAllSampleStatistics",
@@ -72,23 +90,23 @@ setGeneric(
                  method = "maintain_group_ratios",
                  B = 200,
                  nthread = 0,
-                 verbose = TRUE,
-                 ...){
+                 verbose = TRUE){
     standardGeneric("EstimateAllSampleStatistics")
   }
 )
 
 
 
-#' CateCI-X_hRF
-#' @name CateCI-X_hRF
-#' @rdname CateCI-X_hRF
+#' CateCI-Meta-learner
+#' @name CateCI-Meta-learner
+#' @rdname CateCI-Meta-learner
 #' @description Return the estimated confidence intervals for the CATE
-#' @param object A `X_hRF` object.
+#' @param theObject A `Meta-learner` object.
 #' @param feature_new A data frame.
 #' @param method different versions of the bootstrap. Only n2TBS implemented
 #' @param B number of bootstrap samples.
 #' @param nthread number of threats used.
+#' @param verbose ...
 #' @return A data frame of estimated CATE Confidence Intervals
 #' @aliases CateCI,Meta-learner-method
 #' @exportMethod CateCI
@@ -210,9 +228,14 @@ setMethod(
 #' EstimateAllSampleStatistics-Meta-learner
 #' @name EstimateAllSampleStatistics-Meta-learner
 #' @rdname EstimateAllSampleStatistics-Meta-learner
-#' @description Return the estimated CATE
+#' @param theObject A `Meta-learner` object.
+#' @param method ...
+#' @param B ...
+#' @param nthread number of threads to be used
+#' @param verbose ...
+#' @description ...
 #' @aliases EstimateAllSampleStatistics,Meta-learner-method
-#' @exportMethod EstimateAllSampleStatistics
+#' @exportMethod EstimateAllSampleStatistics 
 setMethod(
   f = "EstimateAllSampleStatistics",
   signature = "Meta-learner",

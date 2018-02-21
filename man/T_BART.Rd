@@ -15,10 +15,18 @@ T_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{yobs}{the observed outcome.}
 
+\item{ndpost}{...}
+
+\item{sample_stat}{...}
+
+\item{tree_package}{Package used to create tree}
+
+\item{ntree}{number of trees to grow}
+
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
-A `X_RF` object.
+A `T_BART` object.
 }
 \description{
 This is an implementation of T_BART
