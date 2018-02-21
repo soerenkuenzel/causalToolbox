@@ -75,7 +75,7 @@ test_that("Tests that XhRF is working correctly", {
     verbose = verbose
   )
   EstimateCate(xl, feat)[1]
-  expect_equal(EstimateCate(xl, feat)[1], 0.1250887, tolerance = 1e-3)
+  expect_equal(EstimateCate(xl, feat)[1], 0.1250887, tolerance = 1e-2)
 
   set.seed(432)
   cate_problem <-

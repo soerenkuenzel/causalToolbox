@@ -80,7 +80,7 @@ gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
     # get train and test set -- training set is everything but fold i
     train_idx <- cv_idx != i
     test_idx <- !train_idx
-    
+   
     # Estimate CATE with the given learner function
     estimator_trained <- estimator(feat = feat[train_idx, ],
                                    tr = tr[train_idx],
