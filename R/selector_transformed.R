@@ -43,7 +43,7 @@ getCV_indexes <- function(tr, k) {
 #' gof_transformed
 #' @name gof_transformed
 #' @param feat a data frame of features
-#' @param obs a vector of observations
+#' @param yobs a vector of observations
 #' @param tr a vector of group assignment (assume entries are integers)
 #' @param estimator a learner constructor
 #' @param k we are doing a k fold cross validation

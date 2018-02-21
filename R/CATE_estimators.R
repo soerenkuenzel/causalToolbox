@@ -24,6 +24,7 @@ setClass(
 #'@rdname EstimateCate
 #'@param theObject ...
 #'@param feature_new ...
+#'@param ... Additional parameters
 #'@exportMethod EstimateCate
 setGeneric(
   name = "EstimateCate",

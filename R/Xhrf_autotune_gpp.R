@@ -22,6 +22,7 @@
 #'   the maximum amount of possible threads. Set it 1 for slowest performance
 #'   but absolute deterministic behavior.
 #' @param verbose ...
+#' @param ... Additional parameters
 #' @return A tuned X learner object.
 #' @details This function uses the rBayesianOptimization package to do the
 #'   baysian optimization

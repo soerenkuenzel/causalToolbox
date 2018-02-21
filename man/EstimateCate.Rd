@@ -10,6 +10,8 @@ EstimateCate(theObject, feature_new, ...)
 \item{theObject}{...}
 
 \item{feature_new}{...}
+
+\item{...}{Additional parameters}
 }
 \description{
 Method EstimateCate

@@ -26,6 +26,8 @@ the maximum amount of possible threads. Set it 1 for slowest performance
 but absolute deterministic behavior.}
 
 \item{verbose}{...}
+
+\item{...}{Additional parameters}
 }
 \value{
 A tuned X learner object.
