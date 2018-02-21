@@ -1,5 +1,5 @@
 library(testthat)
-test_that("Tests CateCI", {
+test_that("Tests Selector Transformed", {
   
   # ----------------------------------------------------------------------------
   # test helper functions
@@ -15,21 +15,36 @@ test_that("Tests CateCI", {
   # ----------------------------------------------------------------------------
   set.seed(1423614230)
   
-  feat <- iris[, -1]
-  tr <- rbinom(nrow(iris), 1, .5)
-  yobs <- iris[, 1]
+  dt <- simulate_causal_experiment(ntrain = 500, ntest = 10, dim = 6, alpha = 5,
+                             setup = "complexTau2")
   
   expect_output(
-    gof_values <- gof_transformed(
-      yobs = yobs,
-      tr = tr,
-      feat = feat,
+    gof_values_S_BART <- gof_transformed(
+      yobs = dt$Yobs_tr,
+      tr = dt$W_tr,
+      feat = dt$feat_tr,
       estimator = S_BART,
       k = 3,
       emin = 1e-5
     )
   )
-  expect_equal(gof_values,
-               c(418.1417, 145.1484), 
+  
+  expect_equal(gof_values_S_BART,
+               c(16080.987, 1781.927), 
+               tolerance = 1e-3)
+  
+  expect_output(
+    gof_values_S_RF <- gof_transformed(
+      yobs = dt$Yobs_tr,
+      tr = dt$W_tr,
+      feat = dt$feat_tr,
+      estimator = S_RF,
+      k = 3,
+      emin = 1e-5
+    )
+  )
+  
+  expect_equal(gof_values_S_RF,
+               c(15851.143, 1606.694),
                tolerance = 1e-3)
 })
