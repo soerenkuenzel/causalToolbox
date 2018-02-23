@@ -15,8 +15,11 @@ test_that("Tests Selector Transformed", {
   # ----------------------------------------------------------------------------
   set.seed(1423614230)
   
-  dt <- simulate_causal_experiment(ntrain = 500, ntest = 10, dim = 6, alpha = 5,
-                             setup = "complexTau2")
+  dt <- simulate_causal_experiment(ntrain = 500,
+                                   ntest = 10,
+                                   dim = 6,
+                                   alpha = 0.1,
+                                   setup = "complexTau2")
   
   expect_output(
     gof_values_S_BART <- gof_transformed(
@@ -30,7 +33,7 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_BART,
-               c(16080.987, 1781.927), 
+               c(12338.0071, 997.3583), 
                tolerance = 1e-3)
   
   expect_output(
@@ -45,6 +48,6 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(15851.143, 1606.694),
+               c(13170.07, 1060.57),
                tolerance = 1e-3)
 })

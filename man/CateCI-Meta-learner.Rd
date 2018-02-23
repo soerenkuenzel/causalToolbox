@@ -3,6 +3,7 @@
 \docType{methods}
 \name{CateCI-Meta-learner}
 \alias{CateCI-Meta-learner}
+\alias{CateCI,Meta-learner-method}
 \title{CateCI-Meta-learner}
 \usage{
 \S4method{CateCI}{`Meta-learner`}(theObject, feature_new,

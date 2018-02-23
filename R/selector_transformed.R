@@ -51,6 +51,7 @@ getCV_indexes <- function(tr, k) {
 #' to avoid decide by 0 error
 #' @return mean(error) and sd(error)
 #' @import ranger
+#' @export gof_transformed
 gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
   n <- length(tr)
   # catch nonsensible specifications
