@@ -39,8 +39,8 @@ Collate:
     'Xhrf_autotune_gpp.R'
     'Xhrf_autotune_hyperband.R'
     'Xhrf_autotune_hyperband2.R'
-    'selector_matched.R'
     'selector_transformed.R'
+    'selector_matching.R'
 Suggests:
     testthat,
     knitr,
