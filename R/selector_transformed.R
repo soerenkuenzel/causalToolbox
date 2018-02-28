@@ -59,7 +59,7 @@ gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
   }
   if (sum(tr) == 0 | sum(tr) == length(tr)) {
     stop("All units are in the treated group or all units are in the
-         treated group")
+         control group")
   }
   if (n == 0 | length(yobs) != n | nrow(feat) != n) {
     stop("Either no data was provided or the sizes of yobs, feat or tr do not

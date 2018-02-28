@@ -28,7 +28,7 @@ gof_matching <- function(feat,
   if (sum(as.numeric(tr)) == 0 |
       sum(as.numeric(tr)) == length(tr)) {
     stop("All units are in the treated group or all units are in the
-         treated group")
+         control group")
   }
   if (n == 0 | length(yobs) != n | nrow(feat) != n) {
     stop("Either no data was provided or the sizes of yobs, feat or tr do not
@@ -63,7 +63,8 @@ gof_matching <- function(feat,
   
   Y1 <- m$mdata$Y[m$mdata$Tr == 1]
   Y0 <- m$mdata$Y[m$mdata$Tr == 0]
-  pscore_m <- (pscore_pred[m$index.treated] + pscore_pred[m$index.control]) / 2
+  pscore_m <-
+    (pscore_pred[m$index.treated] + pscore_pred[m$index.control]) / 2
   if (estimand == 'ATT') {
     feat_m <- feat[m$index.treated, ]
   }
@@ -71,7 +72,7 @@ gof_matching <- function(feat,
     feat_m <- feat[m$index.control, ]
   }
   if (estimand == 'ATE') {
-    stop('not implemented yet')
+    feat_m <- feat[m$index.control, ]
   }
   
   # ----------------------------------------------------------------------------
@@ -96,10 +97,12 @@ gof_matching <- function(feat,
     yobs_b <- ifelse(tr_b == 1, Y1[train_idx], Y0[train_idx])
     
     if (sum(tr_b) == 0 | sum(tr_b) == length(tr_b)) {
-      stop("In the CV all units were in the treated group or all units are in the
-         control group")
+      stop("In the CV all units were in the treated group or all units are in
+           the control group")
+      # TODO: We might want to do conditional sampling here such that the 
+      # proportion of treated units is equal to the poroportion of treated units
+      # in the original data set.
     }
-    
     
     # Estimate CATE with the given learner function
     estimator_trained <- estimator(feat = feat_b,
