@@ -10,6 +10,21 @@
 tr <- rbinom(n = 500, size = 1, prob = .1)
 k <- 4
 
+catch_error <- function(feat, yobs, tr, k) {
+  n <- length(tr)
+  if (sum(tr) == 0 | sum(tr) == n) {
+    stop("All units are in the treated group or all units are in the
+         control group")
+  }
+  if (n == 0 | length(yobs) != n | nrow(feat) != n) {
+    stop("Either no data was provided or the sizes of yobs, feat or tr do not
+         match")
+  }
+  if (k < 2 | k%%1!=0){
+    stop("k must be an integer bigger than 1!")
+  }
+}
+
 get_CV_sizes <- function(n, k) {
   # n: number of units
   # k: number of folds
@@ -53,25 +68,15 @@ getCV_indexes <- function(tr, k) {
 #' @import ranger
 #' @export gof_transformed
 gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
-  n <- length(tr)
+  
   # catch nonsensible specifications
   if (emin <= 0 | emin >= 0.5) {
     stop("0 < emin < 0.5")
   }
-  if (sum(tr) == 0 | sum(tr) == length(tr)) {
-    stop("All units are in the treated group or all units are in the
-         treated group")
-  }
-  if (n == 0 | length(yobs) != n | nrow(feat) != n) {
-    stop("Either no data was provided or the sizes of yobs, feat or tr do not
-         match")
-  }
-  if (k < 2 | k%%1!=0){
-    stop("k must be an integer bigger than 1!")
-  }
+  catch_error(feat, yobs, tr, k)
   # --------------------------------------------------------------------------
   # Compute the CATE estimates using a k fold CV
-  
+  n <- length(tr)
   # Create CV idxes
   cv_idx <- getCV_indexes(tr = tr, k = k)
   
