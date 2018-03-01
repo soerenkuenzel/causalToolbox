@@ -23,7 +23,8 @@ Imports:
     methods,
     stats,
     forestry,
-    ranger
+    ranger,
+    Matching
 Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
 Collate: 

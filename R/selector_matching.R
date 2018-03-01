@@ -20,23 +20,12 @@ gof_matching <- function(feat,
                          k = 2,
                          replace = TRUE,
                          emin = 1e-5) {
-  n <- length(tr)
+
   # catch nonsensible specifications
   if (emin <= 0 | emin >= 0.5) {
     stop("0 < emin < 0.5")
   }
-  if (sum(as.numeric(tr)) == 0 |
-      sum(as.numeric(tr)) == length(tr)) {
-    stop("All units are in the treated group or all units are in the
-         control group")
-  }
-  if (n == 0 | length(yobs) != n | nrow(feat) != n) {
-    stop("Either no data was provided or the sizes of yobs, feat or tr do not
-         match")
-  }
-  if (k < 2 | k %% 1 != 0) {
-    stop("k must be an integer bigger than 1!")
-  }
+  catch_error(feat, yobs, tr, k)
   # -------------------------------------------------------------------------
   # Estimate propensity score
   pscore_estimator <- ranger::ranger(tr ~ .,
@@ -117,8 +106,8 @@ gof_matching <- function(feat,
   
   # Calcualte the Goodness-of-Fit
   mse <- mean((ITE - cate_est) ^ 2)
-  sd_err <- sd((ITE - cate_est) ^ 2) / sqrt(n)
+  sd_err <- sd((ITE - cate_est) ^ 2) / sqrt(n_matched)
   
   # --------------------------------------------------------------------------
   return(c(mse, sd_err))
-  }
+}
