@@ -49,12 +49,36 @@ setup <- setup_grid[[setup_i]]
 
 selector_grid <- list(
   "transformed" = function(Yobs, W_tr, feat, estimator) {
-    gof_transformed(yobs = Yobs,
+    gof_transformed(feat = feat,
+                    yobs = Yobs,
                     tr = W_tr,
-                    feat = feat,
                     estimator = estimator,
                     k = 3,
                     emin = 1e-5)
+  },
+  "matching_ATT" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 estimand = 'ATT',
+                 replace = TRUE)
+  },
+  "matching_ATE" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 estimand = 'ATE',
+                 replace = TRUE)
+  },
+   "matching_ATC" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 estimand = 'ATC',
+                 replace = TRUE)
   }
 )
 
