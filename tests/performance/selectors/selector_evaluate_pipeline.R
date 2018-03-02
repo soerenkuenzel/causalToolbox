@@ -56,12 +56,31 @@ selector_grid <- list(
                     k = 3,
                     emin = 1e-5)
   },
+  "matching_ATT_replace" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 k = 3,
+                 estimand = 'ATT',
+                 replace = TRUE)
+  },
   "matching_ATT" = function(Yobs, W_tr, feat, estimator) {
     gof_matching(feat = feat,
                  yobs = Yobs,
                  tr = W_tr,
                  estimator = estimator,
+                 k = 3,
                  estimand = 'ATT',
+                 replace = FALSE)
+  },
+  "matching_ATE_replace" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 k = 3,
+                 estimand = 'ATE',
                  replace = TRUE)
   },
   "matching_ATE" = function(Yobs, W_tr, feat, estimator) {
@@ -69,16 +88,27 @@ selector_grid <- list(
                  yobs = Yobs,
                  tr = W_tr,
                  estimator = estimator,
+                 k = 3,
                  estimand = 'ATE',
-                 replace = TRUE)
+                 replace = FALSE)
   },
-   "matching_ATC" = function(Yobs, W_tr, feat, estimator) {
+  "matching_ATC_replace" = function(Yobs, W_tr, feat, estimator) {
     gof_matching(feat = feat,
                  yobs = Yobs,
                  tr = W_tr,
                  estimator = estimator,
+                 k = 3,
                  estimand = 'ATC',
                  replace = TRUE)
+  },
+  "matching_ATC" = function(Yobs, W_tr, feat, estimator) {
+    gof_matching(feat = feat,
+                 yobs = Yobs,
+                 tr = W_tr,
+                 estimator = estimator,
+                 k = 3,
+                 estimand = 'ATC',
+                 replace = FALSE)
   }
 )
 
@@ -94,26 +124,26 @@ estimator_grid <- list(
   "T_BART" = function(feat, tr, yobs)
     T_BART(feat, tr, yobs),
   "X_BART" = function(feat, tr, yobs)
-    X_BART(feat, tr, yobs),
-  "CF_p" = function(feat, tr, yobs) {
-    feat <- as.matrix(feat)
-    colnames(feat) <- NULL
-    propensityForest(X = feat,
-                     W = tr,
-                     Y = yobs,
-                     num.trees = 500,
-                     sample.size = nrow(feat) / 10,
-                     nodesize = 1)
-  },
-  "CF" = function(feat, tr, yobs) {
-    feat <- as.matrix(feat)
-    colnames(feat) <- NULL
-    grf::causal_forest(X = feat,
-                       Y = yobs,
-                       W = tr,
-                       num.trees = 500,
-                       num.threads = nthread)
-  }
+    X_BART(feat, tr, yobs)
+  # "CF_p" = function(feat, tr, yobs) {
+  #   feat <- as.matrix(feat)
+  #   colnames(feat) <- NULL
+  #   propensityForest(X = feat,
+  #                    W = tr,
+  #                    Y = yobs,
+  #                    num.trees = 500,
+  #                    sample.size = nrow(feat) / 10,
+  #                    nodesize = 1)
+  # },
+  # "CF" = function(feat, tr, yobs) {
+  #   feat <- as.matrix(feat)
+  #   colnames(feat) <- NULL
+  #   grf::causal_forest(X = feat,
+  #                      Y = yobs,
+  #                      W = tr,
+  #                      num.trees = 500,
+  #                      num.threads = nthread)
+  # }
 )
 
 CATEpredictor_grid <- list(
