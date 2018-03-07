@@ -1,6 +1,8 @@
 # Loads in results from selector_evaluate_pipeline and ranks each estimator by
 # each selector as well as the true value.
 
+library("reshape2")
+
 setup <- "complexTau2" # Get this as user input?
 
 data_folder_name <- "sim_data/"
