@@ -178,7 +178,7 @@ if (!dir.exists(data_folder_name)) {
   dir.create(data_folder_name)
 }
 
-filename_base <- paste0(data_folder_name, "selector_rankings_", setup)
+filename_base <- paste0(data_folder_name, "selector_data_", setup)
 filename <- paste0(filename_base, ".csv")
 if (file.exists(filename)) {
   already_ran <- read.csv(filename)

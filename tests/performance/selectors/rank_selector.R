@@ -21,5 +21,8 @@ if (!file.exists(filename) | !file.exists(filename_truth)) {
 selector_data <- read.csv(filename)
 truth_data <- read.csv(filename_truth)
 
-selector_data <- selector_data[!is.na(selector_data[, "score"]), ]
-truth_data <- truth_data[!is.na(truth_data[, "MSE"]), ]
+# selector_data <- selector_data[!is.na(selector_data[, "score"]), ]
+# truth_data <- truth_data[!is.na(truth_data[, "MSE"]), ]
+
+selector_data_opt1 <- dcast(selector_data, ... ~ selector)
+selector_data_opt2 <- dcast(selector_data, selector ~ ...)
