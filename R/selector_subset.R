@@ -24,6 +24,7 @@
 #' @param k k fold cross validation
 #' @return mean(error) and sd(error)
 #' @import quickmatch
+#' @import distances
 gof_subset <- function(feat, yobs, tr, estimator, 
                        important.features = colnames(feat), 
                        min.treat.size.per.group = 25,
@@ -34,7 +35,7 @@ gof_subset <- function(feat, yobs, tr, estimator,
   
   # ----------------------------------------------------------------------------
   # Catch Errors
-  
+  catch_error(feat, yobs, tr, k)
   # ----------------------------------------------------------------------------
   # get subgroups
   feat_distances <- distances::distances(feat, 
