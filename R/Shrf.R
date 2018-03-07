@@ -115,7 +115,7 @@ S_RF <-
         replace = replace,
         sampsize = round(sample_fraction * length(yobs)),
         mtry = mtry,
-        nodesize = nodesizeSpl,
+        nodesizeSpl = nodesizeSpl,
         nodesizeAvg = nodesizeAvg,
         nthread = nthread,
         splitrule =  'variance',

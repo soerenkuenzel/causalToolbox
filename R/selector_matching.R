@@ -2,6 +2,7 @@
 #' This is included to have the get get_CV_sizes.R function
 
 #' gof_matching
+#' @title gof_matching
 #' @name gof_matching
 #' @param feat a data frame of features
 #' @param yobs a vector of observations

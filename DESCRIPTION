@@ -42,6 +42,7 @@ Collate:
     'Xhrf_autotune_hyperband2.R'
     'selector_transformed.R'
     'selector_matching.R'
+    'selector_subset.R'
 Suggests:
     testthat,
     knitr,

@@ -43,7 +43,7 @@ T_BART <-
            sample_stat = "counterfactuals estimated",
            tree_package = "dbarts",
            ntree = 200,
-           verbose) {
+           verbose = FALSE) {
     feat <- as.data.frame(feat)
 
     new(
