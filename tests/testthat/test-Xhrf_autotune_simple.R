@@ -34,7 +34,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
     verbose = FALSE
   )
   
-  expect_equal(setup_check[1, 2], 19.4, tolerance = 1e-1)
+  expect_equal(setup_check[1, 2], 10.09048, tolerance = 1e-1)
   ### Test 2:
   set.seed(432)
   cate_problem <-
@@ -58,9 +58,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
       ntree_testing = 10,
       nthread = 1,
       verbose = FALSE
-    ),
-    paste0("nodesizeAvg cannot exceed averaging sample size. We have set\n", 
-           "            nodesizeAvg to be the maximum")
+    )
   )
   
   expect_equal(mean((
@@ -70,6 +68,5 @@ test_that("Tests test-Xhrf_autotune_simple", {
   
   CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
   
-  expect_equal(CATE_ci[2, 2],-21.4,
-               tolerance = 1e-1)
+  expect_equal(CATE_ci[2, 2], -11.64397, tolerance = 1e-1)
 })
