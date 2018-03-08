@@ -36,6 +36,10 @@ gof_subset <- function(feat, yobs, tr, estimator,
   # ----------------------------------------------------------------------------
   # Catch Errors
   catch_error(feat, yobs, tr, k)
+  if (sum(tr == 1) < min.treat.size.per.group) {
+    stop("The treatment size must be greater than the min.treat.size.per.group.")
+  }
+  
   # ----------------------------------------------------------------------------
   # get subgroups
   feat_distances <- distances::distances(feat, 
@@ -78,8 +82,9 @@ gof_subset <- function(feat, yobs, tr, estimator,
       mean(yobs[tr == 0 & idx_subset])
     eval_df$ATE_estimator[col_subset] <- mean(cate_est[idx_subset])
   }
-  eval_df
   
+  gof_norm <- mean((eval_df$ATE_estimator - eval_df$ATE_matching)^2)
+  gof_sd <- sd((eval_df$ATE_estimator - eval_df$ATE_matching)^2)  / sqrt(nrow(eval_df))
   # ----------------------------------------------------------------------------
-  return(c(mean(eval_df^2), sd(eval_df^2) / sqrt(nrow(eval_df))))
+  return(c(gof_norm, gof_sd))
 }
