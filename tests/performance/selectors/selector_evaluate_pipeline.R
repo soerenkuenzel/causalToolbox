@@ -18,9 +18,9 @@ set.seed(28104)
 # ------------------------------------------------------------------------------
 ## Evaluation setup
 seed_grid <- c(1500)
-dim_grid <- c(20)
-ntrain_grid <- c(1000)
-ntest <- 1000
+dim_grid <- c(5, 20, 100)
+ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .25))
+ntest <- 100000
 
 setup_grid <- c(
   "RespSparseTau1strong",
@@ -109,6 +109,12 @@ selector_grid <- list(
                  k = 3,
                  estimand = 'ATC',
                  replace = FALSE)
+  },
+  "subset" = function(Yobs, W_tr, feat, estimator) {
+    gof_subset(feat = feat,
+               yobs = Yobs,
+               tr = W_tr,
+               estimator = estimator)
   }
 )
 
@@ -246,12 +252,13 @@ for (seed in seed_grid) {
           seed = seed,
           alpha = 0.1,
           dim = dim,
-          ntrain = ntrain,
-          estimator = estimator_name,
-          setup = setup,
           feat_distribution = "normal",
           testseed = 293901,
           trainingseed = seed,
+          ntrain = ntrain,
+          estimator = estimator_name,
+          setup = setup,
+
           MSE = MSE,
           MSE_sd = MSE_sd
         )
@@ -285,12 +292,12 @@ for (seed in seed_grid) {
             alpha = 0.1,
             dim = dim,
             ntrain = ntrain,
-            estimator = estimator_name,
-            selector = selector_name,
-            setup = setup,
             feat_distribution = "normal",
             testseed = 293901,
             trainingseed = seed,
+            estimator = estimator_name,
+            selector = selector_name,
+            setup = setup,
             score = selector_vals[1]
           )
           
