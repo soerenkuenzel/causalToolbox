@@ -15,7 +15,7 @@ test_that("Tests that ShRF is working correctly", {
     ntree = ntree
   )
 
-  expect_equal(EstimateCate(sl, feat)[1], 0.0124, tolerance = 1e-4)
+  expect_equal(EstimateCate(sl, feat)[1], 0.03208351, tolerance = 1e-4)
 
   set.seed(432)
   cate_problem <-
@@ -47,7 +47,7 @@ test_that("Tests that ShRF is working correctly", {
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
   expect_equal(smp_stats$SATT[1, 3],
-               -9.47,
+               -9.77575,
                tolerance = 1e-2)
 
 })

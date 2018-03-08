@@ -23,7 +23,7 @@ test_that("Tests Selector matching", {
   )
   
   expect_equal(gof_values_S_BART,
-               c(70.975690, 7.841114),
+               c(70.975690, 11.38908),
                tolerance = 1e-3)
   
   expect_output(
@@ -37,6 +37,6 @@ test_that("Tests Selector matching", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(244.40207,  18.45547),
+               c(227.5762,  25.2203),
                tolerance = 1e-3)
 })

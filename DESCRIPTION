@@ -24,7 +24,9 @@ Imports:
     stats,
     forestry,
     ranger,
-    Matching
+    Matching,
+    quickmatch,
+    distances
 Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
 Collate: 
@@ -42,6 +44,7 @@ Collate:
     'Xhrf_autotune_hyperband2.R'
     'selector_transformed.R'
     'selector_matching.R'
+    'selector_subset.R'
 Suggests:
     testthat,
     knitr,

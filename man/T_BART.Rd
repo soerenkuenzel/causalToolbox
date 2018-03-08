@@ -6,7 +6,7 @@
 \usage{
 T_BART(feat, tr, yobs, ndpost = 1200,
   sample_stat = "counterfactuals estimated", tree_package = "dbarts",
-  ntree = 200, verbose)
+  ntree = 200, verbose = FALSE)
 }
 \arguments{
 \item{feat}{feature data.frame.}
