@@ -5,7 +5,8 @@
 \title{gof_subset}
 \usage{
 gof_subset(feat, yobs, tr, estimator, important.features = colnames(feat),
-  min.treat.size.per.group = 25, normalize = "studentize", k = 5)
+  min.treat.size.per.group = 25, normalize = "studentize", k = 5,
+  verbose = FALSE)
 }
 \arguments{
 \item{feat}{a data frame of features}
@@ -31,6 +32,8 @@ goup}
 "studentize" (default): normalization is done with the diagonal of var(data)}
 
 \item{k}{k fold cross validation}
+
+\item{verbose}{determines whether detailed updates will be printed}
 
 \item{min.n.group}{Minimum number of groups}
 }

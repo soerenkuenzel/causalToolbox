@@ -4,7 +4,8 @@
 \alias{gof_transformed}
 \title{gof_transformed}
 \usage{
-gof_transformed(feat, yobs, tr, estimator, k = 2, emin = 1e-05)
+gof_transformed(feat, yobs, tr, estimator, k = 2, emin = 1e-05,
+  verbose = FALSE)
 }
 \arguments{
 \item{feat}{a data frame of features}
@@ -19,6 +20,8 @@ gof_transformed(feat, yobs, tr, estimator, k = 2, emin = 1e-05)
 
 \item{emin}{the pscore prediciton will be bounded between emin and 1 - emin
 to avoid decide by 0 error}
+
+\item{verbose}{determines whether detailed updates will be printed}
 }
 \value{
 mean(error) and sd(error)

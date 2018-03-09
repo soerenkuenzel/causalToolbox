@@ -5,7 +5,7 @@
 \title{gof_matching}
 \usage{
 gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
-  replace = TRUE, emin = 1e-05)
+  replace = TRUE, emin = 1e-05, verbose = FALSE)
 }
 \arguments{
 \item{feat}{a data frame of features}
@@ -19,6 +19,12 @@ gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
 \item{estimand}{ATE, ATT or ATC}
 
 \item{k}{we are doing a k fold cross validation}
+
+\item{replace}{Whether or not to replace samples in while matching}
+
+\item{emin}{Minimum value of the propensity score}
+
+\item{verbose}{determines whether detailed updates will be printed}
 }
 \value{
 mean(error) and sd(error)

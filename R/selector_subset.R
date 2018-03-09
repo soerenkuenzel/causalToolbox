@@ -22,15 +22,17 @@
 #' "studentize" (default): normalization is done with the diagonal of var(data)
 #' @param min.n.group Minimum number of groups
 #' @param k k fold cross validation
+#' @param verbose determines whether detailed updates will be printed
 #' @return mean(error) and sd(error)
 #' @import quickmatch
 #' @import distances
+#' @export gof_subset
 gof_subset <- function(feat, yobs, tr, estimator, 
                        important.features = colnames(feat), 
                        min.treat.size.per.group = 25,
                        normalize = "studentize",
-                       k = 5
-                       ) {
+                       k = 5,
+                       verbose = FALSE) {
   n_obs <- length(tr)
   
   # ----------------------------------------------------------------------------
@@ -49,7 +51,7 @@ gof_subset <- function(feat, yobs, tr, estimator,
        treatments = tr, 
        treatment_constraints = c('0' = min.treat.size.per.group, 
                                  '1' = min.treat.size.per.group),
-       target = NULL, 
+       target = NULL,
        caliper = NULL)
   # table(unit_match)
   
@@ -58,7 +60,9 @@ gof_subset <- function(feat, yobs, tr, estimator,
   cv_idx <- getCV_indexes(tr = tr, k = k)
   cate_est <- rep(NA, n_obs) # will contain the estimates
   for (i in 1:k) {
-    print(paste("Running", i, "out of", k, "CV fold."))
+    if (verbose) {
+      print(paste("Running", i, "out of", k, "CV fold."))
+    }
     # get train and test set -- training set is everything but fold i
     train_idx <- cv_idx != i
     test_idx <- !train_idx

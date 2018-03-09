@@ -64,10 +64,17 @@ getCV_indexes <- function(tr, k) {
 #' @param k we are doing a k fold cross validation
 #' @param emin the pscore prediciton will be bounded between emin and 1 - emin
 #' to avoid decide by 0 error
+#' @param verbose determines whether detailed updates will be printed
 #' @return mean(error) and sd(error)
 #' @import ranger
 #' @export gof_transformed
-gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
+gof_transformed <- function(feat,
+                            yobs,
+                            tr,
+                            estimator,
+                            k = 2,
+                            emin = 1e-5,
+                            verbose = FALSE) {
   
   # catch nonsensible specifications
   if (emin <= 0 | emin >= 0.5) {
@@ -82,7 +89,9 @@ gof_transformed <- function(feat, yobs, tr, estimator, k = 2, emin = 1e-5) {
   
   cate_est <- rep(NA, n) # will contain the estimates
   for (i in 1:k) {
-    print(paste("Running", i, "out of", k, "CV fold."))
+    if (verbose) {
+      print(paste("Running", i, "out of", k, "CV fold."))
+    }
     # get train and test set -- training set is everything but fold i
     train_idx <- cv_idx != i
     test_idx <- !train_idx

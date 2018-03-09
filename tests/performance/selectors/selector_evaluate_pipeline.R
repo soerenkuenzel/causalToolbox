@@ -6,12 +6,14 @@ library(causalToolbox)
 library(hte)
 # library(grf)
 
+library(doParallel)
+
 # ------------------------------------------------------------------------------
 ## Evaluation setup configuration
-# args <- commandArgs(TRUE)
-# setup_i <- -as.numeric(args[1])
-setup_i <- 4
-nthread <- 1
+args <- commandArgs(TRUE)
+setup_i <- as.numeric(args[1])
+nthread <- 24
+registerDoParallel(nthread)
 
 set.seed(28104)
 
@@ -276,6 +278,9 @@ for (seed in seed_grid) {
         for (selector_i in 1:length(selector_grid)) {
           selector <- selector_grid[[selector_i]]
           selector_name <- names(selector_grid)[selector_i]
+          print(paste("==> Running", selector_name,
+                      "on", setup))
+
           selector_vals <- tryCatch({
             selector(dt$Yobs_tr, dt$W_tr, dt$feat_tr, estimator)
           },

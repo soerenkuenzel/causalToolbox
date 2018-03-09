@@ -10,9 +10,13 @@
 #' @param estimator a learner constructor
 #' @param estimand ATE, ATT or ATC
 #' @param k we are doing a k fold cross validation
+#' @param replace Whether or not to replace samples in while matching
+#' @param emin Minimum value of the propensity score
+#' @param verbose determines whether detailed updates will be printed
 #' @return mean(error) and sd(error)
 #' @import Matching
 #' @import ranger
+#' @export gof_matching
 gof_matching <- function(feat,
                          yobs,
                          tr,
@@ -20,7 +24,8 @@ gof_matching <- function(feat,
                          estimand = 'ATT',
                          k = 2,
                          replace = TRUE,
-                         emin = 1e-5) {
+                         emin = 1e-5,
+                         verbose = FALSE) {
 
   # catch nonsensible specifications
   if (emin <= 0 | emin >= 0.5) {
@@ -76,7 +81,9 @@ gof_matching <- function(feat,
   
   cate_est <- rep(NA, n_matched) # will contain the estimates
   for (b in 1:k) {
-    print(paste("Running", b, "out of", k, "CV fold."))
+    if (verbose) {
+      print(paste("Running", b, "out of", k, "CV fold."))
+    }
     # get train and test set -- training set is everything but fold i
     train_idx <- which(cv_idx != b)
     test_idx <- which(cv_idx == b)
