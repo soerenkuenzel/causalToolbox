@@ -3,7 +3,7 @@
 # from the MSE from the truth.
 
 library(causalToolbox)
-library(hte)
+# library(hte)
 # library(grf)
 
 library(doParallel)
@@ -12,39 +12,39 @@ library(doParallel)
 ## Evaluation setup configuration
 args <- commandArgs(TRUE)
 setup_i <- as.numeric(args[1])
-nthread <- 24
-registerDoParallel(nthread)
+# nthread <- 24
+# registerDoParallel(nthread)
 
 set.seed(28104)
 
 # ------------------------------------------------------------------------------
 ## Evaluation setup
 seed_grid <- c(1500)
-dim_grid <- c(5, 20, 100)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 6, by = .25))
+dim_grid <- c(20)
+ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
 ntest <- 100000
 
 setup_grid <- c(
-  "RespSparseTau1strong",
-  "RsparseT2weak",
-  "complexTau",
-  "complexTau2",
-  "complexTau3",
-  "complexTau4",
-  "Conf1",
-  "rare1",
-  "rare2",
-  "rare3",
-  "STMpp",
-  "STMpp2",
-  "STMpp3",
-  "STMpp4",
-  "Ufail",
-  "Usual1",
-  "WA1",
-  "WA2",
-  "WA3",
-  "WA4"
+  "RespSparseTau1strong", # 1
+  "RsparseT2weak",        # 2
+  "complexTau",           # 3
+  "complexTau2",          # 4
+  "complexTau3",          # 5
+  "complexTau4",          # 6
+  "Conf1",                # 7
+  "rare1",                # 8
+  "rare2",                # 9
+  "rare3",                # 10
+  "STMpp",                # 11
+  "STMpp2",               # 12
+  "STMpp3",               # 13
+  "STMpp4",               # 14
+  "Ufail",                # 15
+  "Usual1",               # 16
+  "WA1",                  # 17
+  "WA2",                  # 18
+  "WA3",                  # 19
+  "WA4"                   # 20
 )
 
 setup <- setup_grid[[setup_i]]
@@ -156,17 +156,17 @@ estimator_grid <- list(
 
 CATEpredictor_grid <- list(
   "S_RF" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "T_RF" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "X_RF" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "S_BART" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "T_BART" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "X_BART" = function(estimator, feat_te)
-    hte::EstimateCate(estimator, feat_te),
+    EstimateCate(estimator, feat_te),
   "CF_p" = function(estimator, feat_te) {
     feat_te <- as.matrix(feat_te)
     colnames(feat_te) <- NULL
@@ -233,47 +233,59 @@ for (seed in seed_grid) {
         estimator_name <- names(estimator_grid)[estimator_i]
         CATEpredictor <- CATEpredictor_grid[[estimator_name]]
         
-        estimates <- tryCatch({
-          L <- estimator(
-            feat = dt$feat_tr,
-            tr = dt$W_tr,
-            yobs = dt$Yobs_tr
+        if (exists("already_ran_truth") &&
+            (paste(c(seed, 0.1, dim, ntrain, estimator_name),
+                   collapse = ",") %in%
+             apply(already_ran, 1, function(x){
+               paste(x, collapse = ",")
+             }))) {
+          print(paste(
+            paste(c(seed, 0.1, dim, ntrain, estimator_name), collapse = ","),
+            "truth data already exists. Running next setting."
+          ))
+        } else {
+          estimates <- tryCatch({
+            L <- estimator(
+              feat = dt$feat_tr,
+              tr = dt$W_tr,
+              yobs = dt$Yobs_tr
+            )
+            CATEpredictor(L, dt$feat_te)
+          },
+          error = function(e) {
+              print(e)
+              warning(paste("Something went wrong with", estimator_name,
+                            "on", setup))
+              return(NA)         
+          })
+          MSE <- mean((dt$tau_te - estimates)^2)
+          MSE_sd <- sd((dt$tau_te - estimates)^2) / sqrt(length(dt$tau_te))
+          
+          Residuals <- data.frame(
+            seed = seed,
+            alpha = 0.1,
+            dim = dim,
+            feat_distribution = "normal",
+            testseed = 293901,
+            trainingseed = seed,
+            ntrain = ntrain,
+            estimator = estimator_name,
+            setup = setup,
+  
+            MSE = MSE,
+            MSE_sd = MSE_sd
           )
-          CATEpredictor(L, dt$feat_te)
-        },
-        error = function(e) {
-            print(e)
-            warning(paste("Something went wrong with", estimator_name,
-                          "on", setup))
-            return(NA)         
-        })
-        MSE <- mean((dt$tau_te - estimates)^2)
-        MSE_sd <- sd((dt$tau_te - estimates)^2) / sqrt(length(dt$tau_te))
-        
-        Residuals <- data.frame(
-          seed = seed,
-          alpha = 0.1,
-          dim = dim,
-          feat_distribution = "normal",
-          testseed = 293901,
-          trainingseed = seed,
-          ntrain = ntrain,
-          estimator = estimator_name,
-          setup = setup,
-
-          MSE = MSE,
-          MSE_sd = MSE_sd
-        )
-        
-        col.names <- !file.exists(filename_truth)
-        write.table(
-          Residuals,
-          file = filename_truth,
-          append = TRUE,
-          col.names = col.names,
-          row.names = FALSE,
-          sep = ","
-        )
+          
+          col.names <- !file.exists(filename_truth)
+          write.table(
+            Residuals,
+            file = filename_truth,
+            append = TRUE,
+            col.names = col.names,
+            row.names = FALSE,
+            sep = ","
+          )
+        }
         
         for (selector_i in 1:length(selector_grid)) {
           selector <- selector_grid[[selector_i]]
