@@ -416,7 +416,7 @@ X_RF_fully_specified <-
 #' @rdname EstimateCate-X_RF
 #' @description Return the estimated CATE
 #' @param theObject A `X_hRF` object.
-#' @param feature_new A data frame.
+#' @param feature_new A feature data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_RF-method
 #' @exportMethod EstimateCate
@@ -455,11 +455,11 @@ setMethod(
 #' EstimateAllSampleStatistics-X_RF
 #' @name EstimateAllSampleStatistics-X_RF
 #' @rdname EstimateAllSampleStatistics-X_RF
-#' @param theObject ...
-#' @param method ...
-#' @param B ...
-#' @param nthread ...
-#' @param verbose ...
+#' @param theObject A `X_hRF` object.
+#' @param method Different versions of the bootstrap.
+#' @param B Number of bootstrap samples.
+#' @param nthread Number of threads to be used.
+#' @param verbose A `X_hRF` object.
 #' @description Return the estimated CATE
 #' @aliases EstimateAllSampleStatistics,X_RF-method
 #' @exportMethod EstimateAllSampleStatistics

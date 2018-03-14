@@ -9,19 +9,19 @@ T_BART(feat, tr, yobs, ndpost = 1200,
   ntree = 200, verbose = FALSE)
 }
 \arguments{
-\item{feat}{feature data.frame.}
+\item{feat}{A feature data.frame.}
 
-\item{tr}{treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
 
-\item{yobs}{the observed outcome.}
+\item{yobs}{A vector of the observed outcome.}
 
 \item{ndpost}{...}
 
 \item{sample_stat}{...}
 
-\item{tree_package}{Package used to create tree}
+\item{tree_package}{Name of the package used to create a tree}
 
-\item{ntree}{number of trees to grow}
+\item{ntree}{Number of trees to grow}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }

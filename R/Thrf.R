@@ -51,9 +51,9 @@ setClass(
 #' @param nodesizeSpl ...
 #' @param nodesizeAvg ...
 #' @param replace TODO: Add Description
-#' @param ntree number of trees to grow
+#' @param ntree Number of trees to grow
 #' @param sample_fraction TODO: Add Description
-#' @param nthread TODO: Add Description
+#' @param nthread Number of threads to be used.
 #' @param splitratio TODO: Add Description
 #' @export T_RF
 setGeneric(
@@ -172,7 +172,7 @@ T_RF <-
 #' @rdname EstimateCate-T_RF
 #' @description Return the estimated CATE
 #' @param theObject A `T_hRF` object.
-#' @param feature_new A data frame.
+#' @param feature_new A feature data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_RF-method
 #' @exportMethod EstimateCate

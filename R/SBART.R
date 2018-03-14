@@ -25,7 +25,7 @@ setClass(
 #' @param yobs the observed outcome.
 #' @param ndpost ...
 #' @param sample_stat ...
-#' @param tree_package ...
+#' @param tree_package Name of the package used to create a tree
 #' @param ntree Number of trees to grow
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `BART` object.
@@ -69,8 +69,8 @@ S_BART <-
 #' @rdname EstimateCate-S_BART
 #' @description Return the estimated CATE
 #' @param theObject A `S_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
+#' @param feature_new A feature data frame.
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_BART-method
 #' @exportMethod EstimateCate
@@ -98,8 +98,8 @@ setMethod(
 #' @rdname CateCI-S_BART
 #' @description Return the estimated CATE
 #' @param theObject A `S_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
+#' @param feature_new A feature data frame.
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @return A vector of predicted CATE
 #' @aliases CateCI,S_BART-method
 #' @exportMethod CateCI
@@ -135,8 +135,8 @@ setMethod(
 #' EstimateAllSampleStatistics-S_BART
 #' @rdname EstimateAllSampleStatistics-S_BART
 #' @description Return the estimated CATE
-#' @param theObject ...
-#' @param verbose ...
+#' @param theObject A `S_BART` object
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @aliases EstimateAllSampleStatistics,S_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(

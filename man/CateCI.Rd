@@ -8,17 +8,17 @@ CateCI(theObject, feature_new, method = "maintain_group_ratios", B = 200,
   nthread = 0, verbose = TRUE)
 }
 \arguments{
-\item{theObject}{...}
+\item{theObject}{A `Meta-learner` object}
 
-\item{feature_new}{...}
+\item{feature_new}{A feature data frame}
 
-\item{method}{...}
+\item{method}{Different versions of the bootstrap.}
 
-\item{B}{number of bootstrap samples}
+\item{B}{Number of bootstrap samples}
 
 \item{nthread}{number of threads to be used in parallel}
 
-\item{verbose}{...}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \description{
 Method CateCI

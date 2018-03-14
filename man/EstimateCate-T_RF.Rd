@@ -11,7 +11,7 @@
 \arguments{
 \item{theObject}{A `T_hRF` object.}
 
-\item{feature_new}{A data frame.}
+\item{feature_new}{A feature data frame.}
 }
 \value{
 A vector of predicted CATE

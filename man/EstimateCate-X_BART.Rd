@@ -14,7 +14,7 @@
 
 \item{feature_new}{A data frame.}
 
-\item{verbose}{Should the training output be posted?}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 
 \item{return_CI}{...}
 }

@@ -9,9 +9,9 @@
 \S4method{EstimateAllSampleStatistics}{T_BART}(theObject, verbose = FALSE)
 }
 \arguments{
-\item{theObject}{...}
+\item{theObject}{A "T_BART" object}
 
-\item{verbose}{...}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \description{
 Return the estimated CATE

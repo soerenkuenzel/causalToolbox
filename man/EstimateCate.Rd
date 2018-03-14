@@ -7,9 +7,9 @@
 EstimateCate(theObject, feature_new, ...)
 }
 \arguments{
-\item{theObject}{...}
+\item{theObject}{A `Meta-learner` object}
 
-\item{feature_new}{...}
+\item{feature_new}{A feature data frame}
 
 \item{...}{Additional parameters}
 }

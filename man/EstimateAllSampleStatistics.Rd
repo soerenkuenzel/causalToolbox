@@ -9,17 +9,17 @@ EstimateAllSampleStatistics(theObject, feature_new,
   verbose = TRUE)
 }
 \arguments{
-\item{theObject}{...}
+\item{theObject}{A `Meta-learner` object.}
 
-\item{feature_new}{...}
+\item{feature_new}{A feature data frame}
 
-\item{method}{...}
+\item{method}{different versions of the bootstrap.}
 
-\item{B}{...}
+\item{B}{Number of bootstrap samples.}
 
-\item{nthread}{...}
+\item{nthread}{Number of threads to be used.}
 
-\item{verbose}{...}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \description{
 Method EstimateAllSampleStatistics
