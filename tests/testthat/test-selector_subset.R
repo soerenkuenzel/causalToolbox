@@ -14,7 +14,6 @@ test_that("Tests Selector Subset", {
   normalize = "studentize"
   k = 5
   
-  expect_output(
     gof_values_S_BART <- gof_subset(
       feat = dt$feat_tr,
       yobs = dt$Yobs_tr,
@@ -25,13 +24,11 @@ test_that("Tests Selector Subset", {
       normalize = "studentize",
       k = 5
     )
-  )
   
   expect_equal(gof_values_S_BART,
                c(41.75972, 29.95785), 
                tolerance = 1e-3)
   
-  expect_output(
     gof_values_S_RF <- gof_subset(
       feat = dt$feat_tr,
       yobs = dt$Yobs_tr,
@@ -42,7 +39,6 @@ test_that("Tests Selector Subset", {
       normalize = "studentize",
       k = 5
     )
-  )
   
   expect_equal(gof_values_S_RF,
                c(5.756947, 3.308356),
