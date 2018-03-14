@@ -18,7 +18,7 @@ gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
 
 \item{estimand}{ATE, ATT or ATC}
 
-\item{k}{we are doing a k fold cross validation}
+\item{k}{Number of folds used for cross validation}
 
 \item{replace}{Whether or not to replace samples in while matching}
 
@@ -28,4 +28,11 @@ gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
 }
 \value{
 mean(error) and sd(error)
+}
+\description{
+Match each unit in one group(treatment/control) to units in
+another group(treatment/control) based on the chosen estimand. For each iteration
+of cross validation, assign treatment lablels (0 or 1) with probability given 
+by averaged propensity score for each pair of match and estimate CATE. Return
+the mean squared error and its standard deviation of CATE from the true difference.
 }

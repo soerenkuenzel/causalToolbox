@@ -21,7 +21,7 @@ S_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{tree_package}{...}
 
-\item{ntree}{...}
+\item{ntree}{Number of trees to grow}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }

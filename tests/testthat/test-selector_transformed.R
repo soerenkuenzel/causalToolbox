@@ -48,6 +48,6 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(13170.07, 1060.57),
+               c(13155.749, 1060.212),
                tolerance = 1e-3)
 })

@@ -5,6 +5,8 @@
 #' gof_subset
 #' @title gof_subset
 #' @name gof_subset
+#' @description This functino estimates ATE for each subset, average the CATEs 
+#' over each of the subsets and see how close it is to the truth. 
 #' @param feat a data frame of features
 #' @param yobs a vector of observations
 #' @param tr a vector of group assignment (assume entries are integers)
