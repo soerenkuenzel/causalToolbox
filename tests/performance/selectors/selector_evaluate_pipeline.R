@@ -21,7 +21,8 @@ set.seed(28104)
 ## Evaluation setup
 seed_grid <- c(1500)
 dim_grid <- c(20)
-ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
+# ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
+ntrain_grid <- c(2000)
 ntest <- 100000
 
 setup_grid <- c(
