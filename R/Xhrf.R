@@ -10,7 +10,7 @@
 #' forest used for the propensity score estimate, the first stage and the second
 #' stage.
 #' @slot feature_train A data frame of all training features.
-#' @slot tr_train A vector contain 0 for control and 1 for treated variables.
+#' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
 #' @slot m_0 contains an honest random forest predictor for the control group of
 #' the first stage.
@@ -87,7 +87,7 @@ setClass(
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
 #' @param sample_fraction_prop ...
-#' @param nthread number of threats which should be used to work in parallel.
+#' @param nthread number of threads which should be used to work in parallel.
 #' @param verbose whether or not to print messages of the training procedure.
 #' @param middleSplit_first ...
 #' @param middleSplit_second ...
@@ -266,9 +266,9 @@ X_RF <-
 #' constructor. It should not be called by the user, since the list of
 #' parameters is too big. Instead call the simpler version XhRF or one of the
 #' self tuning versions
-#' @param feat feature data.frame.
-#' @param tr treatment assignment 0 for control and 1 for treatment.
-#' @param yobs the observed outcome.
+#' @param feat A feature data frame.
+#' @param tr A vector of treatment assignment: 0 for control and 1 for treatment.
+#' @param yobs A vector of the observed outcomes.
 #' @param hyperparameter_list A list of lists of hyper parameters
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.
@@ -416,7 +416,7 @@ X_RF_fully_specified <-
 #' @rdname EstimateCate-X_RF
 #' @description Return the estimated CATE
 #' @param theObject A `X_hRF` object.
-#' @param feature_new A data frame.
+#' @param feature_new A feature data frame.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_RF-method
 #' @exportMethod EstimateCate
@@ -455,11 +455,11 @@ setMethod(
 #' EstimateAllSampleStatistics-X_RF
 #' @name EstimateAllSampleStatistics-X_RF
 #' @rdname EstimateAllSampleStatistics-X_RF
-#' @param theObject ...
-#' @param method ...
-#' @param B ...
-#' @param nthread ...
-#' @param verbose ...
+#' @param theObject A `X_hRF` object.
+#' @param method Different versions of the bootstrap.
+#' @param B Number of bootstrap samples.
+#' @param nthread Number of threads to be used.
+#' @param verbose A `X_hRF` object.
 #' @description Return the estimated CATE
 #' @aliases EstimateAllSampleStatistics,X_RF-method
 #' @exportMethod EstimateAllSampleStatistics

@@ -40,3 +40,7 @@ goup}
 \value{
 mean(error) and sd(error)
 }
+\description{
+This functino estimates ATE for each subset, average the CATEs 
+over each of the subsets and see how close it is to the truth.
+}

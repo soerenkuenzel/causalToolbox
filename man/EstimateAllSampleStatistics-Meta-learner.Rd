@@ -12,13 +12,13 @@
 \arguments{
 \item{theObject}{A `Meta-learner` object.}
 
-\item{method}{...}
+\item{method}{Different versions of the bootstrap.}
 
-\item{B}{...}
+\item{B}{Number of boostrap samples.}
 
-\item{nthread}{number of threads to be used}
+\item{nthread}{Number of threads to be used}
 
-\item{verbose}{...}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \description{
 ...

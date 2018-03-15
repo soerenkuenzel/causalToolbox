@@ -20,13 +20,13 @@ setClass(
 #' @title X_BART
 #' @rdname X_BART
 #' @description This is an implementation of X_BART
-#' @param feat feature data.frame.
-#' @param tr treatment assignment 0 for control and 1 for treatment.
-#' @param yobs the observed outcome.
+#' @param feat A feature dataframe.
+#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
+#' @param yobs A vector the observed outcome.
 #' @param ensemble ...
 #' @param ndpost ...
 #' @param tree_package Package used to create tree
-#' @param ntree number of trees to grow
+#' @param ntree Number of trees to grow
 #' @return A `X_RF` object.
 #' @export X_BART
 #' @import methods
@@ -81,7 +81,7 @@ X_BART <-
 #' @description Return the estimated CATE
 #' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @param return_CI ...
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_BART-method

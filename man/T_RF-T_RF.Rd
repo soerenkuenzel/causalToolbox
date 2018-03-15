@@ -27,11 +27,11 @@ T_RF(feat, tr, yobs, mtry = ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3,
 
 \item{replace}{TODO: Add Description}
 
-\item{ntree}{number of trees to grow}
+\item{ntree}{Number of trees to grow}
 
 \item{sample_fraction}{TODO: Add Description}
 
-\item{nthread}{TODO: Add Description}
+\item{nthread}{Number of threads to be used.}
 
 \item{splitratio}{TODO: Add Description}
 }

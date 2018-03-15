@@ -14,7 +14,7 @@ stage.
 \describe{
 \item{\code{feature_train}}{A data frame of all training features.}
 
-\item{\code{tr_train}}{A vector contain 0 for control and 1 for treated variables.}
+\item{\code{tr_train}}{A vector containing 0 for control and 1 for treated variables.}
 
 \item{\code{yobs_train}}{A vector containing the observed outcomes.}
 

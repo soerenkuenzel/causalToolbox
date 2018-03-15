@@ -7,11 +7,11 @@
 X_RF_fully_specified(feat, tr, yobs, hyperparameter_list, verbose)
 }
 \arguments{
-\item{feat}{feature data.frame.}
+\item{feat}{A feature data frame.}
 
-\item{tr}{treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A vector of treatment assignment: 0 for control and 1 for treatment.}
 
-\item{yobs}{the observed outcome.}
+\item{yobs}{A vector of the observed outcomes.}
 
 \item{hyperparameter_list}{A list of lists of hyper parameters}
 

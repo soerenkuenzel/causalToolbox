@@ -12,11 +12,12 @@
 \arguments{
 \item{theObject}{A `T_BART` object.}
 
-\item{feature_new}{A data frame.}
+\item{feature_new}{A feature data frame.}
 
-\item{verbose}{Should the training output be posted?}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 
-\item{return_CI}{...}
+\item{return_CI}{If TRUE, return predictions and their confidence intervals;
+if FALSE, return only predictions.}
 }
 \value{
 A vector of predicted CATE

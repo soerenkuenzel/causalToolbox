@@ -1,5 +1,5 @@
 library(testthat)
-test_that("Tests Selector Transformed", {
+test_that("Tests Selector Subset", {
   set.seed(1423614230)
   
   dt <- simulate_causal_experiment(ntrain = 500, ntest = 10, dim = 6, alpha = 5,
@@ -45,6 +45,6 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(5.756949, 3.308358 ),
+               c(5.756947, 3.308356),
                tolerance = 1e-3)
 })

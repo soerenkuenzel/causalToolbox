@@ -19,9 +19,9 @@ S_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{sample_stat}{...}
 
-\item{tree_package}{...}
+\item{tree_package}{Name of the package used to create a tree}
 
-\item{ntree}{...}
+\item{ntree}{Number of trees to grow}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }

@@ -13,15 +13,15 @@
 \arguments{
 \item{theObject}{A `Meta-learner` object.}
 
-\item{feature_new}{A data frame.}
+\item{feature_new}{A feature data frame.}
 
-\item{method}{different versions of the bootstrap. Only n2TBS implemented}
+\item{method}{Different versions of the bootstrap. Only n2TBS implemented}
 
-\item{B}{number of bootstrap samples.}
+\item{B}{Number of bootstrap samples.}
 
-\item{nthread}{number of threats used.}
+\item{nthread}{Number of threads used.}
 
-\item{verbose}{...}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
 A data frame of estimated CATE Confidence Intervals

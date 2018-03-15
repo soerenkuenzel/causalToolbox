@@ -24,14 +24,14 @@ setClass(
 #' @title T_BART
 #' @rdname T_BART
 #' @description This is an implementation of T_BART
-#' @param feat feature data.frame.
-#' @param tr treatment assignment 0 for control and 1 for treatment.
-#' @param yobs the observed outcome.
+#' @param feat A feature data.frame.
+#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
+#' @param yobs A vector of the observed outcome.
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @param ndpost ...
 #' @param sample_stat ...
-#' @param tree_package Package used to create tree
-#' @param ntree number of trees to grow
+#' @param tree_package Name of the package used to create a tree
+#' @param ntree Number of trees to grow
 #' @return A `T_BART` object.
 #' @export T_BART
 #' @import methods
@@ -73,9 +73,10 @@ T_BART <-
 #' @rdname EstimateCate-T_BART
 #' @description Return the estimated CATE
 #' @param theObject A `T_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
-#' @param return_CI ...
+#' @param feature_new A feature data frame.
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @param return_CI If TRUE, return predictions and their confidence intervals;
+#' if FALSE, return only predictions.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_BART-method
 #' @exportMethod EstimateCate
@@ -261,8 +262,8 @@ setMethod(
 #' @name EstimateAllSampleStatistics-T_BART
 #' @rdname EstimateAllSampleStatistics-T_BART
 #' @description Return the estimated CATE
-#' @param theObject ...
-#' @param verbose ...
+#' @param theObject A "T_BART" object
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @aliases EstimateAllSampleStatistics,T_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(

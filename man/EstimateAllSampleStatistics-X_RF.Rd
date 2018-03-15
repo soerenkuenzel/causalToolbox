@@ -10,15 +10,15 @@
   verbose)
 }
 \arguments{
-\item{theObject}{...}
+\item{theObject}{A `X_hRF` object.}
 
-\item{method}{...}
+\item{method}{Different versions of the bootstrap.}
 
-\item{B}{...}
+\item{B}{Number of bootstrap samples.}
 
-\item{nthread}{...}
+\item{nthread}{Number of threads to be used.}
 
-\item{verbose}{...}
+\item{verbose}{A `X_hRF` object.}
 }
 \description{
 Return the estimated CATE

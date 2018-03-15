@@ -93,7 +93,7 @@ training data in the second stage.}
 
 \item{sample_fraction_prop}{...}
 
-\item{nthread}{number of threats which should be used to work in parallel.}
+\item{nthread}{number of threads which should be used to work in parallel.}
 
 \item{verbose}{whether or not to print messages of the training procedure.}
 

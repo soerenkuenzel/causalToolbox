@@ -4,12 +4,17 @@
 #' gof_matching
 #' @title gof_matching
 #' @name gof_matching
+#' @description Match each unit in one group(treatment/control) to units in
+#' another group(treatment/control) based on the chosen estimand. For each iteration
+#' of cross validation, assign treatment lablels (0 or 1) with probability given 
+#' by averaged propensity score for each pair of match and estimate CATE. Return
+#' the mean squared error and its standard deviation of CATE from the true difference. 
 #' @param feat a data frame of features
 #' @param yobs a vector of observations
 #' @param tr a vector of group assignment (assume entries are integers)
 #' @param estimator a learner constructor
 #' @param estimand ATE, ATT or ATC
-#' @param k we are doing a k fold cross validation
+#' @param k Number of folds used for cross validation
 #' @param replace Whether or not to replace samples in while matching
 #' @param emin Minimum value of the propensity score
 #' @param verbose determines whether detailed updates will be printed
@@ -109,7 +114,7 @@ gof_matching <- function(feat,
   }
   
   # --------------------------------------------------------------------------
-  # Compute the ITE = Y(1) - Y(0)c
+  # Compute the ITE = Y(1) - Y(0)
   ITE <- Y1 - Y0
   
   # Calcualte the Goodness-of-Fit

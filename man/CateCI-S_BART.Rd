@@ -10,9 +10,9 @@
 \arguments{
 \item{theObject}{A `S_BART` object.}
 
-\item{feature_new}{A data frame.}
+\item{feature_new}{A feature data frame.}
 
-\item{verbose}{Should the training output be posted?}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
 A vector of predicted CATE
