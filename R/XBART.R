@@ -20,14 +20,14 @@ setClass(
 #' @title X_BART
 #' @rdname X_BART
 #' @description This is an implementation of X_BART
-#' @param feat A feature dataframe.
+#' @param feat A feature data frame.
 #' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
-#' @param yobs A vector the observed outcome.
-#' @param ensemble ...
-#' @param ndpost ...
-#' @param tree_package Package used to create tree
-#' @param ntree Number of trees to grow
-#' @return A `X_RF` object.
+#' @param yobs A vector of all the observed outcomes.
+#' @param ensemble TODO: Add Description
+#' @param ndpost TODO: Add Description
+#' @param tree_package Package used to create tree. 
+#' @param ntree Number of trees to grow. 
+#' @return A `X_BART` object.
 #' @export X_BART
 #' @import methods
 X_BART <-
@@ -82,7 +82,8 @@ X_BART <-
 #' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @param return_CI ...
+#' @param return_CI TRUE for predictions and confidence intervals FALSE for only
+#' predictions.
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_BART-method
 #' @exportMethod EstimateCate
@@ -265,7 +266,8 @@ setMethod(
 #' @description Return the estimated CATE
 #' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
+#' @param verbose TRUE for detailed output FALSE for no output. 
+#' (Should the training output be posted?)
 #' @return A vector of predicted CATE
 #' @aliases CateCI,X_BART-method
 #' @exportMethod CateCI
@@ -292,8 +294,8 @@ setMethod(
 #' @name EstimateAllSampleStatistics-X_BART
 #' @rdname EstimateAllSampleStatistics-X_BART
 #' @description Return the estimated CATE
-#' @param theObject ...
-#' @param verbose ...
+#' @param theObject A `X_BART` object.
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @aliases EstimateAllSampleStatistics,X_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 #' @import stats

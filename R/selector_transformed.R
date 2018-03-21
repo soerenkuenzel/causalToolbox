@@ -57,11 +57,11 @@ getCV_indexes <- function(tr, k) {
 
 #' gof_transformed
 #' @name gof_transformed
-#' @param feat a data frame of features
-#' @param yobs a vector of observations
-#' @param tr a vector of group assignment (assume entries are integers)
-#' @param estimator a learner constructor
-#' @param k we are doing a k fold cross validation
+#' @param feat A data frame of features
+#' @param yobs A vector of observations
+#' @param tr A vector of group assignment (assume entries are integers)
+#' @param estimator A learner constructor
+#' @param k Number of folds used for cross validation
 #' @param emin the pscore prediciton will be bounded between emin and 1 - emin
 #' to avoid decide by 0 error
 #' @param verbose determines whether detailed updates will be printed

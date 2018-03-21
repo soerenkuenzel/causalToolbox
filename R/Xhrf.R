@@ -48,8 +48,9 @@ setClass(
 #' @description This is an implementation of the X-learner with honest random
 #' forest in the first and second stage. The function returns an X-RF object.
 #' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
-#' @param yobs A numeric vector containing the observed outcomes.
+#' @param tr A numeric vector containing 0 for control and 1 for treated 
+#' variables.
+#' @param yobs A numeric vector containing all the observed outcomes.
 #' @param predmode One of propmean, control, treated, extreme. It specifies how
 #' the two estimators of the second stage should be aggregated. The default is
 #' propmean which refers to propensity score weighting.
@@ -57,41 +58,41 @@ setClass(
 #' in the first stage.
 #' @param relevant_Variable_second Variables which are only used 
 #' in the second stage.
-#' @param relevant_Variable_prop ...
+#' @param relevant_Variable_prop TODO: Add Description
 #' @param ntree_first Numbers of trees in the first stage.
 #' @param ntree_second Numbers of trees in the second stage.
-#' @param ntree_prop ... 
-#' @param mtry_first Numbers of trees in the second stage.
+#' @param ntree_prop TODO: Add Description
+#' @param mtry_first Numbers of trees in the first stage.
 #' @param mtry_second Numbers of trees in the second stage.
-#' @param mtry_prop ...
+#' @param mtry_prop TODO: Add Description
 #' @param min_node_size_spl_first minimum nodesize in the first stage for the
 #' observations in the splitting set.
 #' @param min_node_size_ave_first minimum nodesize in the first stage for the
-#' observations in the average set.
+#' observations in the averaging set.
 #' @param min_node_size_spl_second minimum nodesize in the second stage for the
 #' observations in the splitting set.
 #' @param min_node_size_ave_second minimum nodesize in the second stage for the
 #' observations in the averaging set.
-#' @param min_node_size_spl_prop ...
-#' @param min_node_size_ave_prop ...
+#' @param min_node_size_spl_prop TODO: Add Description
+#' @param min_node_size_ave_prop TODO: Add Description
 #' @param splitratio_first Proportion of the training data used as the splitting
 #' dataset in the first stage.
 #' @param splitratio_second Proportion of the training data used as the
 #' splitting dataset in the second stage.
-#' @param splitratio_prop ...
+#' @param splitratio_prop TODO: Add Description
 #' @param replace_first Sample with or without replacement in the first stage.
-#' @param replace_second Sample with or without replacement in the first stage.
-#' @param replace_prop ...
+#' @param replace_second Sample with or without replacement in the second stage.
+#' @param replace_prop TODO: Add Description
 #' @param sample_fraction_first The size of total samples to draw for the
 #' training data in the first stage.
 #' @param sample_fraction_second The size of total samples to draw for the
 #' training data in the second stage.
-#' @param sample_fraction_prop ...
-#' @param nthread number of threads which should be used to work in parallel.
-#' @param verbose whether or not to print messages of the training procedure.
-#' @param middleSplit_first ...
-#' @param middleSplit_second ...
-#' @param middleSplit_prop ...
+#' @param sample_fraction_prop TODO: Add Description
+#' @param nthread Number of threads which should be used to work in parallel.
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @param middleSplit_first TODO: Add Description
+#' @param middleSplit_second TODO: Add Description
+#' @param middleSplit_prop TODO: Add Description
 #' @export X_RF
 setGeneric(
   name = "X_RF",
@@ -268,7 +269,7 @@ X_RF <-
 #' self tuning versions
 #' @param feat A feature data frame.
 #' @param tr A vector of treatment assignment: 0 for control and 1 for treatment.
-#' @param yobs A vector of the observed outcomes.
+#' @param yobs A vector of all the observed outcomes.
 #' @param hyperparameter_list A list of lists of hyper parameters
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.

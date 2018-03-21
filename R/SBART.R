@@ -20,15 +20,15 @@ setClass(
 #' @title S_BART
 #' @rdname S_BART
 #' @description This is an implementation of S_BART
-#' @param feat feature data.frame.
-#' @param tr treatment assignment 0 for control and 1 for treatment.
-#' @param yobs the observed outcome.
-#' @param ndpost ...
-#' @param sample_stat ...
-#' @param tree_package Name of the package used to create a tree
+#' @param feat A data frame of features
+#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
+#' @param yobs A vector of observed outcomes.
+#' @param ndpost TODO: Add description
+#' @param sample_stat TODO: Add description
+#' @param tree_package Package used to create a tree
 #' @param ntree Number of trees to grow
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `BART` object.
+#' @return A `S_BART` object.
 #' @export S_BART
 #' @import methods
 S_BART <-
@@ -98,7 +98,7 @@ setMethod(
 #' @rdname CateCI-S_BART
 #' @description Return the estimated CATE
 #' @param theObject A `S_BART` object.
-#' @param feature_new A feature data frame.
+#' @param feature_new A data frame of features.
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A vector of predicted CATE
 #' @aliases CateCI,S_BART-method

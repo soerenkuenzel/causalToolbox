@@ -11,11 +11,11 @@
 #' @description The `T_RF` object is T-learner combined with honest random
 #' forest used for both response functions
 #' @slot feature_train A data frame of all training features.
-#' @slot tr_train A vector contain 0 for control and 1 for treated variables.
+#' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
 #' @slot m_y_t contains an honest random forest predictor for the treated group
 #' @slot m_y_c contains an honest random forest predictor for the control group
-#' @slot creator function which creates a T_RF
+#' @slot creator A function which creates a T_RF
 #' @exportClass T_RF
 #' @importFrom forestry predict
 setClass(
@@ -45,16 +45,22 @@ setClass(
 #' @description This is an implementation of the T-learner combined with honest
 #' random forest for both response functions
 #' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param tr A numeric vector containing 0 for control and 1 for treated 
+#' variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param mtry Number of variables to try at each node.
-#' @param nodesizeSpl ...
-#' @param nodesizeAvg ...
-#' @param replace TODO: Add Description
-#' @param ntree Number of trees to grow
+#' @param nodesizeSpl Minimum observations contained in terminal nodes. The
+#' default value is 1.
+#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset. The
+#' default value is 3.
+#' @param replace  An indicator of whether sampling of training data is with 
+#' replacement. The default value is TRUE.
+#' @param ntree Number of trees to grow. The default value is 1000.
 #' @param sample_fraction TODO: Add Description
-#' @param nthread Number of threads to be used.
-#' @param splitratio TODO: Add Description
+#' @param nthread Number of threads to train and predict the forest. The
+#' default number is 4.
+#' @param splitratio Proportion of the training data used as the splitting
+#' dataset. The default value is 0.5.
 #' @export T_RF
 setGeneric(
   name = "T_RF",

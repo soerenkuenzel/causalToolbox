@@ -11,10 +11,10 @@
 #' @description The `S_RF` object is S-learner combined with honest random
 #' forest used for both response functions
 #' @slot feature_train A data frame of all training features.
-#' @slot tr_train A vector contain 0 for control and 1 for treated variables.
+#' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
-#' @slot forest TODO: Add Description
-#' @slot creator function which creates a S_RF
+#' @slot forest A forest object
+#' @slot creator A function which creates a S_RF
 #' @exportClass S_RF
 #' @importFrom forestry predict
 setClass(
@@ -43,18 +43,24 @@ setClass(
 #' @description This is an implementation of the S-learner combined with honest
 #'   random forest for both response functions
 #' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param tr A numeric vector containing 0 for control and 1 for treated 
+#' variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param mtry Number of variables to try at each node.
-#' @param replace TODO: Add Description
-#' @param ntree TODO: Add Description
+#' @param replace An indicator of whether sampling of training data is with 
+#' replacement. The default value is TRUE.
+#' @param ntree Number of trees to grow. The default value is 1000.
 #' @param sample_fraction TODO: Add Description
-#' @param nthread TODO: Add Description
-#' @param splitratio TODO: Add Description
-#' @param nodesizeAvg TODO: Add Description
-#' @param nodesizeSpl ...
+#' @param nthread Number of threads to train and predict the forest. The
+#' default number is 4.
+#' @param splitratio Proportion of the training data used as the splitting
+#' dataset. The default value is 0.5.
+#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset. The
+#' default value is 3.
+#' @param nodesizeSpl Minimum observations contained in terminal nodes. The
+#' default value is 1.
 #' @param alwaysTr weather or not we always test weather we should split on the
-#'   treatment assignment. Currently only alwaysTr=FALSE is implemented
+#'   treatment assignment. Currently only alwaysTr=FALSE is implemented.
 #' @export S_RF
 setGeneric(
   name = "S_RF",

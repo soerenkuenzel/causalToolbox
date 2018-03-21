@@ -15,9 +15,9 @@
 #' @param estimator a learner constructor
 #' @param estimand ATE, ATT or ATC
 #' @param k Number of folds used for cross validation
-#' @param replace Whether or not to replace samples in while matching
+#' @param replace Whether or not to replace samples while matching
 #' @param emin Minimum value of the propensity score
-#' @param verbose determines whether detailed updates will be printed
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @return mean(error) and sd(error)
 #' @import Matching
 #' @import ranger

@@ -8,12 +8,12 @@
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param sample.fraction ...
-#' @param num_iter number of iterations.
-#' @param eta ..
-#' @param verbose ..
-#' @param seed ...
-#' @param nthread Number of threads 
+#' @param sample.fraction TODO: Add Description
+#' @param num_iter Number of iterations.
+#' @param eta Downsampling rate. Default value is 3.
+#' @param verbose if tuning process in verbose mode
+#' @param seed A random seed.
+#' @param nthread Number of threads used to work in parallel. 
 #' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 #' @examples
 #'   set.seed(14236142)

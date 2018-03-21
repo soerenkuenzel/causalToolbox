@@ -12,7 +12,7 @@
 #' @param num_iter Maximum iterations/epochs per configuration. Default is 1024.
 #' @param eta Downsampling rate. Default value is 2.
 #' @param verbose if tuning process in verbose mode
-#' @param seed random seed
+#' @param seed A random seed
 #' @param nthread Number of threads to train and predict thre forest. The
 #' default number is 0 which represents using all cores.
 #' @return A `honestRF` object
