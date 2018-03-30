@@ -1,5 +1,6 @@
 library(testthat)
 test_that("Tests Selector Subset", {
+  context('Subset Selector')
   set.seed(1423614230)
   
   dt <- simulate_causal_experiment(ntrain = 500, ntest = 10, dim = 6, alpha = 5,

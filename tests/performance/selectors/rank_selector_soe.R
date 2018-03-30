@@ -75,30 +75,13 @@ performance %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
              y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
              color = selector)) +
   geom_violin() + 
-  geom_point(position = position_jitter(width = .4, height =.01), size = .5, alpha = 0.8) +
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
-  theme(legend.position="none")
+  theme(legend.position = "none")
   
+ggsave('../ChosenMSE_violin_plot.pdf', height = 8, width = 10)
 
-
-
-
-
-
-
-
-
-ggplot(data = my_datal, aes(y = Sensitivity, x = EmotionCondition, fill = EmotionCondition)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha = .8) +
-  geom_point(aes(y = Sensitivity, color = EmotionCondition), position = position_jitter(width = .15), size = .5, alpha = 0.8) +
-  geom_boxplot(width = .1, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
-  expand_limits(x = 5.25) +
-  guides(fill = FALSE) +
-  guides(color = FALSE) +
-  scale_color_brewer(palette = "Spectral") +
-  scale_fill_brewer(palette = "Spectral") +
-  coord_flip() +
-  theme_bw() +
-  raincloud_theme
 
 

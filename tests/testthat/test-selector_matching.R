@@ -1,6 +1,7 @@
 library(testthat)
 test_that("Tests Selector matching", {
   # ----------------------------------------------------------------------------
+  context('Matching Selector')
   set.seed(1423614231)
   
   dt <-

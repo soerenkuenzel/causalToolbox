@@ -1,6 +1,6 @@
 library(testthat)
 test_that("Tests Selector Transformed", {
-  
+  context('transformed selector')
   # ----------------------------------------------------------------------------
   # test helper functions
   expect_equal(get_CV_sizes(22, 5),
