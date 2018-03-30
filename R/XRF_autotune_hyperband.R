@@ -1,4 +1,4 @@
-#' @include Xhrf.R
+#' @include XRF.R
 
 
 #' @title Autotuning for X-Learner with honest RF for both stages
@@ -49,7 +49,7 @@ X_RF_autotune_hyperband <-
     X_1 <- feat[tr == 1,]
 
     m_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = yobs_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -61,7 +61,7 @@ X_RF_autotune_hyperband <-
       )
 
     m_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = yobs_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -79,7 +79,7 @@ X_RF_autotune_hyperband <-
     r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = r_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -91,7 +91,7 @@ X_RF_autotune_hyperband <-
       )
 
     m_tau_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = r_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -107,7 +107,7 @@ X_RF_autotune_hyperband <-
     }
 
     m_prop <-
-      forestry::honestRF(x = feat,
+      forestry::forestry(x = feat,
                y = tr,
                ntree = 500)
     if (verbose) {

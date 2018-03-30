@@ -16,7 +16,8 @@
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 
-\item{return_CI}{...}
+\item{return_CI}{TRUE for predictions and confidence intervals FALSE for only
+predictions.}
 }
 \value{
 A vector of predicted CATE

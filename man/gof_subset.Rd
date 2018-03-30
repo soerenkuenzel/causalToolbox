@@ -33,9 +33,7 @@ goup}
 
 \item{k}{k fold cross validation}
 
-\item{verbose}{determines whether detailed updates will be printed}
-
-\item{min.n.group}{Minimum number of groups}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
 mean(error) and sd(error)

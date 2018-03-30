@@ -8,22 +8,22 @@ X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 1200,
   tree_package = "dbarts", ntree = 200)
 }
 \arguments{
-\item{feat}{A feature dataframe.}
+\item{feat}{A feature data frame.}
 
 \item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
 
-\item{yobs}{A vector the observed outcome.}
+\item{yobs}{A vector of all the observed outcomes.}
 
-\item{ensemble}{...}
+\item{ensemble}{TODO: Add Description}
 
-\item{ndpost}{...}
+\item{ndpost}{TODO: Add Description}
 
-\item{tree_package}{Package used to create tree}
+\item{tree_package}{Package used to create tree.}
 
-\item{ntree}{Number of trees to grow}
+\item{ntree}{Number of trees to grow.}
 }
 \value{
-A `X_RF` object.
+A `X_BART` object.
 }
 \description{
 This is an implementation of X_BART

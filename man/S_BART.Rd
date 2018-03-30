@@ -9,24 +9,24 @@ S_BART(feat, tr, yobs, ndpost = 1200,
   ntree = 200, verbose)
 }
 \arguments{
-\item{feat}{feature data.frame.}
+\item{feat}{A data frame of features}
 
-\item{tr}{treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
 
-\item{yobs}{the observed outcome.}
+\item{yobs}{A vector of observed outcomes.}
 
-\item{ndpost}{...}
+\item{ndpost}{TODO: Add description}
 
-\item{sample_stat}{...}
+\item{sample_stat}{TODO: Add description}
 
-\item{tree_package}{Name of the package used to create a tree}
+\item{tree_package}{Package used to create a tree}
 
 \item{ntree}{Number of trees to grow}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
-A `BART` object.
+A `S_BART` object.
 }
 \description{
 This is an implementation of S_BART

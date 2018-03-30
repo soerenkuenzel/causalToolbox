@@ -1,9 +1,9 @@
 #' @include TBART.R
-#' @include Thrf.R
+#' @include TRF.R
 #' @include XBART.R
-#' @include Xhrf.R
+#' @include XRF.R
 #' @include SBART.R
-#' @include Shrf.R
+#' @include SRF.R
 
 # ------------------------------------------------------------------------------
 # helper functions

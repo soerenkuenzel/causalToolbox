@@ -1,10 +1,10 @@
-#' @include Xhrf.R
+#' @include XRF.R
 
 
-#' @title Simple Autotuning for X-Learner with honest RF
+#' @title Simple Autotuning for X-Learner with RF
 #' @name X_RF_autotune_simple
 #' @rdname X_RF_autotune_simple
-#' @description This function tunes the X-Learner with honest random forest by
+#' @description This function tunes the X-Learner withrandom forest by
 #' testing which of 11 prespecified settings seems to be the best
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector containing 0 for control and 1 for treated 

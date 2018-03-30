@@ -1,8 +1,8 @@
-#' @include Xhrf.R
-#' @include Xhrf_autotune_simple.R
+#' @include XRF.R
+#' @include XRF_autotune_simple.R
 
 
-#' @title Gaussian Process optimization for the X-Learner with honest RF for
+#' @title Gaussian Process optimization for the X-Learner with RF for
 #'   both stages
 #' @name X_RF_autotune_gpp
 #' @rdname X_RF_autotune_gpp

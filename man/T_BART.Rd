@@ -15,11 +15,11 @@ T_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{yobs}{A vector of the observed outcome.}
 
-\item{ndpost}{...}
+\item{ndpost}{TODO: Add Description}
 
-\item{sample_stat}{...}
+\item{sample_stat}{TODO: Add Description}
 
-\item{tree_package}{Name of the package used to create a tree}
+\item{tree_package}{Package used to create a tree}
 
 \item{ntree}{Number of trees to grow}
 

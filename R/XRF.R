@@ -31,11 +31,11 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    m_0 = "honestRF",
-    m_1 = "honestRF",
-    m_tau_0 = "honestRF",
-    m_tau_1 = "honestRF",
-    m_prop = "honestRF",
+    m_0 = "forestry",
+    m_1 = "forestry",
+    m_tau_0 = "forestry",
+    m_tau_1 = "forestry",
+    m_prop = "forestry",
     hyperparameter_list = "list",
     creator = "function"
   )
@@ -300,7 +300,7 @@ X_RF_fully_specified <-
     X_1 <- feat[tr == 1,]
 
     m_0 <-
-      forestry::honestRF(
+      forestry::forestry(
         x = X_0[ , hyperparameter_list[["l_first_0"]]$relevant_Variable],
         y = yobs_0,
         ntree = hyperparameter_list[["l_first_0"]]$ntree,
@@ -315,7 +315,7 @@ X_RF_fully_specified <-
       )
 
     m_1 <-
-      forestry::honestRF(
+      forestry::forestry(
         x = X_1[ , hyperparameter_list[["l_first_1"]]$relevant_Variable],
         y = yobs_1,
         ntree = hyperparameter_list[["l_first_1"]]$ntree,
@@ -336,7 +336,7 @@ X_RF_fully_specified <-
     r_1 <- yobs_1 - forestry::predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
 
     m_tau_0 <-
-      forestry::honestRF(
+      forestry::forestry(
         x = X_0[, hyperparameter_list[["l_second_0"]]$relevant_Variable],
         y = r_0,
         ntree = hyperparameter_list[["l_second_0"]]$ntree,
@@ -351,7 +351,7 @@ X_RF_fully_specified <-
       )
 
     m_tau_1 <-
-      forestry::honestRF(
+      forestry::forestry(
         x = X_1[, hyperparameter_list[["l_second_1"]]$relevant_Variable],
         y = r_1,
         ntree = hyperparameter_list[["l_second_1"]]$ntree,
@@ -369,7 +369,7 @@ X_RF_fully_specified <-
     }
 
     m_prop <-
-      forestry::honestRF(
+      forestry::forestry(
         x = feat[, hyperparameter_list[["l_prop"]]$relevant_Variable],
         y = tr,
         ntree = hyperparameter_list[["l_prop"]]$ntree,

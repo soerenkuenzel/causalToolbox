@@ -13,7 +13,8 @@
 
 \item{feature_new}{A data frame.}
 
-\item{verbose}{Should the training output be posted?}
+\item{verbose}{TRUE for detailed output FALSE for no output. 
+(Should the training output be posted?)}
 }
 \value{
 A vector of predicted CATE
