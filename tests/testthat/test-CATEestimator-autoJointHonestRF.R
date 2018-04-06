@@ -1,7 +1,8 @@
 library(testthat)
 test_that("Tests X_RF_autotune_hyperband2", {
+  context("X_RF_autotune_hyperband2")
   set.seed(1423614230)
-
+  
   feat <- iris[, -1]
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
@@ -14,7 +15,7 @@ test_that("Tests X_RF_autotune_hyperband2", {
   tune_iter <- 1
 
   expect_output(
-    xl <- autoJointHonestRF(
+    xl <- autoJointforestry(
       feat,
       tr,
       yobs,
@@ -48,7 +49,7 @@ test_that("Tests X_RF_autotune_hyperband2", {
     )
 
   expect_output(
-      xl_tuned <- autoJointHonestRF(
+      xl_tuned <- autoJointforestry(
         feat = cate_problem$feat_tr,
         yobs = cate_problem$Yobs_tr,
         tr = cate_problem$W_tr,
@@ -75,7 +76,7 @@ test_that("Tests X_RF_autotune_hyperband2", {
   nthread <- 1
 
   expect_output(
-    xl_at <- autoJointHonestRF(
+    xl_at <- autoJointforestry(
       feat = feat,
       tr = tr,
       yobs = yobs,

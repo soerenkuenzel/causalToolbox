@@ -22,9 +22,8 @@
 #' "none": no normalization. 
 #' "mahalanobize": normalization by var(data)
 #' "studentize" (default): normalization is done with the diagonal of var(data)
-#' @param min.n.group Minimum number of groups
 #' @param k k fold cross validation
-#' @param verbose determines whether detailed updates will be printed
+#' @param verbose TRUE for detailed output FALSE for no output
 #' @return mean(error) and sd(error)
 #' @import quickmatch
 #' @import distances

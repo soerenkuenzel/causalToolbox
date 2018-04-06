@@ -1,6 +1,7 @@
 library(testthat)
 
 test_that("Tests test-Xhrf_gpp", {
+  context("X-RF autotune gpp")
   set.seed(1423614230)
 
   feat <- iris[, -1]

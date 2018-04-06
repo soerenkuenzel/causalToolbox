@@ -1,5 +1,6 @@
 library(testthat)
 test_that("Tests CateCI", {
+  context('CateCI')
   set.seed(1423614230)
 
   feat <- iris[, -1]

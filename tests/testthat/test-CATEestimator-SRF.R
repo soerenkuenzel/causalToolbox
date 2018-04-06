@@ -1,5 +1,6 @@
 library(testthat)
 test_that("Tests that ShRF is working correctly", {
+  context('S-RF')
   set.seed(1423614230)
 
   feat <- iris[, -1]

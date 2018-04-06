@@ -1,20 +1,21 @@
-#' @include Xhrf.R
+#' @include XRF.R
 
 
-#' @title Simple Autotuning for X-Learner with honest RF
+#' @title Simple Autotuning for X-Learner with RF
 #' @name X_RF_autotune_simple
 #' @rdname X_RF_autotune_simple
-#' @description This function tunes the X-Learner with honest random forest by
+#' @description This function tunes the X-Learner withrandom forest by
 #' testing which of 11 prespecified settings seems to be the best
 #' @param feat A data frame of all the features.
-#' @param tr A numeric vector contain 0 for control and 1 for treated variables.
+#' @param tr A numeric vector containing 0 for control and 1 for treated 
+#' variables.
 #' @param yobs A numeric vector containing the observed outcomes.
 #' @param ntree Number of trees used
 #' @param nthread Number of threads which can run in parallel. If set 0, then
 #' the maximum amount of possible threads is determined automatically. If set to
 #' 1 then the algorithm is absolutely deterministic (after specifying a seed).
-#' @param ntree_testing ...
-#' @param verbose ...
+#' @param ntree_testing TODO: Add Description
+#' @param verbose if tuning process in verbose mode
 #' @seealso \code{\link{X_RF_autotune_gpp}},
 #' \code{\link{X_RF_autotune_hyperband}}
 #' @examples

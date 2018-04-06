@@ -1,5 +1,6 @@
 library(testthat)
-test_that("Test non-continuous split", {
+test_that("Test causal experiment creator", {
+  context('causal experiment creator')
   expect_error(simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
                              setup = "rare2"), NA)
   # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,

@@ -1,5 +1,6 @@
 library(testthat)
 test_that("Tests that XhRF is working correctly", {
+  context('X-RF')
   set.seed(1423614230)
 
   feat <- iris[, -1]

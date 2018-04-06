@@ -1,8 +1,8 @@
-#' @include Xhrf.R
+#' @include XRF.R
 
-#' @title tuneStageOne-honestRF
-#' @name tuneStageOne-honestRF
-#' @rdname tuneStageOne-honestRF
+#' @title tuneStageOne-forestry
+#' @name tuneStageOne-forestry
+#' @rdname tuneStageOne-forestry
 #' @description Tune the estimator in the first stage given a fixed second stage
 #' estimator
 #' @param x A data frame of all training predictors.
@@ -12,10 +12,10 @@
 #' @param num_iter Maximum iterations/epochs per configuration. Default is 1024.
 #' @param eta Downsampling rate. Default value is 2.
 #' @param verbose if tuning process in verbose mode
-#' @param seed random seed
+#' @param seed A random seed
 #' @param nthread Number of threads to train and predict thre forest. The
 #' default number is 0 which represents using all cores.
-#' @return A `honestRF` object
+#' @return A `forestry` object
 #' @export tuneStageOne
 #' @importFrom forestry predict
 tuneStageOne <- function(x,
@@ -29,7 +29,7 @@ tuneStageOne <- function(x,
                          nthread = 0) {
 
   # Creat a dummy tree just to reuse its data.
-  dummy_tree <- forestry::honestRF(x, y, ntree=1, nodesizeSpl=nrow(x), nodesizeAvg=nrow(x))
+  dummy_tree <- forestry::forestry(x, y, ntree=1, nodesizeSpl=nrow(x), nodesizeAvg=nrow(x))
 
   # Number of unique executions of Successive Halving (minus one)
   s_max <- as.integer(log(num_iter) / log(eta))
@@ -103,7 +103,7 @@ tuneStageOne <- function(x,
     r_old <- 1
     for (j in 1:nrow(allConfigs)) {
       tryCatch({
-        val_models[[j]] <- forestry::honestRF(
+        val_models[[j]] <- forestry::forestry(
           x = x,
           y = y,
           ntree = r_old,
@@ -115,7 +115,7 @@ tuneStageOne <- function(x,
           sampsize = sampsize,
           nthread = nthread,
           middleSplit = allConfigs$middleSplit[j],
-          reuseHonestRF=dummy_tree
+          reuseforestry=dummy_tree
         )
 
       }, error = function(err) {
@@ -150,10 +150,10 @@ tuneStageOne <- function(x,
             val_losses[[j]] <- forestry::getOOB(val_models[[j]], noWarning = TRUE)
             # Calculate residuals
             res <- forestry::predict(val_models[[j]], x) - y
-            # Train an honestRF for tau
+            # Train an forestry for tau
 
             m_tau <-
-              forestry::honestRF(
+              forestry::forestry(
                 x = x,
                 y = res,
                 ntree = max(r_i, 1),
@@ -208,7 +208,7 @@ tuneStageOne <- function(x,
       best_OOB <- forestry::getOOB(val_models[[1]], noWarning = TRUE)
       res <- forestry::predict(val_models[[1]], x) - y
       m_tau <-
-        forestry::honestRF(
+        forestry::forestry(
           x = x,
           y = res,
           ntree = m_tau_init@ntree,
@@ -269,8 +269,8 @@ tuneStageOne <- function(x,
 }
 
 #' @title Autotuning for X-Learner with honest RF for both stages
-#' @name autoJointHonestRF
-#' @rdname autoJointHonestRF
+#' @name autoJointforestry
+#' @rdname autoJointforestry
 #' @description [TBD]
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
@@ -283,9 +283,9 @@ tuneStageOne <- function(x,
 #' @param nthread ..
 #' @param tune_iter ..
 #' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
-#' @export autoJointHonestRF
+#' @export autoJointforestry
 #' @importFrom forestry predict
-autoJointHonestRF <-
+autoJointforestry <-
   function(feat,
            tr,
            yobs,
@@ -309,7 +309,7 @@ autoJointHonestRF <-
 
     # First, find the best configurations for both estimators
     m_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = yobs_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -321,7 +321,7 @@ autoJointHonestRF <-
       )
 
     m_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = yobs_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -336,7 +336,7 @@ autoJointHonestRF <-
     r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = r_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -348,7 +348,7 @@ autoJointHonestRF <-
       )
 
     m_tau_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = r_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -395,7 +395,7 @@ autoJointHonestRF <-
       r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
       m_tau_0 <-
-        forestry::autohonestRF(
+        forestry::autoforestry(
           x = X_0,
           y = r_0,
           sampsize = floor(nrow(X_0) * sample.fraction),
@@ -407,7 +407,7 @@ autoJointHonestRF <-
         )
 
       m_tau_1 <-
-        forestry::autohonestRF(
+        forestry::autoforestry(
           x = X_1,
           y = r_1,
           sampsize = floor(nrow(X_1) * sample.fraction),
@@ -422,7 +422,7 @@ autoJointHonestRF <-
 
 
     m_prop <-
-      forestry::honestRF(x = feat,
+      forestry::forestry(x = feat,
                y = tr,
                ntree = 500)
     if (verbose) {

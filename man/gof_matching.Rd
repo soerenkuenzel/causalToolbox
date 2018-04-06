@@ -20,11 +20,11 @@ gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
 
 \item{k}{Number of folds used for cross validation}
 
-\item{replace}{Whether or not to replace samples in while matching}
+\item{replace}{Whether or not to replace samples while matching}
 
 \item{emin}{Minimum value of the propensity score}
 
-\item{verbose}{determines whether detailed updates will be printed}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
 mean(error) and sd(error)

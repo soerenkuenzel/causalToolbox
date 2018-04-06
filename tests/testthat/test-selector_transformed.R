@@ -1,6 +1,6 @@
 library(testthat)
 test_that("Tests Selector Transformed", {
-  
+  context('transformed selector')
   # ----------------------------------------------------------------------------
   # test helper functions
   expect_equal(get_CV_sizes(22, 5),
@@ -21,7 +21,7 @@ test_that("Tests Selector Transformed", {
                                    alpha = 0.1,
                                    setup = "complexTau2")
   
-  expect_output(
+
     gof_values_S_BART <- gof_transformed(
       yobs = dt$Yobs_tr,
       tr = dt$W_tr,
@@ -30,13 +30,13 @@ test_that("Tests Selector Transformed", {
       k = 3,
       emin = 1e-5
     )
-  )
+  
   
   expect_equal(gof_values_S_BART,
                c(12338.0071, 997.3583), 
                tolerance = 1e-3)
   
-  expect_output(
+
     gof_values_S_RF <- gof_transformed(
       yobs = dt$Yobs_tr,
       tr = dt$W_tr,
@@ -45,7 +45,7 @@ test_that("Tests Selector Transformed", {
       k = 3,
       emin = 1e-5
     )
-  )
+  
   
   expect_equal(gof_values_S_RF,
                c(13155.749, 1060.212),

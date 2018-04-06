@@ -3,6 +3,7 @@ library(testthat)
 test_that(
   "Tests that S-BART is working correctly",
   {
+    context('S-BART')
     set.seed(1423614230)
 
     feat <- iris[, -1]

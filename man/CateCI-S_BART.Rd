@@ -10,7 +10,7 @@
 \arguments{
 \item{theObject}{A `S_BART` object.}
 
-\item{feature_new}{A feature data frame.}
+\item{feature_new}{A data frame of features.}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }

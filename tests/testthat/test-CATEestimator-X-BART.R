@@ -1,5 +1,6 @@
 test_that("Tests that X-BART is working correctly",
           {
+            context('X-BART')
             # library(testthat)
             set.seed(1423614230)
 

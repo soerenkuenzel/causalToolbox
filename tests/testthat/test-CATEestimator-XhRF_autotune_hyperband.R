@@ -1,5 +1,6 @@
 library(testthat)
 test_that("Tests X_RF_autotune_hyperband", {
+  context("X-RF autotune hyperband")
   set.seed(1423614230)
 
   feat <- iris[, -1]

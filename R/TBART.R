@@ -28,9 +28,9 @@ setClass(
 #' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
 #' @param yobs A vector of the observed outcome.
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @param ndpost ...
-#' @param sample_stat ...
-#' @param tree_package Name of the package used to create a tree
+#' @param ndpost TODO: Add Description
+#' @param sample_stat TODO: Add Description
+#' @param tree_package Package used to create a tree
 #' @param ntree Number of trees to grow
 #' @return A `T_BART` object.
 #' @export T_BART
@@ -173,7 +173,8 @@ setMethod(
 #' @description Return the estimated CATE
 #' @param theObject A `T_BART` object.
 #' @param feature_new A data frame.
-#' @param verbose Should the training output be posted?
+#' @param verbose TRUE for detailed output FALSE for no output. 
+#' (Should the training output be posted?)
 #' @return A vector of predicted CATE
 #' @aliases CateCI,T_BART-method
 #' @exportMethod CateCI

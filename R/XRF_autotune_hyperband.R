@@ -1,4 +1,4 @@
-#' @include Xhrf.R
+#' @include XRF.R
 
 
 #' @title Autotuning for X-Learner with honest RF for both stages
@@ -8,12 +8,12 @@
 #' @param feat A data frame of all the features.
 #' @param tr A numeric vector contain 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param sample.fraction ...
-#' @param num_iter number of iterations.
-#' @param eta ..
-#' @param verbose ..
-#' @param seed ...
-#' @param nthread Number of threads 
+#' @param sample.fraction TODO: Add Description
+#' @param num_iter Number of iterations.
+#' @param eta Downsampling rate. Default value is 3.
+#' @param verbose if tuning process in verbose mode
+#' @param seed A random seed.
+#' @param nthread Number of threads used to work in parallel. 
 #' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 #' @examples
 #'   set.seed(14236142)
@@ -49,7 +49,7 @@ X_RF_autotune_hyperband <-
     X_1 <- feat[tr == 1,]
 
     m_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = yobs_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -61,7 +61,7 @@ X_RF_autotune_hyperband <-
       )
 
     m_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = yobs_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -79,7 +79,7 @@ X_RF_autotune_hyperband <-
     r_1 <- yobs_1 - forestry::predict(m_0, X_1)
 
     m_tau_0 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_0,
         y = r_0,
         sampsize = floor(nrow(X_0) * sample.fraction),
@@ -91,7 +91,7 @@ X_RF_autotune_hyperband <-
       )
 
     m_tau_1 <-
-      forestry::autohonestRF(
+      forestry::autoforestry(
         x = X_1,
         y = r_1,
         sampsize = floor(nrow(X_1) * sample.fraction),
@@ -107,7 +107,7 @@ X_RF_autotune_hyperband <-
     }
 
     m_prop <-
-      forestry::honestRF(x = feat,
+      forestry::forestry(x = feat,
                y = tr,
                ntree = 500)
     if (verbose) {

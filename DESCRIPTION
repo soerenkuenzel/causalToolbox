@@ -29,24 +29,24 @@ Imports:
     distances
 Remotes: soerenkuenzel/forestry
 RoxygenNote: 6.0.1
-Collate: 
-    'CATE_estimators.R'
-    'ExmpleSetups_causaleffects.R'
-    'SBART.R'
-    'Shrf.R'
-    'TBART.R'
-    'Thrf.R'
-    'XBART.R'
-    'Xhrf.R'
-    'Xhrf_autotune_simple.R'
-    'Xhrf_autotune_gpp.R'
-    'Xhrf_autotune_hyperband.R'
-    'Xhrf_autotune_hyperband2.R'
-    'selector_transformed.R'
-    'selector_matching.R'
-    'selector_subset.R'
 Suggests:
     testthat,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Collate: 
+    'CATE_estimators.R'
+    'ExmpleSetups_causaleffects.R'
+    'SBART.R'
+    'SRF.R'
+    'TBART.R'
+    'TRF.R'
+    'XBART.R'
+    'XRF.R'
+    'XRF_autotune_simple.R'
+    'XRF_autotune_gpp.R'
+    'XRF_autotune_hyperband.R'
+    'XRF_autotune_hyperband2.R'
+    'selector_transformed.R'
+    'selector_matching.R'
+    'selector_subset.R'
