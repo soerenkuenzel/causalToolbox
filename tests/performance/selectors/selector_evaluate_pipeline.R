@@ -238,7 +238,7 @@ foreach(ntrain = ntrain_grid) %dopar% {
     if (exists("already_ran_truth") &&
         (paste(c(seed, alpha, dim, ntrain, estimator_name),
                collapse = ",") %in%
-         apply(already_ran, 1, function(x){
+         apply(already_ran_truth, 1, function(x){
            paste(x, collapse = ",")
          }))) {
       print(paste(
@@ -292,43 +292,56 @@ foreach(ntrain = ntrain_grid) %dopar% {
     for (selector_i in 1:length(selector_grid)) {
       selector <- selector_grid[[selector_i]]
       selector_name <- names(selector_grid)[selector_i]
-      print(paste("==> Running", selector_name,
-                  "on", setup))
-
-      selector_vals <- tryCatch({
-        selector(dt$Yobs_tr, dt$W_tr, dt$feat_tr, estimator)
-      },
-      error = function(e) {
-        print(e)
-        warning(paste("Something went wrong with", estimator_name,
-                      "and selector", selector_name,
-                      "on", setup))
-        return(NA)
-      })
       
-      selector_data <- data.frame(
-        seed = seed,
-        alpha = alpha,
-        dim = dim,
-        ntrain = ntrain,
-        feat_distribution = "normal",
-        testseed = 293901,
-        trainingseed = seed,
-        estimator = estimator_name,
-        selector = selector_name,
-        setup = setup,
-        score = selector_vals[1]
-      )
-      
-      col.names <- !file.exists(filename)
-      write.table(
-        selector_data,
-        file = filename,
-        append = TRUE,
-        col.names = col.names,
-        row.names = FALSE,
-        sep = ","
-      )
+      if (exists("already_ran") &&
+         (paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name),
+               collapse = ",") %in%
+         apply(already_ran, 1, function(x){
+           paste(x, collapse = ",")
+         }))) {
+        print(paste(
+          paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name), collapse = ","),
+          "selector data already exists. Running next setting."
+        ))
+      } else {
+        print(paste("==> Running", selector_name,
+                    "on", setup))
+  
+        selector_vals <- tryCatch({
+          selector(dt$Yobs_tr, dt$W_tr, dt$feat_tr, estimator)
+        },
+        error = function(e) {
+          print(e)
+          warning(paste("Something went wrong with", estimator_name,
+                        "and selector", selector_name,
+                        "on", setup))
+          return(NA)
+        })
+        
+        selector_data <- data.frame(
+          seed = seed,
+          alpha = alpha,
+          dim = dim,
+          ntrain = ntrain,
+          feat_distribution = "normal",
+          testseed = 293901,
+          trainingseed = seed,
+          estimator = estimator_name,
+          selector = selector_name,
+          setup = setup,
+          score = selector_vals[1]
+        )
+        
+        col.names <- !file.exists(filename)
+        write.table(
+          selector_data,
+          file = filename,
+          append = TRUE,
+          col.names = col.names,
+          row.names = FALSE,
+          sep = ","
+        )
+      }
     }
     
     print(paste(
