@@ -1,5 +1,4 @@
-#' @include selector_transformed.R
-
+#' @include helper_functions.R
 # ------------------------------------------------------------------------------
 
 #' gof_subset
@@ -7,10 +6,6 @@
 #' @name gof_subset
 #' @description This function estimates ATE for each subset, average the CATEs 
 #' over each of the subsets and see how close it is to the truth. 
-#' @param feat a data frame of features
-#' @param yobs a vector of observations
-#' @param tr a vector of group assignment (assume entries are integers)
-#' @param estimator a learner constructor
 #' @param important.features names of features which should be used in 
 #' quickmatch to find the relevant subgroups. Only features specified here will 
 #' be used to create the subgroups
@@ -22,8 +17,7 @@
 #' "none": no normalization. 
 #' "mahalanobize": normalization by var(data)
 #' "studentize" (default): normalization is done with the diagonal of var(data)
-#' @param k k fold cross validation
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @inheritParams gof_transformed
 #' @return mean(error) and sd(error)
 #' @import quickmatch
 #' @import distances
@@ -57,23 +51,8 @@ gof_subset <- function(feat, yobs, tr, estimator,
   # table(unit_match)
   
   # ----------------------------------------------------------------------------
-  # Run a k fold CV to estimate the CATE for each unit
-  cv_idx <- getCV_indexes(tr = tr, k = k)
-  cate_est <- rep(NA, n_obs) # will contain the estimates
-  for (i in 1:k) {
-    if (verbose) {
-      print(paste("Running", i, "out of", k, "CV fold."))
-    }
-    # get train and test set -- training set is everything but fold i
-    train_idx <- cv_idx != i
-    test_idx <- !train_idx
-    
-    # Estimate CATE with the given learner function
-    estimator_trained <- estimator(feat = feat[train_idx, ],
-                                   tr = tr[train_idx],
-                                   yobs = yobs[train_idx])
-    cate_est[test_idx] <- EstimateCate(estimator_trained, feat[test_idx, ])
-  }
+  # Run a k-fold CV to estimate the CATE for each unit
+  cate_est <- compute_CATE_estimates(feat, yobs, tr, estimator, k, verbose)
   
   # ----------------------------------------------------------------------------
   #  Evaluate how close the average CATE is to the matching estimated ATE

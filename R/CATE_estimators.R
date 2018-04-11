@@ -102,12 +102,7 @@ setGeneric(
 #' @name CateCI-Meta-learner
 #' @rdname CateCI-Meta-learner
 #' @description Return the estimated confidence intervals for the CATE
-#' @param theObject A `Meta-learner` object.
-#' @param feature_new A feature data frame.
-#' @param method Different versions of the bootstrap. Only n2TBS implemented
-#' @param B Number of bootstrap samples.
-#' @param nthread Number of threads used.
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @inheritParams CateCI
 #' @return A data frame of estimated CATE Confidence Intervals
 #' @aliases CateCI,Meta-learner-method
 #' @exportMethod CateCI
@@ -229,12 +224,8 @@ setMethod(
 #' EstimateAllSampleStatistics-Meta-learner
 #' @name EstimateAllSampleStatistics-Meta-learner
 #' @rdname EstimateAllSampleStatistics-Meta-learner
-#' @param theObject A `Meta-learner` object.
-#' @param method Different versions of the bootstrap.
-#' @param B Number of boostrap samples.
-#' @param nthread Number of threads to be used
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @description ...
+#' @inheritParams EstimateAll
+#' @description TODO: add description
 #' @aliases EstimateAllSampleStatistics,Meta-learner-method
 #' @exportMethod EstimateAllSampleStatistics 
 setMethod(

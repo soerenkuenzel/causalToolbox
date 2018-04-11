@@ -11,11 +11,11 @@ gof_subset(feat, yobs, tr, estimator, important.features = colnames(feat),
 \arguments{
 \item{feat}{a data frame of features}
 
-\item{yobs}{a vector of observations}
+\item{yobs}{a vector of observed values}
 
 \item{tr}{a vector of group assignment (assume entries are integers)}
 
-\item{estimator}{a learner constructor}
+\item{estimator}{learner constructor}
 
 \item{important.features}{names of features which should be used in 
 quickmatch to find the relevant subgroups. Only features specified here will 
@@ -31,14 +31,14 @@ goup}
 "mahalanobize": normalization by var(data)
 "studentize" (default): normalization is done with the diagonal of var(data)}
 
-\item{k}{k fold cross validation}
+\item{k}{number of folds used for cross-validation}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{verbose}{logical. If TRUE then detailed updates will be printed}
 }
 \value{
 mean(error) and sd(error)
 }
 \description{
-This functino estimates ATE for each subset, average the CATEs 
+This function estimates ATE for each subset, average the CATEs 
 over each of the subsets and see how close it is to the truth.
 }

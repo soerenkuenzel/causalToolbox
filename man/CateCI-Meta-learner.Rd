@@ -11,15 +11,15 @@
   verbose = TRUE)
 }
 \arguments{
-\item{theObject}{A `Meta-learner` object.}
+\item{theObject}{A `Meta-learner` object}
 
-\item{feature_new}{A feature data frame.}
+\item{feature_new}{A feature data frame}
 
-\item{method}{Different versions of the bootstrap. Only n2TBS implemented}
+\item{method}{Different versions of the bootstrap.}
 
-\item{B}{Number of bootstrap samples.}
+\item{B}{Number of bootstrap samples}
 
-\item{nthread}{Number of threads used.}
+\item{nthread}{number of threads to be used in parallel}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 }

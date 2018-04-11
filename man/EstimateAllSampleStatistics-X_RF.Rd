@@ -12,13 +12,13 @@
 \arguments{
 \item{theObject}{A `X_hRF` object.}
 
-\item{method}{Different versions of the bootstrap.}
+\item{method}{different versions of the bootstrap.}
 
 \item{B}{Number of bootstrap samples.}
 
 \item{nthread}{Number of threads to be used.}
 
-\item{verbose}{A `X_hRF` object.}
+\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \description{
 Return the estimated CATE

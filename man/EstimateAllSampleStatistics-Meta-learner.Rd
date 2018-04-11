@@ -9,17 +9,6 @@
 \S4method{EstimateAllSampleStatistics}{`Meta-learner`}(theObject, method, B,
   nthread, verbose)
 }
-\arguments{
-\item{theObject}{A `Meta-learner` object.}
-
-\item{method}{Different versions of the bootstrap.}
-
-\item{B}{Number of boostrap samples.}
-
-\item{nthread}{Number of threads to be used}
-
-\item{verbose}{TRUE for detailed output FALSE for no output}
-}
 \description{
-...
+TODO: add description
 }

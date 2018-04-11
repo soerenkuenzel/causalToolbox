@@ -16,7 +16,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(xl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[2,]),
-               c(0.068551097, 0.008933832, 0.128168362),
+               c(0.081145063, 0.003390044, 0.158900082),
                tolerance = 1e-4)
 
   sl <- S_RF(
@@ -27,7 +27,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(sl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.0003204346, -0.0438700601,  0.0445109292),
+               c(0-0.009515285, -0.040672827, 0.021642256),
                tolerance = 1e-4)
 
   tl <- T_RF(
@@ -38,7 +38,7 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(-0.01093721, -0.14335959,  0.12148516),
+               c(0.01109552, -0.12133612, 0.14352717),
                tolerance = 1e-4)
 
   tl <- T_BART(
@@ -48,6 +48,6 @@ test_that("Tests CateCI", {
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.01734046, -0.36126050,  0.37568245),
+               c(0.01734046, -0.36126050, 0.37568245),
                tolerance = 1e-7)
 })

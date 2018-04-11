@@ -105,10 +105,10 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  684.4214,
+  207.5641,
   tolerance = 1)
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0; verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], -0.04557606, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], 1.232194, tolerance = 1e-1)
 })

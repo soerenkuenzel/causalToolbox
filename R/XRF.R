@@ -457,10 +457,7 @@ setMethod(
 #' @name EstimateAllSampleStatistics-X_RF
 #' @rdname EstimateAllSampleStatistics-X_RF
 #' @param theObject A `X_hRF` object.
-#' @param method Different versions of the bootstrap.
-#' @param B Number of bootstrap samples.
-#' @param nthread Number of threads to be used.
-#' @param verbose A `X_hRF` object.
+#' @inheritParams EstimateAllSampleStatistics
 #' @description Return the estimated CATE
 #' @aliases EstimateAllSampleStatistics,X_RF-method
 #' @exportMethod EstimateAllSampleStatistics

@@ -35,7 +35,7 @@ test_that("Tests test-Xhrf_autotune_simple", {
     verbose = FALSE
   )
   
-  expect_equal(setup_check[1, 2], 10.09048, tolerance = 1e-1)
+  expect_equal(setup_check[1, 2], 10.09047, tolerance = 1e-1)
   ### Test 2:
   set.seed(432)
   cate_problem <-
@@ -65,9 +65,9 @@ test_that("Tests test-Xhrf_autotune_simple", {
   expect_equal(mean((
     EstimateCate(mm, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  225, tolerance = 1)
+  429.5258, tolerance = 1)
   
   CATE_ci <- CateCI(mm, B = 2, cate_problem$feat_te, verbose = FALSE)
   
-  expect_equal(CATE_ci[2, 2], -11.64397, tolerance = 1e-1)
+  expect_equal(CATE_ci[2, 2], -7.740004, tolerance = 1e-1)
 })
