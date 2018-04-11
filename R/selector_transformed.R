@@ -53,6 +53,30 @@ getCV_indexes <- function(tr, k) {
   
   return(cv_fold_idx)
 }
+
+compute_CATE_estimates <- function(feat, yobs, tr, estimator, k, verbose) {
+  # Compute the CATE estimates using a k fold CV
+  n <- length(tr)
+  # Create CV idxes
+  cv_idx <- getCV_indexes(tr = tr, k = k)
+
+  cate_est <- rep(NA, n) # will contain the estimates
+  for (i in 1:k) {
+    if (verbose) {
+      print(paste("Running", i, "out of", k, "CV fold."))
+    }
+    # get train and test set -- training set is everything but fold i
+    train_idx <- cv_idx != i
+    test_idx <- !train_idx
+   
+    # Estimate CATE with the given learner function
+    estimator_trained <- estimator(feat = feat[train_idx, ],
+                                   tr = tr[train_idx],
+                                   yobs = yobs[train_idx])
+    cate_est[test_idx] <- EstimateCate(estimator_trained, feat[test_idx, ])
+  }
+  return(cate_est)
+}
 # ------------------------------------------------------------------------------
 
 #' gof_transformed
@@ -81,32 +105,14 @@ gof_transformed <- function(feat,
     stop("0 < emin < 0.5")
   }
   catch_error(feat, yobs, tr, k)
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Compute the CATE estimates using a k fold CV
-  n <- length(tr)
-  # Create CV idxes
-  cv_idx <- getCV_indexes(tr = tr, k = k)
-  
-  cate_est <- rep(NA, n) # will contain the estimates
-  for (i in 1:k) {
-    if (verbose) {
-      print(paste("Running", i, "out of", k, "CV fold."))
-    }
-    # get train and test set -- training set is everything but fold i
-    train_idx <- cv_idx != i
-    test_idx <- !train_idx
-   
-    # Estimate CATE with the given learner function
-    estimator_trained <- estimator(feat = feat[train_idx, ],
-                                   tr = tr[train_idx],
-                                   yobs = yobs[train_idx])
-    cate_est[test_idx] <- EstimateCate(estimator_trained, feat[test_idx, ])
-  }
+  cate_est <- compute_CATE_estimates(feat, yobs, tr, estimator, k, verbose)
 
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Compute the Y star and evaluate the model
   
-  # Calculate propensity score
+  # Estimate propensity score
   pscore_estimator <- ranger::ranger(tr ~ ., 
                                      data = data.frame(feat, 
                                                        tr = factor(tr)), 
@@ -122,10 +128,10 @@ gof_transformed <- function(feat,
   # Calculate y_star_te
   y_star <- yobs / (tr * pscore_pred - (1 - tr) * (1 - pscore_pred))
 
-  # Calcualte the Goodness-of-Fit
+  # Calculate the Goodness-of-Fit
   mse <- mean((y_star - cate_est) ^ 2)
   sd_err <- sd((y_star - cate_est) ^ 2) / sqrt(n)
 
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   return(c(mse, sd_err))
 }

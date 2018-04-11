@@ -11,7 +11,6 @@ test_that("Tests Selector Transformed", {
   expect_equal(getCV_indexes(tr = tr, k = 4)[1:4],
                c(4, 2, 2, 1))
   
-  
   # ----------------------------------------------------------------------------
   set.seed(1423614230)
   
@@ -21,31 +20,27 @@ test_that("Tests Selector Transformed", {
                                    alpha = 0.1,
                                    setup = "complexTau2")
   
-
-    gof_values_S_BART <- gof_transformed(
-      yobs = dt$Yobs_tr,
-      tr = dt$W_tr,
-      feat = dt$feat_tr,
-      estimator = S_BART,
-      k = 3,
-      emin = 1e-5
-    )
-  
+  gof_values_S_BART <- gof_transformed(
+    yobs = dt$Yobs_tr,
+    tr = dt$W_tr,
+    feat = dt$feat_tr,
+    estimator = S_BART,
+    k = 3,
+    emin = 1e-5
+  )
   
   expect_equal(gof_values_S_BART,
                c(12338.0071, 997.3583), 
                tolerance = 1e-3)
   
-
-    gof_values_S_RF <- gof_transformed(
-      yobs = dt$Yobs_tr,
-      tr = dt$W_tr,
-      feat = dt$feat_tr,
-      estimator = S_RF,
-      k = 3,
-      emin = 1e-5
-    )
-  
+  gof_values_S_RF <- gof_transformed(
+    yobs = dt$Yobs_tr,
+    tr = dt$W_tr,
+    feat = dt$feat_tr,
+    estimator = S_RF,
+    k = 3,
+    emin = 1e-5
+  )
   
   expect_equal(gof_values_S_RF,
                c(13155.749, 1060.212),

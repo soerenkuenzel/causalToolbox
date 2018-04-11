@@ -57,23 +57,8 @@ gof_subset <- function(feat, yobs, tr, estimator,
   # table(unit_match)
   
   # ----------------------------------------------------------------------------
-  # Run a k fold CV to estimate the CATE for each unit
-  cv_idx <- getCV_indexes(tr = tr, k = k)
-  cate_est <- rep(NA, n_obs) # will contain the estimates
-  for (i in 1:k) {
-    if (verbose) {
-      print(paste("Running", i, "out of", k, "CV fold."))
-    }
-    # get train and test set -- training set is everything but fold i
-    train_idx <- cv_idx != i
-    test_idx <- !train_idx
-    
-    # Estimate CATE with the given learner function
-    estimator_trained <- estimator(feat = feat[train_idx, ],
-                                   tr = tr[train_idx],
-                                   yobs = yobs[train_idx])
-    cate_est[test_idx] <- EstimateCate(estimator_trained, feat[test_idx, ])
-  }
+  # Run a k-fold CV to estimate the CATE for each unit
+  cate_est <- compute_CATE_estimates(feat, yobs, tr, estimator, k, verbose)
   
   # ----------------------------------------------------------------------------
   #  Evaluate how close the average CATE is to the matching estimated ATE
