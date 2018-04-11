@@ -30,7 +30,7 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_BART,
-               c(12104.0393, 886.9624), 
+               c(12338.0071, 997.3583), 
                tolerance = 1e-3)
   
   gof_values_S_RF <- gof_transformed(
@@ -43,6 +43,6 @@ test_that("Tests Selector Transformed", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(12887.1423, 983.2263),
+               c(13161.773, 1060.213),
                tolerance = 1e-3)
 })

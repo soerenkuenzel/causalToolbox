@@ -39,7 +39,7 @@ gof_double_robust <- function(feat, yobs, tr, estimator, emin,
   # For(i in 1:k):
   # 1. Train Estimator on everything but S_i and call the estimator \tau_i
   # 2. Use \tau_i to predict outcomes in in S_i and call them \hat tau_i
-  cate_est <- compute_CATE_estimates(feat, yobs, tr, estimator, k, verbobse)
+  cate_est <- compute_CATE_estimates(feat, yobs, tr, estimator, k, verbose)
   # Return 
   # sum_i (\hat tau_i) ^ 2 - 2 \hat tau_i * (Y_i - \hat \mu(X_i)) / (W_i - \hat e(X_i))
   result <- sum(cate_est ^ 2 - 2 * cate_est * (yobs - outcome_pred) / (tr - pscore_pred))
