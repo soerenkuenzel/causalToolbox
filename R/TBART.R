@@ -172,9 +172,7 @@ setMethod(
 #' @rdname CateCI-T_BART
 #' @description Return the estimated CATE
 #' @param theObject A `T_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose TRUE for detailed output FALSE for no output. 
-#' (Should the training output be posted?)
+#' @inheritParams CateCI
 #' @return A vector of predicted CATE
 #' @aliases CateCI,T_BART-method
 #' @exportMethod CateCI

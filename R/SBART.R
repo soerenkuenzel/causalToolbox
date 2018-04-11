@@ -68,8 +68,8 @@ S_BART <-
 #' @name EstimateCate-S_BART
 #' @rdname EstimateCate-S_BART
 #' @description Return the estimated CATE
+#' @inheritParams EstimateCate
 #' @param theObject A `S_BART` object.
-#' @param feature_new A feature data frame.
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_BART-method
@@ -98,8 +98,7 @@ setMethod(
 #' @rdname CateCI-S_BART
 #' @description Return the estimated CATE
 #' @param theObject A `S_BART` object.
-#' @param feature_new A data frame of features.
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @inheritParams CateCI
 #' @return A vector of predicted CATE
 #' @aliases CateCI,S_BART-method
 #' @exportMethod CateCI
