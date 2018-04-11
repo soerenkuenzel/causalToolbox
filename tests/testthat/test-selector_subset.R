@@ -42,6 +42,6 @@ test_that("Tests Selector Subset", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(5.756947, 3.308356),
+               c(4.760388, 2.881059),
                tolerance = 1e-3)
 })

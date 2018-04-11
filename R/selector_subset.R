@@ -1,5 +1,4 @@
-#' @include selector_transformed.R
-
+#' @include helper_functions.R
 # ------------------------------------------------------------------------------
 
 #' gof_subset

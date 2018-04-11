@@ -26,6 +26,3 @@ to avoid decide by 0 error}
 \value{
 mean(error) and sd(error)
 }
-\description{
-gof_transformed
-}

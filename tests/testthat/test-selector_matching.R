@@ -34,6 +34,6 @@ test_that("Tests Selector matching", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(227.57616, 25.22031),
+               c(227.53828, 25.34041),
                tolerance = 1e-3)
 })

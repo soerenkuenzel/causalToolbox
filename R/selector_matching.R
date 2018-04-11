@@ -1,4 +1,4 @@
-#' @include selector_transformed.R
+#' @include helper_functions.R
 #' This is included to have the get get_CV_sizes.R function
 
 #' gof_matching
@@ -39,16 +39,7 @@ gof_matching <- function(feat,
   catch_error(feat, yobs, tr, k)
   # -------------------------------------------------------------------------
   # Estimate propensity score
-  pscore_estimator <- ranger::ranger(tr ~ .,
-                                     data = data.frame(feat, tr = factor(tr)),
-                                     probability = TRUE)
-  pscore_pred_raw <- pscore_estimator$predictions[, 2]
-  pscore_pred <- ifelse(
-    pscore_pred_raw < emin,
-    emin,
-    ifelse(pscore_pred_raw > 1 - emin, 1 - emin,
-           pscore_pred_raw)
-  )
+  pscore_pred <- get_pscore(feat, tr, emin)
   # --------------------------------------------------------------------------
   # Create the matched data set. We match on the features and we create a
   # data set which has features|Y(0)|Y(1)|pscore
