@@ -10,21 +10,22 @@ gof_matching(feat, yobs, tr, estimator, estimand = "ATT", k = 2,
 \arguments{
 \item{feat}{a data frame of features}
 
-\item{yobs}{a vector of observations}
+\item{yobs}{a vector of observed values}
 
 \item{tr}{a vector of group assignment (assume entries are integers)}
 
-\item{estimator}{a learner constructor}
+\item{estimator}{learner constructor}
 
 \item{estimand}{ATE, ATT or ATC}
 
-\item{k}{Number of folds used for cross validation}
+\item{k}{number of folds used for cross-validation}
 
-\item{replace}{Whether or not to replace samples while matching}
+\item{replace}{logical. If TRUE then samples will be replaced while matching}
 
-\item{emin}{Minimum value of the propensity score}
+\item{emin}{the pscore estimate will be bounded between emin and 1 - emin
+in order to avoid any divide-by-zero errors}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{verbose}{logical. If TRUE then detailed updates will be printed}
 }
 \value{
 mean(error) and sd(error)

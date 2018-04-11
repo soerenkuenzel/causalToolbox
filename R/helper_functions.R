@@ -4,6 +4,7 @@
 #' @include XRF.R
 #' @include SBART.R
 #' @include SRF.R
+
 #-------------------------------------------------------------------------------
 catch_error <- function(feat, yobs, tr, k) {
   n <- length(tr)
@@ -19,6 +20,7 @@ catch_error <- function(feat, yobs, tr, k) {
     stop("k must be an integer bigger than 1!")
   }
 }
+
 #-------------------------------------------------------------------------------
 get_CV_sizes <- function(n, k) {
   # n: number of units
@@ -29,6 +31,7 @@ get_CV_sizes <- function(n, k) {
   sizes <- rep(small_size, k) + c(rep(1, remainder), rep(0, k - remainder)) 
   return(sizes)
 }
+
 #-------------------------------------------------------------------------------
 getCV_indexes <- function(tr, k) {
   # Description: this function splits n = length(tr) units into k folds 
@@ -48,6 +51,7 @@ getCV_indexes <- function(tr, k) {
   
   return(cv_fold_idx)
 }
+
 #-------------------------------------------------------------------------------
 # Compute the CATE estimates using a k fold CV
 compute_CATE_estimates <- function(feat, yobs, tr, estimator, k, verbose) {
@@ -72,10 +76,11 @@ compute_CATE_estimates <- function(feat, yobs, tr, estimator, k, verbose) {
   }
   return(cate_est)
 }
+
 #-------------------------------------------------------------------------------
-#Estimate the propensity score, E[W|X]
+# Estimate the propensity score, E[W|X]
 library(ranger)
-get_pscore <- function(feat, tr, emin) {
+estimate_pscore <- function(feat, tr, emin) {
   pscore_estimator <- ranger::ranger(tr ~ ., 
                                      data = data.frame(feat, 
                                                        tr = factor(tr)), 
@@ -89,9 +94,10 @@ get_pscore <- function(feat, tr, emin) {
   )
   return(pscore_pred)
 }
+
 #-------------------------------------------------------------------------------
-#Estimate the expected outcome, E[Y|X]
-get_pred_y <- function(feat, yobs) {
+# Estimate the expected outcome, E[Y|X]
+estimate_pred_y <- function(feat, yobs) {
   outcome_estimator <- ranger::ranger(yobs ~ ., 
                                       data = data.frame(feat, 
                                                         yobs))

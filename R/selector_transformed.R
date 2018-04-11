@@ -1,16 +1,17 @@
 #' @include helper_functions.R
 #-------------------------------------------------------------------------------
+
 #' gof_transformed
 #' @title gof_transformed
 #' @name gof_transformed
-#' @param feat A data frame of features
-#' @param yobs A vector of observations
-#' @param tr A vector of group assignment (assume entries are integers)
-#' @param estimator A learner constructor
-#' @param k Number of folds used for cross validation
-#' @param emin the pscore prediciton will be bounded between emin and 1 - emin
-#' to avoid decide by 0 error
-#' @param verbose determines whether detailed updates will be printed
+#' @param feat a data frame of features
+#' @param yobs a vector of observed values
+#' @param tr a vector of group assignment (assume entries are integers)
+#' @param estimator learner constructor
+#' @param k number of folds used for cross-validation
+#' @param emin the pscore estimate will be bounded between emin and 1 - emin
+#' in order to avoid any divide-by-zero errors
+#' @param verbose logical. If TRUE then detailed updates will be printed
 #' @return mean(error) and sd(error)
 #' @import ranger
 #' @export gof_transformed
@@ -33,10 +34,10 @@ gof_transformed <- function(feat,
 
   # ----------------------------------------------------------------------------
   # Compute the Y star and evaluate the model
-  
+
   # Estimate propensity score
-  pscore_pred <- get_pscore(feat, tr, emin)
-  
+  pscore_pred <- estimate_pscore(feat, tr, emin)
+
   # Calculate y_star_te
   y_star <- yobs / (tr * pscore_pred - (1 - tr) * (1 - pscore_pred))
 

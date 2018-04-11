@@ -9,17 +9,18 @@ gof_double_robust(feat, yobs, tr, estimator, emin, k = 5, verbose = FALSE)
 \arguments{
 \item{feat}{a data frame of features}
 
-\item{yobs}{a vector of observations}
+\item{yobs}{a vector of observed values}
 
 \item{tr}{a vector of group assignment (assume entries are integers)}
 
-\item{estimator}{a learner constructor}
+\item{estimator}{learner constructor}
 
-\item{emin}{Minimum value of the propensity score}
+\item{emin}{the pscore estimate will be bounded between emin and 1 - emin
+in order to avoid any divide-by-zero errors}
 
-\item{k}{k fold cross validation}
+\item{k}{number of folds used for cross-validation}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{verbose}{logical. If TRUE then detailed updates will be printed}
 }
 \value{
 error

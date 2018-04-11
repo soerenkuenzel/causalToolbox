@@ -8,20 +8,20 @@ gof_transformed(feat, yobs, tr, estimator, k = 2, emin = 1e-05,
   verbose = FALSE)
 }
 \arguments{
-\item{feat}{A data frame of features}
+\item{feat}{a data frame of features}
 
-\item{yobs}{A vector of observations}
+\item{yobs}{a vector of observed values}
 
-\item{tr}{A vector of group assignment (assume entries are integers)}
+\item{tr}{a vector of group assignment (assume entries are integers)}
 
-\item{estimator}{A learner constructor}
+\item{estimator}{learner constructor}
 
-\item{k}{Number of folds used for cross validation}
+\item{k}{number of folds used for cross-validation}
 
-\item{emin}{the pscore prediciton will be bounded between emin and 1 - emin
-to avoid decide by 0 error}
+\item{emin}{the pscore estimate will be bounded between emin and 1 - emin
+in order to avoid any divide-by-zero errors}
 
-\item{verbose}{determines whether detailed updates will be printed}
+\item{verbose}{logical. If TRUE then detailed updates will be printed}
 }
 \value{
 mean(error) and sd(error)

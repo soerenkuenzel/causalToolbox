@@ -1,15 +1,10 @@
 #' @include helper_functions.R
 # ------------------------------------------------------------------------------
+
 #' gof_double_robust
 #' @title gof_double_robust
 #' @name gof_double_robust
-#' @param feat a data frame of features
-#' @param yobs a vector of observations
-#' @param tr a vector of group assignment (assume entries are integers)
-#' @param estimator a learner constructor
-#' @param emin Minimum value of the propensity score
-#' @param k k fold cross validation
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @inheritParams gof_transformed
 #' @return error
 #' @import ranger
 #' @export gof_double_robust
@@ -29,11 +24,11 @@ gof_double_robust <- function(feat, yobs, tr, estimator, emin,
 
   # ----------------------------------------------------------------------------
   # Estimate propensity score: E(W|X)
-  pscore_pred <- get_pscore(feat, tr, emin)
+  pscore_pred <- estimate_pscore(feat, tr, emin)
 
   # ----------------------------------------------------------------------------
   # Estimate the expected outcome: E(Y|X)
-  outcome_pred <- get_pred_y(feat, yobs)
+  outcome_pred <- estimate_pred_y(feat, yobs)
 
   # ----------------------------------------------------------------------------
   # For(i in 1:k):

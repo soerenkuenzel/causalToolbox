@@ -9,15 +9,9 @@
 #' of cross validation, assign treatment lablels (0 or 1) with probability given 
 #' by averaged propensity score for each pair of match and estimate CATE. Return
 #' the mean squared error and its standard deviation of CATE from the true difference. 
-#' @param feat a data frame of features
-#' @param yobs a vector of observations
-#' @param tr a vector of group assignment (assume entries are integers)
-#' @param estimator a learner constructor
 #' @param estimand ATE, ATT or ATC
-#' @param k Number of folds used for cross validation
-#' @param replace Whether or not to replace samples while matching
-#' @param emin Minimum value of the propensity score
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @param replace logical. If TRUE then samples will be replaced while matching
+#' @inheritParams gof_transformed
 #' @return mean(error) and sd(error)
 #' @import Matching
 #' @import ranger
@@ -37,9 +31,11 @@ gof_matching <- function(feat,
     stop("0 < emin < 0.5")
   }
   catch_error(feat, yobs, tr, k)
+  
   # -------------------------------------------------------------------------
   # Estimate propensity score
-  pscore_pred <- get_pscore(feat, tr, emin)
+  pscore_pred <- estimate_pscore(feat, tr, emin)
+  
   # --------------------------------------------------------------------------
   # Create the matched data set. We match on the features and we create a
   # data set which has features|Y(0)|Y(1)|pscore

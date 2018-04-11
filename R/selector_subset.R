@@ -4,12 +4,8 @@
 #' gof_subset
 #' @title gof_subset
 #' @name gof_subset
-#' @description This functino estimates ATE for each subset, average the CATEs 
+#' @description This function estimates ATE for each subset, average the CATEs 
 #' over each of the subsets and see how close it is to the truth. 
-#' @param feat a data frame of features
-#' @param yobs a vector of observations
-#' @param tr a vector of group assignment (assume entries are integers)
-#' @param estimator a learner constructor
 #' @param important.features names of features which should be used in 
 #' quickmatch to find the relevant subgroups. Only features specified here will 
 #' be used to create the subgroups
@@ -21,8 +17,7 @@
 #' "none": no normalization. 
 #' "mahalanobize": normalization by var(data)
 #' "studentize" (default): normalization is done with the diagonal of var(data)
-#' @param k k fold cross validation
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @inheritParams gof_transformed
 #' @return mean(error) and sd(error)
 #' @import quickmatch
 #' @import distances
