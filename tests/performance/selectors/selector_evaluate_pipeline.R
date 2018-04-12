@@ -120,6 +120,14 @@ selector_grid <- list(
                yobs = Yobs,
                tr = W_tr,
                estimator = estimator)
+  },
+  "robust" = function(Yobs, W_tr, feat, estimator) {
+    gof_double_robust(feat = feat,
+                      yobs = Yobs,
+                      tr = W_tr,
+                      estimator = estimator,
+                      k = 5,
+                      emin = 1e-5)
   }
 )
 
@@ -329,7 +337,8 @@ foreach(ntrain = ntrain_grid) %dopar% {
           estimator = estimator_name,
           selector = selector_name,
           setup = setup,
-          score = selector_vals[1]
+          score = selector_vals[1],
+          sd = selector_vals[2]
         )
         
         col.names <- !file.exists(filename)
