@@ -19,7 +19,7 @@ test_that("Tests Selector Double_Robust", {
   )
   
   expect_equal(gof_values_S_BART,
-               -350866.4, 
+               c(-701.73279, 99.38653), 
                tolerance = 1e-3)
   
   gof_values_S_RF <- gof_double_robust(
@@ -32,6 +32,6 @@ test_that("Tests Selector Double_Robust", {
   )
   
   expect_equal(gof_values_S_RF,
-               -20198.55,
+               c(-40.397062, 6.117541),
                tolerance = 1e-3)
 })
