@@ -1,5 +1,5 @@
 library(tidyverse)
-setwd('/Users/soeren/Dropbox/causalToolbox/tests/performance/selectors/sim_data')
+setwd('/Users/soeren/Dropbox/causalToolbox/tests/performance/selectors/sim_data_3/')
 
 # -- Read in all the data ------------------------------------------------------
 available_files <- 
@@ -29,7 +29,7 @@ performance$highestMSE <- NA
 performance$chosenMSE <- NA
 
 for (setting_i in 1:nrow(performance)) {
-  print(paste(setting_i, 'of', nrow(performance)))
+  if(setting_i%%50 == 0) print(paste(setting_i, 'of', nrow(performance)))
   setting <- performance[setting_i,]
   
   # find the lowest MSE
