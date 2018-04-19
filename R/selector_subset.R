@@ -12,7 +12,7 @@
 #' @param min.treat.size.per.group the minimum size of each treatment group 
 #' per matched subset. For example, if it is chosen to be 25 (the default), then 
 #' at least 25 units in each subgroup are treated and 25 are in the control
-#' goup
+#' group
 #' @param normalize Specifies how the distance should be normalized. 
 #' "none": no normalization. 
 #' "mahalanobize": normalization by var(data)
