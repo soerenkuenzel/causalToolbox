@@ -23,18 +23,19 @@ truth_dta <- tbl_df(truth_dta)
 selector_dta <- tbl_df(selector_dta)
 
 # -- Compute for each setting the performance of the selected method -----------
-performance <- unique(selector_dta %>% select(-estimator, -score))
+performance <- unique(selector_dta %>% select(-estimator, -score, -sd))
 performance$lowestMSE <- NA
 performance$highestMSE <- NA
 performance$chosenMSE <- NA
 
 for (setting_i in 1:nrow(performance)) {
-  if(setting_i%%50 == 0) print(paste(setting_i, 'of', nrow(performance)))
+  if (setting_i%%50 == 0) print(paste(setting_i, 'of', nrow(performance)))
   setting <- performance[setting_i,]
   
   # find the lowest MSE
   true_performance <- merge(setting %>% select(-selector), truth_dta)
   dublicated <- true_performance %>% select(-MSE, -MSE_sd) %>% duplicated()
+  if(!all(!dublicated)) stop("There are dublicates")
   true_performance <- true_performance[!dublicated, ]
   performance$lowestMSE[setting_i] <- min(true_performance$MSE)
   performance$highestMSE[setting_i] <- max(true_performance$MSE)
@@ -42,10 +43,11 @@ for (setting_i in 1:nrow(performance)) {
   # find the chosen MSE
   selector_dta_setting <- merge(setting, selector_dta)
   dublicated <- selector_dta_setting %>% select(-score) %>% duplicated()
+  if(!all(!dublicated)) stop("There are dublicates")
   selector_dta_setting <- selector_dta_setting[!dublicated, ]
   chosen_estimator <- 
     selector_dta_setting$estimator[which.min(selector_dta_setting$score)]
-  true_performance$MSE[true_performance$estimator == chosen_estimator]
+  # true_performance$MSE[true_performance$estimator == chosen_estimator]
   
   if(length(chosen_estimator) == 0) next
   performance$chosenMSE[setting_i] <- 
@@ -81,7 +83,31 @@ performance %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
   theme(legend.position = "none")
   
-ggsave('../ChosenMSE_violin_plot.pdf', height = 8, width = 10)
+ggsave('../ChosenMSE_violin_plot_3.pdf', height = 8, width = 10)
 
 
+
+table(performance$selector, performance$)
+table(duplicated(performance[]))
+
+
+performance2 <- performance
+
+performance2 <- performance2[!duplicated(performance2[,1:9]), ]
+
+performance2 %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../ChosenMSE_violin_plot_3_no_dublicated.pdf', height = 8, width = 10)
+
+table(performance2$selector)
 
