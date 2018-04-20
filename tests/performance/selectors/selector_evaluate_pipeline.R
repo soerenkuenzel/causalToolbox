@@ -21,7 +21,7 @@ set.seed(28104)
 # ------------------------------------------------------------------------------
 ## Evaluation setup
 seed <- 1500
-dim <- 20
+dim_grid <- c(5, 20, 100)
 alpha <- 0.1
 # ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
 ntrain_grid <- c(2000)
@@ -133,11 +133,11 @@ selector_grid <- list(
 
 estimator_grid <- list(
   "S_RF" = function(feat, tr, yobs)
-    S_RF(feat, tr, yobs, nthread = nthread),
+    S_RF(feat, tr, yobs),
   "T_RF" = function(feat, tr, yobs)
-    T_RF(feat, tr, yobs, nthread = nthread),
+    T_RF(feat, tr, yobs),
   "X_RF" = function(feat, tr, yobs)
-    X_RF(feat, tr, yobs, verbose = FALSE, nthread = nthread),
+    X_RF(feat, tr, yobs, verbose = FALSE),
   "S_BART" = function(feat, tr, yobs)
     S_BART(feat, tr, yobs),
   "T_BART" = function(feat, tr, yobs)
@@ -224,140 +224,144 @@ if (file.exists(filename)) {
 #             "of", paste(dim_grid, collapse = ", ")))
 # for (ntrain in ntrain_grid) {
 foreach(ntrain = ntrain_grid) %dopar% {
-  # Create training and test data
-  set.seed(seed)
-  dt <- simulate_causal_experiment(
-    ntrain = ntrain,
-    ntest = ntest,
-    dim = dim,
-    alpha = alpha,
-    feat_distribution = "normal",
-    setup = setup,
-    testseed = 293901,
-    trainseed = seed
-  )
-
-  # Evaluate each estimator on the truth and run every selector
-  for (estimator_i in 1:length(estimator_grid)) {
-    estimator <- estimator_grid[[estimator_i]]
-    estimator_name <- names(estimator_grid)[estimator_i]
-    CATEpredictor <- CATEpredictor_grid[[estimator_name]]
-    
-    if (exists("already_ran_truth") &&
-        (paste(c(seed, alpha, dim, ntrain, estimator_name),
-               collapse = ",") %in%
-         apply(already_ran_truth, 1, function(x){
-           paste(x, collapse = ",")
-         }))) {
-      print(paste(
-        paste(c(seed, alpha, dim, ntrain, estimator_name), collapse = ","),
-        "truth data already exists. Running next setting."
-      ))
-    } else {
-      estimates <- tryCatch({
-        L <- estimator(
-          feat = dt$feat_tr,
-          tr = dt$W_tr,
-          yobs = dt$Yobs_tr
-        )
-        CATEpredictor(L, dt$feat_te)
-      },
-      error = function(e) {
-          print(e)
-          warning(paste("Something went wrong with", estimator_name,
-                        "on", setup))
-          return(NA)         
-      })
-      MSE <- mean((dt$tau_te - estimates)^2)
-      MSE_sd <- sd((dt$tau_te - estimates)^2) / sqrt(length(dt$tau_te))
+  for (dim in dim_grid) {
+    # Create training and test data
+    set.seed(seed)
+    dt <- simulate_causal_experiment(
+      ntrain = ntrain,
+      ntest = ntest,
+      dim = dim,
+      alpha = alpha,
+      feat_distribution = "normal",
+      setup = setup,
+      testseed = 293901,
+      trainseed = seed
+    )
+  
+    # Evaluate each estimator on the truth and run every selector
+    for (estimator_i in 1:length(estimator_grid)) {
+      estimator <- estimator_grid[[estimator_i]]
+      estimator_name <- names(estimator_grid)[estimator_i]
+      CATEpredictor <- CATEpredictor_grid[[estimator_name]]
       
-      Residuals <- data.frame(
-        seed = seed,
-        alpha = alpha,
-        dim = dim,
-        feat_distribution = "normal",
-        testseed = 293901,
-        trainingseed = seed,
-        ntrain = ntrain,
-        estimator = estimator_name,
-        setup = setup,
-
-        MSE = MSE,
-        MSE_sd = MSE_sd
-      )
-      
-      col.names <- !file.exists(filename_truth)
-      write.table(
-        Residuals,
-        file = filename_truth,
-        append = TRUE,
-        col.names = col.names,
-        row.names = FALSE,
-        sep = ","
-      )
-    }
-    
-    for (selector_i in 1:length(selector_grid)) {
-      selector <- selector_grid[[selector_i]]
-      selector_name <- names(selector_grid)[selector_i]
-      
-      if (exists("already_ran") &&
-         (paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name),
-               collapse = ",") %in%
-         apply(already_ran, 1, function(x){
-           paste(x, collapse = ",")
-         }))) {
+      if (exists("already_ran_truth") &&
+          (paste(c(seed, alpha, dim, ntrain, estimator_name),
+                 collapse = ",") %in%
+           apply(already_ran_truth, 1, function(x){
+             paste(x, collapse = ",")
+           }))) {
         print(paste(
-          paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name), collapse = ","),
-          "selector data already exists. Running next setting."
+          paste(c(seed, alpha, dim, ntrain, estimator_name), collapse = ","),
+          "truth data already exists. Running next setting."
         ))
       } else {
-        print(paste("==> Running", selector_name,
-                    "on", setup))
-  
-        selector_vals <- tryCatch({
-          selector(dt$Yobs_tr, dt$W_tr, dt$feat_tr, estimator)
+        estimates <- tryCatch({
+          L <- estimator(
+            feat = dt$feat_tr,
+            tr = dt$W_tr,
+            yobs = dt$Yobs_tr
+          )
+          CATEpredictor(L, dt$feat_te)
         },
         error = function(e) {
-          print(e)
-          warning(paste("Something went wrong with", estimator_name,
-                        "and selector", selector_name,
-                        "on", setup))
-          return(NA)
+            print(e)
+            warning(paste("Something went wrong with", estimator_name,
+                          "on", setup))
+            return(NA)         
         })
+        MSE <- mean((dt$tau_te - estimates)^2)
+        MSE_sd <- sd((dt$tau_te - estimates)^2) / sqrt(length(dt$tau_te))
         
-        selector_data <- data.frame(
+        Residuals <- data.frame(
           seed = seed,
           alpha = alpha,
           dim = dim,
-          ntrain = ntrain,
           feat_distribution = "normal",
           testseed = 293901,
           trainingseed = seed,
+          ntrain = ntrain,
           estimator = estimator_name,
-          selector = selector_name,
           setup = setup,
-          score = selector_vals[1],
-          sd = selector_vals[2]
+  
+          MSE = MSE,
+          MSE_sd = MSE_sd
         )
         
-        col.names <- !file.exists(filename)
+        col.names <- !file.exists(filename_truth)
         write.table(
-          selector_data,
-          file = filename,
+          Residuals,
+          file = filename_truth,
           append = TRUE,
           col.names = col.names,
           row.names = FALSE,
           sep = ","
         )
       }
-    }
+      
+      for (selector_i in 1:length(selector_grid)) {
+        selector <- selector_grid[[selector_i]]
+        selector_name <- names(selector_grid)[selector_i]
+        
+        if (exists("already_ran") &&
+           (paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name),
+                 collapse = ",") %in%
+           apply(already_ran, 1, function(x){
+             paste(x, collapse = ",")
+           }))) {
+          print(paste(
+            paste(c(seed, alpha, dim, ntrain, estimator_name, selector_name), collapse = ","),
+            "selector data already exists. Running next setting."
+          ))
+        } else {
+          print(paste("==> Running", selector_name,
+                      "on", setup))
     
-    print(paste(
-      "    Done with ntrain =",
-      ntrain,
-      ", estimator =",
-      estimator_name
-    ))
+          selector_vals <- tryCatch({
+            selector(dt$Yobs_tr, dt$W_tr, dt$feat_tr, estimator)
+          },
+          error = function(e) {
+            print(e)
+            warning(paste("Something went wrong with", estimator_name,
+                          "and selector", selector_name,
+                          "on", setup))
+            return(NA)
+          })
+          
+          selector_data <- data.frame(
+            seed = seed,
+            alpha = alpha,
+            dim = dim,
+            ntrain = ntrain,
+            feat_distribution = "normal",
+            testseed = 293901,
+            trainingseed = seed,
+            estimator = estimator_name,
+            selector = selector_name,
+            setup = setup,
+            score = selector_vals[1],
+            sd = selector_vals[2]
+          )
+          
+          col.names <- !file.exists(filename)
+          write.table(
+            selector_data,
+            file = filename,
+            append = TRUE,
+            col.names = col.names,
+            row.names = FALSE,
+            sep = ","
+          )
+        }
+      }
+      
+      print(paste(
+        "    Done with ntrain =",
+        ntrain,
+        ", estimator =",
+        estimator_name,
+        ", dim =",
+        dim
+      ))
+    }
   }
 }

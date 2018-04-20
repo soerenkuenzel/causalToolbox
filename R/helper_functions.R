@@ -82,8 +82,7 @@ compute_CATE_estimates <- function(feat, yobs, tr, estimator, k, verbose) {
 library(ranger)
 estimate_pscore <- function(feat, tr, emin) {
   pscore_estimator <- ranger::ranger(tr ~ ., 
-                                     data = data.frame(feat, 
-                                                       tr = factor(tr)), 
+                                     data = data.frame(feat, tr = factor(tr)), 
                                      probability = TRUE)
   pscore_pred_raw <- pscore_estimator$predictions[ ,2]
   pscore_pred <- ifelse(
@@ -99,8 +98,7 @@ estimate_pscore <- function(feat, tr, emin) {
 # Estimate the expected outcome, E[Y|X]
 estimate_pred_y <- function(feat, yobs) {
   outcome_estimator <- ranger::ranger(yobs ~ ., 
-                                      data = data.frame(feat, 
-                                                        yobs))
+                                      data = data.frame(feat, tr, yobs))
   outcome_pred <- outcome_estimator$predictions
   return(outcome_pred)
 }

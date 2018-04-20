@@ -28,7 +28,7 @@ gof_double_robust <- function(feat, yobs, tr, estimator, emin,
 
   # ----------------------------------------------------------------------------
   # Estimate the expected outcome: E(Y|X)
-  outcome_pred <- estimate_pred_y(feat, yobs)
+  outcome_pred <- estimate_pred_y(feat, tr, yobs)
 
   # ----------------------------------------------------------------------------
   # For(i in 1:k):
