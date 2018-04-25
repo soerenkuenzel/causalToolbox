@@ -18,6 +18,8 @@ gof_fisher_exact <-
            k = 2,
            verbose = FALSE,
            loss.type = 'min') {
+    print("Think about how this could be done when the propensity score is not
+          constant.")
     catch_error(feat, yobs, tr, k)
     # ----------------------------------------------------------------------------
     # Compute the CATE estimates using a k fold CV
