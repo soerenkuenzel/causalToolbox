@@ -17,7 +17,7 @@ test_that("Tests Selector Double_Robust", {
     k = 3,
     emin = 1e-5
   )
-  
+
   expect_equal(gof_values_S_BART,
                c(-701.73279, 99.38653), 
                tolerance = 1e-3)

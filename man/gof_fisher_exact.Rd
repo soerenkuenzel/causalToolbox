@@ -5,7 +5,7 @@
 \title{gof_fisher_exact}
 \usage{
 gof_fisher_exact(feat, yobs, tr, estimator, k = 2, verbose = FALSE,
-  loss.type = c("min", "mean", "0", "1", "wilcox", "ks"))
+  loss.type = "min")
 }
 \arguments{
 \item{feat}{a data frame of features}
@@ -20,10 +20,10 @@ gof_fisher_exact(feat, yobs, tr, estimator, k = 2, verbose = FALSE,
 
 \item{verbose}{logical. If TRUE then detailed updates will be printed}
 
-\item{loss.type}{One of 'min', 'mean', '0', '1', 'wilcox', and 'ks'. 
-Determines how the loss should be computed from the pvalues of the ks and 
+\item{loss.type}{One of 'min', 'mean', '0', '1', 'wilcox', and 'ks'.
+Determines how the loss should be computed from the pvalues of the ks and
 wilcoxon rank tests.}
 }
 \value{
-mean(error) and sd(error)
+loss between 0 and 1. In the best case the loss is 0.
 }

@@ -98,7 +98,7 @@ estimate_pscore <- function(feat, tr, emin) {
 # Estimate the expected outcome, E[Y|X]
 estimate_pred_y <- function(feat, yobs) {
   outcome_estimator <- ranger::ranger(yobs ~ ., 
-                                      data = data.frame(feat, tr, yobs))
+                                      data = data.frame(feat, yobs))
   outcome_pred <- outcome_estimator$predictions
   return(outcome_pred)
 }
