@@ -1,6 +1,6 @@
 library(tidyverse)
-setwd('/Users/soeren/Dropbox/causalToolbox/tests/performance/selectors/sim_data_3/')
-
+#setwd('/Users/soeren/Dropbox/causalToolbox/tests/performance/selectors/sim_data_3/')
+setwd('/Users/lingxie/Desktop/urap/causalToolbox/tests/performance/selectors/sim_data_3/')
 # -- Read in all the data ------------------------------------------------------
 available_files <- 
   data.frame(file = dir(), 
@@ -23,7 +23,7 @@ truth_dta <- tbl_df(truth_dta)
 selector_dta <- tbl_df(selector_dta)
 
 # -- Compute for each setting the performance of the selected method -----------
-performance <- unique(selector_dta %>% select(-estimator, -score))
+performance <- unique(selector_dta %>% select(-estimator, -score, -sd))
 performance$lowestMSE <- NA
 performance$highestMSE <- NA
 performance$chosenMSE <- NA
@@ -84,4 +84,110 @@ performance %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
 ggsave('../ChosenMSE_violin_plot.pdf', height = 8, width = 10)
 
 
+performance_nonconstant_e <- performance[performance$setup == c('WA1','Conf1'),  ]
+apply(performance_nonconstant_e, 2, function(x)length(unique(x)))
 
+performance_nonconstant_e %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../nonconstant_e_violin_plot.pdf', height = 8, width = 10)
+
+performance_constant_e <- performance[performance$setup != c('WA1','Conf1'),  ]
+apply(performance_constant_e, 2, function(x)length(unique(x)))
+
+performance_constant_e %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../constant_e_violin_plot.pdf', height = 8, width = 10)
+
+performance_WA1 <- performance[performance$setup == c('WA1'),  ]
+apply(performance_WA1, 2, function(x)length(unique(x)))
+
+performance_WA1 %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../WA1_violin_plot.pdf', height = 8, width = 10)
+
+performance_Conf1 <- performance[performance$setup == c('Conf1'),  ]
+apply(performance_Conf1, 2, function(x)length(unique(x)))
+
+performance_Conf1 %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../Conf1_violin_plot.pdf', height = 8, width = 10)
+
+performance_0.5 <- performance[performance$setup == c("RespSparseTau1strong",
+                                                      "RsparseT2weak", 
+                                                      "STMpp", "STMpp2", 
+                                                      "STMpp3", "STMpp4", 
+                                                      "Ufail", "Usual1", 
+                                                      "WA2", "WA3", "WA4") ,  ]
+apply(performance_0.5, 2, function(x)length(unique(x)))
+
+performance_0.5 %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../e0.5_violin_plot.pdf', height = 8, width = 10)
+
+performance_0.01 <- performance[performance$setup == c("rare1","rare2", 
+                                                      "rare3"),  ]
+apply(performance_0.01, 2, function(x)length(unique(x)))
+
+performance_0.01 %>% mutate(setting = paste0(setup, '_', dim, '_', ntrain)) %>%
+  select(setting, selector, lowestMSE, highestMSE, chosenMSE) %>%  
+  # filter(selector %in% c('transformed', 'matching_ATT', 'subset')) %>%
+  ggplot(aes(x = selector, 
+             y = (chosenMSE - lowestMSE) / (highestMSE - lowestMSE), 
+             color = selector)) +
+  geom_violin() + 
+  geom_point(position = position_jitter(width = .4, height =.01), size = .5,
+             alpha = 0.8) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  theme(legend.position = "none")
+ggsave('../e0.01_violin_plot.pdf', height = 8, width = 10)
