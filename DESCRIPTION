@@ -49,6 +49,7 @@ Collate:
     'XRF_autotune_hyperband2.R'
     'helper_functions.R'
     'selector_double_robust.R'
+    'selector_fishers_exact.R'
     'selector_matching.R'
     'selector_subset.R'
     'selector_transformed.R'

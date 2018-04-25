@@ -24,7 +24,7 @@ be used to create the subgroups}
 \item{min.treat.size.per.group}{the minimum size of each treatment group 
 per matched subset. For example, if it is chosen to be 25 (the default), then 
 at least 25 units in each subgroup are treated and 25 are in the control
-goup}
+group}
 
 \item{normalize}{Specifies how the distance should be normalized. 
 "none": no normalization. 

@@ -23,5 +23,5 @@ in order to avoid any divide-by-zero errors}
 \item{verbose}{logical. If TRUE then detailed updates will be printed}
 }
 \value{
-error
+mean(error) and sd(error)
 }

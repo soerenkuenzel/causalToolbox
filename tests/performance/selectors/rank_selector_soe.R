@@ -87,7 +87,7 @@ ggsave('../ChosenMSE_violin_plot_3.pdf', height = 8, width = 10)
 
 
 
-table(performance$selector, performance$)
+# table(performance$selector, performance$)
 table(duplicated(performance[]))
 
 
