@@ -21,7 +21,7 @@ set.seed(28104)
 # ------------------------------------------------------------------------------
 ## Evaluation setup
 seed <- 1500
-dim_grid <- c(5, 20, 100)
+dim_grid <- c(6, 20, 100)
 alpha <- 0.1
 # ntrain_grid <- round(10 ^ seq(from = 2, to = 5, by = .25))
 ntrain_grid <- c(2000)
@@ -126,8 +126,15 @@ selector_grid <- list(
                       yobs = Yobs,
                       tr = W_tr,
                       estimator = estimator,
-                      k = 5,
+                      k = 3,
                       emin = 1e-5)
+  },
+  "fischer" = function(Yobs, W_tr, feat, estimator) {
+    gof_fischer_exact(feat = feat,
+                      yobs = Yobs,
+                      tr = W_tr,
+                      estimator = estimator,
+                      k = 2)
   }
 )
 
