@@ -4,8 +4,9 @@
 \alias{CateCI}
 \title{Method CateCI}
 \usage{
-CateCI(theObject, feature_new, method = "maintain_group_ratios", B = 200,
-  nthread = 0, verbose = TRUE)
+CateCI(theObject, feature_new, method = "maintain_group_ratios",
+  bootstrapVersion = "normalApprox", B = 200, nthread = 0,
+  verbose = TRUE)
 }
 \arguments{
 \item{theObject}{A `Meta-learner` object}
@@ -13,6 +14,10 @@ CateCI(theObject, feature_new, method = "maintain_group_ratios", B = 200,
 \item{feature_new}{A feature data frame}
 
 \item{method}{Different versions of the bootstrap.}
+
+\item{bootstrapVersion}{default is normalApprox which will just use the 
+bootstrap normal approximation to get CI. smoothed will use use CI around the
+smoothed bootstrap as introduced by Efron 2014.}
 
 \item{B}{Number of bootstrap samples}
 

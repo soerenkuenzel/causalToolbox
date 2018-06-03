@@ -42,14 +42,14 @@ test_that("Tests CateCI", {
                c(0.01109552, -0.12133612, 0.14352717),
                tolerance = 1e-4)
 
-  tl <- T_BART(
+  Ltl <- T_BART(
     feat = feat, 
     tr = tr,
     yobs = yobs
   )
   CIs <- CateCI(tl, feat, B = 5, verbose = FALSE)
   expect_equal(as.numeric(CIs[1,]),
-               c(0.01734046, -0.36126050, 0.37568245),
+               c(0.01109552, -0.26207101,  0.28426206),
                tolerance = 1e-7)
   
   
@@ -63,6 +63,6 @@ test_that("Tests CateCI", {
     nthread = 0
   )
   testthat::expect_equal(as.numeric(CIs[2,]),
-                         c(0.003920345, -0.727707690,  0.735548380),
+                         c(0.07460039, -0.51438222,  0.66358299),
                          tolerance = 1e-4)
 })

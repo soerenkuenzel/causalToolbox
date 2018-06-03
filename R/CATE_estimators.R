@@ -41,13 +41,16 @@ setGeneric(
 #'@param B Number of bootstrap samples
 #'@param nthread number of threads to be used in parallel
 #'@param verbose TRUE for detailed output FALSE for no output
+#'@param bootstrapVersion default is normalApprox which will just use the 
+#'bootstrap normal approximation to get CI. smoothed will use use CI around the
+#'smoothed bootstrap as introduced by Efron 2014.
 #'@exportMethod CateCI
 setGeneric(
   name = "CateCI",
   def = function(theObject,
                  feature_new,
                  method = "maintain_group_ratios",
-                 bootstrapVersion = c("normalApprox", "smoothed"),
+                 bootstrapVersion = "normalApprox",
                  B = 200,
                  nthread = 0,
                  verbose = TRUE) {
@@ -124,6 +127,15 @@ setMethod(
     yobs <- theObject@yobs_train
     creator <- theObject@creator
     ntrain <- length(tr)
+    if((bootstrapVersion == "smoothed") & 
+       (as.double(nrow(feat)) * as.double(nrow(feature_new)) > 5e8)){
+      stop(paste("We would have to create a", nrow(feat), 
+                 "by", nrow(feature_new), "matrix. This is too big to run in",
+                 "a reasonable amount of time. Either decrease feature_new",
+                 "or use `bootstrapVersion <- normalApprox` option.",
+                 "The matrix should have less than 5e8 values."))
+    }
+    
     if (method == "maintain_group_ratios") {
       createbootstrappedData <- function() {
 
@@ -248,7 +260,6 @@ setMethod(
           ncol = B,
           byrow = FALSE
         )
-      
       var_sol <- apply((pred_term %*% t(S_term)/ B )^2, 1, sum)
 
       return(data.frame(
