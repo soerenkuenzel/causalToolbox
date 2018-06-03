@@ -47,6 +47,7 @@ setGeneric(
   def = function(theObject,
                  feature_new,
                  method = "maintain_group_ratios",
+                 bootstrapVersion = c("normalApprox", "smoothed"),
                  B = 200,
                  nthread = 0,
                  verbose = TRUE) {
@@ -96,7 +97,8 @@ setGeneric(
   }
 )
 
-
+# ------------------------------------------------------------------------------
+# Estimating Confidence intervals
 
 #' CateCI-Meta-learner
 #' @name CateCI-Meta-learner
@@ -112,6 +114,7 @@ setMethod(
   definition = function(theObject,
                         feature_new,
                         method,
+                        bootstrapVersion,
                         B,
                         nthread,
                         verbose) {
@@ -135,7 +138,8 @@ setMethod(
         return(list(
           feat_b = feat[smpl, ],
           tr_b = tr[smpl],
-          yobs_b = yobs[smpl]
+          yobs_b = yobs[smpl], 
+          smpl = smpl
         ))
       }
     }
@@ -146,7 +150,14 @@ setMethod(
     # simulaions:
     pred_B <-
       as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
-
+  
+    # S is needed for Efron's smooth bootstrap each column corresponse to one 
+    # bootstrap sample and each row corresponse to one of the smple indexes
+    S <- as.data.frame(matrix(0, nrow = length(yobs), ncol = B))
+    row.names(S) <- 1:length(yobs)
+    colnames(S) <- 1:B
+    
+    
     known_warnings <- c()
     # this is needed such that bootstrapped warnings are only printed once
     for (b in 1:B) { # b= 1
@@ -160,10 +171,14 @@ setMethod(
         if (went_wrong == 100)
           stop("one of the groups might be too small to
                do valid inference.")
+        S[, b] <- rep(0, nrow(S))
+        
         pred_B[, b] <-
           tryCatch({
             bs <- createbootstrappedData()
-
+            
+            counts <- table(bs$smpl)
+            S[names(counts), b] <- counts
             withCallingHandlers(
               # this is needed such that bootstrapped warnings are only
               # printed once
@@ -193,32 +208,64 @@ setMethod(
       }
     }
 
+    if (bootstrapVersion == "normalApprox") {
+      # get the predictions from the original method
+      pred <- EstimateCate(theObject, feature_new = feature_new)
+      # the the 5% and 95% CI from the bootstrapped procedure
+      CI_b <- data.frame(
+        X5. =  apply(pred_B, 1, function(x)
+          quantile(x, c(.025))),
+        X95. = apply(pred_B, 1, function(x)
+          quantile(x, c(.975))),
+        sd = apply(pred_B, 1, function(x)
+          sd(x))
+      )
+      
+      return(data.frame(
+        pred = pred,
+        X5. =  pred - 1.96 * CI_b$sd,
+        X95. = pred + 1.96 * CI_b$sd
+        # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
+        # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
+        # X5. =  2 * pred - CI_b$X95.,
+        # X95. = 2 * pred - CI_b$X5.
+      ))
+    } else if (bootstrapVersion == "smoothed") {
+      smoothed_mean <- apply(pred_B, 1, mean)
+      
 
-    # get the predictions from the original method
-    pred <- EstimateCate(theObject, feature_new = feature_new)
-    # the the 5% and 95% CI from the bootstrapped procedure
-    CI_b <- data.frame(
-      X5. =  apply(pred_B, 1, function(x)
-        quantile(x, c(.025))),
-      X95. = apply(pred_B, 1, function(x)
-        quantile(x, c(.975))),
-      sd = apply(pred_B, 1, function(x)
-        sd(x))
-    )
+      pred_term <- as.matrix(pred_B - matrix(
+        smoothed_mean,
+        nrow = length(smoothed_mean),
+        ncol = B,
+        byrow = FALSE
+      ))
+      
+      S_term <-
+        S - matrix(
+          apply(S, 1, mean),
+          nrow = nrow(S),
+          ncol = B,
+          byrow = FALSE
+        )
+      
+      var_sol <- apply((pred_term %*% t(S_term)/ B )^2, 1, sum)
 
-    return(data.frame(
-      pred = pred,
-      X5. =  pred - 1.96 * CI_b$sd,
-      X95. = pred + 1.96 * CI_b$sd
-      # X5. =  pred - (CI_b$X95. - CI_b$X5.) / 2,
-      # X95. = pred + (CI_b$X95. - CI_b$X5.) / 2
-      # X5. =  2 * pred - CI_b$X95.,
-      # X95. = 2 * pred - CI_b$X5.
-    ))
+      return(data.frame(
+        pred = smoothed_mean,
+        X5. =  smoothed_mean - 1.96 * sqrt(var_sol),
+        X95. = smoothed_mean + 1.96 * sqrt(var_sol)))
+    } else {
+      stop("bootstrapVersion must be specified.")
     }
+  }
 )
 
 
+
+
+
+# ------------------------------------------------------------------------------
 
 
 #' EstimateAllSampleStatistics-Meta-learner
@@ -248,7 +295,7 @@ setMethod(
 
         smpl_0 <- sample((1:ntrain)[tr == 0],
                          replace = TRUE,
-                         size = sum(1-tr))
+                         size = sum(1 - tr))
         smpl_1 <- sample((1:ntrain)[tr == 1],
                          replace = TRUE,
                          size = sum(tr))
