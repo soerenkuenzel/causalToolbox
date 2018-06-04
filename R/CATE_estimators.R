@@ -135,6 +135,14 @@ setMethod(
                  "or use `bootstrapVersion <- normalApprox` option.",
                  "The matrix should have less than 5e8 values."))
     }
+    if((bootstrapVersion == "smoothed") & B < 2000) {
+      warning(
+        paste(
+          "We have found that when using smoothed intervals,",
+          "B should be chosen to be bigger than 2000."
+        )
+      )
+    }
     
     if (method == "maintain_group_ratios") {
       createbootstrappedData <- function() {
@@ -229,8 +237,7 @@ setMethod(
           quantile(x, c(.025))),
         X95. = apply(pred_B, 1, function(x)
           quantile(x, c(.975))),
-        sd = apply(pred_B, 1, function(x)
-          sd(x))
+        sd = apply(pred_B, 1, function(x) sd(x))
       )
       
       return(data.frame(
@@ -246,22 +253,22 @@ setMethod(
       smoothed_mean <- apply(pred_B, 1, mean)
       
 
-      pred_term <- as.matrix(pred_B - matrix(
-        smoothed_mean,
-        nrow = length(smoothed_mean),
-        ncol = B,
-        byrow = FALSE
-      ))
+      pred_term <- as.matrix(
+        pred_B - 
+          matrix( smoothed_mean,
+                  nrow = length(smoothed_mean),
+                  ncol = B,
+                  byrow = FALSE
+          ))
       
-      S_term <-
-        S - matrix(
-          apply(S, 1, mean),
-          nrow = nrow(S),
-          ncol = B,
-          byrow = FALSE
-        )
-      var_sol <- apply((pred_term %*% t(S_term)/ B )^2, 1, sum)
-
+      S_term <- as.matrix(
+        S -
+          matrix(apply(S, 1, mean),
+                 nrow = nrow(S),
+                 ncol = B,
+                 byrow = FALSE))
+      var_sol <- apply(((pred_term %*% t(S_term)) / (B-1) )^2, 1, sum)
+      
       return(data.frame(
         pred = smoothed_mean,
         X5. =  smoothed_mean - 1.96 * sqrt(var_sol),
