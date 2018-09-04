@@ -18,7 +18,7 @@ test_that(
       ntree = ntree
     )
 
-  expect_equal(EstimateCate(mo_bart, feat)[1], 0.07434052, tolerance = 1e-4)
+  testthat::expect_equal(EstimateCate(mo_bart, feat)[1], 0.07434052, tolerance = 1e-4)
 
   
   set.seed(432)
@@ -38,12 +38,12 @@ test_that(
     feat = cate_problem$feat_tr,
     yobs = cate_problem$Yobs_tr,
     tr = cate_problem$W_tr,
-    ntree = 50,
+    ntree = 50
   )
   
 
   
-  expect_equal(  mean((
+  testthat::expect_equal(  mean((
     EstimateCate(mo_bart, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
   222.4855,

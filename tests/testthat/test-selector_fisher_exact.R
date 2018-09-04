@@ -9,25 +9,27 @@ test_that("Tests Selector Transformed", {
                                    alpha = 0.1,
                                    setup = "complexTau2")
   
-  gof_values_S_BART <- gof_fisher_exact(
-    yobs = dt$Yobs_tr,
-    tr = dt$W_tr,
-    feat = dt$feat_tr,
-    estimator = S_BART,
-    k = 3
-  )
+  expect_output(
+    gof_values_S_BART <- gof_fisher_exact(
+      yobs = dt$Yobs_tr,
+      tr = dt$W_tr,
+      feat = dt$feat_tr,
+      estimator = S_BART,
+      k = 3
+  ))
   
   expect_equal(gof_values_S_BART,
                0.5020295, 
                tolerance = 1e-3)
   
-  gof_values_S_RF <- gof_fisher_exact(
-    yobs = dt$Yobs_tr,
-    tr = dt$W_tr,
-    feat = dt$feat_tr,
-    estimator = S_RF,
-    k = 3
-  )
+  expect_output(
+    gof_values_S_RF <- gof_fisher_exact(
+      yobs = dt$Yobs_tr,
+      tr = dt$W_tr,
+      feat = dt$feat_tr,
+      estimator = S_RF,
+      k = 3
+  ))
   
   expect_equal(gof_values_S_RF,
                0.1845004,

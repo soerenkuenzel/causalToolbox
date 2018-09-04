@@ -52,8 +52,7 @@ test_that("Tests CateCI", {
                c(0.01109552, -0.26207101,  0.28426206),
                tolerance = 1e-7)
   
-  
-  CIs <- CateCI(
+  expect_warning(CIs <- CateCI(
     theObject = xl,
     feature_new = feat[1:100,],
     bootstrapVersion = "smoothed",
@@ -61,8 +60,8 @@ test_that("Tests CateCI", {
     verbose = FALSE, 
     method = "maintain_group_ratios",
     nthread = 0
-  )
+  ))
   testthat::expect_equal(as.numeric(CIs[2,]),
-                         c(0.07460039, -0.51438222,  0.66358299),
+                         c(0.07460039, -0.66162787,  0.81082864),
                          tolerance = 1e-4)
 })

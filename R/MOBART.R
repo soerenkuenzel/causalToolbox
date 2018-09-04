@@ -1,7 +1,7 @@
 #' @include CATE_estimators.R
 #' @import dbarts
 
-## the standard Xlearner object with random forest
+## the standard MO_BART object
 setClass(
   "MO_BART",
   contains = "Meta-learner",
@@ -96,7 +96,8 @@ setMethod(
                         verbose = FALSE,
                         return_CI = FALSE)
   {
-    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; feature_new = feat[1:5,]; ensemble = "pscore"
+    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; 
+    # feature_new = feat[1:5,]; ensemble = "pscore"
     yobs <- theObject@yobs_train
     feat <- theObject@feature_train
     tr <- theObject@tr_train
