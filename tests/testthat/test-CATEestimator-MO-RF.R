@@ -48,10 +48,10 @@ test_that(
   tolerance = 1)
   
   
-  expect_output(smp_stats <- EstimateAllSampleStatistics(morf, B = 2))
-  expect_equal(smp_stats$SATT[1, 3],
-               -9.004184,
-               tolerance = 1e-2)
+  #expect_output(smp_stats <- EstimateAllSampleStatistics(morf, B = 2))
+  #expect_equal(smp_stats$SATT[1, 3],
+  #             -9.004184,
+  #             tolerance = 1e-2)
   
 })
 
