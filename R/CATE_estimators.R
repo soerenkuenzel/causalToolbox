@@ -51,7 +51,7 @@ setGeneric(
                  feature_new,
                  method = "maintain_group_ratios",
                  bootstrapVersion = "normalApprox",
-                 B = 200,
+                 B = 2000,
                  nthread = 0,
                  verbose = TRUE) {
     standardGeneric("CateCI")
@@ -72,7 +72,7 @@ setGeneric(
   def = function(theObject,
                  feature_new,
                  method = "maintain_group_ratios",
-                 B = 200,
+                 B = 2000,
                  nthread = 0,
                  verbose = TRUE){
     standardGeneric("EstimateATT")
@@ -93,14 +93,14 @@ setGeneric(
   def = function(theObject,
                  feature_new,
                  method = "maintain_group_ratios",
-                 B = 200,
+                 B = 2000,
                  nthread = 0,
                  verbose = TRUE){
     standardGeneric("EstimateAllSampleStatistics")
   }
 )
 
-# ------------------------------------------------------------------------------
+# Confidence Interval Estimation -----------------------------------------------
 # Estimating Confidence intervals
 
 #' CateCI-Meta-learner
@@ -128,7 +128,7 @@ setMethod(
     creator <- theObject@creator
     ntrain <- length(tr)
     if((bootstrapVersion == "smoothed") & 
-       (as.double(nrow(feat)) * as.double(nrow(feature_new)) > 5e8)){
+       (as.double(nrow(feat)) * as.double(nrow(feature_new)) > 5e8)) {
       stop(paste("We would have to create a", nrow(feat), 
                  "by", nrow(feature_new), "matrix. This is too big to run in",
                  "a reasonable amount of time. Either decrease feature_new",
@@ -149,7 +149,7 @@ setMethod(
 
         smpl_0 <- sample((1:ntrain)[tr == 0],
                        replace = TRUE,
-                       size = sum(1-tr))
+                       size = sum(1 - tr))
         smpl_1 <- sample((1:ntrain)[tr == 1],
                          replace = TRUE,
                          size = sum(tr))
@@ -229,6 +229,7 @@ setMethod(
     }
 
     if (bootstrapVersion == "normalApprox") {
+      # normal Approximated Bootstrap ------------------------------------------
       # get the predictions from the original method
       pred <- EstimateCate(theObject, feature_new = feature_new)
       # the the 5% and 95% CI from the bootstrapped procedure
@@ -250,6 +251,7 @@ setMethod(
         # X95. = 2 * pred - CI_b$X5.
       ))
     } else if (bootstrapVersion == "smoothed") {
+      # Smoothed Bootstrap -----------------------------------------------------
       smoothed_mean <- apply(pred_B, 1, mean)
       
 
@@ -276,6 +278,134 @@ setMethod(
     } else {
       stop("bootstrapVersion must be specified.")
     }
+  }
+)
+
+# BIAS Estimation -----------------------------------------------
+# Estimating the bias
+
+setGeneric(
+  name = "CateBIAS",
+  def = function(theObject,
+                 feature_new,
+                 method = "maintain_group_ratios",
+                 B = 2000,
+                 nthread = 0,
+                 verbose = TRUE) {
+    standardGeneric("CateBIAS")
+  }
+)
+
+#' CateBIAS-Meta-learner
+#' @name CateBIAS-Meta-learner
+#' @rdname CateBIAS-Meta-learner
+#' @description Return the estimated bias for the CATE
+#' @inheritParams CateBIAS
+#' @return A data frame of estimated CATE bias
+#' @aliases CateBIAS,Meta-learner-method
+#' @exportMethod CateBIAS
+setMethod(
+  f = "CateBIAS",
+  signature = "Meta-learner",
+  definition = function(theObject,
+                        feature_new,
+                        method,
+                        B,
+                        nthread,
+                        verbose) {
+    ## shortcuts:
+    feat <- theObject@feature_train
+    tr <- theObject@tr_train
+    yobs <- theObject@yobs_train
+    creator <- theObject@creator
+    ntrain <- length(tr)
+    
+    if (method == "maintain_group_ratios") {
+      createbootstrappedData <- function() {
+        
+        smpl_0 <- sample((1:ntrain)[tr == 0],
+                         replace = TRUE,
+                         size = sum(1 - tr))
+        smpl_1 <- sample((1:ntrain)[tr == 1],
+                         replace = TRUE,
+                         size = sum(tr))
+        smpl <- sample(c(smpl_0, smpl_1))
+        
+        return(list(
+          feat_b = feat[smpl, ],
+          tr_b = tr[smpl],
+          yobs_b = yobs[smpl], 
+          smpl = smpl
+        ))
+      }
+    }
+    
+    #### Run the bootstrap CI estimation #####################################
+    
+    # pred_B will contain for each simulation the prediction of each of the B
+    # simulaions:
+    pred_B <- as.data.frame(matrix(NA, nrow = nrow(feature_new), ncol = B))
+    
+    # S is needed for Efron's smooth bootstrap each column corresponse to one 
+    # bootstrap sample and each row corresponse to one of the smple indexes
+    S <- as.data.frame(matrix(0, nrow = length(yobs), ncol = B))
+    row.names(S) <- 1:length(yobs)
+    colnames(S) <- 1:B
+    
+    
+    known_warnings <- c()
+    # this is needed such that bootstrapped warnings are only printed once
+    for (b in 1:B) { # b= 1
+      if (verbose)
+        print(b)
+      went_wrong <- 0
+      # if that is 100 we really cannot fit it and bootstrap
+      # seems to be infeasible.
+      
+      while (is.na(pred_B[1, b])) {
+        if (went_wrong == 100)
+          stop("one of the groups might be too small to
+               do valid inference.")
+        S[, b] <- rep(0, nrow(S))
+        
+        pred_B[, b] <-
+          tryCatch({
+            bs <- createbootstrappedData()
+            
+            counts <- table(bs$smpl)
+            S[names(counts), b] <- counts
+            withCallingHandlers(
+              # this is needed such that bootstrapped warnings are only
+              # printed once
+              EstimateCate(
+                creator(
+                  feat = bs$feat_b,
+                  tr = bs$tr_b,
+                  yobs = bs$yobs_b
+                ),
+                feature_new = feature_new
+              ),
+              warning = function(w) {
+                if (w$message %in% known_warnings) {
+                  # message was already printed and can be ignored
+                  invokeRestart("muffleWarning")
+                } else{
+                  # message is added to the known_warning list:
+                  known_warnings <<- c(known_warnings, w$message)
+                }
+              }
+            )
+          },
+          error = function(e) {
+            return(NA)
+          })
+        went_wrong <- went_wrong + 1
+      }
+    }
+    
+    pred <- EstimateCate(theObject, feature_new = feature_new)
+    bs_means <- apply(pred_B, 1, mean)
+    return(bs_means - pred)
   }
 )
 
