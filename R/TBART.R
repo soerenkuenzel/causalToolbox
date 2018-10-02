@@ -17,6 +17,7 @@ setClass(
     sample_stat = "character",
     tree_package = "character",
     ntree = "numeric",
+    nthread = "integer",
     creator = "function"
   )
 )
@@ -24,17 +25,12 @@ setClass(
 #' @title T_BART
 #' @rdname T_BART
 #' @description This is an implementation of T_BART
-#' @param feat A feature data.frame.
-#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
-#' @param yobs A vector of the observed outcome.
+#' @param feat feature data.frame.
+#' @param tr treatment assignment 0 for control and 1 for treatment.
+#' @param yobs the observed outcome.
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @param ndpost TODO: Add Description
-#' @param sample_stat TODO: Add Description
-#' @param tree_package Package used to create a tree
-#' @param ntree Number of trees to grow
 #' @return A `T_BART` object.
 #' @export T_BART
-#' @import methods
 T_BART <-
   function(feat,
            tr,
@@ -43,9 +39,10 @@ T_BART <-
            sample_stat = "counterfactuals estimated",
            tree_package = "dbarts",
            ntree = 200,
-           verbose = FALSE) {
+           nthread = 1,
+           verbose) {
     feat <- as.data.frame(feat)
-
+    
     new(
       "T_BART",
       feature_train = feat,
@@ -62,7 +59,8 @@ T_BART <-
                ndpost = ndpost,
                sample_stat = sample_stat,
                tree_package = tree_package,
-               ntree = ntree)
+               ntree = ntree,
+               nthread = nthread)
       }
     )
   }
@@ -72,13 +70,11 @@ T_BART <-
 #' @name EstimateCate-T_BART
 #' @rdname EstimateCate-T_BART
 #' @description Return the estimated CATE
-#' @param theObject A `T_BART` object.
-#' @param feature_new A feature data frame.
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @param return_CI If TRUE, return predictions and their confidence intervals;
-#' if FALSE, return only predictions.
+#' @param object A `T_BART` object.
+#' @param feature_new A data frame.
+#' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases EstimateCate,T_BART-method
+#' @aliases EstimateCate, T_BART-method
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
@@ -93,72 +89,81 @@ setMethod(
     yobs <- theObject@yobs_train
     feat <- theObject@feature_train
     tr <- theObject@tr_train
-
+    nthread <- theObject@nthread
+    
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0, ]
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
-
-
+    feat_new_subset <- split(feature_new, rep(x = 1:nthread,
+                                              times = get_CV_sizes(nrow(feature_new),
+                                                                   nthread)))
     if (theObject@tree_package == "BayesTree") {
-      pred_matrix_f_0 <- BayesTree::bart(
-        x.train = X_0,
-        y.train = yobs_0,
-        x.test =  feature_new,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        pred_matrix_f_0 <- BayesTree::bart(
+          x.train = X_0,
+          y.train = yobs_0,
+          x.test =  feat_new_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
       mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
-
-      pred_matrix_f_1 <- BayesTree::bart(
-        x.train = X_1,
-        y.train = yobs_1,
-        x.test =  feature_new,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        pred_matrix_f_1 <- BayesTree::bart(
+          x.train = X_1,
+          y.train = yobs_1,
+          x.test =  feat_new_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
     } else if (theObject@tree_package == "dbarts") {
-      pred_matrix_f_0 <- dbarts::bart(
-        x.train = X_0,
-        y.train = yobs_0,
-        x.test =  feature_new,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        pred_matrix_f_0 <- dbarts::bart(
+          x.train = X_0,
+          y.train = yobs_0,
+          x.test =  feat_new_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
       mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
-
-      pred_matrix_f_1 <- dbarts::bart(
-        x.train = X_1,
-        y.train = yobs_1,
-        x.test =  feature_new,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        pred_matrix_f_1 <- dbarts::bart(
+          x.train = X_1,
+          y.train = yobs_1,
+          x.test =  feat_new_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
     } else{
       stop("tree_package must be either BayesTree or dbarts")
     }
-
+    
     ############################################################################
     predictions <- mu_hat_1 - mu_hat_0
-
+    
     if (return_CI) {
       get_CI_0 <- t(apply(pred_matrix_f_0, 2, function(x)
         quantile(x, probs = c(.05, 0.95))))
       get_CI_1 <- t(apply(pred_matrix_f_1, 2, function(x)
         quantile(x, probs = c(.05, 0.95))))
-
+      
       CI_comb <- get_CI_1 - get_CI_0[, 2:1]
-
+      
       return(cbind(predictions, CI_comb))
     } else{
       return(predictions)
@@ -167,15 +172,16 @@ setMethod(
 )
 
 
-#' CateCI-T_BART
-#' @name CateCI-T_BART
-#' @rdname CateCI-T_BART
+#' EstimateCate-T_BART
+#' @name EstimateCate-T_BART
+#' @rdname EstimateCate-T_BART
 #' @description Return the estimated CATE
-#' @param theObject A `T_BART` object.
-#' @inheritParams CateCI
+#' @param object A `T_BART` object.
+#' @param feature_new A data frame.
+#' @param verbose Should the training output be posted?
 #' @return A vector of predicted CATE
-#' @aliases CateCI,T_BART-method
-#' @exportMethod CateCI
+#' @aliases EstimateCate, T_BART-method
+#' @exportMethod EstimateCate
 setMethod(
   f = "CateCI",
   signature = "T_BART",
@@ -187,12 +193,13 @@ setMethod(
     yobs <- theObject@yobs_train
     feat <- theObject@feature_train
     tr <- theObject@tr_train
-
+    nthread <- theObject@nthread
+    
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0,]
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1,]
-
+    
     # will contain for each estimator the prediciton for x_to_predict:
     output <- list()
     # will contain the appropraite CI:
@@ -208,47 +215,50 @@ setMethod(
         y = yobs_1
         x_to_predict = feature_new
       }
-
-
+      
+      x_to_predict_subset <- split(x_to_predict, rep(x = 1:nthread,
+                                                     times = get_CV_sizes(
+                                                       nrow(x_to_predict_subset),
+                                                       nthread)))
       if (theObject@tree_package == "BayesTree") {
-
-        pred_matrix <- BayesTree::bart(
-          x.train = x,
-          y.train = y,
-          x.test =  x_to_predict,
-          verbose = verbose,
-          ndpost = ndpost,
-          ntree = theObject@ntree
-        )$yhat.test
-
+        foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+          pred_matrix <- BayesTree::bart(
+            x.train = x,
+            y.train = y,
+            x.test =  x_to_predict_subset[thread],
+            verbose = verbose,
+            ndpost = ndpost,
+            ntree = theObject@ntree
+          )$yhat.test
+        }
       } else if (theObject@tree_package == "dbarts") {
-
-        pred_matrix <- dbarts::bart(
-          x.train = x,
-          y.train = y,
-          x.test =  x_to_predict,
-          verbose = verbose,
-          ndpost = ndpost,
-          ntree = theObject@ntree
-        )$yhat.test
-
+        foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+          pred_matrix <- dbarts::bart(
+            x.train = x,
+            y.train = y,
+            x.test =  x_to_predict_subset[thread],
+            verbose = verbose,
+            ndpost = ndpost,
+            ntree = theObject@ntree
+          )$yhat.test
+        }
       } else{
         stop("tree_package must be either BayesTree or dbarts")
       }
-
+      
       output[[this_learner]] <- apply(pred_matrix, 2, mean)
       CI[[this_learner]] <-
         t(apply(pred_matrix, 2, function(x)
           quantile(x, probs = c(.05, 0.95))))
-
+      
     }
     if (verbose) {
       print("Done with the propensity score estimation.")
     }
     pred <- output[["l_first_1"]] - output[["l_first_0"]]
-
+    
     CI_comb <- CI[["l_first_1"]] - CI[["l_first_0"]][, 2:1]
-
+    
     to_return <- as.data.frame(cbind(pred, CI_comb))
     row.names(to_return) <- 1:nrow(to_return)
     colnames(to_return) <- c('pred','X5.','X95.')
@@ -261,9 +271,6 @@ setMethod(
 #' @name EstimateAllSampleStatistics-T_BART
 #' @rdname EstimateAllSampleStatistics-T_BART
 #' @description Return the estimated CATE
-#' @param theObject A "T_BART" object
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @aliases EstimateAllSampleStatistics,T_BART-method
 #' @exportMethod EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",
@@ -275,58 +282,62 @@ setMethod(
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
     sample_stat <- theObject@sample_stat
-
-
+    nthread <- theObject@nthread
+    feat_subset <- split(feat, rep(x = 1:nthread,
+                                   times = get_CV_sizes(nrow(feat), nthread)))
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0, ]
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
-
-
+    
     if (theObject@tree_package == "BayesTree") {
-
-      mu_hat_0_MCMC_samples <- BayesTree::bart(
-        x.train = X_0,
-        y.train = yobs_0,
-        x.test =  feat,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
-      mu_hat_1_MCMC_samples <- BayesTree::bart(
-        x.train = X_1,
-        y.train = yobs_1,
-        x.test =  feat,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        mu_hat_0_MCMC_samples <- BayesTree::bart(
+          x.train = X_0,
+          y.train = yobs_0,
+          x.test =  feat_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        mu_hat_1_MCMC_samples <- BayesTree::bart(
+          x.train = X_1,
+          y.train = yobs_1,
+          x.test =  feat_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
     } else if (theObject@tree_package == "dbarts") {
-
-      mu_hat_0_MCMC_samples <- dbarts::bart(
-        x.train = X_0,
-        y.train = yobs_0,
-        x.test =  feat,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
-      mu_hat_1_MCMC_samples <- dbarts::bart(
-        x.train = X_1,
-        y.train = yobs_1,
-        x.test =  feat,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        mu_hat_0_MCMC_samples <- dbarts::bart(
+          x.train = X_0,
+          y.train = yobs_0,
+          x.test =  feat_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        mu_hat_1_MCMC_samples <- dbarts::bart(
+          x.train = X_1,
+          y.train = yobs_1,
+          x.test =  feat_subset[thread],
+          verbose = verbose,
+          ndpost = ndpost,
+          ntree = theObject@ntree
+        )$yhat.test
+      }
+      
     } else{
       stop("tree_package must be either BayesTree or dbarts")
     }
-
+    
     return(
       compute_sample_statistics(
         mu_hat_0_MCMC_samples = mu_hat_0_MCMC_samples,
@@ -340,5 +351,4 @@ setMethod(
     )
   }
 )
-
 
