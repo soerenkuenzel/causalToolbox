@@ -94,51 +94,6 @@ setClass(
 #' @param middleSplit_second TODO: Add Description
 #' @param middleSplit_prop TODO: Add Description
 #' @export X_RF
-setGeneric(
-  name = "X_RF",
-  def = function(
-    feat,
-    tr,
-    yobs,
-    predmode,
-    relevant_Variable_first,
-    relevant_Variable_second,
-    relevant_Variable_prop,
-    ntree_first,
-    ntree_second,
-    ntree_prop,
-    mtry_first,
-    mtry_second,
-    mtry_prop,
-    min_node_size_spl_first,
-    min_node_size_ave_first,
-    min_node_size_spl_second,
-    min_node_size_ave_second,
-    min_node_size_spl_prop,
-    min_node_size_ave_prop,
-    splitratio_first,
-    splitratio_second,
-    splitratio_prop,
-    replace_first,
-    replace_second,
-    replace_prop,
-    sample_fraction_first,
-    sample_fraction_second,
-    sample_fraction_prop,
-    nthread,
-    middleSplit_first,
-    middleSplit_second,
-    middleSplit_prop,
-    verbose
-  ) {
-    standardGeneric("X_RF")
-  }
-)
-
-#' @title X_RF Constructor
-#' @rdname X_RF-X_RF
-#' @aliases X_RF,X_RF-X_RF
-#' @return A `X_RF` object.
 X_RF <-
   function(feat,
            tr,

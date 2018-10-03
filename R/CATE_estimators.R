@@ -1,13 +1,15 @@
 #' @import forestry
-list()
+NULL
 
-#' Class CATE-estimators
+# Cate estimators --------------------------------------------------------------
+#' Class CATE-estimators 
 #' @name CATE-estimators-class
 #' @rdname CATE-estimators-class
 #' @exportClass CATE-estimators
 setClass("CATE-estimators")
 setOldClass("forestry::honestRF")
 
+# Meta-learner -----------------------------------------------------------------
 #' Class Meta-learner
 #' @name Meta-learner-class
 #' @rdname Meta-learner-class
@@ -28,7 +30,7 @@ setClass(
 #'@param theObject A `Meta-learner` object
 #'@param feature_new A feature data frame
 #'@param ... Additional parameters
-#'@exportMethod EstimateCate
+#'@export EstimateCate
 setGeneric(
   name = "EstimateCate",
   def = function(theObject, feature_new, ...) {
@@ -130,7 +132,7 @@ setMethod(
     yobs <- theObject@yobs_train
     creator <- theObject@creator
     ntrain <- length(tr)
-    if((bootstrapVersion == "smoothed") & 
+    if ((bootstrapVersion == "smoothed") & 
        (as.double(nrow(feat)) * as.double(nrow(feature_new)) > 5e8)) {
       stop(paste("We would have to create a", nrow(feat), 
                  "by", nrow(feature_new), "matrix. This is too big to run in",
@@ -286,7 +288,14 @@ setMethod(
 
 # BIAS Estimation -----------------------------------------------
 # Estimating the bias
-
+#' CateBIAS-Meta-learner
+#' @name CateBIAS
+#' @rdname CateBIAS
+#' @description Return the estimated bias for the CATE
+#' @inheritParams CateBIAS
+#' @return A data frame of estimated bias
+#' @aliases CateBIAS, Meta-learner-method
+#' @export CateBIAS
 setGeneric(
   name = "CateBIAS",
   def = function(theObject,
@@ -420,12 +429,12 @@ setMethod(
 
 
 #' EstimateAllSampleStatistics-Meta-learner
-#' @name EstimateAllSampleStatistics-Meta-learner
-#' @rdname EstimateAllSampleStatistics-Meta-learner
+#' @name EstimateAllSampleStatistics
+#' @rdname EstimateAllSampleStatistics
 #' @inheritParams EstimateAll
 #' @description TODO: add description
 #' @aliases EstimateAllSampleStatistics,Meta-learner-method
-#' @exportMethod EstimateAllSampleStatistics 
+#' @export EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",
   signature = "Meta-learner",

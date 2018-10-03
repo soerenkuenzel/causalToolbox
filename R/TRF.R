@@ -61,30 +61,6 @@ setClass(
 #' @param splitratio Proportion of the training data used as the splitting
 #' dataset. The default value is 0.5.
 #' @export T_RF
-setGeneric(
-  name = "T_RF",
-  def = function(feat,
-                 tr,
-                 yobs,
-                 mtry,
-                 nodesizeSpl,
-                 nodesizeAvg,
-                 replace,
-                 ntree,
-                 sample_fraction,
-                 nthread,
-                 splitratio) {
-    standardGeneric("T_RF")
-  }
-)
-
-#' @title T_RF Constructor
-#' @rdname T_RF-T_RF
-#' @description This is an implementation of the T-learner combined with honest
-#' random forest for both response functions
-#' @aliases T_RF,T_RF-T_RF
-#' @return A `T_RF` object.
-#' @import methods
 T_RF <-
   function(feat,
            tr,

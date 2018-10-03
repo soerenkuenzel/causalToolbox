@@ -61,31 +61,6 @@ setClass(
 #' @param alwaysTr weather or not we always test weather we should split on the
 #'   treatment assignment. Currently only alwaysTr=FALSE is implemented.
 #' @export S_RF
-setGeneric(
-  name = "S_RF",
-  def = function(feat,
-                 tr,
-                 yobs,
-                 mtry,
-                 nodesizeSpl,
-                 nodesizeAvg,
-                 replace,
-                 ntree,
-                 sample_fraction,
-                 nthread,
-                 splitratio,
-                 alwaysTr) {
-    standardGeneric("S_RF")
-  }
-)
-
-#' @title S_RF Constructor
-#' @rdname S_RF-S_RF
-#' @description This is an implementation of the S-learner combined with honest
-#'   random forest for both response functions
-#' @aliases S_RF,S_RF-S_RF
-#' @return A `S_RF` object.
-#' @import methods
 S_RF <-
   function(feat,
            tr,

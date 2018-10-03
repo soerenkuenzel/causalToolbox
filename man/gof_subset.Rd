@@ -4,9 +4,9 @@
 \alias{gof_subset}
 \title{gof_subset}
 \usage{
-gof_subset(feat, yobs, tr, estimator, important.features = colnames(feat),
-  min.treat.size.per.group = 25, normalize = "studentize", k = 5,
-  verbose = FALSE)
+gof_subset(feat, yobs, tr, estimator,
+  important.features = colnames(feat), min.treat.size.per.group = 25,
+  normalize = "studentize", k = 5, verbose = FALSE)
 }
 \arguments{
 \item{feat}{a data frame of features}

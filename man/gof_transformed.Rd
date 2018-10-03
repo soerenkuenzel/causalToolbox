@@ -26,3 +26,6 @@ in order to avoid any divide-by-zero errors}
 \value{
 mean(error) and sd(error)
 }
+\description{
+gof_transformed
+}

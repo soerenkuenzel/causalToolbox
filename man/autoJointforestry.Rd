@@ -4,9 +4,9 @@
 \alias{autoJointforestry}
 \title{Autotuning for X-Learner with honest RF for both stages}
 \usage{
-autoJointforestry(feat, tr, yobs, sample.fraction = 0.75, num_iter = 3^8,
-  eta = 3, verbose = TRUE, seed = 24750371, nthread = 0,
-  tune_iter = 10)
+autoJointforestry(feat, tr, yobs, sample.fraction = 0.75,
+  num_iter = 3^8, eta = 3, verbose = TRUE, seed = 24750371,
+  nthread = 0, tune_iter = 10)
 }
 \arguments{
 \item{feat}{A data frame of all the features.}

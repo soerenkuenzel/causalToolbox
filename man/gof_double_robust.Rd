@@ -4,7 +4,8 @@
 \alias{gof_double_robust}
 \title{gof_double_robust}
 \usage{
-gof_double_robust(feat, yobs, tr, estimator, emin, k = 5, verbose = FALSE)
+gof_double_robust(feat, yobs, tr, estimator, emin, k = 5,
+  verbose = FALSE)
 }
 \arguments{
 \item{feat}{a data frame of features}
@@ -24,4 +25,7 @@ in order to avoid any divide-by-zero errors}
 }
 \value{
 mean(error) and sd(error)
+}
+\description{
+gof_double_robust
 }
