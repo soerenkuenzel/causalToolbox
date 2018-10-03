@@ -17,7 +17,6 @@
 #' default number is 0 which represents using all cores.
 #' @return A `forestry` object
 #' @export tuneStageOne
-#' @importFrom forestry predict
 tuneStageOne <- function(x,
                          y,
                          m_tau_init,
@@ -149,7 +148,7 @@ tuneStageOne <- function(x,
             # If the model is available, get its OOB error
             val_losses[[j]] <- forestry::getOOB(val_models[[j]], noWarning = TRUE)
             # Calculate residuals
-            res <- forestry::predict(val_models[[j]], x) - y
+            res <- predict(val_models[[j]], x) - y
             # Train an forestry for tau
 
             m_tau <-
@@ -206,7 +205,7 @@ tuneStageOne <- function(x,
     # End finite horizon successive halving with (n,r)
     if (!is.null(val_models[[1]])) {
       best_OOB <- forestry::getOOB(val_models[[1]], noWarning = TRUE)
-      res <- forestry::predict(val_models[[1]], x) - y
+      res <- predict(val_models[[1]], x) - y
       m_tau <-
         forestry::forestry(
           x = x,
@@ -284,7 +283,6 @@ tuneStageOne <- function(x,
 #' @param tune_iter ..
 #' @seealso \code{\link{X_RF_autotune_simple}}, \code{\link{X_RF_autotune_gpp}},
 #' @export autoJointforestry
-#' @importFrom forestry predict
 autoJointforestry <-
   function(feat,
            tr,
@@ -332,8 +330,8 @@ autoJointforestry <-
         nthread = nthread
       )
 
-    r_0 <- forestry::predict(m_1, X_0) - yobs_0
-    r_1 <- yobs_1 - forestry::predict(m_0, X_1)
+    r_0 <- predict(m_1, X_0) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1)
 
     m_tau_0 <-
       forestry::autoforestry(
@@ -391,8 +389,8 @@ autoJointforestry <-
         nthread = nthread
       )
 
-      r_0 <- forestry::predict(m_1, X_0) - yobs_0
-      r_1 <- yobs_1 - forestry::predict(m_0, X_1)
+      r_0 <- predict(m_1, X_0) - yobs_0
+      r_1 <- yobs_1 - predict(m_0, X_1)
 
       m_tau_0 <-
         forestry::autoforestry(

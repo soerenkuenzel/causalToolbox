@@ -1,3 +1,6 @@
+#' @import forestry
+list()
+
 #' Class CATE-estimators
 #' @name CATE-estimators-class
 #' @rdname CATE-estimators-class

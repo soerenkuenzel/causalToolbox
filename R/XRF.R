@@ -1,5 +1,6 @@
 #' @include CATE_estimators.R
 
+
 ############################
 ### Xlearner - hRF - hRF ###
 ############################
@@ -23,7 +24,6 @@
 #' @slot m_prop contains an honest random forest predictor the propensity score.
 #' @slot hyperparameter_list A list of lists of hyper parameters
 #' @exportClass X_RF
-#' @importFrom forestry predict
 setClass(
   "X_RF",
   contains = "Meta-learner",
@@ -275,7 +275,6 @@ X_RF <-
 #' @return A `X_RF` object.
 #' @export X_RF_fully_specified
 #' @import methods
-#' @importFrom forestry predict
 X_RF_fully_specified <-
   function(feat,
            tr,
@@ -332,8 +331,8 @@ X_RF_fully_specified <-
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- forestry::predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
-    r_1 <- yobs_1 - forestry::predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
+    r_0 <- predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
 
     m_tau_0 <-
       forestry::forestry(
@@ -421,7 +420,6 @@ X_RF_fully_specified <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,X_RF-method
 #' @exportMethod EstimateCate
-#' @importFrom forestry predict
 setMethod(
   f = "EstimateCate",
   signature = "X_RF",
@@ -430,25 +428,25 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     predmode <- theObject@hyperparameter_list[["general"]]$predmode
-    prop_scores <- forestry::predict(theObject@m_prop, feature_new)
+    prop_scores <- predict(theObject@m_prop, feature_new)
     if (predmode == "propmean") {
       return(
-        prop_scores        * forestry::predict(theObject@m_tau_0, feature_new) +
-          (1 - prop_scores)  * forestry::predict(theObject@m_tau_1, feature_new)
+        prop_scores        * predict(theObject@m_tau_0, feature_new) +
+          (1 - prop_scores)  * predict(theObject@m_tau_1, feature_new)
       )
     }
     if (predmode == "extreme") {
       return(ifelse(
         prop_scores > .5,
-        forestry::predict(theObject@m_tau_0, feature_new),
-        forestry::predict(theObject@m_tau_1, feature_new)
+        predict(theObject@m_tau_0, feature_new),
+        predict(theObject@m_tau_1, feature_new)
       ))
     }
     if (predmode == "control") {
-      return(forestry::predict(theObject@m_tau_0, feature_new))
+      return(predict(theObject@m_tau_0, feature_new))
     }
     if (predmode == "treated") {
-      return(forestry::predict(theObject@m_tau_1, feature_new))
+      return(predict(theObject@m_tau_1, feature_new))
     }
   }
 )
