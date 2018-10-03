@@ -8,7 +8,7 @@
 \usage{
 \S4method{CateCI}{`Meta-learner`}(theObject, feature_new,
   method = "maintain_group_ratios", bootstrapVersion = "normalApprox",
-  B = 200, nthread = 0, verbose = TRUE)
+  B = 2000, nthread = 0, verbose = TRUE)
 }
 \arguments{
 \item{theObject}{A `Meta-learner` object}

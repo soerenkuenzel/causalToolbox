@@ -27,3 +27,6 @@ wilcoxon rank tests.}
 \value{
 loss between 0 and 1. In the best case the loss is 0.
 }
+\description{
+gof_fisher_exact
+}

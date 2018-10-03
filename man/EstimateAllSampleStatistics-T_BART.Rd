@@ -6,7 +6,8 @@
 \alias{EstimateAllSampleStatistics,T_BART-method}
 \title{EstimateAllSampleStatistics-T_BART}
 \usage{
-\S4method{EstimateAllSampleStatistics}{T_BART}(theObject, verbose = FALSE)
+\S4method{EstimateAllSampleStatistics}{T_BART}(theObject,
+  verbose = FALSE)
 }
 \arguments{
 \item{theObject}{A "T_BART" object}

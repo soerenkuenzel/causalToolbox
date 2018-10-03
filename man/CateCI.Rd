@@ -5,7 +5,7 @@
 \title{Method CateCI}
 \usage{
 CateCI(theObject, feature_new, method = "maintain_group_ratios",
-  bootstrapVersion = "normalApprox", B = 200, nthread = 0,
+  bootstrapVersion = "normalApprox", B = 2000, nthread = 0,
   verbose = TRUE)
 }
 \arguments{
