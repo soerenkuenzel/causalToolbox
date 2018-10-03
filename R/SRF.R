@@ -16,7 +16,6 @@
 #' @slot forest A forest object
 #' @slot creator A function which creates a S_RF
 #' @exportClass S_RF
-#' @importFrom forestry predict
 setClass(
   "S_RF",
   contains = "Meta-learner",
@@ -165,7 +164,6 @@ S_RF <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_RF-method
 #' @exportMethod EstimateCate
-#' @importFrom forestry predict
 setMethod(
   f = "EstimateCate",
   signature = "S_RF",
@@ -174,8 +172,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      forestry::predict(theObject@forest, cbind(feature_new, tr = 1)) -
-        forestry::predict(theObject@forest, cbind(feature_new, tr = 0))
+      predict(theObject@forest, cbind(feature_new, tr = 1)) -
+        predict(theObject@forest, cbind(feature_new, tr = 0))
     )
   }
 )

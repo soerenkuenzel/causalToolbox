@@ -26,7 +26,6 @@
 #'   EstimateCate(xl_gpp, feat)
 #'   CateCI(xl_gpp, feat, B = 5, verbose = FALSE)
 #' @export X_RF_autotune_hyperband
-#' @importFrom forestry predict
 X_RF_autotune_hyperband <-
   function(feat,
            tr,
@@ -75,8 +74,8 @@ X_RF_autotune_hyperband <-
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- forestry::predict(m_1, X_0) - yobs_0
-    r_1 <- yobs_1 - forestry::predict(m_0, X_1)
+    r_0 <- predict(m_1, X_0) - yobs_0
+    r_1 <- yobs_1 - predict(m_0, X_1)
 
     m_tau_0 <-
       forestry::autoforestry(

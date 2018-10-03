@@ -17,7 +17,6 @@
 #' @slot m_y_c contains an honest random forest predictor for the control group
 #' @slot creator A function which creates a T_RF
 #' @exportClass T_RF
-#' @importFrom forestry predict
 setClass(
   "T_RF",
   contains = "Meta-learner",
@@ -182,7 +181,6 @@ T_RF <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_RF-method
 #' @exportMethod EstimateCate
-#' @importFrom forestry predict
 
 setMethod(
   f = "EstimateCate",
@@ -192,8 +190,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      forestry::predict(theObject@m_y_t, feature_new) -
-        forestry::predict(theObject@m_y_c, feature_new)
+      predict(theObject@m_y_t, feature_new) -
+        predict(theObject@m_y_c, feature_new)
     )
   }
 )

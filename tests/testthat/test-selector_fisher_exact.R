@@ -19,7 +19,7 @@ test_that("Tests Selector Transformed", {
   ))
   
   expect_equal(gof_values_S_BART,
-               0.5020295, 
+               0.3761287, 
                tolerance = 1e-3)
   
   expect_output(
@@ -32,6 +32,6 @@ test_that("Tests Selector Transformed", {
   ))
   
   expect_equal(gof_values_S_RF,
-               0.1845004,
+               0.1426197,
                tolerance = 1e-3)
 })
