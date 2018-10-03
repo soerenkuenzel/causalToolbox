@@ -48,7 +48,7 @@ test_that("Tests that ShRF is working correctly", {
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
   expect_equal(smp_stats$SATT[1, 3],
-               -9.004184,
+               -0.6381499,
                tolerance = 1e-2)
 
 })

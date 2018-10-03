@@ -17,7 +17,6 @@
 #' @slot m_y_c contains an honest random forest predictor for the control group
 #' @slot creator A function which creates a T_RF
 #' @exportClass T_RF
-#' @importFrom forestry predict
 setClass(
   "T_RF",
   contains = "Meta-learner",
@@ -62,30 +61,6 @@ setClass(
 #' @param splitratio Proportion of the training data used as the splitting
 #' dataset. The default value is 0.5.
 #' @export T_RF
-setGeneric(
-  name = "T_RF",
-  def = function(feat,
-                 tr,
-                 yobs,
-                 mtry,
-                 nodesizeSpl,
-                 nodesizeAvg,
-                 replace,
-                 ntree,
-                 sample_fraction,
-                 nthread,
-                 splitratio) {
-    standardGeneric("T_RF")
-  }
-)
-
-#' @title T_RF Constructor
-#' @rdname T_RF-T_RF
-#' @description This is an implementation of the T-learner combined with honest
-#' random forest for both response functions
-#' @aliases T_RF,T_RF-T_RF
-#' @return A `T_RF` object.
-#' @import methods
 T_RF <-
   function(feat,
            tr,
@@ -182,7 +157,6 @@ T_RF <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_RF-method
 #' @exportMethod EstimateCate
-#' @importFrom forestry predict
 
 setMethod(
   f = "EstimateCate",
@@ -192,8 +166,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      forestry::predict(theObject@m_y_t, feature_new) -
-        forestry::predict(theObject@m_y_c, feature_new)
+      predict(theObject@m_y_t, feature_new) -
+        predict(theObject@m_y_c, feature_new)
     )
   }
 )

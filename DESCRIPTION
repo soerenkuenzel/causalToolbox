@@ -28,7 +28,7 @@ Imports:
     quickmatch,
     distances
 Remotes: soerenkuenzel/forestry
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests:
     testthat,
     knitr,
@@ -37,6 +37,7 @@ VignetteBuilder: knitr
 Collate: 
     'CATE_estimators.R'
     'ExmpleSetups_causaleffects.R'
+    'MOBART.R'
     'SBART.R'
     'SRF.R'
     'TBART.R'

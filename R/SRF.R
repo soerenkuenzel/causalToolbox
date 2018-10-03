@@ -16,7 +16,6 @@
 #' @slot forest A forest object
 #' @slot creator A function which creates a S_RF
 #' @exportClass S_RF
-#' @importFrom forestry predict
 setClass(
   "S_RF",
   contains = "Meta-learner",
@@ -62,31 +61,6 @@ setClass(
 #' @param alwaysTr weather or not we always test weather we should split on the
 #'   treatment assignment. Currently only alwaysTr=FALSE is implemented.
 #' @export S_RF
-setGeneric(
-  name = "S_RF",
-  def = function(feat,
-                 tr,
-                 yobs,
-                 mtry,
-                 nodesizeSpl,
-                 nodesizeAvg,
-                 replace,
-                 ntree,
-                 sample_fraction,
-                 nthread,
-                 splitratio,
-                 alwaysTr) {
-    standardGeneric("S_RF")
-  }
-)
-
-#' @title S_RF Constructor
-#' @rdname S_RF-S_RF
-#' @description This is an implementation of the S-learner combined with honest
-#'   random forest for both response functions
-#' @aliases S_RF,S_RF-S_RF
-#' @return A `S_RF` object.
-#' @import methods
 S_RF <-
   function(feat,
            tr,
@@ -165,7 +139,6 @@ S_RF <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,S_RF-method
 #' @exportMethod EstimateCate
-#' @importFrom forestry predict
 setMethod(
   f = "EstimateCate",
   signature = "S_RF",
@@ -174,8 +147,8 @@ setMethod(
     feature_new <- as.data.frame(feature_new)
 
     return(
-      forestry::predict(theObject@forest, cbind(feature_new, tr = 1)) -
-        forestry::predict(theObject@forest, cbind(feature_new, tr = 0))
+      predict(theObject@forest, cbind(feature_new, tr = 1)) -
+        predict(theObject@forest, cbind(feature_new, tr = 0))
     )
   }
 )
