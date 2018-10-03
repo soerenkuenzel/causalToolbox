@@ -27,7 +27,7 @@ test_that("Tests Selector Subset", {
   )
   
   expect_equal(gof_values_S_BART,
-               c(41.75972, 29.95785), 
+               c(96.07298, 59.19640), 
                tolerance = 1e-3)
   
   gof_values_S_RF <- gof_subset(
@@ -42,6 +42,6 @@ test_that("Tests Selector Subset", {
   )
   
   expect_equal(gof_values_S_RF,
-               c(4.760388, 2.881059),
+               c(28.44484, 11.22975),
                tolerance = 1e-3)
 })
