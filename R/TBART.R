@@ -2,6 +2,8 @@
 #' @include SBART.R
 
 #' @import dbarts
+#' @import foreach
+#' @import doParallel
 
 
 
@@ -17,7 +19,7 @@ setClass(
     sample_stat = "character",
     tree_package = "character",
     ntree = "numeric",
-    nthread = "integer",
+    nthread = "numeric",
     creator = "function"
   )
 )
@@ -57,6 +59,7 @@ T_BART <-
       sample_stat = sample_stat,
       tree_package = tree_package,
       ntree = ntree,
+      nthread = nthread,
       creator = function(feat, tr, yobs) {
         T_BART(feat,
                tr,
@@ -83,6 +86,7 @@ T_BART <-
 #' @return A vector of predicted CATE
 #' @aliases EstimateCate,T_BART-method
 #' @exportMethod EstimateCate
+#' @import parallel
 setMethod(
   f = "EstimateCate",
   signature = "T_BART",
@@ -102,15 +106,16 @@ setMethod(
     X_0 <- feat[tr == 0, ]
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
-    feat_new_subset <- split(feature_new, rep(x = 1:nthread,
-                                              times = get_CV_sizes(nrow(feature_new),
-                                                                   nthread)))
+    feat_new_subset <- split.data.frame(feature_new, 
+                                        rep(x = 1:nthread,
+                                            times = get_CV_sizes(nrow(feature_new),
+                                                                nthread)))
     if (theObject@tree_package == "BayesTree") {
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         pred_matrix_f_0 <- BayesTree::bart(
           x.train = X_0,
           y.train = yobs_0,
-          x.test =  feat_new_subset[thread],
+          x.test =  feat_new_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
@@ -119,11 +124,11 @@ setMethod(
       
       mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
       
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         pred_matrix_f_1 <- BayesTree::bart(
           x.train = X_1,
           y.train = yobs_1,
-          x.test =  feat_new_subset[thread],
+          x.test =  feat_new_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
@@ -132,11 +137,11 @@ setMethod(
       
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
     } else if (theObject@tree_package == "dbarts") {
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         pred_matrix_f_0 <- dbarts::bart(
           x.train = X_0,
           y.train = yobs_0,
-          x.test =  feat_new_subset[thread],
+          x.test =  feat_new_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
@@ -144,11 +149,11 @@ setMethod(
       }
       
       mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         pred_matrix_f_1 <- dbarts::bart(
           x.train = X_1,
           y.train = yobs_1,
-          x.test =  feat_new_subset[thread],
+          x.test =  feat_new_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
@@ -224,25 +229,25 @@ setMethod(
       
       x_to_predict_subset <- split(x_to_predict, rep(x = 1:nthread,
                                                      times = get_CV_sizes(
-                                                       nrow(x_to_predict_subset),
+                                                       nrow(x_to_predict),
                                                        nthread)))
       if (theObject@tree_package == "BayesTree") {
-        foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
           pred_matrix <- BayesTree::bart(
             x.train = x,
             y.train = y,
-            x.test =  x_to_predict_subset[thread],
+            x.test =  x_to_predict_subset[[thread]],
             verbose = verbose,
             ndpost = ndpost,
             ntree = theObject@ntree
           )$yhat.test
         }
       } else if (theObject@tree_package == "dbarts") {
-        foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+        foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
           pred_matrix <- dbarts::bart(
             x.train = x,
             y.train = y,
-            x.test =  x_to_predict_subset[thread],
+            x.test =  x_to_predict_subset[[thread]],
             verbose = verbose,
             ndpost = ndpost,
             ntree = theObject@ntree
@@ -300,21 +305,21 @@ setMethod(
     X_1 <- feat[tr == 1, ]
     
     if (theObject@tree_package == "BayesTree") {
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         mu_hat_0_MCMC_samples <- BayesTree::bart(
           x.train = X_0,
           y.train = yobs_0,
-          x.test =  feat_subset[thread],
+          x.test =  feat_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
         )$yhat.test
       }
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         mu_hat_1_MCMC_samples <- BayesTree::bart(
           x.train = X_1,
           y.train = yobs_1,
-          x.test =  feat_subset[thread],
+          x.test =  feat_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
@@ -322,21 +327,21 @@ setMethod(
       }
       
     } else if (theObject@tree_package == "dbarts") {
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         mu_hat_0_MCMC_samples <- dbarts::bart(
           x.train = X_0,
           y.train = yobs_0,
-          x.test =  feat_subset[thread],
+          x.test =  feat_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
         )$yhat.test
       }
-      foreach(thread = 1:nthread, .combine = 'rbind') %dopar% {
+      foreach(thread = 1:nthread, .combine = 'cbind') %dopar% {
         mu_hat_1_MCMC_samples <- dbarts::bart(
           x.train = X_1,
           y.train = yobs_1,
-          x.test =  feat_subset[thread],
+          x.test =  feat_subset[[thread]],
           verbose = verbose,
           ndpost = ndpost,
           ntree = theObject@ntree
