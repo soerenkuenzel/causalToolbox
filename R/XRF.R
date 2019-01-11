@@ -1,9 +1,9 @@
+#' This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+#' as base learner.
 #' @include CATE_estimators.R
 
-
-############################
-### Xlearner - hRF - hRF ###
-############################
+# X- RF class ------------------------------------------------------------------
 #' @title XhRF constructor
 #' @name X_RF-class
 #' @rdname X_RF-class
@@ -21,8 +21,10 @@
 #' group of the second stage.
 #' @slot m_tau_1 contains an honest random forest predictor for the treated
 #' group of the second stage.
-#' @slot m_prop contains an honest random forest predictor the propensity score.
-#' @slot hyperparameter_list A list of lists of hyper parameters
+#' @slot m_prop contains an honest random forest predictor for the propensity 
+#' score.
+#' @slot hyperparameter_list A list of lists of hyper parameters used for the
+#'   honest random forest algorithm of the forestry package
 #' @exportClass X_RF
 setClass(
   "X_RF",
@@ -41,193 +43,291 @@ setClass(
   )
 )
 
-
+# X_RF generator ---------------------------------------------------------------
 #' @title X-Learner with honest RF for both stages
-#' @name X_RF-X_RF
-#' @rdname X_RF-X_RF
+#' @details 
+#' The X-Learner with random forest 
+#' \enumerate{
+#'  \item
+#'     Estimate the response functions 
+#'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
+#'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+#'     using the
+#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+#'     forest version with the hyperparameters specified in \code{mu.forestry}
+#'     and denote the estimates as \eqn{\hat \mu_0} and \eqn{\hat \mu_1}.
+#'  \item
+#'     Impute the treatment effects for the individuals in the treated group,
+#'     based on the control outcome estimator, and the treatment effects for the
+#'     individuals in the control group, based on the treatment outcome
+#'     estimator, that is,
+#'     \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
+#'     \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
+#'     Now employ the 
+#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+#'     forest version with the hyperparameters specified in \code{tau.forestry}
+#'     in two ways: using \eqn{D^1_i} as the dependent variable to obtain \eqn{\hat
+#'     \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to obtain
+#'     \eqn{\hat \tau_0(x)}.
+#'  \item 
+#'     Define the CATE estimate by a weighted average of the two estimates in
+#'     Stage 2: 
+#'     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
+#'     If \code{predmode = propmean}, then \eqn{g(x) = e(x)} where
+#'     \eqn{e(x)} is an estimate of the propensity score using the 
+#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+#'     forest version with the hyperparameters specified in \code{e.forestry}.
+#'     If \code{predmode = control}, then \eqn{g(x) = 1} and if 
+#'     \code{predmode = treated}, then \eqn{g(x) = 0}.
+#' }
 #' @description This is an implementation of the X-learner with honest random
 #' forest in the first and second stage. The function returns an X-RF object.
-#' @param feat A data frame of all the features.
-#' @param tr A numeric vector containing 0 for control and 1 for treated 
-#' variables.
-#' @param yobs A numeric vector containing all the observed outcomes.
-#' @param predmode One of propmean, control, treated, extreme. It specifies how
-#' the two estimators of the second stage should be aggregated. The default is
-#' propmean which refers to propensity score weighting.
-#' @param relevant_Variable_first Variables which are only used 
-#' in the first stage.
-#' @param relevant_Variable_second Variables which are only used 
-#' in the second stage.
-#' @param relevant_Variable_prop TODO: Add Description
-#' @param ntree_first Numbers of trees in the first stage.
-#' @param ntree_second Numbers of trees in the second stage.
-#' @param ntree_prop TODO: Add Description
-#' @param mtry_first Numbers of trees in the first stage.
-#' @param mtry_second Numbers of trees in the second stage.
-#' @param mtry_prop TODO: Add Description
-#' @param min_node_size_spl_first minimum nodesize in the first stage for the
-#' observations in the splitting set.
-#' @param min_node_size_ave_first minimum nodesize in the first stage for the
-#' observations in the averaging set.
-#' @param min_node_size_spl_second minimum nodesize in the second stage for the
-#' observations in the splitting set.
-#' @param min_node_size_ave_second minimum nodesize in the second stage for the
-#' observations in the averaging set.
-#' @param min_node_size_spl_prop TODO: Add Description
-#' @param min_node_size_ave_prop TODO: Add Description
-#' @param splitratio_first Proportion of the training data used as the splitting
-#' dataset in the first stage.
-#' @param splitratio_second Proportion of the training data used as the
-#' splitting dataset in the second stage.
-#' @param splitratio_prop TODO: Add Description
-#' @param replace_first Sample with or without replacement in the first stage.
-#' @param replace_second Sample with or without replacement in the second stage.
-#' @param replace_prop TODO: Add Description
-#' @param sample_fraction_first The size of total samples to draw for the
-#' training data in the first stage.
-#' @param sample_fraction_second The size of total samples to draw for the
-#' training data in the second stage.
-#' @param sample_fraction_prop TODO: Add Description
+#' @param feat A data frame containing the features.
+#' @param tr A numeric vector with 0 for control and 1 for treated variables.
+#' @param yobs A numeric vector containing the observed outcomes.
+#' @param predmode One of propmean, control, treated. It specifies how
+#'   the two estimators of the second stage should be aggregated. The default is
+#'   propmean which refers to propensity score weighting.
 #' @param nthread Number of threads which should be used to work in parallel.
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @param middleSplit_first TODO: Add Description
-#' @param middleSplit_second TODO: Add Description
-#' @param middleSplit_prop TODO: Add Description
-#' @export X_RF
+#' @param verbose TRUE for detailed output FALSE for no output:
+#' @param mu.forestry A list containing the hyperparameters for the
+#'   \code{forestry} package that are used in the first stage of the X-learner.
+#'   These hyperparameters are passed to the \code{forestry} package. Please
+#'   refer to \url{https://github.com/soerenkuenzel/forestry} for a more
+#'   detailed documentation of the hyperparamters.
+#'   \itemize{
+#'      \item \code{relevant.Variable} Variables that are only used in the first 
+#'            stage.
+#'      \item \code{ntree} Numbers of trees in the first stage.
+#'      \item \code{replace} Sample with or without replacement in the first 
+#'            stage.
+#'      \item \code{sample.fraction} The size of total samples to draw for the 
+#'            training data in the first stage.
+#'      \item \code{mtry} The number of variables randomly selected at each 
+#'            splitting point.
+#'      \item \code{nodesizeSpl} minimum nodesize in the first stage for 
+#'            the observations in the splitting set. (see the details of the 
+#'            \code{forestry} package)
+#'      \item \code{nodesizeAvg} minimum nodesize in the first stage for 
+#'            the observations in the averaging set.
+#'      \item \code{splitratio} Proportion of the training data used as the 
+#'            splitting dataset in the first stage.
+#'      \item \code{middleSplit} If true, the split value will be exactly in the 
+#'            middle between two observations. Otherwise, it will take a point 
+#'            based on a uniform distribution between the two observations. 
+#'   }
+#' @param tau.forestry hyperparameters for the second stage of the X-learner.
+#'   Refer to the \code{mu.forestry} description for details.
+#' @param e.forestry hyperparameters for estimating the propensity score. This
+#'   is only relevant if \code{predmode = propmean} and \code{e = NULL}. 
+#'   Refer to the \code{mu.forestry} description for details.
+#' @return Object of class \code{X_RF}. It should be used with one of the 
+#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#'   \item{\code{feature_train}}{A copy of feat.}
+#'   \item{\code{tr_train}}{A copy of tr.}
+#'   \item{\code{yobs_train}}{A copy of yobs.}
+#'   \item{\code{m_0}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the control group as the dependent variable.}
+#'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the treated group as the dependent variable.}
+#'   \item{\code{m_tau_0}}{An object of class forestry that is fitted with the 
+#'      \eqn{D_0} as the dependent variable.}
+#'   \item{\code{m_tau_1}}{An object of class forestry that is fitted with the 
+#'      \eqn{D_1} as the dependent variable.}
+#'   \item{\code{m_prop}}{An object of class forestry that is fitted with tr as 
+#'      the dependent variable.}
+#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+#'      the three random forest algorithms used}
+#'   \item{\code{creator}}{Function call of X_RF. This is used for different 
+#'      bootstrap procedures.}
+#' @author Soeren R. Kuenzel
+#' @references
+#' \itemize{
+#'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+#'     Meta-learners for estimating heterogeneous treatment effects using
+#'     machine learning. 
+#'     \url{https://arxiv.org/pdf/1706.03461.pdf}
+#'   \item 
+#'     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
+#'     Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
+#'     \url{https://arxiv.org/pdf/1811.02833.pdf}
+#'   \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
+#'     Jasjeet Sekhon, and Pieter Abbeel (2018). 
+#'     Transfer learning for estimating causal effects using neural networks. 
+#'     \url{https://arxiv.org/pdf/1808.07804.pdf}
+#'   }
+#' @seealso \code{\link{X_RF_fully_specified}}
+#' @examples
+#' require(causalToolbox)
+#' 
+#' # create example data set
+#' simulated_experiment <- simulate_causal_experiment(
+#'   ntrain = 1000,
+#'   ntest = 1000,
+#'   dim = 10,
+#'   setup = "complexTau",
+#'   testseed = 293901,
+#'   trainseed = 307017
+#' )
+#' feat <- simulated_experiment$feat_tr
+#' tr <- simulated_experiment$W_tr
+#' yobs <- simulated_experiment$Yobs_tr
+#' 
+#' # create the hte object using honest Random Forests (RF)
+#' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+#' 
+#' cate_esti_rf <- EstimateCate(xl_rf, feature_test)
+
+#' # evaluate the performance
+#' cate_true <- simulated_experiment$tau_te
+#' mean((cate_esti_rf - cate_true) ^ 2)
+#' #' \dontrun{
+#' # Create confidence intervals via bootstrapping. 
+#' xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
+#' }
+#' @export 
 X_RF <-
   function(feat,
            tr,
            yobs,
            predmode = "propmean",
-           relevant_Variable_first = 1:ncol(feat),
-           relevant_Variable_second = 1:ncol(feat),
-           relevant_Variable_prop = 1:ncol(feat),
-           ntree_first = 1000,
-           ntree_second = 1000,
-           ntree_prop = 500,
-           mtry_first = round(ncol(feat) * 13 / 20),
-           mtry_second = round(ncol(feat) * 17 / 20),
-           mtry_prop = ncol(feat),
-           min_node_size_spl_first = 2,
-           min_node_size_ave_first = 1,
-           min_node_size_spl_second = 5,
-           min_node_size_ave_second = 6,
-           min_node_size_spl_prop = 11,
-           min_node_size_ave_prop = 33,
-           splitratio_first = 1,
-           splitratio_second = 0.8,
-           splitratio_prop = .5,
-           replace_first = TRUE,
-           replace_second = TRUE,
-           replace_prop = TRUE,
-           sample_fraction_first = 0.8,
-           sample_fraction_second = 0.7,
-           sample_fraction_prop =  0.5,
            nthread = 0,
            verbose = TRUE,
-           middleSplit_first = TRUE,
-           middleSplit_second = TRUE,
-           middleSplit_prop = FALSE) {
-    # if relevant_Variable_first is not set, then set it to select all:
+           mu.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 1000,
+               replace = TRUE,
+               sample.fraction = 0.8,
+               mtry = round(ncol(feat) * 13 / 20),
+               nodesizeSpl = 2,
+               nodesizeAvg = 1,
+               splitratio = 1,
+               middleSplit = TRUE
+             ),
+           tau.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 1000,
+               replace = TRUE,
+               sample.fraction = 0.7,
+               mtry = round(ncol(feat) * 17 / 20),
+               nodesizeSpl = 5,
+               nodesizeAvg = 6,
+               splitratio = 0.8,
+               middleSplit = TRUE
+             ),
+           e.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 500,
+               replace = TRUE,
+               sample.fraction =  0.5,
+               mtry = ncol(feat),
+               nodesizeSpl = 11,
+               nodesizeAvg = 33,
+               splitratio = .5,
+               middleSplit = FALSE
+             )) {
+    
+    # Cast input data to a standard format -------------------------------------
     feat <- as.data.frame(feat)
-    if (is.null(relevant_Variable_first)) {
-      relevant_Variable_first <- 1:ncol(feat)
-    } else{
-      if (is.character(relevant_Variable_first))
-        relevant_Variable_first <-
-          which(colnames(feat) %in% relevant_Variable_first)
-    }
-    if (is.null(relevant_Variable_second)) {
-      relevant_Variable_second <- 1:ncol(feat)
-    } else{
-      if (is.character(relevant_Variable_second))
-        relevant_Variable_second <-
-          which(colnames(feat) %in% relevant_Variable_second)
-    }
-    if ((!is.null(mtry_first)) &&
-        (mtry_first > ncol(feat))) {
-      warning(
-        "mtry_first is chosen bigger than number of features. It will be set
-        to be equal to the number of features"
+  
+    # Catch misspecification erros ---------------------------------------------
+    if (!(all(sort(unique(tr)) == c(0, 1)) &&
+          mode(tr) == "numeric")) {
+      stop(
+        paste(
+          "tr must be a numeric vector with 0 for control units and 1",
+          "for treated units. There has to be at least one treated and",
+          "one control unit."
+        )
       )
-      mtry_first <- ncol(feat)
     }
-    if ((!is.null(mtry_second)) &&
-        (mtry_second > ncol(feat))) {
-      warning(
-        "mtry_second is chosen bigger than number of features. It will be set
-        to be equal to the number of features"
-      )
-      mtry_second <- ncol(feat)
+    
+    if (!(all(!is.na(yobs)) && mode(yobs) == "numeric")) {
+      stop(paste("yobs must be a numeric vector without missing values"))
     }
-
-    ############################################################################
-    # Translate the settings to a feature list
-    ############################################################################
+    
+    if (!(is.data.frame(feat) && all(!is.na(feat)))) {
+      stop(paste("feat must be a data.frame without missing values"))
+    }
+    
+    for (i in 1:ncol(feat)) {
+      if (is.character(feat[, i])) {
+        warning(paste("feature", i,
+                      "is a character, and must be casted to a factor!"))
+      }
+    }
+    
+    # Set relevant relevant.Variable -------------------------------------------
+    # User often sets the relevant variables by column names and not numerical
+    # values. We translate it here to the index of the columns.
+    
+    if (is.null(mu.forestry$relevant.Variable)) {
+      mu.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(mu.forestry$relevant.Variable))
+        mu.forestry$relevant.Variable <-
+          which(colnames(feat) %in% mu.forestry$relevant.Variable)
+    }
+    
+    if (is.null(tau.forestry$relevant.Variable)) {
+      tau.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(tau.forestry$relevant.Variable))
+        tau.forestry$relevant.Variable <-
+          which(colnames(feat) %in% tau.forestry$relevant.Variable)
+    }
+    
+    if (is.null(e.forestry$relevant.Variable)) {
+      e.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(e.forestry$relevant.Variable))
+        e.forestry$relevant.Variable <-
+          which(colnames(feat) %in% e.forestry$relevant.Variable)
+    }
+    
+    # Translate the settings to a feature list ---------------------------------
     general_hyperpara <- list("predmode" = predmode,
                               "nthread" = nthread)
-    first_stage_hyperpara <- list(
-      "relevant_Variable" = relevant_Variable_first,
-      "ntree" = ntree_first,
-      "replace" = replace_first,
-      "sample.fraction" = sample_fraction_first,
-      "mtry" = mtry_first,
-      "nodesizeSpl" = min_node_size_spl_first,
-      "nodesizeAvg" = min_node_size_ave_first,
-      "splitratio" = splitratio_first,
-      "middleSplit" = middleSplit_first
-    )
-    second_stage_hyperpara <- list(
-      "relevant_Variable" = relevant_Variable_second,
-      "ntree" = ntree_second,
-      "replace" = replace_second,
-      "sample.fraction" = sample_fraction_second,
-      "mtry" = mtry_second,
-      "nodesizeSpl" = min_node_size_spl_second,
-      "nodesizeAvg" = min_node_size_ave_second,
-      "splitratio" = splitratio_second,
-      "middleSplit" = middleSplit_second
-    )
-    prop_hyperpara <- list(
-      "relevant_Variable" = relevant_Variable_prop,
-      "ntree" = ntree_prop,
-      "replace" = replace_prop,
-      "sample.fraction" = sample_fraction_prop,
-      "mtry" = mtry_prop,
-      "nodesizeSpl" = min_node_size_spl_prop,
-      "nodesizeAvg" = min_node_size_ave_prop,
-      "splitratio" = splitratio_prop,
-      "middleSplit" = middleSplit_prop
-    )
-
+    
     hyperparameter_list <- list(
       "general" = general_hyperpara,
-      "l_first_0" = first_stage_hyperpara,
-      "l_first_1" = first_stage_hyperpara,
-      "l_second_0" = second_stage_hyperpara,
-      "l_second_1" = second_stage_hyperpara,
-      "l_prop" = prop_hyperpara
+      "l_first_0" = mu.forestry,
+      "l_first_1" = mu.forestry,
+      "l_second_0" = tau.forestry,
+      "l_second_1" = tau.forestry,
+      "l_prop" = e.forestry
     )
-
-    return(X_RF_fully_specified(feat = feat,
-                                tr = tr,
-                                yobs = yobs,
-                                hyperparameter_list = hyperparameter_list,
-                                verbose = verbose))
+    
+    return(
+      X_RF_fully_specified(
+        feat = feat,
+        tr = tr,
+        yobs = yobs,
+        hyperparameter_list = hyperparameter_list,
+        verbose = verbose
+      )
+    )
   }
 
-#' @title X_RF_most_basic Constructor
-#' @rdname X_RF_fully_specified
+# X-RF basic constructor -------------------------------------------------------
+#' @title X_RF fully specified constructor
 #' @description This is the most basic X-learner with honest random forest
-#' constructor. It should not be called by the user, since the list of
-#' parameters is too big. Instead call the simpler version XhRF or one of the
-#' self tuning versions
+#'   constructor. It should not be called by the user, since the list of
+#'   parameters is too big. Instead call the simpler version X_RF or one of the
+#'   self tuning versions should be called. This function mainly exists to be
+#'   called from other functions.
 #' @param feat A feature data frame.
-#' @param tr A vector of treatment assignment: 0 for control and 1 for treatment.
+#' @param tr A vector of treatment assignment: 0 for control and 1 for
+#'   treatment.
 #' @param yobs A vector of all the observed outcomes.
 #' @param hyperparameter_list A list of lists of hyper parameters
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @return A `X_RF` object.
+#' @seealso \code{\link{X_RF}}
 #' @export X_RF_fully_specified
 #' @import methods
 X_RF_fully_specified <-
@@ -236,26 +336,17 @@ X_RF_fully_specified <-
            yobs,
            hyperparameter_list,
            verbose) {
-
-    #---------------------------------------------------------------------------
-
-    for(i in 1:ncol(feat)){
-      if(is.character(feat[,i])) {
-        stop(paste("feature", i, "is a character, please first make it a factor"))
-        feat[,i] <- as.factor(feat[,i])
-      }
-    }
-    #---------------------------------------------------------------------------
-
+    
+    # First stage --------------------------------------------------------------
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
-
-    X_0 <- feat[tr == 0,]
-    X_1 <- feat[tr == 1,]
-
+    
+    X_0 <- feat[tr == 0, ]
+    X_1 <- feat[tr == 1, ]
+    
     m_0 <-
       forestry::forestry(
-        x = X_0[ , hyperparameter_list[["l_first_0"]]$relevant_Variable],
+        x = X_0[, hyperparameter_list[["l_first_0"]]$relevant.Variable],
         y = yobs_0,
         ntree = hyperparameter_list[["l_first_0"]]$ntree,
         replace = hyperparameter_list[["l_first_0"]]$replace,
@@ -267,10 +358,10 @@ X_RF_fully_specified <-
         splitrule = "variance",
         splitratio = hyperparameter_list[["l_first_0"]]$splitratio
       )
-
+    
     m_1 <-
       forestry::forestry(
-        x = X_1[ , hyperparameter_list[["l_first_1"]]$relevant_Variable],
+        x = X_1[, hyperparameter_list[["l_first_1"]]$relevant.Variable],
         y = yobs_1,
         ntree = hyperparameter_list[["l_first_1"]]$ntree,
         replace = hyperparameter_list[["l_first_1"]]$replace,
@@ -282,16 +373,23 @@ X_RF_fully_specified <-
         splitrule = "variance",
         splitratio = hyperparameter_list[["l_first_1"]]$splitratio
       )
-
+    
     if (verbose) {
       print("Done with the first stage.")
     }
-    r_0 <- predict(m_1, X_0[, hyperparameter_list[["l_first_0"]]$relevant_Variable]) - yobs_0
-    r_1 <- yobs_1 - predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant_Variable])
-
+    
+    # Second Stage -------------------------------------------------------------
+    r_0 <- 
+      predict(m_1, 
+              X_0[, hyperparameter_list[["l_first_0"]]$relevant.Variable]) - 
+      yobs_0
+    r_1 <-
+      yobs_1 - 
+      predict(m_0, X_1[, hyperparameter_list[["l_first_1"]]$relevant.Variable])
+    
     m_tau_0 <-
       forestry::forestry(
-        x = X_0[, hyperparameter_list[["l_second_0"]]$relevant_Variable],
+        x = X_0[, hyperparameter_list[["l_second_0"]]$relevant.Variable],
         y = r_0,
         ntree = hyperparameter_list[["l_second_0"]]$ntree,
         replace = hyperparameter_list[["l_second_0"]]$replace,
@@ -303,10 +401,10 @@ X_RF_fully_specified <-
         splitrule = "variance",
         splitratio = hyperparameter_list[["l_second_0"]]$splitratio
       )
-
+    
     m_tau_1 <-
       forestry::forestry(
-        x = X_1[, hyperparameter_list[["l_second_1"]]$relevant_Variable],
+        x = X_1[, hyperparameter_list[["l_second_1"]]$relevant.Variable],
         y = r_1,
         ntree = hyperparameter_list[["l_second_1"]]$ntree,
         replace = hyperparameter_list[["l_second_1"]]$replace,
@@ -321,10 +419,11 @@ X_RF_fully_specified <-
     if (verbose) {
       print("Done with the second stage.")
     }
-
+    
+    # Prop score estimation ----------------------------------------------------
     m_prop <-
       forestry::forestry(
-        x = feat[, hyperparameter_list[["l_prop"]]$relevant_Variable],
+        x = feat[, hyperparameter_list[["l_prop"]]$relevant.Variable],
         y = tr,
         ntree = hyperparameter_list[["l_prop"]]$ntree,
         replace = hyperparameter_list[["l_prop"]]$replace,
@@ -353,10 +452,10 @@ X_RF_fully_specified <-
         hyperparameter_list = hyperparameter_list,
         creator = function(feat, tr, yobs) {
           X_RF_fully_specified(feat,
-               tr,
-               yobs,
-               hyperparameter_list,
-               verbose)
+                               tr,
+                               yobs,
+                               hyperparameter_list,
+                               verbose)
         }
       )
     )

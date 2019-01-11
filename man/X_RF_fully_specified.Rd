@@ -2,14 +2,15 @@
 % Please edit documentation in R/XRF.R
 \name{X_RF_fully_specified}
 \alias{X_RF_fully_specified}
-\title{X_RF_most_basic Constructor}
+\title{X_RF fully specified constructor}
 \usage{
 X_RF_fully_specified(feat, tr, yobs, hyperparameter_list, verbose)
 }
 \arguments{
 \item{feat}{A feature data frame.}
 
-\item{tr}{A vector of treatment assignment: 0 for control and 1 for treatment.}
+\item{tr}{A vector of treatment assignment: 0 for control and 1 for
+treatment.}
 
 \item{yobs}{A vector of all the observed outcomes.}
 
@@ -22,7 +23,11 @@ A `X_RF` object.
 }
 \description{
 This is the most basic X-learner with honest random forest
-constructor. It should not be called by the user, since the list of
-parameters is too big. Instead call the simpler version XhRF or one of the
-self tuning versions
+  constructor. It should not be called by the user, since the list of
+  parameters is too big. Instead call the simpler version X_RF or one of the
+  self tuning versions should be called. This function mainly exists to be
+  called from other functions.
+}
+\seealso{
+\code{\link{X_RF}}
 }

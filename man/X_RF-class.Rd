@@ -9,6 +9,11 @@ The `X_RF` object is X-learner combined with honest random
 forest used for the propensity score estimate, the first stage and the second
 stage.
 }
+\details{
+This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+as base learner.
+}
 \section{Slots}{
 
 \describe{
@@ -30,8 +35,10 @@ group of the second stage.}
 \item{\code{m_tau_1}}{contains an honest random forest predictor for the treated
 group of the second stage.}
 
-\item{\code{m_prop}}{contains an honest random forest predictor the propensity score.}
+\item{\code{m_prop}}{contains an honest random forest predictor for the propensity 
+score.}
 
-\item{\code{hyperparameter_list}}{A list of lists of hyper parameters}
+\item{\code{hyperparameter_list}}{A list of lists of hyper parameters used for the
+honest random forest algorithm of the forestry package}
 }}
 
