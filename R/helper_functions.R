@@ -6,7 +6,36 @@
 #' @include SRF.R
 
 #-------------------------------------------------------------------------------
-catch_error <- function(feat, yobs, tr, k) {
+catch_feat_input_errors <- function(feat) {
+  if (!(is.data.frame(feat) && all(!is.na(feat)))) {
+    stop(paste("feat must be a data.frame without missing values"))
+  }
+  
+  for (i in 1:ncol(feat)) {
+    if (is.character(feat[, i])) {
+      warning(paste("feature", i,
+                    "is a character, and must be casted to a factor!"))
+    }
+  }
+}
+
+catch_input_errors <- function(feat, yobs, tr) {
+  if (!(all(sort(unique(tr)) == c(0, 1)) &&
+        mode(tr) == "numeric")) {
+    stop(
+      paste(
+        "tr must be a numeric vector with 0 for control units and 1",
+        "for treated units. There has to be at least one treated and",
+        "one control unit."
+      )
+    )
+  }
+  if (!(all(!is.na(yobs)) && mode(yobs) == "numeric")) {
+    stop(paste("yobs must be a numeric vector without missing values"))
+  }
+  
+  catch_feat_input_errors(feat)
+  
   n <- length(tr)
   if (sum(tr) == 0 | sum(tr) == n) {
     stop("All units are in the treated group or all units are in the
@@ -16,10 +45,15 @@ catch_error <- function(feat, yobs, tr, k) {
     stop("Either no data was provided or the sizes of yobs, feat or tr do not
          match")
   }
-  if (k < 2 | k%%1!=0){
+}
+
+catch_error <- function(feat, yobs, tr, k) {
+  catch_input_errors(feat, yobs, tr) 
+  if (k < 2 | k %% 1 != 0) {
     stop("k must be an integer bigger than 1!")
   }
 }
+
 
 #-------------------------------------------------------------------------------
 get_CV_sizes <- function(n, k) {

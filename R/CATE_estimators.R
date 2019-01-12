@@ -27,9 +27,10 @@ setClass(
 #'Method EstimateCate
 #'@name EstimateCate
 #'@rdname EstimateCate
-#'@param theObject A `Meta-learner` object
-#'@param feature_new A feature data frame
-#'@param ... Additional parameters
+#'@description Returns the estimated CATE. 
+#'@param theObject A `Meta-learner` object.
+#'@param feature_new A feature data frame.
+#'@param ... Additional parameters that are specific for some meta-learners
 #'@export EstimateCate
 setGeneric(
   name = "EstimateCate",

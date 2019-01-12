@@ -2,6 +2,8 @@
 #' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
 #' as base learner.
 #' @include CATE_estimators.R
+#' @include helper_functions.R
+
 
 # X- RF class ------------------------------------------------------------------
 #' @title XhRF constructor
@@ -235,31 +237,19 @@ X_RF <-
     feat <- as.data.frame(feat)
   
     # Catch misspecification erros ---------------------------------------------
-    if (!(all(sort(unique(tr)) == c(0, 1)) &&
-          mode(tr) == "numeric")) {
-      stop(
-        paste(
-          "tr must be a numeric vector with 0 for control units and 1",
-          "for treated units. There has to be at least one treated and",
-          "one control unit."
-        )
-      )
+    if (!is.integer(nthread) | nthread < 0) {
+      stop("nthread must be a positive integer!")
     }
     
-    if (!(all(!is.na(yobs)) && mode(yobs) == "numeric")) {
-      stop(paste("yobs must be a numeric vector without missing values"))
+    if (!is.boolean(verbose)) {
+      stop("verbose must be either TRUE or FALSE.")
     }
     
-    if (!(is.data.frame(feat) && all(!is.na(feat)))) {
-      stop(paste("feat must be a data.frame without missing values"))
+    if (predmode %in% c("propmean", "extreme", "control", "treated")) {
+      stop("predmode should be one of propmean, extreme, control, or treated.")
     }
     
-    for (i in 1:ncol(feat)) {
-      if (is.character(feat[, i])) {
-        warning(paste("feature", i,
-                      "is a character, and must be casted to a factor!"))
-      }
-    }
+    catch_input_errors(feat, yobs, tr)
     
     # Set relevant relevant.Variable -------------------------------------------
     # User often sets the relevant variables by column names and not numerical
@@ -461,18 +451,11 @@ X_RF_fully_specified <-
     )
   }
 
-
-############################
-### Estimate CATE Method ###
-############################
+# Estimate CATE Method ---------------------------------------------------------
 #' EstimateCate-X_hRF
 #' @name EstimateCate-X_RF
-#' @rdname EstimateCate-X_RF
-#' @description Return the estimated CATE
-#' @param theObject A `X_hRF` object.
-#' @param feature_new A feature data frame.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,X_RF-method
+#' @rdname EstimateCate
+#' @inherit EstimateCate
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
@@ -481,14 +464,20 @@ setMethod(
   {
     feature_new <- as.data.frame(feature_new)
 
+    catch_feat_input_errors(feature_new)
+    
     predmode <- theObject@hyperparameter_list[["general"]]$predmode
     prop_scores <- predict(theObject@m_prop, feature_new)
+    
+    
+    
     if (predmode == "propmean") {
       return(
         prop_scores        * predict(theObject@m_tau_0, feature_new) +
           (1 - prop_scores)  * predict(theObject@m_tau_1, feature_new)
       )
     }
+    
     if (predmode == "extreme") {
       return(ifelse(
         prop_scores > .5,
@@ -496,12 +485,17 @@ setMethod(
         predict(theObject@m_tau_1, feature_new)
       ))
     }
+    
     if (predmode == "control") {
       return(predict(theObject@m_tau_0, feature_new))
     }
+    
     if (predmode == "treated") {
       return(predict(theObject@m_tau_1, feature_new))
     }
+    
+    stop("predmode should be one of propmean, extreme, control, or treated.")
+    
   }
 )
 
