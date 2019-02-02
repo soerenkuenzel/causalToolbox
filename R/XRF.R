@@ -5,26 +5,26 @@
 #' @include helper_functions.R
 
 
-# X- RF class ------------------------------------------------------------------
+# X-RF class -------------------------------------------------------------------
 #' @title XhRF constructor
 #' @name X_RF-class
 #' @rdname X_RF-class
 #' @description The `X_RF` object is X-learner combined with honest random
-#' forest used for the propensity score estimate, the first stage and the second
-#' stage.
+#'   forest used for the propensity score estimate, the first stage and the
+#'   second stage.
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
 #' @slot m_0 contains an honest random forest predictor for the control group of
-#' the first stage.
+#'   the first stage.
 #' @slot m_1 contains an honest random forest predictor for the treated group of
-#' the first stage.
+#'   the first stage.
 #' @slot m_tau_0 contains an honest random forest predictor for the control
-#' group of the second stage.
+#'   group of the second stage.
 #' @slot m_tau_1 contains an honest random forest predictor for the treated
-#' group of the second stage.
-#' @slot m_prop contains an honest random forest predictor for the propensity 
-#' score.
+#'   group of the second stage.
+#' @slot m_prop contains an honest random forest predictor for the propensity
+#'   score.
 #' @slot hyperparameter_list A list of lists of hyper parameters used for the
 #'   honest random forest algorithm of the forestry package
 #' @exportClass X_RF
@@ -160,6 +160,7 @@ setClass(
 #'     \url{https://arxiv.org/pdf/1808.07804.pdf}
 #'   }
 #' @seealso \code{\link{X_RF_fully_specified}}
+#' @family metalearners
 #' @examples
 #' require(causalToolbox)
 #' 
@@ -178,13 +179,14 @@ setClass(
 #' 
 #' # create the hte object using honest Random Forests (RF)
 #' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+#' tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 #' 
 #' cate_esti_rf <- EstimateCate(xl_rf, feature_test)
-
+#'
 #' # evaluate the performance
 #' cate_true <- simulated_experiment$tau_te
 #' mean((cate_esti_rf - cate_true) ^ 2)
-#' #' \dontrun{
+#' \dontrun{
 #' # Create confidence intervals via bootstrapping. 
 #' xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 #' }
@@ -310,16 +312,11 @@ X_RF <-
 #'   parameters is too big. Instead call the simpler version X_RF or one of the
 #'   self tuning versions should be called. This function mainly exists to be
 #'   called from other functions.
-#' @param feat A feature data frame.
-#' @param tr A vector of treatment assignment: 0 for control and 1 for
-#'   treatment.
-#' @param yobs A vector of all the observed outcomes.
 #' @param hyperparameter_list A list of lists of hyper parameters
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `X_RF` object.
 #' @seealso \code{\link{X_RF}}
-#' @export X_RF_fully_specified
+#' @inherit X_RF
 #' @import methods
+#' @export
 X_RF_fully_specified <-
   function(feat,
            tr,

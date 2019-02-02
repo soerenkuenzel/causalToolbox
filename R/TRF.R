@@ -1,15 +1,17 @@
+#' This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+#' as base learner.
 #' @include CATE_estimators.R
+#' @include helper_functions.R
+#' @include XRF.R
 
 
-
-############################
-### Tlearner - hRF ###
-############################
+# T-RF class -------------------------------------------------------------------
 #' @title ThRF constructor
 #' @name T_RF-class
 #' @rdname T_RF-class
 #' @description The `T_RF` object is T-learner combined with honest random
-#' forest used for both response functions
+#'   forest used for both response functions
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
@@ -24,8 +26,9 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    m_y_t = "forestry",
-    m_y_c = "forestry",
+    m_0 = "forestry",
+    m_1 = "forestry",
+    hyperparameter_list = "list", 
     creator = "function"
   ),
   validity = function(object)
@@ -37,133 +40,219 @@ setClass(
   }
 )
 
-
-#' @title honstRF Constructor
-#' @name T_RF-T_RF
-#' @rdname T_RF-T_RF
+# T_RF generator ---------------------------------------------------------------
+#' @title T-Learner with honest RF for both stages
+#' @details 
+#' The T-Learner with random forest 
+#' \enumerate{
+#'  \item
+#'     Estimate the response functions 
+#'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
+#'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+#'     using the
+#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+#'     forest version with the hyperparameters specified in \code{mu0.forestry}
+#'     and \code{mu1.forestry} and denote the estimates as \eqn{\hat \mu_0} and
+#'     \eqn{\hat \mu_1}.
+#'  \item 
+#'     Define the CATE estimate as
+#'     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
+#' }
 #' @description This is an implementation of the T-learner combined with honest
-#' random forest for both response functions
-#' @param feat A data frame of all the features.
-#' @param tr A numeric vector containing 0 for control and 1 for treated 
-#' variables.
-#' @param yobs A numeric vector containing the observed outcomes.
-#' @param mtry Number of variables to try at each node.
-#' @param nodesizeSpl Minimum observations contained in terminal nodes. The
-#' default value is 1.
-#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset. The
-#' default value is 3.
-#' @param replace  An indicator of whether sampling of training data is with 
-#' replacement. The default value is TRUE.
-#' @param ntree Number of trees to grow. The default value is 1000.
-#' @param sample_fraction TODO: Add Description
-#' @param nthread Number of threads to train and predict the forest. The
-#' default number is 4.
-#' @param splitratio Proportion of the training data used as the splitting
-#' dataset. The default value is 0.5.
-#' @export T_RF
+#'   random forest for both response functions
+#' @param mu0.forestry A list containing the hyperparameters for the
+#'   \code{forestry} package that are used in \eqn{\hat \mu_0}.
+#'   These hyperparameters are passed to the \code{forestry} package. 
+#' @param mu1.forestry A list containing the hyperparameters for the
+#'   \code{forestry} package that are used in \eqn{\hat \mu_1}.
+#'   These hyperparameters are passed to the \code{forestry} package. Please
+#'   refer to \url{https://github.com/soerenkuenzel/forestry} for a more
+#'   detailed documentation of the hyperparamters.
+#' @return Object of class \code{X_RF}. It should be used with one of the 
+#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#'   \item{\code{feature_train}}{A copy of feat.}
+#'   \item{\code{tr_train}}{A copy of tr.}
+#'   \item{\code{yobs_train}}{A copy of yobs.}
+#'   \item{\code{m_0}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the control group as the dependent variable.}
+#'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the treated group as the dependent variable.}
+#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+#'      the three random forest algorithms used}
+#'   \item{\code{creator}}{Function call of X_RF. This is used for different 
+#'      bootstrap procedures.}
+#' @inherit X_RF
+#' @family metalearners
+#' @export
 T_RF <-
   function(feat,
            tr,
-           yobs,
-           mtry = ncol(feat),
-           nodesizeSpl = 1,
-           nodesizeAvg = 3,
-           replace = TRUE,
-           ntree = 1000,
-           sample_fraction = 0.9,
-           nthread = 4,
-           splitratio = .5) {
+           yobs, 
+           nthread = 0,
+           verbose = TRUE,
+           mu0.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 1000,
+               replace = TRUE,
+               sample.fraction = 0.9,
+               mtry = ncol(feat),
+               nodesizeSpl = 1,
+               nodesizeAvg = 3,
+               splitratio = .5,
+               middleSplit = FALSE
+             ),
+           mu1.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 1000,
+               replace = TRUE,
+               sample.fraction = 0.9,
+               mtry = ncol(feat),
+               nodesizeSpl = 1,
+               nodesizeAvg = 3,
+               splitratio = .5,
+               middleSplit = FALSE
+             )) {
+    # Cast input data to a standard format -------------------------------------
     feat <- as.data.frame(feat)
-
-    if ((!is.null(mtry)) && (mtry > ncol(feat))) {
-      warning(
-        "mtry is chosen bigger than number of features. It will be set
-        to be equal to the number of features"
-      )
-      mtry <- ncol(feat)
+    
+    # Catch misspecification erros ---------------------------------------------
+    if (!(nthread - round(nthread) == 0) | nthread < 0) {
+      stop("nthread must be a positive integer!")
     }
+    
+    if (!is.logical(verbose)) {
+      stop("verbose must be either TRUE or FALSE.")
+    }
+    
+    catch_input_errors(feat, yobs, tr)
+    
+    # Set relevant relevant.Variable -------------------------------------------
+    # User often sets the relevant variables by column names and not numerical
+    # values. We translate it here to the index of the columns.
+    
+    if (is.null(mu0.forestry$relevant.Variable)) {
+      mu0.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(mu0.forestry$relevant.Variable))
+        mu0.forestry$relevant.Variable <-
+          which(colnames(feat) %in% mu0.forestry$relevant.Variable)
+    }
+    
+    if (is.null(mu1.forestry$relevant.Variable)) {
+      mu1.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(mu1.forestry$relevant.Variable))
+        mu1.forestry$relevant.Variable <-
+          which(colnames(feat) %in% mu1.forestry$relevant.Variable)
+    }
+    
+    # Translate the settings to a feature list ---------------------------------
+    general_hyperpara <- list("nthread" = nthread)
+    
+    hyperparameter_list <- list(
+      "general" = general_hyperpara,
+      "l_first_0" = mu0.forestry,
+      "l_first_1" = mu1.forestry
+    )
+    
+    return(
+     T_RF_fully_specified(
+        feat = feat,
+        tr = tr,
+        yobs = yobs,
+        hyperparameter_list = hyperparameter_list,
+        verbose = verbose
+      )
+    )
+  }
 
-
+# T-RF basic constructor -------------------------------------------------------
+#' @title T_RF fully specified constructor
+#' @description This is the most basic T-learner with honest random forest
+#'   constructor. It should not be called by the user, since the list of
+#'   parameters is too big. Instead call the simpler version X_RF or one of the
+#'   self tuning versions. This function mainly exists to be called from other
+#'   functions.
+#' @inherit X_RF_fully_specified
+#' @seealso \code{\link{T_RF}}
+#' @export
+T_RF_fully_specified <-
+  function(feat,
+           tr,
+           yobs,
+           hyperparameter_list,
+           verbose) {
     yobs_0 <- yobs[tr == 0]
     yobs_1 <- yobs[tr == 1]
-
-    X_0 <- feat[tr == 0, ]
-    X_1 <- feat[tr == 1, ]
-
-
-    m_y_c <- forestry::forestry(
-      x = X_0,
-      y = yobs_0,
-      ntree = ntree,
-      replace = replace,
-      sampsize = round(sample_fraction * length(yobs_0)),
-      mtry = mtry,
-      nodesizeSpl = nodesizeSpl,
-      nodesizeAvg = nodesizeAvg,
-      nthread = nthread,
-      splitrule =  'variance',
-      splitratio = splitratio
-    )
-
-    m_y_t <- forestry::forestry(
-      x = X_1,
-      y = yobs_1,
-      ntree = ntree,
-      replace = replace,
-      sampsize = round(sample_fraction * length(yobs_1)),
-      mtry = mtry,
-      nodesizeSpl = nodesizeSpl,
-      nodesizeAvg = nodesizeAvg,
-      nthread = nthread,
-      splitrule =  'variance',
-      splitratio = splitratio
-    )
-
-
+    
+    X_0 <- feat[tr == 0,]
+    X_1 <- feat[tr == 1,]
+    
+    m_0 <-
+      forestry::forestry(
+        x = X_0[, hyperparameter_list[["l_first_0"]]$relevant.Variable],
+        y = yobs_0,
+        ntree = hyperparameter_list[["l_first_0"]]$ntree,
+        replace = hyperparameter_list[["l_first_0"]]$replace,
+        sample.fraction = hyperparameter_list[["l_first_0"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_first_0"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_first_0"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_first_0"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_first_0"]]$splitratio
+      )
+    
+    m_1 <-
+      forestry::forestry(
+        x = X_1[, hyperparameter_list[["l_first_1"]]$relevant.Variable],
+        y = yobs_1,
+        ntree = hyperparameter_list[["l_first_1"]]$ntree,
+        replace = hyperparameter_list[["l_first_1"]]$replace,
+        sample.fraction = hyperparameter_list[["l_first_1"]]$sample.fraction,
+        mtry = hyperparameter_list[["l_first_1"]]$mtry,
+        nodesizeSpl = hyperparameter_list[["l_first_1"]]$nodesizeSpl,
+        nodesizeAvg = hyperparameter_list[["l_first_1"]]$nodesizeAvg,
+        nthread = hyperparameter_list[["general"]]$nthread,
+        splitrule = "variance",
+        splitratio = hyperparameter_list[["l_first_1"]]$splitratio
+      )
+    
+    
     new(
       "T_RF",
       feature_train = feat,
       tr_train = tr,
       yobs_train = yobs,
-      m_y_t = m_y_t,
-      m_y_c = m_y_c,
+      m_0 = m_0,
+      m_1 = m_1,
+      hyperparameter_list = hyperparameter_list,
       creator = function(feat, tr, yobs) {
-        T_RF(
-          feat,
-          tr,
-          yobs,
-          mtry = mtry,
-          nodesizeSpl = nodesizeSpl,
-          nodesizeAvg = nodesizeAvg,
-          replace = replace,
-          ntree = ntree,
-          sample_fraction = sample_fraction,
-          nthread = nthread,
-          splitratio = splitratio
-        )
+        T_RF_fully_specified(feat,
+                             tr,
+                             yobs,
+                             hyperparameter_list,
+                             verbose)
       }
     )
   }
 
-############################
-### Estimate CATE Method ###
-############################
-#' EstimateCate-T_hRF
+# Estimate CATE Method ---------------------------------------------------------
+#' EstimateCate-X_hRF
 #' @name EstimateCate-T_RF
-#' @rdname EstimateCate-T_RF
-#' @description Return the estimated CATE
-#' @param theObject A `T_hRF` object.
-#' @param feature_new A feature data frame.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,T_RF-method
+#' @rdname EstimateCate
+#' @inherit EstimateCate
 #' @exportMethod EstimateCate
-
 setMethod(
   f = "EstimateCate",
   signature = "T_RF",
   definition = function(theObject, feature_new)
   {
     feature_new <- as.data.frame(feature_new)
+    catch_feat_input_errors(feature_new)
 
     return(
       predict(theObject@m_y_t, feature_new) -

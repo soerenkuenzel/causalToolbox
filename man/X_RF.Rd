@@ -145,12 +145,14 @@ yobs <- simulated_experiment$Yobs_tr
 
 # create the hte object using honest Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 
 cate_esti_rf <- EstimateCate(xl_rf, feature_test)
+
 # evaluate the performance
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_rf - cate_true) ^ 2)
-#' \dontrun{
+\dontrun{
 # Create confidence intervals via bootstrapping. 
 xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 }
@@ -173,7 +175,10 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 }
 \seealso{
 \code{\link{X_RF_fully_specified}}
+
+Other metalearners: \code{\link{T_RF}}
 }
 \author{
 Soeren R. Kuenzel
 }
+\concept{metalearners}

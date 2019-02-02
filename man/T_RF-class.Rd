@@ -6,7 +6,12 @@
 \title{ThRF constructor}
 \description{
 The `T_RF` object is T-learner combined with honest random
-forest used for both response functions
+  forest used for both response functions
+}
+\details{
+This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+as base learner.
 }
 \section{Slots}{
 
