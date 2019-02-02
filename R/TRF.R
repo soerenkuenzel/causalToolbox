@@ -255,8 +255,8 @@ setMethod(
     catch_feat_input_errors(feature_new)
 
     return(
-      predict(theObject@m_y_t, feature_new) -
-        predict(theObject@m_y_c, feature_new)
+      predict(theObject@m_1, feature_new) -
+        predict(theObject@m_0, feature_new)
     )
   }
 )

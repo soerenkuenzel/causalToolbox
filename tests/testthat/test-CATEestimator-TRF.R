@@ -7,76 +7,9 @@ test_that("Tests that XhRF is working correctly", {
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
 
-  predmode = "propmean"
-  relevant_Variable_first = 1:ncol(feat)
-  relevant_Variable_second = 1:ncol(feat)
-  relevant_Variable_prop = 1:ncol(feat)
-  ntree_first = 500
-  ntree_second = 500
-  ntree_prop = 500
-  mtry_first = round(ncol(feat) / 2)
-  mtry_second = ncol(feat)
-  mtry_prop = max(floor(ncol(feat) / 3), 1)
-  min_node_size_spl_first = 1
-  min_node_size_ave_first = 5
-  min_node_size_spl_second = 5
-  min_node_size_ave_second = 3
-  min_node_size_spl_prop = 3
-  min_node_size_ave_prop = 10
-  splitratio_first = .5
-  splitratio_second = .5
-  splitratio_prop = .5
-  replace_first = TRUE
-  replace_second = TRUE
-  replace_prop = TRUE
-  sample_fraction_first = 0.8
-  sample_fraction_second = 0.9
-  sample_fraction_prop = 1
-  nthread = 0
-  verbose = FALSE
-  middleSplit_first = FALSE
-  middleSplit_second = FALSE
-  middleSplit_prop = FALSE
-
-
-
-  xl <- X_RF(
-    feat = feat,
-    tr = tr,
-    yobs = yobs,
-    predmode = predmode,
-    relevant_Variable_first = relevant_Variable_first,
-    relevant_Variable_second = relevant_Variable_second,
-    relevant_Variable_prop = relevant_Variable_prop,
-    ntree_first = ntree_first,
-    ntree_second = ntree_second,
-    ntree_prop = ntree_prop,
-    mtry_first = mtry_first,
-    mtry_second = mtry_second,
-    mtry_prop = mtry_prop,
-    min_node_size_spl_first = min_node_size_spl_first,
-    min_node_size_ave_first = min_node_size_ave_first,
-    min_node_size_spl_second = min_node_size_spl_second,
-    min_node_size_ave_second = min_node_size_ave_second,
-    min_node_size_spl_prop = min_node_size_spl_prop,
-    min_node_size_ave_prop = min_node_size_ave_prop,
-    splitratio_first = splitratio_first,
-    splitratio_second = splitratio_second,
-    splitratio_prop = splitratio_prop,
-    replace_first = replace_first,
-    replace_second = replace_second,
-    replace_prop = replace_prop,
-    sample_fraction_first = sample_fraction_first,
-    sample_fraction_second = sample_fraction_second,
-    sample_fraction_prop = sample_fraction_prop,
-    nthread = nthread,
-    middleSplit_first = middleSplit_first,
-    middleSplit_second = middleSplit_second,
-    middleSplit_prop = middleSplit_prop,
-    verbose = verbose
-  )
-  EstimateCate(xl, feat)[1]
-  expect_equal(EstimateCate(xl, feat)[1], 0.06161339, tolerance = 1e-2)
+  tl <- T_RF(feat = feat, tr = tr, yobs = yobs)
+  EstimateCate(tl, feat)[1]
+  expect_equal(EstimateCate(tl, feat)[1], 0.004849434, tolerance = 1e-2)
 
   set.seed(432)
   cate_problem <-
@@ -91,24 +24,20 @@ test_that("Tests that XhRF is working correctly", {
       trainseed = 234
     )
 
-  xl <- X_RF(
+  tl <- T_RF(
     feat = cate_problem$feat_tr,
     yobs = cate_problem$Yobs_tr,
-    tr = cate_problem$W_tr,
-    ntree_first = 50,
-    ntree_second = 50,
-    # ntree_prop = 50,
-    verbose = FALSE,
-    nthread = 1
+    tr = cate_problem$W_tr
   )
   
   expect_equal(mean((
-    EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
+    EstimateCate(tl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  207.5641,
+  120.0557,
   tolerance = 1)
 
-  expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
-  # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0; verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 2.862779, tolerance = 1e-1)
+  expect_output(smp_stats <- EstimateAllSampleStatistics(tl, B = 2))
+  # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
+  # verbose = TRUE
+  expect_equal(smp_stats$SATE[1, 2], 3.556161, tolerance = 1e-1)
 })
