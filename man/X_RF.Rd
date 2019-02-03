@@ -31,11 +31,12 @@ propmean which refers to propensity score weighting.}
 
 \item{verbose}{TRUE for detailed output FALSE for no output:}
 
-\item{mu.forestry}{A list containing the hyperparameters for the
-\code{forestry} package that are used in the first stage of the X-learner.
+\item{mu.forestry, tau.forestry, e.forestry}{A list containing the
+hyperparameters for the \code{forestry} package that are used for
+estimating the response functions, the CATE, and the propensity score.
 These hyperparameters are passed to the \code{forestry} package. Please
-refer to \url{https://github.com/soerenkuenzel/forestry} for a more
-detailed documentation of the hyperparamters.
+refer to the \href{https://github.com/soerenkuenzel/forestry}{forestry}
+package for a more detailed documentation of the hyperparamters.
 \itemize{
    \item \code{relevant.Variable} Variables that are only used in the first 
          stage.
@@ -57,13 +58,6 @@ detailed documentation of the hyperparamters.
          middle between two observations. Otherwise, it will take a point 
          based on a uniform distribution between the two observations. 
 }}
-
-\item{tau.forestry}{hyperparameters for the second stage of the X-learner.
-Refer to the \code{mu.forestry} description for details.}
-
-\item{e.forestry}{hyperparameters for estimating the propensity score. This
-is only relevant if \code{predmode = propmean} and \code{e = NULL}. 
-Refer to the \code{mu.forestry} description for details.}
 }
 \value{
 Object of class \code{X_RF}. It should be used with one of the 

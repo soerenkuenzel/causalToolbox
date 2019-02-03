@@ -23,15 +23,12 @@ T_RF(feat, tr, yobs, nthread = 0, verbose = TRUE,
 
 \item{verbose}{TRUE for detailed output FALSE for no output:}
 
-\item{mu0.forestry}{A list containing the hyperparameters for the
-\code{forestry} package that are used in \eqn{\hat \mu_0}.
-These hyperparameters are passed to the \code{forestry} package.}
-
-\item{mu1.forestry}{A list containing the hyperparameters for the
-\code{forestry} package that are used in \eqn{\hat \mu_1}.
-These hyperparameters are passed to the \code{forestry} package. Please
-refer to \url{https://github.com/soerenkuenzel/forestry} for a more
-detailed documentation of the hyperparamters.}
+\item{mu0.forestry, mu1.forestry}{Lists containing the hyperparameters for the
+\code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
+\mu_1}, respectively. These hyperparameters are passed to the
+\code{forestry} package. Please refer to the
+\href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
+for a more detailed documentation of the hyperparamters.}
 }
 \value{
 Object of class \code{T_RF}. It should be used with one of the 

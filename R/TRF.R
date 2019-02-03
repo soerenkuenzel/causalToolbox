@@ -60,14 +60,12 @@ setClass(
 #' }
 #' @description This is an implementation of the T-learner combined with honest
 #'   random forest for both response functions
-#' @param mu0.forestry A list containing the hyperparameters for the
-#'   \code{forestry} package that are used in \eqn{\hat \mu_0}.
-#'   These hyperparameters are passed to the \code{forestry} package. 
-#' @param mu1.forestry A list containing the hyperparameters for the
-#'   \code{forestry} package that are used in \eqn{\hat \mu_1}.
-#'   These hyperparameters are passed to the \code{forestry} package. Please
-#'   refer to \url{https://github.com/soerenkuenzel/forestry} for a more
-#'   detailed documentation of the hyperparamters.
+#' @param mu0.forestry,mu1.forestry Lists containing the hyperparameters for the
+#'   \code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
+#'   \mu_1}, respectively. These hyperparameters are passed to the
+#'   \code{forestry} package. Please refer to the
+#'   \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
+#'   for a more detailed documentation of the hyperparamters.
 #' @return Object of class \code{T_RF}. It should be used with one of the 
 #'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
 #'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
