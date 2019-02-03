@@ -2,7 +2,7 @@
 % Please edit documentation in R/TRF.R
 \name{T_RF}
 \alias{T_RF}
-\title{T-Learner with honest RF for both stages}
+\title{T-Learner with honest RF for both response functions}
 \usage{
 T_RF(feat, tr, yobs, nthread = 0, verbose = TRUE,
   mu0.forestry = list(relevant.Variable = 1:ncol(feat), ntree = 1000,
@@ -34,7 +34,7 @@ refer to \url{https://github.com/soerenkuenzel/forestry} for a more
 detailed documentation of the hyperparamters.}
 }
 \value{
-Object of class \code{X_RF}. It should be used with one of the 
+Object of class \code{T_RF}. It should be used with one of the 
   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
   and \code{EstimateAllSampleStatistics}. The object has the following slots:
   \item{\code{feature_train}}{A copy of feat.}
@@ -46,7 +46,7 @@ Object of class \code{X_RF}. It should be used with one of the
      observed outcomes of the treated group as the dependent variable.}
   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
      the three random forest algorithms used}
-  \item{\code{creator}}{Function call of X_RF. This is used for different 
+  \item{\code{creator}}{Function call of T_RF. This is used for different 
      bootstrap procedures.}
 }
 \description{
@@ -89,6 +89,7 @@ yobs <- simulated_experiment$Yobs_tr
 # create the hte object using honest Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
+sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
 
 cate_esti_rf <- EstimateCate(xl_rf, feature_test)
 
@@ -117,6 +118,6 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{X_RF}}
+Other metalearners: \code{\link{S_RF}}, \code{\link{X_RF}}
 }
 \concept{metalearners}

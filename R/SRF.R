@@ -1,11 +1,7 @@
 #' @include CATE_estimators.R
 
-
-
-############################
-### Tlearner - hRF ###
-############################
-#' @title ThRF constructor
+# S-RF class -------------------------------------------------------------------
+#' @title ShRF constructor
 #' @name S_RF-class
 #' @rdname S_RF-class
 #' @description The `S_RF` object is S-learner combined with honest random
@@ -24,6 +20,7 @@ setClass(
     tr_train = "numeric",
     yobs_train = "numeric",
     forest = "forestry",
+    hyperparameter_list = "list",
     creator = "function"
   ),
   validity = function(object)
@@ -35,94 +32,164 @@ setClass(
   }
 )
 
-
-#' @title honstRF Constructor
-#' @name S_RF-S_RF
-#' @rdname S_RF-S_RF
+# S_RF generator ---------------------------------------------------------------
+#' @title S-Learner with honest RF
+#' @details 
+#' The S-Learner with random forest works in two steps: 
+#' \enumerate{
+#'  \item
+#'     Estimate the joint response function \deqn{\mu(x, w) = E[Y | X = x, W =
+#'     w]} using the
+#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+#'     forest version with the hyperparameters specified in \code{mu.forestry}.
+#'     We denote the estimate as \eqn{\hat \mu}.
+#'  \item 
+#'     Define the CATE estimate as
+#'     \deqn{\tau(x) = \hat \mu_1(x, 1) - \hat \mu_0(x, 0).}
+#' }
 #' @description This is an implementation of the S-learner combined with honest
-#'   random forest for both response functions
-#' @param feat A data frame of all the features.
-#' @param tr A numeric vector containing 0 for control and 1 for treated 
-#' variables.
-#' @param yobs A numeric vector containing the observed outcomes.
-#' @param mtry Number of variables to try at each node.
-#' @param replace An indicator of whether sampling of training data is with 
-#' replacement. The default value is TRUE.
-#' @param ntree Number of trees to grow. The default value is 1000.
-#' @param sample_fraction TODO: Add Description
-#' @param nthread Number of threads to train and predict the forest. The
-#' default number is 4.
-#' @param splitratio Proportion of the training data used as the splitting
-#' dataset. The default value is 0.5.
-#' @param nodesizeAvg Minimum size of terminal nodes for averaging dataset. The
-#' default value is 3.
-#' @param nodesizeSpl Minimum observations contained in terminal nodes. The
-#' default value is 1.
-#' @param alwaysTr weather or not we always test weather we should split on the
-#'   treatment assignment. Currently only alwaysTr=FALSE is implemented.
-#' @export S_RF
+#' @param mu.forestry A list containing the hyperparameters for the
+#'   \code{forestry} package that are used in \eqn{\hat \mu_0}.
+#'   These hyperparameters are passed to the \code{forestry} package. 
+#' @return Object of class \code{S_RF}. It should be used with one of the 
+#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#'   \item{\code{feature_train}}{A copy of feat.}
+#'   \item{\code{tr_train}}{A copy of tr.}
+#'   \item{\code{yobs_train}}{A copy of yobs.}
+#'   \item{\code{m_0}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the control group as the dependent variable.}
+#'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the treated group as the dependent variable.}
+#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+#'      the three random forest algorithms used}
+#'   \item{\code{creator}}{Function call of S_RF. This is used for different 
+#'      bootstrap procedures.}
+#' @inherit X_RF
+#' @family metalearners
+#' @export
 S_RF <-
   function(feat,
            tr,
-           yobs,
-           mtry = ncol(feat),
-           nodesizeSpl = 1,
-           nodesizeAvg = 3,
-           replace = TRUE,
-           ntree = 1000,
-           sample_fraction = 0.9,
-           nthread = 4,
-           splitratio = .5,
-           alwaysTr = FALSE) {
-    feat <- as.data.frame(feat)
-
-    if ((!is.null(mtry)) && (mtry > ncol(feat) + 1)) {
-      warning(
-        "mtry is chosen bigger than number of features. It will be set
-        to be equal to the number of features"
-      )
-      mtry <- ncol(feat) + 1
-    }
-
+           yobs, 
+           nthread = 0,
+           verbose = TRUE,
+           alwaysTr = FALSE,
+           takeOutATE = FALSE, 
+           mu.forestry =
+             list(
+               relevant.Variable = 1:ncol(feat),
+               ntree = 1000,
+               replace = TRUE,
+               sample.fraction = 0.9,
+               mtry = ncol(feat),
+               nodesizeSpl = 1,
+               nodesizeAvg = 3,
+               splitratio = .5,
+               middleSplit = FALSE
+             )) {
+    #TODO
     if (alwaysTr) {
-      stop("always trying to split on the treatment variable is currently not
-           implemented")
-    } else{
-      m <- forestry::forestry(
-        x = cbind(feat, tr),
-        y = yobs,
-        ntree = ntree,
-        replace = replace,
-        sampsize = round(sample_fraction * length(yobs)),
-        mtry = mtry,
-        nodesizeSpl = nodesizeSpl,
-        nodesizeAvg = nodesizeAvg,
-        nthread = nthread,
-        splitrule =  'variance',
-        splitratio = splitratio
-      )
+      stop(paste("always trying to split on the treatment variable is", 
+                 "currently not implemented."))
     }
+    #TODO
+    if (takeOutATE) {
+      stop(paste("taking out the ATE before applying the S-learner is", 
+                 "currently not implemented."))
+    }
+    
+    # Cast input data to a standard format -------------------------------------
+    feat <- as.data.frame(feat)
+    
+    # Catch misspecification erros ---------------------------------------------
+    if (!(nthread - round(nthread) == 0) | nthread < 0) {
+      stop("nthread must be a positive integer!")
+    }
+    
+    if (!is.logical(verbose)) {
+      stop("verbose must be either TRUE or FALSE.")
+    }
+    
+    catch_input_errors(feat, yobs, tr)
+    
+    # Set relevant relevant.Variable -------------------------------------------
+    # User often sets the relevant variables by column names and not numerical
+    # values. We translate it here to the index of the columns.
+    
+    if (is.null(mu.forestry$relevant.Variable)) {
+      mu.forestry$relevant.Variable <- 1:ncol(feat)
+    } else{
+      if (is.character(mu.forestry$relevant.Variable))
+        mu.forestry$relevant.Variable <-
+          which(colnames(feat) %in% mu.forestry$relevant.Variable)
+    }
+    
+    # Translate the settings to a feature list ---------------------------------
+    general_hyperpara <- list("nthread" = nthread, alwaysTr = alwaysTr,
+                              takeOutATE = takeOutATE)
+    
+    hyperparameter_list <- list(
+      "general" = general_hyperpara,
+      "mu.forestry" = mu.forestry
+    )
+    
+    return(
+      S_RF_fully_specified(
+        feat = feat,
+        tr = tr,
+        yobs = yobs,
+        hyperparameter_list = hyperparameter_list,
+        verbose = verbose
+      )
+    )
+  }
+    
+# S-RF basic constructor -------------------------------------------------------
+#' @title S_RF fully specified constructor
+#' @description This is the most basic S-learner with honest random forest
+#'   constructor. It should not be called directly, since the list of
+#'   parameters is too big. Instead call the simpler version S_RF or one of the
+#'   self tuning versions. This function mainly exists to be called from other
+#'   functions.
+#' @inherit X_RF_fully_specified
+#' @seealso \code{\link{S_RF}}
+#' @export
+S_RF_fully_specified <-
+  function(feat,
+           tr,
+           yobs,
+           hyperparameter_list,
+           verbose) {
+    
+    m <- forestry::forestry(
+      x = cbind(feat[, hyperparameter_list[["mu.forestry"]]$relevant.Variable], 
+                tr),
+      y = yobs,
+      ntree = hyperparameter_list[["mu.forestry"]]$ntree,
+      replace = hyperparameter_list[["mu.forestry"]]$replace,
+      sample.fraction = hyperparameter_list[["mu.forestry"]]$sample.fraction,
+      mtry = hyperparameter_list[["mu.forestry"]]$mtry,
+      nodesizeSpl = hyperparameter_list[["mu.forestry"]]$nodesizeSpl,
+      nodesizeAvg = hyperparameter_list[["mu.forestry"]]$nodesizeAvg,
+      nthread = hyperparameter_list[["general"]]$nthread,
+      splitrule = "variance",
+      splitratio = hyperparameter_list[["mu.forestry"]]$splitratio
+    )
+    
     new(
       "S_RF",
       feature_train = feat,
       tr_train = tr,
       yobs_train = yobs,
       forest = m,
+      hyperparameter_list = hyperparameter_list,
       creator = function(feat, tr, yobs) {
-        S_RF(
-          feat,
-          tr,
-          yobs,
-          mtry = mtry,
-          nodesizeSpl = nodesizeSpl,
-          nodesizeAvg = nodesizeAvg,
-          replace = replace,
-          ntree = ntree,
-          sample_fraction = sample_fraction,
-          nthread = nthread,
-          splitratio = splitratio,
-          alwaysTr = alwaysTr
-        )
+        S_RF_fully_specified(feat,
+                             tr,
+                             yobs,
+                             hyperparameter_list,
+                             verbose)
       }
     )
   }
@@ -145,6 +212,7 @@ setMethod(
   definition = function(theObject, feature_new)
   {
     feature_new <- as.data.frame(feature_new)
+    catch_feat_input_errors(feature_new)
 
     return(
       predict(theObject@forest, cbind(feature_new, tr = 1)) -

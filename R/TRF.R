@@ -41,7 +41,7 @@ setClass(
 )
 
 # T_RF generator ---------------------------------------------------------------
-#' @title T-Learner with honest RF for both stages
+#' @title T-Learner with honest RF for both response functions
 #' @details 
 #' The T-Learner with random forest 
 #' \enumerate{
@@ -68,7 +68,7 @@ setClass(
 #'   These hyperparameters are passed to the \code{forestry} package. Please
 #'   refer to \url{https://github.com/soerenkuenzel/forestry} for a more
 #'   detailed documentation of the hyperparamters.
-#' @return Object of class \code{X_RF}. It should be used with one of the 
+#' @return Object of class \code{T_RF}. It should be used with one of the 
 #'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
 #'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
 #'   \item{\code{feature_train}}{A copy of feat.}
@@ -80,7 +80,7 @@ setClass(
 #'      observed outcomes of the treated group as the dependent variable.}
 #'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
 #'      the three random forest algorithms used}
-#'   \item{\code{creator}}{Function call of X_RF. This is used for different 
+#'   \item{\code{creator}}{Function call of T_RF. This is used for different 
 #'      bootstrap procedures.}
 #' @inherit X_RF
 #' @family metalearners
@@ -173,7 +173,7 @@ T_RF <-
 #' @title T_RF fully specified constructor
 #' @description This is the most basic T-learner with honest random forest
 #'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead call the simpler version X_RF or one of the
+#'   parameters is too big. Instead call the simpler version T_RF or one of the
 #'   self tuning versions. This function mainly exists to be called from other
 #'   functions.
 #' @inherit X_RF_fully_specified

@@ -6,15 +6,23 @@ test_that("Tests that ShRF is working correctly", {
   feat <- iris[, -1]
   tr <- rbinom(nrow(iris), 1, .5)
   yobs <- iris[, 1]
-  verbose = TRUE
-  ntree = 20
 
   sl <- S_RF(
     feat = feat,
     tr = tr,
-    yobs = yobs,
-    ntree = ntree
-  )
+    yobs = yobs, 
+    mu.forestry =
+      list(
+        relevant.Variable = 1:ncol(feat),
+        ntree = 20,
+        replace = TRUE,
+        sample.fraction = 0.9,
+        mtry = ncol(feat),
+        nodesizeSpl = 1,
+        nodesizeAvg = 3,
+        splitratio = .5,
+        middleSplit = FALSE
+      ))
 
   expect_equal(EstimateCate(sl, feat)[1], 0.08649969, tolerance = 1e-4)
 
@@ -35,9 +43,17 @@ test_that("Tests that ShRF is working correctly", {
     feat = cate_problem$feat_tr,
     yobs = cate_problem$Yobs_tr,
     tr = cate_problem$W_tr,
-    ntree = 50,
-    nthread = 1
-  )
+    mu.forestry =
+      list(
+        relevant.Variable = 1:ncol(feat),
+        ntree = 20,
+        replace = TRUE,
+        sample.fraction = 0.9,
+        mtry = ncol(feat),
+        nodesizeSpl = 1,
+        nodesizeAvg = 3,
+        splitratio = .5,
+        middleSplit = FALSE))
 
   expect_equal(mean((
     EstimateCate(sl, cate_problem$feat_te) - cate_problem$tau_te
@@ -47,8 +63,8 @@ test_that("Tests that ShRF is working correctly", {
 
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
-  expect_equal(smp_stats$SATT[1, 3],
-               -0.6381499,
+  expect_equal(sum(smp_stats$CATE[, 3]),
+               -0.0003108437,
                tolerance = 1e-2)
 
 })

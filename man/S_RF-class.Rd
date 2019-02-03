@@ -3,7 +3,7 @@
 \docType{class}
 \name{S_RF-class}
 \alias{S_RF-class}
-\title{ThRF constructor}
+\title{ShRF constructor}
 \description{
 The `S_RF` object is S-learner combined with honest random
 forest used for both response functions
