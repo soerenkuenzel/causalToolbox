@@ -95,7 +95,9 @@ setMethod(
                         verbose = FALSE,
                         return_CI = FALSE)
   {
-    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; feature_new = feat[1:5,]
+    browser()
+    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE;
+    # feature_new = feat[1:5,]
     ndpost <- theObject@ndpost
     yobs <- theObject@yobs_train
     if ((is.null(yobs)) | (is.data.frame(yobs) && nrow(yobs) == 0)) {
@@ -132,10 +134,10 @@ setMethod(
     if (is.data.frame(X_1) && nrow(X_1) == 0) {
       stop('There is no feature in the treatment group (labelled 1).')
     }
-    feat_new_subset <- split.data.frame(feature_new, 
-                                        rep(x = 1:nthread,
-                                            times = get_CV_sizes(nrow(feature_new),
-                                                                nthread)))
+    feat_new_subset <- 
+      split.data.frame(feature_new, rep(x = 1:nthread, 
+                                        times = get_CV_sizes(nrow(feature_new),
+                                                             nthread)))
 
     cl <- parallel::makeCluster(nthread)
     doParallel::registerDoParallel(cl)

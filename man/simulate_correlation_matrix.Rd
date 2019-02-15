@@ -2,12 +2,12 @@
 % Please edit documentation in R/ExmpleSetups_causaleffects.R
 \name{simulate_correlation_matrix}
 \alias{simulate_correlation_matrix}
-\title{simulate a RCT or observational data for causal effect estimation}
+\title{Simulate a Correlation Matrix}
 \usage{
 simulate_correlation_matrix(dim, alpha)
 }
 \arguments{
-\item{dim}{Number of training examples.}
+\item{dim}{dimension of the correlation matrix.}
 
 \item{alpha}{level of random correlation beteween the features. Choose 0 for
 independent featues. The bigger alpha the bigger the correlation. For the
@@ -19,7 +19,10 @@ A correlation matrix
 }
 \description{
 This function uses the C-vine method for simulating correlation
-  matrixes as in the paper "Generating random correlation matrices based on
-  vines and extended onion method" by Daniel Lewandowskia, Dorota Kurowickaa,
-  Harry Joe
+  matrixes. Refer to the referenced paper for details.
+}
+\references{
+\itemize{\item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe
+  (2009). Generating random correlation matrices based on vines and extended
+  onion method.}
 }

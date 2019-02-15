@@ -4,16 +4,20 @@
 \alias{S_BART}
 \title{S_BART}
 \usage{
-S_BART(feat, tr, yobs, ndpost = 1200,
-  sample_stat = "counterfactuals estimated", tree_package = "dbarts",
-  ntree = 200, verbose)
+S_BART(feat, tr, yobs, verbose = TRUE, mu.bart = list(ndpost = 1200,
+  sample_stat = "counterfactuals estimated", tree_package = "dbarts", ntree
+  = 200))
 }
 \arguments{
-\item{feat}{A data frame of features}
+\item{feat}{A data frame containing the features.}
 
-\item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A numeric vector with 0 for control and 1 for treated variables.}
 
-\item{yobs}{A vector of observed outcomes.}
+\item{yobs}{A numeric vector containing the observed outcomes.}
+
+\item{verbose}{TRUE for detailed output FALSE for no output}
+
+\item{um.bart}{}
 
 \item{ndpost}{TODO: Add description}
 
@@ -22,12 +26,111 @@ S_BART(feat, tr, yobs, ndpost = 1200,
 \item{tree_package}{Package used to create a tree}
 
 \item{ntree}{Number of trees to grow}
-
-\item{verbose}{TRUE for detailed output FALSE for no output}
 }
 \value{
-A `S_BART` object.
+Object of class \code{S_RF}. It should be used with one of the 
+  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+  \item{\code{feature_train}}{A copy of feat.}
+  \item{\code{tr_train}}{A copy of tr.}
+  \item{\code{yobs_train}}{A copy of yobs.}
+  \item{\code{m_0}}{An object of class forestry that is fitted with the 
+     observed outcomes of the control group as the dependent variable.}
+  \item{\code{m_1}}{An object of class forestry that is fitted with the 
+     observed outcomes of the treated group as the dependent variable.}
+  \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+     the three random forest algorithms used}
+  \item{\code{creator}}{Function call of S_RF. This is used for different 
+     bootstrap procedures.}
 }
 \description{
 This is an implementation of S_BART
 }
+\details{
+The X-Learner with random forest 
+\enumerate{
+ \item
+    Estimate the response functions 
+    \deqn{\mu_0(x) = E[Y(0) | X = x]}
+    \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+    using the
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+    forest version with the hyperparameters specified in \code{mu.forestry}
+    and denote the estimates as \eqn{\hat \mu_0} and \eqn{\hat \mu_1}.
+ \item
+    Impute the treatment effects for the individuals in the treated group,
+    based on the control outcome estimator, and the treatment effects for the
+    individuals in the control group, based on the treatment outcome
+    estimator, that is,
+    \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
+    \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
+    Now employ the 
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+    forest version with the hyperparameters specified in \code{tau.forestry}
+    in two ways: using \eqn{D^1_i} as the dependent variable to obtain \eqn{\hat
+    \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to obtain
+    \eqn{\hat \tau_0(x)}.
+ \item 
+    Define the CATE estimate by a weighted average of the two estimates in
+    Stage 2: 
+    \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
+    If \code{predmode = propmean}, then \eqn{g(x) = e(x)} where
+    \eqn{e(x)} is an estimate of the propensity score using the 
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+    forest version with the hyperparameters specified in \code{e.forestry}.
+    If \code{predmode = control}, then \eqn{g(x) = 1} and if 
+    \code{predmode = treated}, then \eqn{g(x) = 0}.
+}
+}
+\examples{
+require(causalToolbox)
+
+# create example data set
+simulated_experiment <- simulate_causal_experiment(
+  ntrain = 1000,
+  ntest = 1000,
+  dim = 10,
+  setup = "complexTau",
+  testseed = 293901,
+  trainseed = 307017
+)
+feat <- simulated_experiment$feat_tr
+tr <- simulated_experiment$W_tr
+yobs <- simulated_experiment$Yobs_tr
+
+# create the hte object using honest Random Forests (RF)
+xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
+sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+
+cate_esti_rf <- EstimateCate(xl_rf, feature_test)
+
+# evaluate the performance
+cate_true <- simulated_experiment$tau_te
+mean((cate_esti_rf - cate_true) ^ 2)
+\dontrun{
+# Create confidence intervals via bootstrapping. 
+xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
+}
+}
+\references{
+\itemize{
+  \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+    Meta-learners for estimating heterogeneous treatment effects using
+    machine learning. 
+    \url{https://arxiv.org/pdf/1706.03461.pdf}
+  \item 
+    Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
+    Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
+    \url{https://arxiv.org/pdf/1811.02833.pdf}
+  \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
+    Jasjeet Sekhon, and Pieter Abbeel (2018). 
+    Transfer learning for estimating causal effects using neural networks. 
+    \url{https://arxiv.org/pdf/1808.07804.pdf}
+  }
+}
+\seealso{
+Other metalearners: \code{\link{S_RF}}, \code{\link{T_RF}},
+  \code{\link{X_RF}}
+}
+\concept{metalearners}

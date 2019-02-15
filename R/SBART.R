@@ -20,26 +20,40 @@ setClass(
 #' @title S_BART
 #' @rdname S_BART
 #' @description This is an implementation of S_BART
-#' @param feat A data frame of features
-#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
-#' @param yobs A vector of observed outcomes.
+#' @param um.bart 
 #' @param ndpost TODO: Add description
 #' @param sample_stat TODO: Add description
 #' @param tree_package Package used to create a tree
 #' @param ntree Number of trees to grow
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @return A `S_BART` object.
-#' @export S_BART
 #' @import methods
+#' @return Object of class \code{S_RF}. It should be used with one of the 
+#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#'   \item{\code{feature_train}}{A copy of feat.}
+#'   \item{\code{tr_train}}{A copy of tr.}
+#'   \item{\code{yobs_train}}{A copy of yobs.}
+#'   \item{\code{m_0}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the control group as the dependent variable.}
+#'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
+#'      observed outcomes of the treated group as the dependent variable.}
+#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+#'      the three random forest algorithms used}
+#'   \item{\code{creator}}{Function call of S_RF. This is used for different 
+#'      bootstrap procedures.}
+#' @inherit X_RF
+#' @family metalearners
+#' @export
 S_BART <-
   function(feat,
            tr,
-           yobs,
-           ndpost = 1200,
-           sample_stat = "counterfactuals estimated",
-           tree_package = "dbarts",
-           ntree = 200,
-           verbose) {
+           yobs, 
+           verbose = TRUE, 
+           mu.bart = list(
+             ndpost = 1200,
+             sample_stat = "counterfactuals estimated",
+             tree_package = "dbarts",
+             ntree = 200)) {
     feat <- as.data.frame(feat)
 
     new(
@@ -338,8 +352,6 @@ compute_sample_statistics <- function(mu_hat_0_MCMC_samples,
     )
 
   row.names(ATE) <- row.names(ATT) <- row.names(ATC) <- NULL
-
-
 
   return(list("SATE" = ATE,
               "SATT" = ATT,

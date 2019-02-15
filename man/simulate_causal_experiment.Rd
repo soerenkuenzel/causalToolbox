@@ -2,11 +2,12 @@
 % Please edit documentation in R/ExmpleSetups_causaleffects.R
 \name{simulate_causal_experiment}
 \alias{simulate_causal_experiment}
-\title{simulate a RCT or observational data for causal effect estimation}
+\title{Simulate a Causal Experiment}
 \usage{
 simulate_causal_experiment(ntrain, ntest, dim = ncol(given_features),
   alpha = 0.1, feat_distribution = "normal", given_features = NULL,
-  setup = "RespSparseTau1strong", testseed = NULL, trainseed = NULL)
+  setup = "RespSparseTau1strong", testseed = NULL, trainseed = NULL,
+  setupseed = 23987214)
 }
 \arguments{
 \item{ntrain}{Number of training examples.}
@@ -17,32 +18,126 @@ simulate_causal_experiment(ntrain, ntest, dim = ncol(given_features),
 
 \item{alpha}{Only used if given_features is not set and feat_distribution is
 chosen to be normal. It specifies how correlated the features can be. If
-alpha = 0, then the features are independent if alpha is very large, then the
-features can be very correlated.}
+alpha = 0, then the features are independent if alpha is very large, then
+the features can be very correlated. Use the
+\code{simulate_correlation_matrix} function to get a better understanding
+of the impact of alpha.}
 
 \item{feat_distribution}{Only used if given_features is not specified. Either
 "normal" or "unif". It specifies the distribution of the features.}
 
-\item{given_features}{This is used, if we already have features and want to test
-the performance of different estimators for a particular set of features.}
+\item{given_features}{This is used, if we already have features and want to
+test the performance of different estimators for a particular set of
+features.}
 
-\item{setup}{This is used to specify the function form of the potential
-outcomes and the treatment assignment. One of
-RespSparseTau1strong, RsparseT2weak, complexTau,
-Conf1, rare1, STMpp, Ufail, Usual1, WA1, WA2, WA3.}
+\item{setup}{This is used to specify the function form of the response
+functions and the treatment assignment. Refer to the details for a complete
+description of the different choices.}
 
 \item{testseed}{is the seed used to generate the testing data, if NULL, then
 the seed of the main session is used.}
 
 \item{trainseed}{is the seed used to generate the training data, if NULL,
 then the seed of the main session is used.}
+
+\item{setupseed}{For some of the setups, betas are created randomly. This
+seed is per default chosen, but can be changed here to generate more
+setups.}
 }
 \value{
-A list of the transformed object `x`, and encoding information
-`labels`.
+A list with the following elements 
+  \item{\code{setup_name}}{Name of the setup} 
+  \item{\code{m_t_truth}}{Function contraining the response function of the
+  treated units}
+  \item{\code{m_c_truth}}{Function contraining the response function of the
+  control units}
+  \item{\code{propscore}}{Propensity score function} 
+  \item{\code{alpha}}{Chosen alpha} 
+  \item{\code{feat_te}}{Data.frame containing the features of the test
+  samples}
+  \item{\code{W_te}}{Numeric vector containing the treatment assignment of
+  the test samples}
+  \item{\code{tau_te}}{Numeric vector containing the true conditional average
+  treatment effects of the test samples}
+  \item{\code{Yobs_te}}{Numeric vector containing the observed Y values of
+  the test samples}
+  \item{\code{feat_tr}}{Data.frame containing the features of the training 
+  samples}
+  \item{\code{W_tr}}{Numeric vector containing the treatment assignment of
+  the training samples}
+  \item{\code{tau_tr}}{Numeric vector containing the true conditional average
+  treatment effects of the training samples}
+  \item{\code{Yobs_tr}}{Numeric vector containing the observed Y values of
+  the training samples}
 }
 \description{
 This function simulates a RCT or observational data for causal
-effect estimation to test different heterogenuous treatment effect estimation
-strategies.
+  effect estimation. It is mainly used to test different heterogenuous
+  treatment effect estimation strategies.
+}
+\details{
+The function simulates causal experiments by generating the
+  features, the treatment assignment, the observed Y values, and the CATE for
+  a test set and a training set. The different setups define the response
+  functions and the propensity score. The following options are implemented:
+  \code{RespSparseTau1strong, RsparseT2weak, complexTau, complexTau2,
+  complexTau, complexTau2, complexTau3, complexTau4, Conf1, rare1, rare2,
+  rare3, STMpp, STMpp2, STMpp3, STMpp4, Ufail, Usual1, WA1, WA2, WA3, WA4}
+  See the example code to find the exact definition of \eqn{\mu_0, \mu_1},
+  and \eqn{e}. We also give the following examples:
+  \itemize{
+     \item \code{RsparseT2weak} 
+       \itemize{
+       \item \eqn{\mu_0(x) = 3 x_1 + 5 x_2}, 
+       \item \eqn{\mu_1(x) = 3 x_1 + 3 x_2  + 4 x_3}, 
+       \item \eqn{e(x) = 0.1.}}
+     \item \code{complexTau}
+     
+       Create \eqn{\beta_0, \beta_1 \epsilon R^dim} independently from a
+       Unif[1,30]
+       \itemize{
+       \item \eqn{\mu_0(x) = x^T \beta_0}, 
+       \item \eqn{\mu_1(x) = x^T \beta_1}, 
+       \item \eqn{e(x) = 0.5}}
+     \item \code{Conf1} 
+       \itemize{
+       \item \eqn{\mu_0(x) =   2 x_1 + 2 x_2}, 
+       \item \eqn{\mu_1(x) =   2 x_1 + 2  x_2}, 
+       \item \eqn{e(x) = max(0.05, min(.95, x_1 / 2 + 1 / 4)).}}
+     \item \code{RespSparseTau1strong} 
+       \itemize{
+       \item \eqn{\mu_0(x) = 3  x_1 + 5  x_2   }, 
+       \item \eqn{\mu_1(x) = 3 x_1 + 5 x_2  + 30 x_3}, 
+       \item \eqn{e(x) = 0.1.}}
+     }
+}
+\examples{
+require(causalToolbox)
+
+ce_sim <- simulate_causal_experiment(
+  ntrain = 20,
+  ntest = 20,
+  dim = 7,
+  setup = "RsparseT2weak",
+  testseed = 293901,
+  trainseed = 307017
+)
+
+# To see the treatment response function use:
+ce_sim$m_t_truth
+ce_sim$m_c_truth
+ce_sim$propscore
+}
+\references{
+\itemize{
+  \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
+  random correlation matrices based on vines and extended onion method.
+  \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+    Meta-learners for estimating heterogeneous treatment effects using
+    machine learning.
+  \item Wager, Stefan and Athey, Susan (2017). Estimation and inference of
+  heterogeneous treatment effects using random forests.}
+}
+\seealso{
+\code{\link{X_RF}}
 }

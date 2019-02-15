@@ -171,7 +171,8 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 \seealso{
 \code{\link{X_RF_fully_specified}}
 
-Other metalearners: \code{\link{S_RF}}, \code{\link{T_RF}}
+Other metalearners: \code{\link{S_BART}},
+  \code{\link{S_RF}}, \code{\link{T_RF}}
 }
 \author{
 Soeren R. Kuenzel
