@@ -23,9 +23,9 @@ X_RF(feat, tr, yobs, predmode = "propmean", nthread = 0,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
-\item{predmode}{One of propmean, control, treated. It specifies how
-the two estimators of the second stage should be aggregated. The default is
-propmean which refers to propensity score weighting.}
+\item{predmode}{Specifies how the two estimators of the second stage should 
+be aggregated. Possible types are "propmean", "control" and "treated". 
+The default is "propmean" which refers to propensity score weighting.}
 
 \item{nthread}{Number of threads which should be used to work in parallel.}
 
@@ -38,22 +38,22 @@ These hyperparameters are passed to the \code{forestry} package. Please
 refer to the \href{https://github.com/soerenkuenzel/forestry}{forestry}
 package for a more detailed documentation of the hyperparamters.
 \itemize{
-   \item \code{relevant.Variable} Variables that are only used in the first 
+   \item \code{relevant.Variable} Variables that are only used at the first 
          stage.
-   \item \code{ntree} Numbers of trees in the first stage.
-   \item \code{replace} Sample with or without replacement in the first 
+   \item \code{ntree} Numbers of trees at the first stage.
+   \item \code{replace} Sample with or without replacement at the first 
          stage.
    \item \code{sample.fraction} The size of total samples to draw for the 
          training data in the first stage.
    \item \code{mtry} The number of variables randomly selected at each 
          splitting point.
-   \item \code{nodesizeSpl} minimum nodesize in the first stage for 
+   \item \code{nodesizeSpl} minimum nodesize at the first stage for 
          the observations in the splitting set. (see the details of the 
          \code{forestry} package)
-   \item \code{nodesizeAvg} minimum nodesize in the first stage for 
+   \item \code{nodesizeAvg} minimum nodesize at the first stage for 
          the observations in the averaging set.
    \item \code{splitratio} Proportion of the training data used as the 
-         splitting dataset in the first stage.
+         splitting dataset at the first stage.
    \item \code{middleSplit} If true, the split value will be exactly in the 
          middle between two observations. Otherwise, it will take a point 
          based on a uniform distribution between the two observations. 
@@ -83,7 +83,7 @@ Object of class \code{X_RF}. It should be used with one of the
 }
 \description{
 This is an implementation of the X-learner with honest random
-forest in the first and second stage. The function returns an X-RF object.
+forest at the first and second stage. The function returns an X-RF object.
 }
 \details{
 The X-Learner with random forest 
@@ -113,12 +113,12 @@ The X-Learner with random forest
     Define the CATE estimate by a weighted average of the two estimates in
     Stage 2: 
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
-    If \code{predmode = propmean}, then \eqn{g(x) = e(x)} where
+    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where
     \eqn{e(x)} is an estimate of the propensity score using the 
     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
     forest version with the hyperparameters specified in \code{e.forestry}.
-    If \code{predmode = control}, then \eqn{g(x) = 1} and if 
-    \code{predmode = treated}, then \eqn{g(x) = 0}.
+    If \code{predmode = "control"}, then \eqn{g(x) = 1} and if 
+    \code{predmode = "treated"}, then \eqn{g(x) = 0}.
 }
 }
 \examples{
