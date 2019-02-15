@@ -74,12 +74,12 @@ The X-Learner with random forest
     Define the CATE estimate by a weighted average of the two estimates in
     Stage 2: 
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
-    If \code{predmode = propmean}, then \eqn{g(x) = e(x)} where
+    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where
     \eqn{e(x)} is an estimate of the propensity score using the 
     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
     forest version with the hyperparameters specified in \code{e.forestry}.
-    If \code{predmode = control}, then \eqn{g(x) = 1} and if 
-    \code{predmode = treated}, then \eqn{g(x) = 0}.
+    If \code{predmode = "control"}, then \eqn{g(x) = 1} and if 
+    \code{predmode = "treated"}, then \eqn{g(x) = 0}.
 }
 }
 \examples{

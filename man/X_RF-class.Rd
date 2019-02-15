@@ -5,7 +5,7 @@
 \alias{X_RF-class}
 \title{XhRF constructor}
 \description{
-The `X_RF` object is X-learner combined with honest random
+The `X_RF` object is an X-learner combined with honest random
   forest used for the propensity score estimate, the first stage and the
   second stage.
 }
@@ -38,7 +38,7 @@ group of the second stage.}
 \item{\code{m_prop}}{contains an honest random forest predictor for the propensity
 score.}
 
-\item{\code{hyperparameter_list}}{A list of lists of hyper parameters used for the
+\item{\code{hyperparameter_list}}{A list of lists of hyperparameters used for the
 honest random forest algorithm of the forestry package}
 }}
 
