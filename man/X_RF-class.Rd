@@ -23,19 +23,19 @@ as base learner.
 
 \item{\code{yobs_train}}{A vector containing the observed outcomes.}
 
-\item{\code{m_0}}{contains an honest random forest predictor for the control group of
+\item{\code{m_0}}{is an honest random forest predictor for the control group of
 the first stage.}
 
-\item{\code{m_1}}{contains an honest random forest predictor for the treated group of
+\item{\code{m_1}}{is an honest random forest predictor for the treated group of
 the first stage.}
 
-\item{\code{m_tau_0}}{contains an honest random forest predictor for the control
+\item{\code{m_tau_0}}{is an honest random forest predictor for the control
 group of the second stage.}
 
-\item{\code{m_tau_1}}{contains an honest random forest predictor for the treated
+\item{\code{m_tau_1}}{is an honest random forest predictor for the treated
 group of the second stage.}
 
-\item{\code{m_prop}}{contains an honest random forest predictor for the propensity
+\item{\code{m_prop}}{is an honest random forest predictor for the propensity
 score.}
 
 \item{\code{hyperparameter_list}}{A list of lists of hyperparameters used for the

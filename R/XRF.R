@@ -15,15 +15,15 @@
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector containing 0 for control and 1 for treated variables.
 #' @slot yobs_train A vector containing the observed outcomes.
-#' @slot m_0 contains an honest random forest predictor for the control group of
+#' @slot m_0 is an honest random forest predictor for the control group of
 #'   the first stage.
-#' @slot m_1 contains an honest random forest predictor for the treated group of
+#' @slot m_1 is an honest random forest predictor for the treated group of
 #'   the first stage.
-#' @slot m_tau_0 contains an honest random forest predictor for the control
+#' @slot m_tau_0 is an honest random forest predictor for the control
 #'   group of the second stage.
-#' @slot m_tau_1 contains an honest random forest predictor for the treated
+#' @slot m_tau_1 is an honest random forest predictor for the treated
 #'   group of the second stage.
-#' @slot m_prop contains an honest random forest predictor for the propensity
+#' @slot m_prop is an honest random forest predictor for the propensity
 #'   score.
 #' @slot hyperparameter_list A list of lists of hyperparameters used for the
 #'   honest random forest algorithm of the forestry package
@@ -46,9 +46,10 @@ setClass(
 )
 
 # X_RF generator ---------------------------------------------------------------
-#' @title X-Learner with honest RF for both stages
+#' @title X-Learner with honest RF
 #' @details 
-#' The X-Learner with random forest 
+#' The X-Learner with random forest estimates the CATE usig the following three
+#' stages.
 #' \enumerate{
 #'  \item
 #'     Estimate the response functions 
@@ -65,12 +66,12 @@ setClass(
 #'     estimator, that is,
 #'     \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
 #'     \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
-#'     Now employ the 
+#'     Now employ the
 #'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
 #'     forest version with the hyperparameters specified in \code{tau.forestry}
-#'     in two ways: using \eqn{D^1_i} as the dependent variable to obtain \eqn{\hat
-#'     \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to obtain
-#'     \eqn{\hat \tau_0(x)}.
+#'     in two ways: using \eqn{D^1_i} as the dependent variable to obtain
+#'     \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
+#'     obtain \eqn{\hat \tau_0(x)}.
 #'  \item 
 #'     Define the CATE estimate by a weighted average of the two estimates in
 #'     Stage 2: 
@@ -172,17 +173,18 @@ setClass(
 #' feat <- simulated_experiment$feat_tr
 #' tr <- simulated_experiment$W_tr
 #' yobs <- simulated_experiment$Yobs_tr
+#' feature_test <- simulated_experiment$feat_te
 #' 
 #' # create the hte object using honest Random Forests (RF)
 #' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 #' tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 #' sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
 #' 
-#' cate_esti_rf <- EstimateCate(xl_rf, feature_test)
+#' cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 #'
 #' # evaluate the performance
 #' cate_true <- simulated_experiment$tau_te
-#' mean((cate_esti_rf - cate_true) ^ 2)
+#' mean((cate_esti_xrf - cate_true) ^ 2)
 #' \dontrun{
 #' # Create confidence intervals via bootstrapping. 
 #' xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)

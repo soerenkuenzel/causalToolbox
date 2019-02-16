@@ -95,7 +95,6 @@ setMethod(
                         verbose = FALSE,
                         return_CI = FALSE)
   {
-    browser()
     # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE;
     # feature_new = feat[1:5,]
     ndpost <- theObject@ndpost

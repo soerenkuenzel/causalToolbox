@@ -47,7 +47,8 @@ This is the most basic T-learner with honest random forest
   functions.
 }
 \details{
-The X-Learner with random forest 
+The X-Learner with random forest estimates the CATE usig the following three
+stages.
 \enumerate{
  \item
     Estimate the response functions 
@@ -64,12 +65,12 @@ The X-Learner with random forest
     estimator, that is,
     \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
     \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
-    Now employ the 
+    Now employ the
     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
     forest version with the hyperparameters specified in \code{tau.forestry}
-    in two ways: using \eqn{D^1_i} as the dependent variable to obtain \eqn{\hat
-    \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to obtain
-    \eqn{\hat \tau_0(x)}.
+    in two ways: using \eqn{D^1_i} as the dependent variable to obtain
+    \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
+    obtain \eqn{\hat \tau_0(x)}.
  \item 
     Define the CATE estimate by a weighted average of the two estimates in
     Stage 2: 
