@@ -137,17 +137,18 @@ simulated_experiment <- simulate_causal_experiment(
 feat <- simulated_experiment$feat_tr
 tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
+feature_test <- simulated_experiment$feat_te
 
 # create the hte object using honest Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
 
-cate_esti_rf <- EstimateCate(xl_rf, feature_test)
+cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
 # evaluate the performance
 cate_true <- simulated_experiment$tau_te
-mean((cate_esti_rf - cate_true) ^ 2)
+mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{
 # Create confidence intervals via bootstrapping. 
 xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)

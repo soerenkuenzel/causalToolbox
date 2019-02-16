@@ -61,7 +61,7 @@ cbind(cate_t_rf, cate_s_rf, cate_x_bart, cate_t_bart)
 
 ### Example 2: Generating Examples
 The *causalToolbox* package also implements a method to simulate many data sets:
-```{r, simulated Example 2, cache = TRUE,}
+```{r, simulated Example 2, cache = TRUE}
 simulated_experiment <- simulate_causal_experiment(
   ntrain = 1000,
   ntest = 1000,
@@ -72,16 +72,16 @@ simulated_experiment <- simulate_causal_experiment(
 )
 ```
 
+This can be used to compare the different estimators in terms of MSE.
 
-
-```{r, Example 2 run experiments, cache = TRUE, echo = FALSE}
+```{r, Example 2 run experiments, cache = TRUE}
 feat <- simulated_experiment$feat_tr
 tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
 # create the hte object using honest Random Forests (RF)
-xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs, verbose = FALSE)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
 
@@ -94,8 +94,11 @@ cate_true <- simulated_experiment$tau_te
 c("mse_xrf" = mean((cate_esti_xrf - cate_true) ^ 2), 
   "mse_trf" = mean((cate_esti_trf - cate_true) ^ 2), 
   "mse_srf" = mean((cate_esti_srf - cate_true) ^ 2))
+```
 
+One can also access the coverage of confidence intervals. 
 
+```{r, Example 2 get CIs, cache = TRUE}
 ci_srf <- CateCI(tl_rf, feature_test, B = 200, verbose = FALSE)
 mean(ci_srf$X5. < cate_true & ci_srf$X95. > cate_true)
 ```

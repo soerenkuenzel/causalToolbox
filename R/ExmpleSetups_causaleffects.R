@@ -532,10 +532,10 @@ simulate_causal_experiment <- function(ntrain,
       betac_trunc3 <- beatc_raw3[1:ncol(feat)]
 
       ifelse(
-        feat[, 20] < -0.4,
+        feat[, ncol(feat)] < -0.4,
         as.matrix(feat) %*% betac_trunc1,
         ifelse(
-          feat[, 20] < 0.4,
+          feat[, ncol(feat)] < 0.4,
           as.matrix(feat) %*% betac_trunc2,
           as.matrix(feat) %*% betac_trunc3
         )
@@ -547,10 +547,10 @@ simulate_causal_experiment <- function(ntrain,
       betat_trunc3 <- beatt_raw3[1:ncol(feat)]
 
       ifelse(
-        feat[, 20] < -0.4,
+        feat[, ncol(feat)] < -0.4,
         as.matrix(feat) %*% betat_trunc1,
         ifelse(
-          feat[, 20] < 0.4,
+          feat[, ncol(feat)] < 0.4,
           as.matrix(feat) %*% betat_trunc2,
           as.matrix(feat) %*% betat_trunc3
         )
