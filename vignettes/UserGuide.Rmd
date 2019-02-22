@@ -14,9 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Example 1: The GOTV data set.
 The *gotv* data set is part of the *causalToolbox* library and it was taken from
 Gerber AS, Green DP, Larimer CW (2008). It contains 229,461 observations. For
-each of them we observe seven covariates: **sex**, **age**, and whether or not
-they have voted in the general election 2000 and 2002 or the primary election
-2000 and 2002. The goal of this study was to increase voter turnout (**voted**)
+each of them, we observe seven covariates: **sex**, **age**, and whether or not
+they have voted in the general election in 2000 and 2002 or the primary election
+in 2000 and 2002. The goal of this study was to increase voter turnout (**voted**)
 in the 2006 primary election. The authors used a mailer that is indicated in the
 **treatment** column. For treated units the treatment variable is equal to 1 and
 for units in the control group, the treatment indicator is equal to 0.
@@ -40,12 +40,16 @@ feat <- gotv[train_ids , -(8:9)]
 tr <- gotv$treatment[train_ids]
 yobs <- gotv$voted[train_ids]
 
+# Create a T_RF learner with given features, treatments, and observations
 t_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
+# Estimate CATE with a given learner and test data
 cate_t_rf <- EstimateCate(t_rf, gotv[test_ids, ])
+# Calculate the estimated confidence interval for the CATE
 cateCI <- CateCI(t_rf, gotv[test_ids, ], B = 200, verbose = FALSE)
 cateCI
 ```
-It is straight foward to use other Cate estimators.
+
+The other Cate estimators are constructed similarly to this one. Next, we train our CATE estimators based on **S_RF, X_BART, and T_BART** respectively. 
 ```{r, several learners, cache=TRUE}
 set.seed(50245181)
 
@@ -72,15 +76,14 @@ simulated_experiment <- simulate_causal_experiment(
 )
 ```
 
-This can be used to compare the different estimators in terms of MSE.
-
+This method can be used to compare different estimators in terms of MSE.
 ```{r, Example 2 run experiments, cache = TRUE}
 feat <- simulated_experiment$feat_tr
 tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using honest Random Forests (RF)
+# Create the hte object using honest Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs, verbose = FALSE)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -89,7 +92,7 @@ cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 cate_esti_trf <- EstimateCate(tl_rf, feature_test)
 cate_esti_srf <- EstimateCate(sl_rf, feature_test)
 
-# evaluate the performance
+# Evaluate their performances
 cate_true <- simulated_experiment$tau_te
 c("mse_xrf" = mean((cate_esti_xrf - cate_true) ^ 2), 
   "mse_trf" = mean((cate_esti_trf - cate_true) ^ 2), 
