@@ -10,7 +10,7 @@
 #' @title ThRF constructor
 #' @name T_RF-class
 #' @rdname T_RF-class
-#' @description The `T_RF` object is T-learner combined with honest random
+#' @description The `T_RF` object is a T-learner combined with honest random
 #'   forest used for both response functions
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector containing 0 for control and 1 for treated variables.
@@ -171,8 +171,8 @@ T_RF <-
 #' @title T_RF fully specified constructor
 #' @description This is the most basic T-learner with honest random forest
 #'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead call the simpler version T_RF or one of the
-#'   self tuning versions. This function mainly exists to be called from other
+#'   parameters is too big. Instead, call the simpler version T_RF or one of the
+#'   self tuning versions. This function exists mainly to be called from other
 #'   functions.
 #' @inherit X_RF_fully_specified
 #' @seealso \code{\link{T_RF}}

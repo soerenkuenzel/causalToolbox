@@ -4,7 +4,7 @@
 #' @title ShRF constructor
 #' @name S_RF-class
 #' @rdname S_RF-class
-#' @description The `S_RF` object is S-learner combined with honest random
+#' @description The `S_RF` object is a S-learner combined with honest random
 #' forest used for both response functions
 #' @slot feature_train A data frame of all training features.
 #' @slot tr_train A vector containing 0 for control and 1 for treated variables.
@@ -61,7 +61,7 @@ setClass(
 #'      observed outcomes of the control group as the dependent variable.}
 #'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
 #'      observed outcomes of the treated group as the dependent variable.}
-#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+#'   \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
 #'      the three random forest algorithms used}
 #'   \item{\code{creator}}{Function call of S_RF. This is used for different 
 #'      bootstrap procedures.}
@@ -149,8 +149,8 @@ S_RF <-
 #' @title S_RF fully specified constructor
 #' @description This is the most basic S-learner with honest random forest
 #'   constructor. It should not be called directly, since the list of
-#'   parameters is too big. Instead call the simpler version S_RF or one of the
-#'   self tuning versions. This function mainly exists to be called from other
+#'   parameters is too big. Instead, call the simpler version S_RF or one of the
+#'   self tuning versions. This function exists mainly to be called from other
 #'   functions.
 #' @inherit X_RF_fully_specified
 #' @seealso \code{\link{S_RF}}
