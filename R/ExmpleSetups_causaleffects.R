@@ -1177,6 +1177,52 @@ simulate_causal_experiment <- function(ntrain,
       )
     ))
   }
+  
+  # 22.) sameCate_differentResponseFkts ----------------------------------------
+  if (setup == "sameCate_differentResponseFkts") {
+    # the following is used so that the seed is fixed for the creation of this
+    # data set, but th seed is set back afterwards:
+    
+    current_seed <- .Random.seed  # saves the current random stage
+    set.seed(setupseed)                # introduces a new seed to stay consistent
+    beatc_raw <- runif(dim, -5, 5)
+    beattau_raw <- runif(dim, -5, 5)
+    .Random.seed <- current_seed  # sets back the current random stage
+    
+    m_c_truth <- function(feat) {
+      betac_trunc <- beatc_raw[1:ncol(feat)]
+      as.matrix(feat) %*% betac_trunc                 # mu^c
+    }
+    m_t_truth <- function(feat) {
+      browser()
+      rel_feature_ids <- 1:(min(5, ncol(feat)))
+      beattau_trunc <- beattau_raw[rel_feature_ids]
+      m_c_truth(feat) + as.matrix(feat[,rel_feature_ids]) %*% beattau_trunc 
+    }
+    propscore <-
+      function(feat)
+        .5                    # propensity score
+    
+    return(c(
+      list(
+        setup_name = setup,
+        m_t_truth = m_t_truth,
+        m_c_truth = m_c_truth,
+        propscore = propscore
+      ),
+      createTrainAndTest_base(
+        ntrain,
+        ntest,
+        dim,
+        m_t_truth,
+        m_c_truth,
+        propscore,
+        alpha,
+        feat_distribution,
+        given_features
+      )
+    ))
+  }
 
 
   ## If nothing was returned by now, then something went wrong and we want to
