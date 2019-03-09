@@ -36,7 +36,7 @@ Object of class \code{S_RF}. It should be used with one of the
      observed outcomes of the control group as the dependent variable.}
   \item{\code{m_1}}{An object of class forestry that is fitted with the 
      observed outcomes of the treated group as the dependent variable.}
-  \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+  \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
      the three random forest algorithms used}
   \item{\code{creator}}{Function call of S_RF. This is used for different 
      bootstrap procedures.}

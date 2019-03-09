@@ -47,7 +47,7 @@ Object of class \code{S_RF}. It should be used with one of the
 This is an implementation of S_BART
 }
 \details{
-The X-Learner with random forest estimates the CATE usig the following three
+The X-Learner with random forest estimates the CATE following the following three
 stages.
 \enumerate{
  \item
@@ -72,7 +72,7 @@ stages.
     \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
     obtain \eqn{\hat \tau_0(x)}.
  \item 
-    Define the CATE estimate by a weighted average of the two estimates in
+    Define the CATE estimate by a weighted average of the two estimates at
     Stage 2: 
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
     If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where

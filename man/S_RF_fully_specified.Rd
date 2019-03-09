@@ -34,7 +34,7 @@ Object of class \code{X_RF}. It should be used with one of the
      \eqn{D_1} as the dependent variable.}
   \item{\code{m_prop}}{An object of class forestry that is fitted with tr as 
      the dependent variable.}
-  \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
+  \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
      the three random forest algorithms used}
   \item{\code{creator}}{Function call of X_RF. This is used for different 
      bootstrap procedures.}
@@ -42,12 +42,12 @@ Object of class \code{X_RF}. It should be used with one of the
 \description{
 This is the most basic S-learner with honest random forest
   constructor. It should not be called directly, since the list of
-  parameters is too big. Instead call the simpler version S_RF or one of the
-  self tuning versions. This function mainly exists to be called from other
+  parameters is too big. Instead, call the simpler version S_RF or one of the
+  self tuning versions. This function exists mainly to be called from other
   functions.
 }
 \details{
-The X-Learner with random forest estimates the CATE usig the following three
+The X-Learner with random forest estimates the CATE following the following three
 stages.
 \enumerate{
  \item
@@ -72,7 +72,7 @@ stages.
     \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
     obtain \eqn{\hat \tau_0(x)}.
  \item 
-    Define the CATE estimate by a weighted average of the two estimates in
+    Define the CATE estimate by a weighted average of the two estimates at
     Stage 2: 
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
     If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where

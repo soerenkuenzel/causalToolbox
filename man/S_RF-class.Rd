@@ -5,7 +5,7 @@
 \alias{S_RF-class}
 \title{ShRF constructor}
 \description{
-The `S_RF` object is S-learner combined with honest random
+The `S_RF` object is a S-learner combined with honest random
 forest used for both response functions
 }
 \section{Slots}{

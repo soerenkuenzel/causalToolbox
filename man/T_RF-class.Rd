@@ -5,7 +5,7 @@
 \alias{T_RF-class}
 \title{ThRF constructor}
 \description{
-The `T_RF` object is T-learner combined with honest random
+The `T_RF` object is a T-learner combined with honest random
   forest used for both response functions
 }
 \details{

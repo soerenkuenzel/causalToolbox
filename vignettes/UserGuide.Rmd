@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Getting Started
 
-### Example 1: The GOTV data set.
+### Introductory Example: The GOTV data set.
 The *gotv* data set is part of the *causalToolbox* library and it was taken from
 Gerber AS, Green DP, Larimer CW (2008). It contains 229,461 observations. For
 each of them, we observe seven covariates: **sex**, **age**, and whether or not
@@ -45,7 +45,7 @@ t_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 # Estimate CATE with a given learner and test data
 cate_t_rf <- EstimateCate(t_rf, gotv[test_ids, ])
 # Calculate the estimated confidence interval for the CATE
-cateCI <- CateCI(t_rf, gotv[test_ids, ], B = 200, verbose = FALSE)
+cateCI <- CateCI(t_rf, gotv[test_ids, ], B = 2, verbose = FALSE)
 cateCI
 ```
 
@@ -63,7 +63,20 @@ cate_t_bart <- EstimateCate(t_bart, gotv[test_ids, ])
 cbind(cate_t_rf, cate_s_rf, cate_x_bart, cate_t_bart) 
 ```
 
-### Example 2: Generating Examples
+
+
+
+# Package strucutre and detailed example
+The package goal of the package is to make heterogeneous treatment effect 
+estimation simple and useful. The package is created in such a way that it 
+encourages high scientific standards. 
+
+The core of the package are the CATE estimators. In total there are eight 
+different CATE estimators implemented: S-RF, T-RF, X-RF, MO-RF, S-BART, T-BART, 
+X-BART, and MO-BART. 
+
+Each of these functions 
+
 The *causalToolbox* package also implements a method to simulate many data sets:
 ```{r, simulated Example 2, cache = TRUE}
 simulated_experiment <- simulate_causal_experiment(
@@ -102,6 +115,8 @@ c("mse_xrf" = mean((cate_esti_xrf - cate_true) ^ 2),
 One can also access the coverage of confidence intervals. 
 
 ```{r, Example 2 get CIs, cache = TRUE}
-ci_srf <- CateCI(tl_rf, feature_test, B = 200, verbose = FALSE)
+ci_srf <- CateCI(tl_rf, feature_test, B = 2, verbose = FALSE)
 mean(ci_srf$X5. < cate_true & ci_srf$X95. > cate_true)
 ```
+
+
