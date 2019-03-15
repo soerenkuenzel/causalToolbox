@@ -4,9 +4,9 @@
 \alias{S_BART}
 \title{S_BART}
 \usage{
-S_BART(feat, tr, yobs, verbose = TRUE, mu.bart = list(ndpost = 1200,
-  sample_stat = "counterfactuals estimated", tree_package = "dbarts", ntree
-  = 200))
+S_BART(feat, tr, yobs, verbose = TRUE, ndpost = 1200,
+  sample_stat = "counterfactuals estimated", tree_package = "dbarts",
+  ntree = 200)
 }
 \arguments{
 \item{feat}{A data frame containing the features.}
@@ -17,8 +17,6 @@ S_BART(feat, tr, yobs, verbose = TRUE, mu.bart = list(ndpost = 1200,
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 
-\item{um.bart}{}
-
 \item{ndpost}{TODO: Add description}
 
 \item{sample_stat}{TODO: Add description}
@@ -26,6 +24,8 @@ S_BART(feat, tr, yobs, verbose = TRUE, mu.bart = list(ndpost = 1200,
 \item{tree_package}{Package used to create a tree}
 
 \item{ntree}{Number of trees to grow}
+
+\item{um.bart}{}
 }
 \value{
 Object of class \code{S_RF}. It should be used with one of the 

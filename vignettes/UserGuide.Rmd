@@ -101,15 +101,25 @@ xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs, verbose = FALSE)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
 
+xl_bart <- X_BART(feat = feat, tr = tr, yobs = yobs)
+tl_bart <- T_BART(feat = feat, tr = tr, yobs = yobs)
+sl_bart <- S_BART(feat = feat, tr = tr, yobs = yobs)
+
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 cate_esti_trf <- EstimateCate(tl_rf, feature_test)
 cate_esti_srf <- EstimateCate(sl_rf, feature_test)
 
+cate_esti_xbart <- EstimateCate(xl_bart, feature_test)
+cate_esti_tbart <- EstimateCate(tl_bart, feature_test)
+cate_esti_sbart <- EstimateCate(sl_bart, feature_test)
 # Evaluate their performances
 cate_true <- simulated_experiment$tau_te
 c("mse_xrf" = mean((cate_esti_xrf - cate_true) ^ 2), 
   "mse_trf" = mean((cate_esti_trf - cate_true) ^ 2), 
-  "mse_srf" = mean((cate_esti_srf - cate_true) ^ 2))
+  "mse_srf" = mean((cate_esti_srf - cate_true) ^ 2),
+  "mse_xbart" = mean((cate_esti_xbart - cate_true) ^ 2),
+  "mse_tbart" = mean((cate_esti_tbart - cate_true) ^ 2),
+  "mse_sbart" = mean((cate_esti_sbart - cate_true) ^ 2))
 ```
 
 One can also access the coverage of confidence intervals. 
