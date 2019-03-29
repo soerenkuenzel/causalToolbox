@@ -192,8 +192,28 @@ setMethod(
       }
       
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
+    } else if (theObject@tree_package == "BART"){
+      pred_matrix_f_0 <- BART::mc.wbart(
+        x.train = X_0,
+        y.train = yobs_0,
+        x.test =  feature_new,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+      
+      mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
+      
+      pred_matrix_f_1 <- BART::mc.wbart(
+        x.train = X_1,
+        y.train = yobs_1,
+        x.test =  feature_new,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+      
+      mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
     } else{
-      stop("tree_package must be either BayesTree or dbarts")
+      stop("tree_package must be BayesTree, dbarts and BART")
     }
     stopCluster(cl)
     ############################################################################
