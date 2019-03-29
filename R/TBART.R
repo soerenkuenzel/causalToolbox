@@ -198,7 +198,8 @@ setMethod(
         y.train = yobs_0,
         x.test =  feature_new,
         ndpost = ndpost,
-        ntree = theObject@ntree
+        ntree = theObject@ntree,
+        mc.cores = nthread
       )$yhat.test
       
       mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
@@ -208,7 +209,8 @@ setMethod(
         y.train = yobs_1,
         x.test =  feature_new,
         ndpost = ndpost,
-        ntree = theObject@ntree
+        ntree = theObject@ntree,
+        mc.cores = nthread
       )$yhat.test
       
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
