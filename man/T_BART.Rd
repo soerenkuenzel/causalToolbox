@@ -15,7 +15,7 @@ T_BART(feat, tr, yobs, ndpost = 1200,
 
 \item{yobs}{A vector of the observed outcome.}
 
-\item{ndpost}{TODO: Add Description}
+\item{ndpost}{Number of posterior draws}
 
 \item{sample_stat}{TODO: Add Description}
 

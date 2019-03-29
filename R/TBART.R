@@ -2,6 +2,7 @@
 #' @include SBART.R
 
 #' @import dbarts
+#' @import BART
 #' @import foreach
 #' @import doParallel
 
@@ -31,7 +32,7 @@ setClass(
 #' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
 #' @param yobs A vector of the observed outcome.
 #' @param verbose TRUE for detailed output FALSE for no output
-#' @param ndpost TODO: Add Description
+#' @param ndpost Number of posterior draws
 #' @param sample_stat TODO: Add Description
 #' @param tree_package Package used to create a tree
 #' @param ntree Number of trees to grow
@@ -215,7 +216,7 @@ setMethod(
       
       mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
     } else{
-      stop("tree_package must be BayesTree, dbarts and BART")
+      stop("tree_package must be BayesTree, dbarts or BART")
     }
     stopCluster(cl)
     ############################################################################
