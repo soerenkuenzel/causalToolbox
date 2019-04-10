@@ -1,6 +1,6 @@
 library(testthat)
-test_that("Tests that XhRF is working correctly", {
-  context('X-RF')
+test_that("Tests that TRF is working correctly", {
+  context('T-RF')
   set.seed(1423614230)
 
   feat <- iris[, -1]
@@ -39,5 +39,5 @@ test_that("Tests that XhRF is working correctly", {
   expect_output(smp_stats <- EstimateAllSampleStatistics(tl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
   # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 3.556161, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], 2.869393, tolerance = 1e-1)
 })

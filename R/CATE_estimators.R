@@ -2,11 +2,11 @@
 NULL
 
 # Cate estimators --------------------------------------------------------------
-#' Class CATE-estimators 
-#' @name CATE-estimators-class
-#' @rdname CATE-estimators-class
-#' @exportClass CATE-estimators
-setClass("CATE-estimators")
+#' Class CATE-estimator 
+#' @name CATE-estimator-class
+#' @rdname CATE-estimator-class
+#' @exportClass CATE-estimator
+setClass("CATE-estimator")
 setOldClass("forestry::honestRF")
 
 # Meta-learner -----------------------------------------------------------------
@@ -16,7 +16,7 @@ setOldClass("forestry::honestRF")
 #' @exportClass Meta-learner
 setClass(
   "Meta-learner",
-  contains = "CATE-estimators",
+  contains = "CATE-estimator",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",
@@ -141,7 +141,7 @@ setMethod(
                  "or use `bootstrapVersion <- normalApprox` option.",
                  "The matrix should have less than 5e8 values."))
     }
-    if((bootstrapVersion == "smoothed") & B < 2000) {
+    if ((bootstrapVersion == "smoothed") & B < 2000) {
       warning(
         paste(
           "We have found that when using smoothed intervals,",
