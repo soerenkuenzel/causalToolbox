@@ -6,7 +6,13 @@ NULL
 #' @name CATE-estimator-class
 #' @rdname CATE-estimator-class
 #' @exportClass CATE-estimator
-setClass("CATE-estimator")
+setClass("CATE-estimator",
+         slots = list(
+           feature_train = "data.frame",
+           tr_train = "numeric",
+           yobs_train = "numeric",
+           creator = "function"
+         ))
 setOldClass("forestry::honestRF")
 
 # Meta-learner -----------------------------------------------------------------
@@ -16,13 +22,7 @@ setOldClass("forestry::honestRF")
 #' @exportClass Meta-learner
 setClass(
   "Meta-learner",
-  contains = "CATE-estimator",
-  slots = list(
-    feature_train = "data.frame",
-    tr_train = "numeric",
-    yobs_train = "numeric",
-    creator = "function"
-  )
+  contains = "CATE-estimator"
 )
 #'Method EstimateCate
 #'@name EstimateCate
@@ -119,7 +119,7 @@ setGeneric(
 #' @exportMethod CateCI
 setMethod(
   f = "CateCI",
-  signature = "Meta-learner",
+  signature = "CATE-estimator",
   definition = function(theObject,
                         feature_new,
                         method,
@@ -319,7 +319,7 @@ setGeneric(
 #' @exportMethod CateBIAS
 setMethod(
   f = "CateBIAS",
-  signature = "Meta-learner",
+  signature = "CATE-estimator",
   definition = function(theObject,
                         feature_new,
                         method,
@@ -438,7 +438,7 @@ setMethod(
 #' @export EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",
-  signature = "Meta-learner",
+  signature = "CATE-estimator",
   definition = function(theObject,
                         method,
                         B,
