@@ -32,16 +32,12 @@ setClass(
   "X_RF",
   contains = "Meta-learner",
   slots = list(
-    feature_train = "data.frame",
-    tr_train = "numeric",
-    yobs_train = "numeric",
     m_0 = "forestry",
     m_1 = "forestry",
     m_tau_0 = "forestry",
     m_tau_1 = "forestry",
     m_prop = "forestry",
-    hyperparameter_list = "list",
-    creator = "function"
+    hyperparameter_list = "list"
   )
 )
 

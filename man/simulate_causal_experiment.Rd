@@ -4,10 +4,11 @@
 \alias{simulate_causal_experiment}
 \title{Simulate a Causal Experiment}
 \usage{
-simulate_causal_experiment(ntrain, ntest, dim = ncol(given_features),
+simulate_causal_experiment(ntrain = nrow(given_features),
+  ntest = nrow(given_features), dim = ncol(given_features),
   alpha = 0.1, feat_distribution = "normal", given_features = NULL,
-  setup = "RespSparseTau1strong", testseed = NULL, trainseed = NULL,
-  setupseed = 23987214)
+  pscore = "rct5", mu0 = "sparseLinearStrong",
+  tau = "sparseLinearWeak", testseed = NULL, trainseed = NULL)
 }
 \arguments{
 \item{ntrain}{Number of training examples.}
@@ -30,15 +31,15 @@ of the impact of alpha.}
 test the performance of different estimators for a particular set of
 features.}
 
-\item{setup}{This is used to specify the function form of the response
-functions and the treatment assignment. Refer to the details for a complete
-description of the different choices.}
-
 \item{testseed}{is the seed used to generate the testing data, if NULL, then
 the seed of the main session is used.}
 
 \item{trainseed}{is the seed used to generate the training data, if NULL,
 then the seed of the main session is used.}
+
+\item{setup}{This is used to specify the function form of the response
+functions and the treatment assignment. Refer to the details for a complete
+description of the different choices.}
 
 \item{setupseed}{For some of the setups, betas are created randomly. This
 seed is per default chosen, but can be changed here to generate more
@@ -80,31 +81,30 @@ The function simulates causal experiments by generating the
   features, the treatment assignment, the observed Y values, and the CATE for
   a test set and a training set. The different setups define the response
   functions and the propensity score. The following options are implemented:
-  \code{RespSparseTau1strong, RsparseT2weak, complexTau, complexTau2,
-  complexTau, complexTau2, complexTau3, complexTau4, Conf1, rare1, rare2,
+  \code{RCT_SparseLinear_SparceLinear1, RCT_SparseLinear2, RCT_LinearComplex, RCT_LinearComplex2,
+  RCT_LinearComplex, RCT_LinearComplex2, RCT_LinearComplex3, RCT_LinearComplex4, OS_SparseLinear1, rare1, rare2,
   rare3, STMpp, STMpp2, STMpp3, STMpp4, Ufail, Usual1, WA1, WA2, WA3, WA4}
   See the example code to find the exact definition of \eqn{\mu_0, \mu_1},
   and \eqn{e}. We also give the following examples:
   \itemize{
-     \item \code{RsparseT2weak} 
+     \item \code{RCT_SparseLinear2} 
        \itemize{
        \item \eqn{\mu_0(x) = 3 x_1 + 5 x_2}, 
        \item \eqn{\mu_1(x) = 3 x_1 + 3 x_2  + 4 x_3}, 
        \item \eqn{e(x) = 0.1.}}
-     \item \code{complexTau}
-     
-       Create \eqn{\beta_0, \beta_1 \epsilon R^dim} independently from a
+     \item \code{RCT_LinearComplex}
+       Create \eqn{\beta_0, \beta_1 \in R^dim} independently from a
        Unif[1,30]
        \itemize{
        \item \eqn{\mu_0(x) = x^T \beta_0}, 
        \item \eqn{\mu_1(x) = x^T \beta_1}, 
        \item \eqn{e(x) = 0.5}}
-     \item \code{Conf1} 
+     \item \code{OS_SparseLinear1} 
        \itemize{
        \item \eqn{\mu_0(x) =   2 x_1 + 2 x_2}, 
        \item \eqn{\mu_1(x) =   2 x_1 + 2  x_2}, 
        \item \eqn{e(x) = max(0.05, min(.95, x_1 / 2 + 1 / 4)).}}
-     \item \code{RespSparseTau1strong} 
+     \item \code{RCT_SparseLinear_SparceLinear1} 
        \itemize{
        \item \eqn{\mu_0(x) = 3  x_1 + 5  x_2   }, 
        \item \eqn{\mu_1(x) = 3 x_1 + 5 x_2  + 30 x_3}, 
@@ -118,7 +118,7 @@ ce_sim <- simulate_causal_experiment(
   ntrain = 20,
   ntest = 20,
   dim = 7,
-  setup = "RsparseT2weak",
+  setup = "RCT_SparseLinear2",
   testseed = 293901,
   trainseed = 307017
 )

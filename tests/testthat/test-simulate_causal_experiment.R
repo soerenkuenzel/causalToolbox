@@ -1,18 +1,23 @@
 library(testthat)
 test_that("Test causal experiment creator", {
   context('causal experiment creator')
-  expect_error(simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-                             setup = "rare2"), NA)
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-  #                            setup = "rare3")
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-  #                            setup = "STMpp2")
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-  #                            setup = "STMpp3")
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-  #                            setup = "complexTau2")
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 6, alpha = 5,
-  #                            setup = "WA4")
-  # simulate_causal_experiment(ntrain = 40, ntest = 40, dim = 20, alpha = 5,
-  #                            setup = "STMpp4")
+  
+  ce <- simulate_causal_experiment(
+    ntrain = 20,
+    ntest = 20,
+    dim = 3,
+    alpha = .1,
+    feat_distribution = "normal",
+    given_features = NULL,
+    pscore = "rct5",
+    mu0 = "sparseLinearStrong",
+    tau = "sparseLinearWeak",
+    testseed = 4972609,
+    trainseed = 1184332
+  ) 
+  
+  expect_equal(ce$Yobs_tr[1:10], 
+               c(-71.628878, -4.562855, -82.279931, 59.705728, -22.144589, 
+                 7.685433, 65.266380, 118.229187, 1.079148, 25.941377))
+  
 })

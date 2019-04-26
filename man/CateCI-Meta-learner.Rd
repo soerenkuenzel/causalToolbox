@@ -6,7 +6,7 @@
 \alias{CateCI,Meta-learner-method}
 \title{CateCI-Meta-learner}
 \usage{
-\S4method{CateCI}{`Meta-learner`}(theObject, feature_new,
+\S4method{CateCI}{`CATE-estimator`}(theObject, feature_new,
   method = "maintain_group_ratios", bootstrapVersion = "normalApprox",
   B = 2000, nthread = 0, verbose = TRUE)
 }

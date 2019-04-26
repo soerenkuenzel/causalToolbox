@@ -6,7 +6,7 @@
 \alias{CateBIAS,Meta-learner-method}
 \title{CateBIAS-Meta-learner}
 \usage{
-\S4method{CateBIAS}{`Meta-learner`}(theObject, feature_new,
+\S4method{CateBIAS}{`CATE-estimator`}(theObject, feature_new,
   method = "maintain_group_ratios", B = 2000, nthread = 0,
   verbose = TRUE)
 }

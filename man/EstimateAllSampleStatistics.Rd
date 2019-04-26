@@ -10,7 +10,7 @@ EstimateAllSampleStatistics(theObject, feature_new,
   method = "maintain_group_ratios", B = 2000, nthread = 0,
   verbose = TRUE)
 
-\S4method{EstimateAllSampleStatistics}{`Meta-learner`}(theObject, method,
+\S4method{EstimateAllSampleStatistics}{`CATE-estimator`}(theObject, method,
   B, nthread, verbose)
 }
 \arguments{
