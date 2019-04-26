@@ -1,4 +1,4 @@
-`hte` provides functions for estimating heterogenous treatment effects.
+`causalToolbox` provides functions for estimating heterogenous treatment effects.
 
 ## How to install
 
