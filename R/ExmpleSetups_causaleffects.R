@@ -66,16 +66,20 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' @param given_features This is used, if we already have features and want to
 #'   test the performance of different estimators for a particular set of
 #'   features.
-#' @param setup This is used to specify the function form of the response
-#'   functions and the treatment assignment. Refer to the details for a complete
-#'   description of the different choices.
-#' @param testseed is the seed used to generate the testing data, if NULL, then
+#' @param pscore,mu0,tau parameters that determine the propensity score, the
+#'   response function for the control units, and tau, respectively. The
+#'   different options can be seen using
+#'   \code{names(pscores.simulate_causal_experiment)},
+#'   \code{names(mu0.simulate_causal_experiment)}, and
+#'   \code{names(tau.simulate_causal_experiment)}. This is implemented this way,
+#'   because it enables the user to easily loop through the different
+#'   estimators.
+#' @param testseed The seed used to generate the testing data, if NULL, then
 #'   the seed of the main session is used.
-#' @param trainseed is the seed used to generate the training data, if NULL,
+#' @param trainseed The seed used to generate the training data, if NULL,
 #'   then the seed of the main session is used.
-#' @param setupseed For some of the setups, betas are created randomly. This
-#'   seed is per default chosen, but can be changed here to generate more
-#'   setups.
+#' @param setupseed Some of the setups are random. This seed is per default
+#'   chosen, but can be changed here to generate more setups.
 #' @return A list with the following elements 
 #'   \item{\code{setup_name}}{Name of the setup} 
 #'   \item{\code{m_t_truth}}{Function contraining the response function of the
@@ -102,37 +106,12 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   the training samples}
 #' @details The function simulates causal experiments by generating the
 #'   features, the treatment assignment, the observed Y values, and the CATE for
-#'   a test set and a training set. The different setups define the response
-#'   functions and the propensity score. The following options are implemented:
-#'   \code{RCT_SparseLinear_SparceLinear1, RCT_SparseLinear2, RCT_LinearComplex, RCT_LinearComplex2,
-#'   RCT_LinearComplex, RCT_LinearComplex2, RCT_LinearComplex3, RCT_LinearComplex4, OS_SparseLinear1, rare1, rare2,
-#'   rare3, STMpp, STMpp2, STMpp3, STMpp4, Ufail, Usual1, WA1, WA2, WA3, WA4}
-#'   See the example code to find the exact definition of \eqn{\mu_0, \mu_1},
-#'   and \eqn{e}. We also give the following examples:
-#'   \itemize{
-#'      \item \code{RCT_SparseLinear2} 
-#'        \itemize{
-#'        \item \eqn{\mu_0(x) = 3 x_1 + 5 x_2}, 
-#'        \item \eqn{\mu_1(x) = 3 x_1 + 3 x_2  + 4 x_3}, 
-#'        \item \eqn{e(x) = 0.1.}}
-#'      \item \code{RCT_LinearComplex}
-#'        Create \eqn{\beta_0, \beta_1 \in R^dim} independently from a
-#'        Unif[1,30]
-#'        \itemize{
-#'        \item \eqn{\mu_0(x) = x^T \beta_0}, 
-#'        \item \eqn{\mu_1(x) = x^T \beta_1}, 
-#'        \item \eqn{e(x) = 0.5}}
-#'      \item \code{OS_SparseLinear1} 
-#'        \itemize{
-#'        \item \eqn{\mu_0(x) =   2 x_1 + 2 x_2}, 
-#'        \item \eqn{\mu_1(x) =   2 x_1 + 2  x_2}, 
-#'        \item \eqn{e(x) = max(0.05, min(.95, x_1 / 2 + 1 / 4)).}}
-#'      \item \code{RCT_SparseLinear_SparceLinear1} 
-#'        \itemize{
-#'        \item \eqn{\mu_0(x) = 3  x_1 + 5  x_2   }, 
-#'        \item \eqn{\mu_1(x) = 3 x_1 + 5 x_2  + 30 x_3}, 
-#'        \item \eqn{e(x) = 0.1.}}
-#'      }
+#'   a test set and a training set. pscore, mu0, and tau define the response
+#'   functions and the propensity score. For example, \code{pscore =
+#'   "osSparse1Linear"} specifies that \deqn{e(x) = max(0.05, min(.95, x1 / 2 +
+#'   1 / 4))} and \code{mu0 ="sparseLinearWeak"} specifies that the response
+#'   function for the control units is given by a simple linear function,
+#'   \deqn{mu0(x) = 3 x1 + 5 x2.}
 #' @seealso \code{\link{X_RF}}
 #' @references \itemize{
 #'   \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
@@ -140,24 +119,53 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
 #'     Meta-learners for estimating heterogeneous treatment effects using
 #'     machine learning.
-#'   \item Wager, Stefan and Athey, Susan (2017). Estimation and inference of
-#'   heterogeneous treatment effects using random forests.}
 #' @examples
 #' require(causalToolbox)
 #' 
 #' ce_sim <- simulate_causal_experiment(
 #'   ntrain = 20,
 #'   ntest = 20,
-#'   dim = 7,
-#'   setup = "RCT_SparseLinear2",
-#'   testseed = 293901,
-#'   trainseed = 307017
+#'   dim = 7
 #' )
 #' 
-#' # To see the treatment response function use:
-#' ce_sim$m_t_truth
-#' ce_sim$m_c_truth
-#' ce_sim$propscore
+#' ce_sim
+#' 
+#' \dontrun{
+#' estimators <- list(
+#' S_RF = S_RF, 
+#' T_RF = T_RF, 
+#' X_RF = X_RF, 
+#' S_BART = S_BART,
+#' T_BART = T_BART, 
+#' X_BARTT = X_BART)
+#' 
+#' performance <- data.frame()
+#' for(tau_n in names(tau.simulate_causal_experiment)){
+#'   for(mu0_n in names(mu0.simulate_causal_experiment)) {
+#'     ce <- simulate_causal_experiment(
+#'       given_features = iris,
+#'       pscore = "rct5",
+#'       mu0 = mu0_n,
+#'       tau = tau_n)
+#'     
+#'     for(estimator_n in names(estimators)) {
+#'       print(paste(tau_n, mu0_n, estimator_n))
+#'     
+#'       trained_e <- estimators[[estimator_n]](ce$feat_tr, ce$W_tr, ce$Yobs_tr)
+#'       performance <- 
+#'         rbind(performance, 
+#'               data.frame(
+#'                 mu0 = mu0_n,
+#'                 tau = tau_n,
+#'                 estimator = estimator_n,
+#'                 MSE = mean((EstimateCate(trained_e, ce$feat_te) - 
+#'                             ce$tau_te)^2)))
+#'     }
+#'   }
+#' }
+#' 
+#' reshape2::dcast(data = performance, mu0 + tau ~ estimator)
+#' }
 #' @import MASS
 #' @export 
 simulate_causal_experiment <- function(ntrain = nrow(given_features),
@@ -325,6 +333,7 @@ simulate_causal_experiment <- function(ntrain = nrow(given_features),
 
 
 # Propensity score functions ---------------------------------------------------
+#' @export 
 pscores.simulate_causal_experiment <- list(
   rct5 = function(feat) {.5}, 
   rct1 = function(feat) {.1}, 
@@ -332,14 +341,16 @@ pscores.simulate_causal_experiment <- list(
   osSparse1Linear = function(feat) {max(0.05, min(.95, feat$x1 / 2 + 1 / 4))},
   osSparse1Beta = function(feat) {0.25 + dbeta(feat$x1, 2, 4) / 4})
 
+
 # mu0 functions ----------------------------------------------------------------
+#' @export
 mu0.simulate_causal_experiment <- list(
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
   sparseLinearStrong = function(feat) {30 * feat$x1 + 50 * feat$x2},
   fullLinearWeak = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
     set.seed(5397936)
-    d <- dim(feat)
+    d <- ncol(feat)
     
     beta <- runif(d, -5, 5)
     as.matrix(feat) %*% beta   
@@ -347,7 +358,7 @@ mu0.simulate_causal_experiment <- list(
   fullLocallyLinear = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
     set.seed(7020829)
-    d <- dim(feat)
+    d <- ncol(feat)
     
     beta1 <- runif(d, -5, 5)
     beta2 <- runif(d, -5, 5)
@@ -364,12 +375,12 @@ mu0.simulate_causal_experiment <- list(
   fullLinearWeakStep = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
     set.seed(1496661)
-    d <- dim(feat)
+    d <- ncol(feat)
     
     beta <- runif(d, -5, 5)
     as.matrix(feat) %*% beta + ifelse(feat$x1 > 0, 5, 0)
   }, 
-  sparseNonLinear1 <- function(feat) {
+  sparseNonLinear1 = function(feat) {
     sin(feat$x1) *
       sin(feat$x2) *
       sin(feat$x3) *
@@ -389,14 +400,23 @@ mu0.simulate_causal_experiment <- list(
 )
 
 # tau functions ----------------------------------------------------------------
+#' @export 
 tau.simulate_causal_experiment <- list(
   no = function(feat) {0},
   const = function(feat) {10},
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
+  fullLinearWeak = function(feat) {
+    oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
+    set.seed(5397936)
+    d <- ncol(feat)
+    
+    beta <- runif(d, -5, 5)
+    as.matrix(feat) %*% beta   
+  }, 
   fullLocallyLinear = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
     set.seed(6482480)
-    d <- dim(feat)
+    d <- ncol(feat)
     
     beta1 <- runif(d, -5, 5)
     beta2 <- runif(d, -5, 5)
