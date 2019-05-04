@@ -27,7 +27,6 @@
 #'   score.
 #' @slot hyperparameter_list A list of lists of hyperparameters used for the
 #'   honest random forest algorithm of the forestry package
-#' @exportClass X_RF
 setClass(
   "X_RF",
   contains = "Meta-learner",
@@ -161,10 +160,7 @@ setClass(
 #' simulated_experiment <- simulate_causal_experiment(
 #'   ntrain = 1000,
 #'   ntest = 1000,
-#'   dim = 10,
-#'   setup = "complexTau",
-#'   testseed = 293901,
-#'   trainseed = 307017
+#'   dim = 10
 #' )
 #' feat <- simulated_experiment$feat_tr
 #' tr <- simulated_experiment$W_tr

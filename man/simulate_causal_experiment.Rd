@@ -138,6 +138,15 @@ for(tau_n in names(tau.simulate_causal_experiment)){
 reshape2::dcast(data = performance, mu0 + tau ~ estimator)
 }
 }
+\references{
+\itemize{
+  \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
+  random correlation matrices based on vines and extended onion method.
+  \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+    Meta-learners for estimating heterogeneous treatment effects using
+    machine learning.
+    }
+}
 \seealso{
 \code{\link{X_RF}}
 }

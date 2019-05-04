@@ -45,15 +45,6 @@ setClass(
 #' @family metalearners
 #' @export
 S_BART <-
-  # function(feat,
-  #          tr,
-  #          yobs, 
-  #          verbose = TRUE, 
-  #          mu.bart = list(
-  #            ndpost = 1200,
-  #            sample_stat = "counterfactuals estimated",
-  #            tree_package = "dbarts",
-  #            ntree = 200))
     function(feat,
              tr,
              yobs, 

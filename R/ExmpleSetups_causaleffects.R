@@ -119,6 +119,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
 #'     Meta-learners for estimating heterogeneous treatment effects using
 #'     machine learning.
+#'     }
 #' @examples
 #' require(causalToolbox)
 #' 

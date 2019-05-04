@@ -65,10 +65,7 @@ require(causalToolbox)
 simulated_experiment <- simulate_causal_experiment(
   ntrain = 1000,
   ntest = 1000,
-  dim = 10,
-  setup = "complexTau",
-  testseed = 293901,
-  trainseed = 307017
+  dim = 10
 )
 feat <- simulated_experiment$feat_tr
 tr <- simulated_experiment$W_tr
