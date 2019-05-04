@@ -34,7 +34,6 @@ test_that("Tests that ShRF is working correctly", {
       dim = 20,
       alpha = .1,
       feat_distribution = "normal",
-      setup = "RespSparseTau1strong",
       testseed = 543,
       trainseed = 234
     )
@@ -58,13 +57,13 @@ test_that("Tests that ShRF is working correctly", {
   expect_equal(mean((
     EstimateCate(sl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  603.9621,
+  31.19558,
   tolerance = 1)
 
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
   expect_equal(sum(smp_stats$CATE[, 3]),
-               -0.0003108437,
+               -0.002551624,
                tolerance = 1e-2)
 
 })

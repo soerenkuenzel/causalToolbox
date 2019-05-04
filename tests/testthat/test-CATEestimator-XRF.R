@@ -21,10 +21,8 @@ test_that("Tests that XhRF is working correctly", {
       dim = 20,
       alpha = .1,
       feat_distribution = "normal",
-      setup = "RespSparseTau1strong",
       testseed = 543,
-      trainseed = 234
-    )
+      trainseed = 234)
 
   expect_output(xl <- X_RF(feat = cate_problem$feat_tr,
                            yobs = cate_problem$Yobs_tr,
@@ -33,11 +31,11 @@ test_that("Tests that XhRF is working correctly", {
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  227.4364,
+  10.20051,
   tolerance = 1)
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
   # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 2.706582, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], -0.03804457, tolerance = 1e-1)
 })

@@ -19,7 +19,6 @@ test_that("Tests that TRF is working correctly", {
       dim = 20,
       alpha = .1,
       feat_distribution = "normal",
-      setup = "RespSparseTau1strong",
       testseed = 543,
       trainseed = 234
     )
@@ -33,11 +32,11 @@ test_that("Tests that TRF is working correctly", {
   expect_equal(mean((
     EstimateCate(tl, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  120.0557,
+  70.08503,
   tolerance = 1)
 
   expect_output(smp_stats <- EstimateAllSampleStatistics(tl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
   # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 2.869393, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], 0.4207244, tolerance = 1e-1)
 })

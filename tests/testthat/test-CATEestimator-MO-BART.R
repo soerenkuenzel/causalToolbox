@@ -1,5 +1,3 @@
-
-library(testthat)
 test_that(
   "Tests that MO-BART is working correctly",
   {
@@ -18,7 +16,7 @@ test_that(
       ntree = ntree
     )
 
-  testthat::expect_equal(EstimateCate(mo_bart, feat)[1], 0.07434052, tolerance = 1e-4)
+  expect_equal(EstimateCate(mo_bart, feat)[1], 0.07434052, tolerance = 1e-4)
 
   
   set.seed(432)
@@ -29,7 +27,6 @@ test_that(
       dim = 20,
       alpha = .1,
       feat_distribution = "normal",
-      setup = "RespSparseTau1strong",
       testseed = 543,
       trainseed = 234
     )
@@ -46,14 +43,8 @@ test_that(
   testthat::expect_equal(  mean((
     EstimateCate(mo_bart, cate_problem$feat_te) - cate_problem$tau_te
   ) ^ 2),
-  222.4855,
+  13.86115,
   tolerance = 1)
-  
-  
-  # expect_output(smp_stats <- EstimateAllSampleStatistics(morf, B = 2))
-  #expect_equal(smp_stats$SATT[1, 3],
-  #             -9.004184,
-  #             tolerance = 1e-2)
   
 })
 
