@@ -6,6 +6,7 @@ NULL
 #' @name CATE-estimator-class
 #' @rdname CATE-estimator-class
 #' @exportClass CATE-estimator
+#' @noRd
 setClass("CATE-estimator",
          slots = list(
            feature_train = "data.frame",
@@ -20,6 +21,7 @@ setOldClass("forestry::honestRF")
 #' @name Meta-learner-class
 #' @rdname Meta-learner-class
 #' @exportClass Meta-learner
+#' @noRd
 setClass(
   "Meta-learner",
   contains = "CATE-estimator"

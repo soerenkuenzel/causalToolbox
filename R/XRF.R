@@ -6,9 +6,6 @@
 
 
 # X-RF class -------------------------------------------------------------------
-#' @title XhRF constructor
-#' @name X_RF-class
-#' @rdname X_RF-class
 #' @description The `X_RF` object is an X-learner combined with honest random
 #'   forest used for the propensity score estimate, the first stage and the
 #'   second stage.
@@ -27,6 +24,7 @@
 #'   score.
 #' @slot hyperparameter_list A list of lists of hyperparameters used for the
 #'   honest random forest algorithm of the forestry package
+#' @noRd
 setClass(
   "X_RF",
   contains = "Meta-learner",

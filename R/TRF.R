@@ -19,6 +19,7 @@
 #' @slot m_y_c contains an honest random forest predictor for the control group
 #' @slot creator A function which creates a T_RF
 #' @exportClass T_RF
+#' @noRd
 setClass(
   "T_RF",
   contains = "Meta-learner",

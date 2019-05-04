@@ -79,13 +79,8 @@ S_BART <-
 
 #' EstimateCate-S_BART
 #' @name EstimateCate-S_BART
-#' @rdname EstimateCate-S_BART
-#' @description Return the estimated CATE
-#' @inheritParams EstimateCate
-#' @param theObject A `S_BART` object.
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,S_BART-method
+#' @rdname EstimateCate
+#' @inherit EstimateCate
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",

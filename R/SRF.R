@@ -12,6 +12,7 @@
 #' @slot forest A forest object
 #' @slot creator A function which creates a S_RF
 #' @exportClass S_RF
+#' @noRd
 setClass(
   "S_RF",
   contains = "Meta-learner",
