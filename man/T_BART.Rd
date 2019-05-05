@@ -5,7 +5,7 @@
 \title{T_BART}
 \usage{
 T_BART(feat, tr, yobs, ndpost = 1200,
-  sample_stat = "counterfactuals estimated", tree_package = "dbarts",
+  sample_stat = "counterfactuals estimated", tree_package = "BART",
   ntree = 200, nthread = 1, verbose = FALSE)
 }
 \arguments{

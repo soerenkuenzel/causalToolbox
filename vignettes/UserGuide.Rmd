@@ -83,7 +83,7 @@ simulated_experiment <- simulate_causal_experiment(
   ntrain = 1000,
   ntest = 1000,
   dim = 10,
-  setup = "complexTau",
+  #setup = "complexTau",
   testseed = 293901,
   trainseed = 307017
 )
