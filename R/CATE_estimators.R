@@ -53,6 +53,7 @@ setGeneric(
 #'bootstrap normal approximation to get CI. smoothed will use use CI around the
 #'smoothed bootstrap as introduced by Efron 2014.
 #'@exportMethod CateCI
+#'@noRd
 setGeneric(
   name = "CateCI",
   def = function(theObject,
@@ -113,9 +114,18 @@ setGeneric(
 
 #' CateCI-Meta-learner
 #' @name CateCI-Meta-learner
-#' @rdname CateCI-Meta-learner
+#' @rdname CateCI
 #' @description Return the estimated confidence intervals for the CATE
-#' @inheritParams CateCI
+#' @param theObject A `Meta-learner` object
+#' @param feature_new A feature data frame
+#' @param method Different versions of the bootstrap.
+#' @param B Number of bootstrap samples
+#' @param nthread number of threads to be used in parallel
+#' @param verbose TRUE for detailed output FALSE for no output
+#' @param bootstrapVersion default is normalApprox which will just use the 
+#'bootstrap normal approximation to get CI. smoothed will use use CI around the
+#'smoothed bootstrap as introduced by Efron 2014.
+#'@exportMethod CateCI
 #' @return A data frame of estimated CATE Confidence Intervals
 #' @aliases CateCI,Meta-learner-method
 #' @exportMethod CateCI
@@ -299,6 +309,7 @@ setMethod(
 #' @return A data frame of estimated bias
 #' @aliases CateBIAS, Meta-learner-method
 #' @export CateBIAS
+#' @noRd
 setGeneric(
   name = "CateBIAS",
   def = function(theObject,
@@ -313,7 +324,7 @@ setGeneric(
 
 #' CateBIAS-Meta-learner
 #' @name CateBIAS-Meta-learner
-#' @rdname CateBIAS-Meta-learner
+#' @rdname CateBIAS
 #' @description Return the estimated bias for the CATE
 #' @inheritParams CateBIAS
 #' @return A data frame of estimated CATE bias

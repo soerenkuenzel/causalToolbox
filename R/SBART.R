@@ -103,11 +103,8 @@ setMethod(
 
 
 #' CateCI-S_BART
-#' @rdname CateCI-S_BART
-#' @description Return the estimated CATE
-#' @param theObject A `S_BART` object.
+#' @rdname CateCI
 #' @inheritParams CateCI
-#' @return A vector of predicted CATE
 #' @aliases CateCI,S_BART-method
 #' @exportMethod CateCI
 setMethod(
@@ -140,12 +137,11 @@ setMethod(
 
 
 #' EstimateAllSampleStatistics-S_BART
-#' @rdname EstimateAllSampleStatistics-S_BART
-#' @description Return the estimated CATE
-#' @param theObject A `S_BART` object
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @aliases EstimateAllSampleStatistics,S_BART-method
+#' @name EstimateAllSampleStatistics-S_BART
+#' @rdname EstimateAllSampleStatistics
+#' @inherit EstimateAllSampleStatistics
 #' @exportMethod EstimateAllSampleStatistics
+#' @import stats
 setMethod(
   f = "EstimateAllSampleStatistics",
   signature = "S_BART",

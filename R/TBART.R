@@ -75,18 +75,12 @@ T_BART <-
   }
 
 
-#' EstimateCate-T_BART
-#' @name EstimateCate-T_BART
-#' @rdname EstimateCate-T_BART
-#' @description Return the estimated CATE
-#' @param theObject A `T_BART` object.
-#' @param feature_new A feature data frame.
+#' @name EstimateCate-X_BART
+#' @rdname EstimateCate
+#' @inherit EstimateCate
+#' @exportMethod EstimateCate
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @param return_CI If TRUE, return predictions and their confidence intervals;
-#' if FALSE, return only predictions.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,T_BART-method
-#' @exportMethod EstimateCate
 #' @import parallel
 setMethod(
   f = "EstimateCate",
@@ -240,11 +234,8 @@ setMethod(
 
 #' CateCI-T_BART
 #' @name CateCI-T_BART
-#' @rdname CateCI-T_BART
-#' @description Return the estimated CATE
-#' @param theObject A `T_BART` object.
+#' @rdname CateCI
 #' @inheritParams CateCI
-#' @return A vector of predicted CATE
 #' @aliases CateCI,T_BART-method
 #' @exportMethod CateCI
 setMethod(
@@ -359,15 +350,11 @@ setMethod(
   }
 )
 
-
-#' EstimateAllSampleStatistics-T_BART
 #' @name EstimateAllSampleStatistics-T_BART
-#' @rdname EstimateAllSampleStatistics-T_BART
-#' @description Return the estimated CATE
-#' @param theObject A "T_BART" object
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @aliases EstimateAllSampleStatistics,T_BART-method
+#' @rdname EstimateAllSampleStatistics
+#' @inherit EstimateAllSampleStatistics
 #' @exportMethod EstimateAllSampleStatistics
+#' @import stats
 setMethod(
   f = "EstimateAllSampleStatistics",
   signature = "T_BART",

@@ -76,16 +76,10 @@ MO_BART <-
 
 
 #' EstimateCate-MO_BART
-#' @name EstimateCate-MO_BART
-#' @rdname EstimateCate-MO_BART
-#' @description Return the estimated CATE
-#' @param theObject A `MO_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @param return_CI TRUE for predictions and confidence intervals FALSE for only
-#' predictions.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,MO_BART-method
+#' EstimateCate-M_BART
+#' @name EstimateCate-M_BART
+#' @rdname EstimateCate
+#' @inherit EstimateCate
 #' @exportMethod EstimateCate
 #' @import stats
 setMethod(

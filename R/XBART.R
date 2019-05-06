@@ -76,17 +76,14 @@ X_BART <-
 
 
 #' EstimateCate-X_BART
-#' @name EstimateCate-X_BART
-#' @rdname EstimateCate-X_BART
-#' @description Return the estimated CATE
+#' @name EstimateCate-S_BART
+#' @rdname EstimateCate
+#' @inherit EstimateCate
+#' @exportMethod EstimateCate
 #' @param theObject A `X_BART` object.
 #' @param feature_new A data frame.
 #' @param verbose TRUE for detailed output FALSE for no output
 #' @param return_CI TRUE for predictions and confidence intervals FALSE for only
-#' predictions.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,X_BART-method
-#' @exportMethod EstimateCate
 #' @import stats
 setMethod(
   f = "EstimateCate",
@@ -262,13 +259,7 @@ setMethod(
 
 #' CateCI-X_BART
 #' @name CateCI-X_BART
-#' @rdname CateCI-X_BART
-#' @description Return the estimated CATE
-#' @param theObject A `X_BART` object.
-#' @param feature_new A data frame.
-#' @param verbose TRUE for detailed output FALSE for no output. 
-#' (Should the training output be posted?)
-#' @return A vector of predicted CATE
+#' @rdname CateCI
 #' @aliases CateCI,X_BART-method
 #' @exportMethod CateCI
 setMethod(
@@ -292,11 +283,8 @@ setMethod(
 
 #' EstimateAllSampleStatistics-X_BART
 #' @name EstimateAllSampleStatistics-X_BART
-#' @rdname EstimateAllSampleStatistics-X_BART
-#' @description Return the estimated CATE
-#' @param theObject A `X_BART` object.
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @aliases EstimateAllSampleStatistics,X_BART-method
+#' @rdname EstimateAllSampleStatistics
+#' @inherit EstimateAllSampleStatistics
 #' @exportMethod EstimateAllSampleStatistics
 #' @import stats
 setMethod(

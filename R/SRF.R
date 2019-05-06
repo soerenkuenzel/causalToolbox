@@ -200,12 +200,8 @@ S_RF_fully_specified <-
 ############################
 #' EstimateCate-S_hRF
 #' @name EstimateCate-S_RF
-#' @rdname EstimateCate-S_RF
-#' @description Return the estimated CATE
-#' @param theObject A `S_hRF` object.
-#' @param feature_new A data frame.
-#' @return A vector of predicted CATE
-#' @aliases EstimateCate,S_RF-method
+#' @rdname EstimateCate
+#' @inherit EstimateCate
 #' @exportMethod EstimateCate
 setMethod(
   f = "EstimateCate",
