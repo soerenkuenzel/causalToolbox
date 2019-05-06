@@ -48,6 +48,10 @@ X_BART <-
       bart_function <- function(...) {
         BayesTree::bart(...)
       }
+    } else if (tree_package == "BART") {
+      bart_function <- function(...) {
+        BART::mc.wbart(...)
+      }
     } else{
       stop("tree_package must be either BayesTree or dbarts")
     }

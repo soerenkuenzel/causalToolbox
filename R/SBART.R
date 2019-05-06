@@ -21,7 +21,7 @@ setClass(
 #' @rdname S_BART
 #' @description This is an implementation of S_BART
 #' @param um.bart 
-#' @param ndpost TODO: Add description
+#' @param ndpost The number of posterior draws
 #' @param sample_stat TODO: Add description
 #' @param tree_package Package used to create a tree
 #' @param ntree Number of trees to grow
@@ -205,6 +205,19 @@ get_pred_mat <- function(theObject, feature_new, verbose, ndpost) {
   } else if (theObject@tree_package == "dbarts") {
     pred_matrix <-
       dbarts::bart(
+        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
+        y.train = theObject@yobs_train,
+        x.test = cbind(rbind(feature_new, feature_new),
+                       tr = c(
+                         rep(0, n_feature_new), rep(1, n_feature_new)
+                       )),
+        verbose = verbose,
+        ndpost = ndpost,
+        ntree = theObject@ntree
+      )$yhat.test
+  } else if (theObject@tree_package == "BART"){
+    pred_matrix <-
+      BART::mc.wbart(
         x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
         y.train = theObject@yobs_train,
         x.test = cbind(rbind(feature_new, feature_new),

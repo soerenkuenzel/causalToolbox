@@ -17,7 +17,7 @@ S_BART(feat, tr, yobs, verbose = TRUE, ndpost = 1200,
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 
-\item{ndpost}{TODO: Add description}
+\item{ndpost}{The number of posterior draws}
 
 \item{sample_stat}{TODO: Add description}
 
