@@ -23,13 +23,10 @@ packageVersion("causalToolbox")
 
 # create example data set
 simulated_experiment <- simulate_causal_experiment(
-ntrain = 1000,
-ntest = 1000,
-dim = 10,
-setup = "complexTau",
-testseed = 293901,
-trainseed = 307017
-)
+    ntrain = 1000,
+    ntest = 1000,
+    dim = 10)
+    
 feature_train <- simulated_experiment$feat_tr
 w_train <- simulated_experiment$W_tr
 yobs_train <- simulated_experiment$Yobs_tr
