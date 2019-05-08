@@ -2,32 +2,115 @@
 % Please edit documentation in R/TBART.R
 \name{T_BART}
 \alias{T_BART}
-\title{T_BART}
+\title{T-Learner with BART}
 \usage{
-T_BART(feat, tr, yobs, ndpost = 1200,
-  sample_stat = "counterfactuals estimated", tree_package = "BART",
-  ntree = 200, nthread = 1, verbose = FALSE)
+T_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
+  verbose = FALSE, mu0.BART = list(sparse = FALSE, theta = 0, omega =
+  1, a = 0.5, b = 1, augment = FALSE, rho = NULL, usequants = FALSE, cont =
+  FALSE, sigest = NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base =
+  0.95, sigmaf = NA, lambda = NA, numcut = 100L, nskip = 100L),
+  mu1.BART = list(sparse = FALSE, theta = 0, omega = 1, a = 0.5, b = 1,
+  augment = FALSE, rho = NULL, usequants = FALSE, cont = FALSE, sigest =
+  NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base = 0.95, sigmaf =
+  NA, lambda = NA, numcut = 100L, nskip = 100L))
 }
 \arguments{
-\item{feat}{A feature data.frame.}
+\item{feat}{A data frame containing the features.}
 
-\item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A numeric vector with 0 for control and 1 for treated variables.}
 
-\item{yobs}{A vector of the observed outcome.}
+\item{yobs}{A numeric vector containing the observed outcomes.}
 
 \item{ndpost}{Number of posterior draws}
 
-\item{sample_stat}{TODO: Add Description}
+\item{ntree}{Number of trees}
 
-\item{tree_package}{Package used to create a tree}
+\item{nthread}{Number of threads which should be used to work in parallel.}
 
-\item{ntree}{Number of trees to grow}
+\item{verbose}{TRUE for detailed output FALSE for no output:}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{mu0.BART, mu1.BART}{hyperparameters of the BART functions for the
+control and treated group. Use \code{?BART::mc.wbart} for a detailed 
+explanation of their effects.}
 }
 \value{
-A `T_BART` object.
+Object of class \code{T_BART}. It should be used with one of the 
+  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+  \item{\code{feature_train}}{A copy of feat.}
+  \item{\code{tr_train}}{A copy of tr.}
+  \item{\code{yobs_train}}{A copy of yobs.}
+  \item{\code{ntree}}{Number of trees.}
+  \item{\code{nthread}}{Number of threads to use in parallel.}
+  \item{\code{creator}}{Function that creates another T-BART estimator.}
 }
 \description{
-This is an implementation of T_BART
+This is an implementation of the T-learner combined with BART
 }
+\details{
+The T-Learner with BART 
+\enumerate{
+ \item
+    Estimate the response functions 
+    \deqn{\mu_0(x) = E[Y(0) | X = x]}
+    \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+    using the BART package with the hyperparameters specified in
+    \code{mu0.BART} and \code{mu1.BART} and denote the estimates as \eqn{\hat
+    \mu_0} and \eqn{\hat \mu_1}.
+ \item 
+    Define the CATE estimate as
+    \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
+}
+}
+\examples{
+require(causalToolbox)
+
+# create example data set
+simulated_experiment <- simulate_causal_experiment(
+  ntrain = 1000,
+  ntest = 1000,
+  dim = 10
+)
+feat <- simulated_experiment$feat_tr
+tr <- simulated_experiment$W_tr
+yobs <- simulated_experiment$Yobs_tr
+feature_test <- simulated_experiment$feat_te
+
+# create the hte object using honest Random Forests (RF)
+xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
+sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
+
+cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
+
+# evaluate the performance
+cate_true <- simulated_experiment$tau_te
+mean((cate_esti_xrf - cate_true) ^ 2)
+\dontrun{
+# Create confidence intervals via bootstrapping. 
+xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
+}
+}
+\references{
+\itemize{
+  \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+    Meta-learners for estimating heterogeneous treatment effects using
+    machine learning. 
+    \url{https://arxiv.org/pdf/1706.03461.pdf}
+  \item 
+    Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
+    Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
+    \url{https://arxiv.org/pdf/1811.02833.pdf}
+  \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
+    Jasjeet Sekhon, and Pieter Abbeel (2018). 
+    Transfer learning for estimating causal effects using neural networks. 
+    \url{https://arxiv.org/pdf/1808.07804.pdf}
+  }
+}
+\seealso{
+Other metalearners: \code{\link{S_BART}},
+  \code{\link{S_RF}}, \code{\link{T_RF}},
+  \code{\link{X_RF}}
+}
+\concept{metalearners}

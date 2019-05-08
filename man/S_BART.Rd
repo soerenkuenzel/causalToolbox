@@ -101,6 +101,7 @@ feature_test <- simulated_experiment$feat_te
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
 
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
@@ -129,7 +130,8 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{S_RF}}, \code{\link{T_RF}},
+Other metalearners: \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{T_RF}},
   \code{\link{X_RF}}
 }
 \concept{metalearners}

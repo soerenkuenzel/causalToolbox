@@ -13,38 +13,99 @@ setClass(
     tr_train = "numeric",
     yobs_train = "numeric",
     ndpost = "numeric",
-    sample_stat = "character",
-    tree_package = "character",
     ntree = "numeric",
     nthread = "numeric",
+    mu0.BART = "list", 
+    mu1.BART = "list",
     creator = "function"
   )
 )
 
-#' @title T_BART
-#' @rdname T_BART
-#' @description This is an implementation of T_BART
-#' @param feat A feature data.frame.
-#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
-#' @param yobs A vector of the observed outcome.
-#' @param verbose TRUE for detailed output FALSE for no output
+
+# T_BART generator -------------------------------------------------------------
+#' @title T-Learner with BART
+#' @details 
+#' The T-Learner with BART 
+#' \enumerate{
+#'  \item
+#'     Estimate the response functions 
+#'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
+#'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+#'     using the BART package with the hyperparameters specified in
+#'     \code{mu0.BART} and \code{mu1.BART} and denote the estimates as \eqn{\hat
+#'     \mu_0} and \eqn{\hat \mu_1}.
+#'  \item 
+#'     Define the CATE estimate as
+#'     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
+#' }
+#' @description This is an implementation of the T-learner combined with BART
+#' @return Object of class \code{T_BART}. It should be used with one of the 
+#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
+#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#'   \item{\code{feature_train}}{A copy of feat.}
+#'   \item{\code{tr_train}}{A copy of tr.}
+#'   \item{\code{yobs_train}}{A copy of yobs.}
+#'   \item{\code{ntree}}{Number of trees.}
+#'   \item{\code{nthread}}{Number of threads to use in parallel.}
+#'   \item{\code{creator}}{Function that creates another T-BART estimator.}
 #' @param ndpost Number of posterior draws
-#' @param sample_stat TODO: Add Description
-#' @param tree_package Package used to create a tree
-#' @param ntree Number of trees to grow
-#' @return A `T_BART` object.
-#' @export T_BART
-#' @import methods
+#' @param ntree Number of trees
+#' @param mu0.BART,mu1.BART hyperparameters of the BART functions for the
+#'   control and treated group. Use \code{?BART::mc.wbart} for a detailed 
+#'   explanation of their effects.
+#' @inherit X_RF
+#' @family metalearners
+#' @export
 T_BART <-
   function(feat,
            tr,
            yobs,
            ndpost = 1200,
-           sample_stat = "counterfactuals estimated",
-           tree_package = "BART",
            ntree = 200,
            nthread = 1,
-           verbose = FALSE) {
+           verbose = FALSE, 
+           mu0.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           ), 
+           mu1.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           )) {
     feat <- as.data.frame(feat)
     
     new(
@@ -53,19 +114,19 @@ T_BART <-
       tr_train = tr,
       yobs_train = yobs,
       ndpost = ndpost,
-      sample_stat = sample_stat,
-      tree_package = tree_package,
       ntree = ntree,
       nthread = nthread,
+      mu0.BART = mu0.BART, 
+      mu1.BART = mu1.BART,
       creator = function(feat, tr, yobs) {
         T_BART(feat,
                tr,
                yobs,
                ndpost = ndpost,
-               sample_stat = sample_stat,
-               tree_package = tree_package,
                ntree = ntree,
-               nthread = nthread)
+               nthread = nthread,
+               mu0.BART = mu0.BART, 
+               mu1.BART = mu1.BART)
       }
     )
   }
@@ -124,33 +185,67 @@ setMethod(
     if (is.data.frame(X_1) && nrow(X_1) == 0) {
       stop('There is no feature in the treatment group (labelled 1).')
     }
+
+    pred_matrix_f_0 <- BART::mc.wbart(
+      x.train = X_0,
+      y.train = yobs_0,
+      x.test =  feature_new,
+      ndpost = ndpost,
+      ntree = theObject@ntree,
+      mc.cores = nthread, 
+      sparse =    theObject@mu0.BART$sparse,
+      theta =     theObject@mu0.BART$theta,
+      omega =     theObject@mu0.BART$omega,
+      a =         theObject@mu0.BART$a,
+      b =         theObject@mu0.BART$b,
+      augment =   theObject@mu0.BART$augment,
+      rho =       theObject@mu0.BART$rho,
+      usequants = theObject@mu0.BART$usequants,
+      cont =      theObject@mu0.BART$cont,
+      sigest =    theObject@mu0.BART$sigest,
+      sigdf =     theObject@mu0.BART$sigdf,
+      sigquant =  theObject@mu0.BART$sigquant,
+      k =         theObject@mu0.BART$k,
+      power =     theObject@mu0.BART$power,
+      base =      theObject@mu0.BART$base,
+      sigmaf =    theObject@mu0.BART$sigmaf,
+      lambda =    theObject@mu0.BART$lambda,
+      numcut =    theObject@mu0.BART$numcut,
+      nskip =     theObject@mu0.BART$nskip
+    )$yhat.test
     
-    if (theObject@tree_package == "BART"){
-      pred_matrix_f_0 <- BART::mc.wbart(
-        x.train = X_0,
-        y.train = yobs_0,
-        x.test =  feature_new,
-        ndpost = ndpost,
-        ntree = theObject@ntree,
-        mc.cores = nthread
-      )$yhat.test
-      
-      mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
-      
-      pred_matrix_f_1 <- BART::mc.wbart(
-        x.train = X_1,
-        y.train = yobs_1,
-        x.test =  feature_new,
-        ndpost = ndpost,
-        ntree = theObject@ntree,
-        mc.cores = nthread
-      )$yhat.test
-      
-      mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
-    } else{
-      stop("tree_package must be BART")
-    }
-    ############################################################################
+    mu_hat_0 <- apply(pred_matrix_f_0, 2, mean)
+    
+    pred_matrix_f_1 <- BART::mc.wbart(
+      x.train = X_1,
+      y.train = yobs_1,
+      x.test =  feature_new,
+      ndpost = ndpost,
+      ntree = theObject@ntree,
+      mc.cores = nthread, 
+      sparse =    theObject@mu1.BART$sparse,
+      theta =     theObject@mu1.BART$theta,
+      omega =     theObject@mu1.BART$omega,
+      a =         theObject@mu1.BART$a,
+      b =         theObject@mu1.BART$b,
+      augment =   theObject@mu1.BART$augment,
+      rho =       theObject@mu1.BART$rho,
+      usequants = theObject@mu1.BART$usequants,
+      cont =      theObject@mu1.BART$cont,
+      sigest =    theObject@mu1.BART$sigest,
+      sigdf =     theObject@mu1.BART$sigdf,
+      sigquant =  theObject@mu1.BART$sigquant,
+      k =         theObject@mu1.BART$k,
+      power =     theObject@mu1.BART$power,
+      base =      theObject@mu1.BART$base,
+      sigmaf =    theObject@mu1.BART$sigmaf,
+      lambda =    theObject@mu1.BART$lambda,
+      numcut =    theObject@mu1.BART$numcut,
+      nskip =     theObject@mu1.BART$nskip
+    )$yhat.test
+    
+    mu_hat_1 <- apply(pred_matrix_f_1, 2, mean)
+
     predictions <- mu_hat_1 - mu_hat_0
     
     if (return_CI) {
@@ -228,31 +323,47 @@ setMethod(
         x = X_0
         y = yobs_0
         x_to_predict = feature_new
+        parameters = theObject@mu0.BART
       } else if (this_learner == "l_first_1") {
         x = X_1
         y = yobs_1
         x_to_predict = feature_new
+        parameters = theObject@mu1.BART
       }
       
-      x_to_predict_subset <- split(x_to_predict, rep(x = 1:nthread,
-                                                     times = get_CV_sizes(
-                                                       nrow(x_to_predict),
-                                                      nthread)))
-
- 
-      if (theObject@tree_package == "BART"){
-        pred_matrix <- BART::mc.wbart(
-            x.train = x,
-            y.train = y,
-            x.test =  x_to_predict,
-            verbose = verbose,
-            ndpost = ndpost,
-            ntree = theObject@ntree,
-            mc.cores = nthread
-          )$yhat.test
-      } else {
-        stop("tree_package must be BART")
-      }
+      # x_to_predict_subset <- split(x_to_predict, rep(x = 1:nthread,
+      #                                                times = get_CV_sizes(
+      #                                                  nrow(x_to_predict),
+      #                                                 nthread)))
+      
+      pred_matrix <- BART::mc.wbart(
+        x.train = x,
+        y.train = y,
+        x.test =  x_to_predict,
+        ndpost = ndpost,
+        ntree = theObject@ntree,
+        mc.cores = nthread,
+        sparse =    parameters$sparse,
+        theta =     parameters$theta,
+        omega =     parameters$omega,
+        a =         parameters$a,
+        b =         parameters$b,
+        augment =   parameters$augment,
+        rho =       parameters$rho,
+        usequants = parameters$usequants,
+        cont =      parameters$cont,
+        sigest =    parameters$sigest,
+        sigdf =     parameters$sigdf,
+        sigquant =  parameters$sigquant,
+        k =         parameters$k,
+        power =     parameters$power,
+        base =      parameters$base,
+        sigmaf =    parameters$sigmaf,
+        lambda =    parameters$lambda,
+        numcut =    parameters$numcut,
+        nskip =     parameters$nskip
+      )$yhat.test
+      
 
       output[[this_learner]] <- apply(pred_matrix, 2, mean)
       CI[[this_learner]] <-
@@ -288,40 +399,86 @@ setMethod(
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
-    sample_stat <- theObject@sample_stat
     nthread <- theObject@nthread
-    feat_subset <- split(feat, rep(x = 1:nthread,
-                                   times = get_CV_sizes(nrow(feat), nthread)))
+    # feat_subset <- split(feat, rep(x = 1:nthread,
+    #                                times = get_CV_sizes(nrow(feat), nthread)))
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0, ]
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
     
-
-    if (theObject@tree_package == "BART"){
-      mu_hat_0_MCMC_samples <- BART::mc.wbart(
-          x.train = X_0,
-          y.train = yobs_0,
-          x.test =  feat,
-          verbose = verbose,
-          ndpost = ndpost,
-          ntree = theObject@ntree,
-          mc.cores = nthread
-        )$yhat.test
+    # mu_hat_0_MCMC_samples <- BART::mc.wbart(
+    #     x.train = X_0,
+    #     y.train = yobs_0,
+    #     x.test =  feat,
+    #     ndpost = ndpost,
+    #     ntree = theObject@ntree,
+    #     mc.cores = nthread
+    #   )$yhat.test
+    # 
+    # mu_hat_1_MCMC_samples <- BART::mc.wbart(
+    #     x.train = X_1,
+    #     y.train = yobs_1,
+    #     x.test =  feat,
+    #     ndpost = ndpost,
+    #     ntree = theObject@ntree,
+    #     mc.cores = nthread
+    #   )$yhat.test
+    mu_hat_0_MCMC_samples <- BART::mc.wbart(
+      x.train = X_0,
+      y.train = yobs_0,
+      x.test =  feat,
+      ndpost = ndpost,
+      ntree = theObject@ntree,
+      mc.cores = nthread, 
+      sparse =    theObject@mu0.BART$sparse,
+      theta =     theObject@mu0.BART$theta,
+      omega =     theObject@mu0.BART$omega,
+      a =         theObject@mu0.BART$a,
+      b =         theObject@mu0.BART$b,
+      augment =   theObject@mu0.BART$augment,
+      rho =       theObject@mu0.BART$rho,
+      usequants = theObject@mu0.BART$usequants,
+      cont =      theObject@mu0.BART$cont,
+      sigest =    theObject@mu0.BART$sigest,
+      sigdf =     theObject@mu0.BART$sigdf,
+      sigquant =  theObject@mu0.BART$sigquant,
+      k =         theObject@mu0.BART$k,
+      power =     theObject@mu0.BART$power,
+      base =      theObject@mu0.BART$base,
+      sigmaf =    theObject@mu0.BART$sigmaf,
+      lambda =    theObject@mu0.BART$lambda,
+      numcut =    theObject@mu0.BART$numcut,
+      nskip =     theObject@mu0.BART$nskip
+    )$yhat.test
     
-      mu_hat_1_MCMC_samples <- BART::mc.wbart(
-          x.train = X_1,
-          y.train = yobs_1,
-          x.test =  feat,
-          verbose = verbose,
-          ndpost = ndpost,
-          ntree = theObject@ntree,
-          mc.cores = nthread
-        )$yhat.test
-      
-    } else{
-      stop("tree_package must be BART")
-    }
+    mu_hat_1_MCMC_samples <- BART::mc.wbart(
+      x.train = X_1,
+      y.train = yobs_1,
+      x.test =  feat,
+      ndpost = ndpost,
+      ntree = theObject@ntree,
+      mc.cores = nthread, 
+      sparse =    theObject@mu1.BART$sparse,
+      theta =     theObject@mu1.BART$theta,
+      omega =     theObject@mu1.BART$omega,
+      a =         theObject@mu1.BART$a,
+      b =         theObject@mu1.BART$b,
+      augment =   theObject@mu1.BART$augment,
+      rho =       theObject@mu1.BART$rho,
+      usequants = theObject@mu1.BART$usequants,
+      cont =      theObject@mu1.BART$cont,
+      sigest =    theObject@mu1.BART$sigest,
+      sigdf =     theObject@mu1.BART$sigdf,
+      sigquant =  theObject@mu1.BART$sigquant,
+      k =         theObject@mu1.BART$k,
+      power =     theObject@mu1.BART$power,
+      base =      theObject@mu1.BART$base,
+      sigmaf =    theObject@mu1.BART$sigmaf,
+      lambda =    theObject@mu1.BART$lambda,
+      numcut =    theObject@mu1.BART$numcut,
+      nskip =     theObject@mu1.BART$nskip
+    )$yhat.test
     
     return(
       compute_sample_statistics(
@@ -331,7 +488,7 @@ setMethod(
         feat = feat,
         tr = tr,
         yobs = yobs,
-        sample_stat = sample_stat
+        sample_stat = "counterfactuals estimated"
       )
     )
   }
