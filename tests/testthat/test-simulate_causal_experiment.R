@@ -2,6 +2,7 @@ library(testthat)
 test_that("Test causal experiment creator", {
   context('causal experiment creator')
   
+  
   ce <- simulate_causal_experiment(
     ntrain = 20,
     ntest = 20,
@@ -17,7 +18,7 @@ test_that("Test causal experiment creator", {
   ) 
   
   expect_equal(ce$Yobs_tr[1:10], 
-               c(-71.628878, -4.562855, -82.279931, 59.705728, -22.144589, 
-                 7.685433, 65.266380, 118.229187, 1.079148, 25.941377))
+               c(-24.939932, -10.492052, -16.162362, 9.945661, -6.344967, 
+                 -104.458783, 37.289647, 27.835309, 41.925713, 112.604875))
   
 })

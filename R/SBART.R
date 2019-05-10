@@ -1,4 +1,4 @@
-#'@import dbarts
+#'@import BART
 #'@include CATE_estimators.R
 
 

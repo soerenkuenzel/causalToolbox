@@ -4,31 +4,137 @@
 \alias{X_BART}
 \title{X_BART}
 \usage{
-X_BART(feat, tr, yobs, ensemble = "pscore", ndpost = 1200,
-  tree_package = "dbarts", ntree = 200)
+X_BART(feat, tr, yobs, predmode = "pscore", ndpost = 1200,
+  ntree = 200, mu.BART = list(sparse = FALSE, theta = 0, omega = 1, a =
+  0.5, b = 1, augment = FALSE, rho = NULL, usequants = FALSE, cont = FALSE,
+  sigest = NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base = 0.95,
+  sigmaf = NA, lambda = NA, numcut = 100L, nskip = 100L),
+  tau.BART = list(sparse = FALSE, theta = 0, omega = 1, a = 0.5, b = 1,
+  augment = FALSE, rho = NULL, usequants = FALSE, cont = FALSE, sigest =
+  NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base = 0.95, sigmaf =
+  NA, lambda = NA, numcut = 100L, nskip = 100L), e.BART = list(sparse =
+  FALSE, theta = 0, omega = 1, a = 0.5, b = 1, augment = FALSE, rho = NULL,
+  usequants = FALSE, cont = FALSE, sigest = NA, sigdf = 3, sigquant = 0.9,
+  k = 2, power = 2, base = 0.95, sigmaf = NA, lambda = NA, numcut = 100L,
+  nskip = 100L))
 }
 \arguments{
-\item{feat}{A feature data frame.}
+\item{feat}{A data frame containing the features.}
 
-\item{tr}{A vector of treatment assignment 0 for control and 1 for treatment.}
+\item{tr}{A numeric vector with 0 for control and 1 for treated variables.}
 
-\item{yobs}{A vector of all the observed outcomes.}
+\item{yobs}{A numeric vector containing the observed outcomes.}
 
-\item{ensemble}{TODO: Add Description}
+\item{predmode}{Specifies how the two estimators of the second stage should 
+be aggregated. Possible types are "propmean", "control" and "treated". 
+The default is "propmean" which refers to propensity score weighting.}
 
-\item{ndpost}{TODO: Add Description}
+\item{ndpost}{Number of posterior draws}
 
-\item{tree_package}{Package used to create tree.}
+\item{ntree}{Number of trees}
 
-\item{ntree}{Number of trees to grow.}
+\item{mu.BART, tau.BART, e.BART}{hyperparameters of the BART functions for the
+estimates of the first and second stage and the propensity score. Use
+\code{?BART::mc.wbart} for a detailed explanation of their effects.}
 }
 \value{
-A `X_BART` object.
+An object from a class that is derived from the \code{CATE-estimator}
+  class. It should be used with one of the following functions
+  \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
+  and \code{EstimateAllSampleStatistics}. The object has at least the
+  following slots:
+  \item{\code{feature_train}}{A copy of feat.}
+  \item{\code{tr_train}}{A copy of tr.}
+  \item{\code{yobs_train}}{A copy of yobs.}
+  \item{\code{creator}}{Function call that creates the CATE estimator. This
+  is used for different bootstrap procedures.}
 }
 \description{
 This is an implementation of X_BART
 }
+\details{
+The X-Learner estimates the CATE in three steps:
+\enumerate{
+ \item
+    Estimate the response functions 
+    \deqn{\mu_0(x) = E[Y(0) | X = x]}
+    \deqn{\mu_1(x) = E[Y(1) | X = x]} 
+    using the base learner and denote the estimates as \eqn{\hat \mu_0} and
+    \eqn{\hat \mu_1}.
+ \item
+    Impute the treatment effects for the individuals in the treated group,
+    based on the control outcome estimator, and the treatment effects for the
+    individuals in the control group, based on the treatment outcome
+    estimator, that is,
+    \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
+    \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
+    Now employ the base learner in two ways: using \eqn{D^1_i} as the
+    dependent variable to obtain \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i}
+    as the dependent variable to obtain \eqn{\hat \tau_0(x)}.
+ \item 
+    Define the CATE estimate by a weighted average of the two estimates at
+    Stage 2: 
+    \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
+    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where
+    \eqn{e(x)} is an estimate of the propensity score using the 
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
+    forest version with the hyperparameters specified in \code{e.forestry}.
+    If \code{predmode = "control"}, then \eqn{g(x) = 1} and if 
+    \code{predmode = "treated"}, then \eqn{g(x) = 0}.
+}
+}
+\examples{
+require(causalToolbox)
+
+# create example data set
+simulated_experiment <- simulate_causal_experiment(
+  ntrain = 1000,
+  ntest = 1000,
+  dim = 10
+)
+feat <- simulated_experiment$feat_tr
+tr <- simulated_experiment$W_tr
+yobs <- simulated_experiment$Yobs_tr
+feature_test <- simulated_experiment$feat_te
+
+# create the hte object using honest Random Forests (RF)
+xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
+sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
+
+cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
+
+# evaluate the performance
+cate_true <- simulated_experiment$tau_te
+mean((cate_esti_xrf - cate_true) ^ 2)
+\dontrun{
+# Create confidence intervals via bootstrapping. 
+xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
+}
+}
+\references{
+\itemize{
+  \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+    Meta-learners for estimating heterogeneous treatment effects using
+    machine learning. 
+    \url{https://arxiv.org/pdf/1706.03461.pdf}
+  \item 
+    Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
+    Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
+    \url{https://arxiv.org/pdf/1811.02833.pdf}
+  \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
+    Jasjeet Sekhon, and Pieter Abbeel (2018). 
+    Transfer learning for estimating causal effects using neural networks. 
+    \url{https://arxiv.org/pdf/1808.07804.pdf}
+  }
+}
 \seealso{
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_BART}}, \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{T_RF}},
+  \code{\link{X_RF}}
+
 Other metalearners: \code{\link{MO_BART}},
   \code{\link{S_BART}}, \code{\link{S_RF}},
   \code{\link{T_BART}}, \code{\link{T_RF}},

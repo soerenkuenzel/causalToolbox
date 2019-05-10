@@ -9,7 +9,7 @@ test_that("Tests that TRF is working correctly", {
 
   tl <- T_RF(feat = feat, tr = tr, yobs = yobs)
   EstimateCate(tl, feat)[1]
-  expect_equal(EstimateCate(tl, feat)[1], 0.004849434, tolerance = 1e-2)
+  expect_equal(EstimateCate(tl, feat)[1], 0.1143112, tolerance = 1e-2)
 
   set.seed(432)
   cate_problem <-
@@ -38,5 +38,5 @@ test_that("Tests that TRF is working correctly", {
   expect_output(smp_stats <- EstimateAllSampleStatistics(tl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
   # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 0.4207244, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], 1.252301, tolerance = 1e-1)
 })

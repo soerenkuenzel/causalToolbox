@@ -11,7 +11,7 @@ test_that("Tests that XhRF is working correctly", {
                            tr = tr,
                            yobs = yobs))
   EstimateCate(xl, feat)[1]
-  expect_equal(EstimateCate(xl, feat)[1], 0.0533342, tolerance = 1e-2)
+  expect_equal(EstimateCate(xl, feat)[1], 0.07867132, tolerance = 1e-2)
 
   set.seed(432)
   cate_problem <-
@@ -37,5 +37,6 @@ test_that("Tests that XhRF is working correctly", {
   expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
   # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
   # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], -0.03804457, tolerance = 1e-1)
+  expect_equal(smp_stats$SATE[1, 2], 0.929466, tolerance = 1e-1)
 })
+

@@ -9,10 +9,15 @@ setClass(
     feature_train = "data.frame",
     tr_train = "numeric",
     yobs_train = "numeric",
-    ensemble = "character",
+    predmode = "character",
     ndpost = "numeric",
-    bart_function = "function",
     ntree = "numeric",
+    nthread = "numeric",
+    mu0.BART = "list", 
+    mu1.BART = "list",
+    tau0.BART = "list", 
+    tau1.BART = "list",
+    e.BART = "list",
     creator = "function"
   )
 )
@@ -20,61 +25,110 @@ setClass(
 #' @title X_BART
 #' @rdname X_BART
 #' @description This is an implementation of X_BART
-#' @param feat A feature data frame.
-#' @param tr A vector of treatment assignment 0 for control and 1 for treatment.
-#' @param yobs A vector of all the observed outcomes.
-#' @param ensemble TODO: Add Description
-#' @param ndpost TODO: Add Description
-#' @param tree_package Package used to create tree. 
-#' @param ntree Number of trees to grow. 
-#' @return A `X_BART` object.
-#' @export X_BART
+#' @param mu.BART,tau.BART,e.BART hyperparameters of the BART functions for the
+#'   estimates of the first and second stage and the propensity score. Use
+#'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
+#' @inherit X_RF
+#' @inheritParams T_BART
 #' @family metalearners
 #' @import methods
+#' @family metalearners
+#' @export 
 X_BART <-
   function(feat,
            tr,
            yobs,
-           ensemble = "pscore",
+           predmode = "pscore",
            ndpost = 1200,
-           tree_package = "dbarts",
-           ntree = 200) {
+           ntree = 200,
+           mu.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           ),
+           tau.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           ),
+           e.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           )) {
     feat <- as.data.frame(feat)
-
-    if (tree_package == "dbarts") {
-      bart_function <- function(...) {
-        dbarts::bart(...)
-      }
-    } else if (tree_package == "BayesTree") {
-      bart_function <- function(...) {
-        BayesTree::bart(...)
-      }
-    } else if (tree_package == "BART") {
-      bart_function <- function(...) {
-        BART::mc.wbart(...)
-      }
-    } else{
-      stop("tree_package must be either BayesTree or dbarts")
-    }
-
-
     new(
       "X_BART",
       feature_train = feat,
       tr_train = tr,
       yobs_train = yobs,
-      ensemble = ensemble,
+      predmode = predmode,
       ndpost = ndpost,
-      bart_function = bart_function,
       ntree = ntree,
+      nthread = nthread,
+      mu0.BART = mu.BART, 
+      mu1.BART = mu.BART,
+      tau0.BART = tau.BART, 
+      tau1.BART = tau.BART,
+      e.BART = e.BART,
       creator = function(feat, tr, yobs) {
         X_BART(feat,
                tr,
                yobs,
-               ensemble = ensemble,
+               predmode = predmode,
                ndpost = ndpost,
-               tree_package = tree_package,
-               ntree = ntree)
+               ntree = ntree, 
+               mu.BART = mu.BART,
+               tau.BART = tau.BART, 
+               e.BART = e.BART)
       }
     )
   }
@@ -98,12 +152,12 @@ setMethod(
                         verbose = FALSE,
                         return_CI = FALSE)
   {
-    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; feature_new = feat[1:5,]; ensemble = "pscore"
+    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; feature_new = feat[1:5,]; predmode = "pscore"
     yobs <- theObject@yobs_train
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     ndpost <- theObject@ndpost
-    ensemble <- theObject@ensemble
+    predmode <- theObject@predmode
 
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0, ]
@@ -187,7 +241,7 @@ setMethod(
     ### Combining the two ######################################################
     ############################################################################
 
-    if(ensemble == "pscore"){
+    if(predmode == "pscore"){
       prop_matrix <- theObject@bart_function(
         x.train = feat,
         y.train = factor(tr),
@@ -200,15 +254,15 @@ setMethod(
       g_weights <- pnorm(apply(prop_matrix, 2, mean))
       if (verbose)
         print("Done with the propensity score estimation.")
-    }else if(ensemble == "1/2"){
+    }else if(predmode == "1/2"){
       g_weights <- 1/2
-    }else if(ensemble == "constant p-score"){
+    }else if(predmode == "constant p-score"){
       g_weights <- sum(tr) / length(tr)
-    }else if(ensemble == "only control"){
+    }else if(predmode == "only control"){
       g_weights <- 0
-    }else if(ensemble == "only treated"){
+    }else if(predmode == "only treated"){
       g_weights <- 1
-    }else if(ensemble == "variance"){
+    }else if(predmode == "variance"){
       var_s_0 <- apply(pred_matrix_s_0, 2, var) / ndpost
       var_s_1 <- apply(pred_matrix_s_1, 2, var) / ndpost
       g_weights <- var_s_1 / (var_s_1 + var_s_0)
@@ -302,7 +356,7 @@ setMethod(
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     ndpost <- theObject@ndpost
-    ensemble <- theObject@ensemble
+    predmode <- theObject@predmode
 
     yobs_0 <- yobs[tr == 0]
     X_0 <- feat[tr == 0, ]
@@ -381,7 +435,7 @@ setMethod(
     ### Combining the two ######################################################
     ############################################################################
 
-    if(ensemble == "pscore"){
+    if(predmode == "pscore"){
       prop_matrix <- theObject@bart_function(
         x.train = feat,
         y.train = factor(tr),
@@ -394,15 +448,15 @@ setMethod(
       g_weights <- pnorm(apply(prop_matrix, 2, mean))
       if (verbose)
         print("Done with the propensity score estimation.")
-    }else if(ensemble == "1/2"){
+    }else if(predmode == "1/2"){
       g_weights <- 1/2
-    }else if(ensemble == "constant p-score"){
+    }else if(predmode == "constant p-score"){
       g_weights <- sum(tr) / length(tr)
-    }else if(ensemble == "only control"){
+    }else if(predmode == "only control"){
       g_weights <- 0
-    }else if(ensemble == "only treated"){
+    }else if(predmode == "only treated"){
       g_weights <- 1
-    }else if(ensemble == "variance"){
+    }else if(predmode == "variance"){
       var_s_0 <- apply(pred_matrix_s_0, 2, var) / ndpost
       var_s_1 <- apply(pred_matrix_s_1, 2, var) / ndpost
       g_weights <- var_s_1 / (var_s_1 + var_s_0)

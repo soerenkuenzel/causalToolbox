@@ -41,17 +41,14 @@ setClass(
 # X_RF generator ---------------------------------------------------------------
 #' @title X-Learner with honest RF
 #' @details 
-#' The X-Learner with random forest estimates the CATE following the following three
-#' stages.
+#' The X-Learner estimates the CATE in three steps:
 #' \enumerate{
 #'  \item
 #'     Estimate the response functions 
 #'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
 #'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-#'     using the
-#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-#'     forest version with the hyperparameters specified in \code{mu.forestry}
-#'     and denote the estimates as \eqn{\hat \mu_0} and \eqn{\hat \mu_1}.
+#'     using the base learner and denote the estimates as \eqn{\hat \mu_0} and
+#'     \eqn{\hat \mu_1}.
 #'  \item
 #'     Impute the treatment effects for the individuals in the treated group,
 #'     based on the control outcome estimator, and the treatment effects for the
@@ -59,12 +56,9 @@ setClass(
 #'     estimator, that is,
 #'     \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
 #'     \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
-#'     Now employ the
-#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-#'     forest version with the hyperparameters specified in \code{tau.forestry}
-#'     in two ways: using \eqn{D^1_i} as the dependent variable to obtain
-#'     \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
-#'     obtain \eqn{\hat \tau_0(x)}.
+#'     Now employ the base learner in two ways: using \eqn{D^1_i} as the
+#'     dependent variable to obtain \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i}
+#'     as the dependent variable to obtain \eqn{\hat \tau_0(x)}.
 #'  \item 
 #'     Define the CATE estimate by a weighted average of the two estimates at
 #'     Stage 2: 
