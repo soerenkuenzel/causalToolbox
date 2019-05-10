@@ -24,35 +24,14 @@ setClass(
 
 # T_BART generator -------------------------------------------------------------
 #' @title T-Learner with BART
-#' @details 
-#' The T-Learner with BART 
-#' \enumerate{
-#'  \item
-#'     Estimate the response functions 
-#'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
-#'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-#'     using the BART package with the hyperparameters specified in
-#'     \code{mu0.BART} and \code{mu1.BART} and denote the estimates as \eqn{\hat
-#'     \mu_0} and \eqn{\hat \mu_1}.
-#'  \item 
-#'     Define the CATE estimate as
-#'     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
-#' }
-#' @description This is an implementation of the T-learner combined with BART
-#' @return Object of class \code{T_BART}. It should be used with one of the 
-#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
-#'   \item{\code{feature_train}}{A copy of feat.}
-#'   \item{\code{tr_train}}{A copy of tr.}
-#'   \item{\code{yobs_train}}{A copy of yobs.}
-#'   \item{\code{ntree}}{Number of trees.}
-#'   \item{\code{nthread}}{Number of threads to use in parallel.}
-#'   \item{\code{creator}}{Function that creates another T-BART estimator.}
+#' @description This is an implementation of the T-learner combined with BART as
+#'   base learner.
 #' @param ndpost Number of posterior draws
 #' @param ntree Number of trees
 #' @param mu0.BART,mu1.BART hyperparameters of the BART functions for the
 #'   control and treated group. Use \code{?BART::mc.wbart} for a detailed 
 #'   explanation of their effects.
+#' @inherit T_RF details
 #' @inherit X_RF
 #' @family metalearners
 #' @export

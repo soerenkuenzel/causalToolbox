@@ -36,13 +36,16 @@ setClass(
 # S_RF generator ---------------------------------------------------------------
 #' @title S-Learner with honest RF
 #' @details 
-#' The S-Learner with random forest works in two steps: 
+#' In the S-Learner the outcome is estimated using all of the features and the 
+#' treatment indicator,  without giving the treatment indicator a special role. 
+#' The predicted CATE for an individual unit is then the difference between the 
+#' predicted values when the treatment assignment indicator is changed from 
+#' control to treatment:
 #' \enumerate{
 #'  \item
 #'     Estimate the joint response function \deqn{\mu(x, w) = E[Y | X = x, W =
 #'     w]} using the
-#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-#'     forest version with the hyperparameters specified in \code{mu.forestry}.
+#'     base learner.
 #'     We denote the estimate as \eqn{\hat \mu}.
 #'  \item 
 #'     Define the CATE estimate as

@@ -51,16 +51,13 @@ This is an implementation of the T-learner combined with honest
   random forest for both response functions
 }
 \details{
-The T-Learner with random forest 
+The CATE is estimated using two estimators:
 \enumerate{
  \item
-    Estimate the response functions 
+    First, estimate the response functions 
     \deqn{\mu_0(x) = E[Y(0) | X = x]}
     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-    using the
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-    forest version with the hyperparameters specified in \code{mu0.forestry}
-    and \code{mu1.forestry} and denote the estimates as \eqn{\hat \mu_0} and
+    using the base leaner and denote the estimates as \eqn{\hat \mu_0} and
     \eqn{\hat \mu_1}.
  \item 
     Define the CATE estimate as
@@ -114,8 +111,9 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{S_BART}},
-  \code{\link{S_RF}}, \code{\link{T_BART}},
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_BART}}, \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{X_BART}},
   \code{\link{X_RF}}
 }
 \concept{metalearners}

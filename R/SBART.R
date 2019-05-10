@@ -1,6 +1,7 @@
 #'@import dbarts
 #'@include CATE_estimators.R
 
+
 ## the standard Xlearner object with random forest
 setClass(
   "S_BART",
@@ -10,9 +11,9 @@ setClass(
     tr_train = "numeric",
     yobs_train = "numeric",
     ndpost = "numeric",
-    sample_stat = "character",
-    tree_package = "character",
     ntree = "numeric",
+    nthread = "numeric",
+    mu.BART = "list", 
     creator = "function"
   )
 )
@@ -20,39 +21,43 @@ setClass(
 #' @title S_BART
 #' @rdname S_BART
 #' @description This is an implementation of S_BART
-#' @param um.bart 
-#' @param ndpost The number of posterior draws
-#' @param sample_stat TODO: Add description
-#' @param tree_package Package used to create a tree
-#' @param ntree Number of trees to grow
-#' @param verbose TRUE for detailed output FALSE for no output
+#' @param mu.BART hyperparameters of the BART function. Use
+#'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
 #' @import methods
-#' @return Object of class \code{S_RF}. It should be used with one of the 
-#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
-#'   \item{\code{feature_train}}{A copy of feat.}
-#'   \item{\code{tr_train}}{A copy of tr.}
-#'   \item{\code{yobs_train}}{A copy of yobs.}
-#'   \item{\code{m_0}}{An object of class forestry that is fitted with the 
-#'      observed outcomes of the control group as the dependent variable.}
-#'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
-#'      observed outcomes of the treated group as the dependent variable.}
-#'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
-#'      the three random forest algorithms used}
-#'   \item{\code{creator}}{Function call of S_RF. This is used for different 
-#'      bootstrap procedures.}
-#' @inherit X_RF
+#' @inherit S_RF details
+#' @inherit T_BART
 #' @family metalearners
 #' @export
 S_BART <-
-    function(feat,
-             tr,
-             yobs, 
-             verbose = TRUE, 
-             ndpost = 1200,
-             sample_stat = "counterfactuals estimated",
-             tree_package = "dbarts",
-             ntree = 200){
+  function(feat,
+           tr,
+           yobs,
+           ndpost = 1200,
+           ntree = 200,
+           nthread = 1,
+           verbose = FALSE, 
+           mu.BART = list(
+             sparse = FALSE,
+             theta = 0,
+             omega = 1,
+             a = 0.5,
+             b = 1,
+             augment = FALSE,
+             rho = NULL,
+             usequants = FALSE,
+             cont = FALSE,
+             sigest = NA,
+             sigdf = 3,
+             sigquant = 0.90,
+             k = 2.0,
+             power = 2.0,
+             base = .95,
+             sigmaf = NA,
+             lambda = NA,
+             numcut = 100L,
+             nskip = 100L
+           )) {
+    
     feat <- as.data.frame(feat)
 
     new(
@@ -61,21 +66,21 @@ S_BART <-
       tr_train = tr,
       yobs_train = yobs,
       ndpost = ndpost,
-      sample_stat = sample_stat,
-      tree_package = tree_package,
       ntree = ntree,
+      nthread = nthread,
+      mu.BART = mu.BART, 
       creator = function(feat, tr, yobs) {
         S_BART(feat,
                tr,
                yobs,
                ndpost = ndpost,
-               sample_stat = sample_stat,
-               tree_package = tree_package,
-               ntree = ntree)
+               ntree = ntree,
+               nthread = nthread,
+               verbose = verbose, 
+               mu.BART = mu.BART)
       }
     )
   }
-
 
 #' EstimateCate-S_BART
 #' @name EstimateCate-S_BART
@@ -90,11 +95,14 @@ setMethod(
     ndpost <- theObject@ndpost
     n_feature_new <- nrow(feature_new)
 
-    pred_matrix <-
-      get_pred_mat(theObject, feature_new, verbose, ndpost)
+    pred_matrix <- get_pred_mat(
+      theObject = theObject,
+      feature_new = feature_new,
+      ndpost = ndpost, 
+      nthread = theObject@nthread)
 
     pred_0 <- apply(pred_matrix, 2, mean)[1:n_feature_new]
-    pred_1 <-
+    pred_1 <- 
       apply(pred_matrix, 2, mean)[(n_feature_new + 1):(2 * n_feature_new)]
 
     return(pred_1 - pred_0)
@@ -114,8 +122,13 @@ setMethod(
   {
     ndpost <- theObject@ndpost
     n_feature_new <- nrow(feature_new)
-    pred_matrix <-
-      get_pred_mat(theObject, feature_new, verbose, ndpost)
+    
+    pred_matrix <- get_pred_mat(
+      theObject = theObject,
+      feature_new = feature_new,
+      ndpost = ndpost,
+      nthread = theObject@nthread
+    )
 
     ite_matrix <-
       pred_matrix[, (n_feature_new + 1):(2 * n_feature_new)] -
@@ -151,14 +164,12 @@ setMethod(
     feat <- theObject@feature_train
     tr <- theObject@tr_train
     yobs <- theObject@yobs_train
-    sample_stat <- theObject@sample_stat
 
     pred_matrix <- get_pred_mat(
       theObject = theObject,
       feature_new = feat,
-      verbose = verbose,
-      ndpost = ndpost
-    )
+      ndpost = ndpost, 
+      nthread = theObject@nthread)
 
     n_feat <- nrow(feat)
 
@@ -174,7 +185,7 @@ setMethod(
         feat = feat,
         tr = tr,
         yobs = yobs,
-        sample_stat = sample_stat
+        sample_stat = "counterfactuals estimated"
       )
     )
   }
@@ -182,60 +193,44 @@ setMethod(
 
 # Helper Functions -------------------------------------------------------------
 
-get_pred_mat <- function(theObject, feature_new, verbose, ndpost) {
+get_pred_mat <- function(theObject, feature_new, ndpost, nthread) {
   feature_new <- as.data.frame(feature_new)
   n_feature_new <- nrow(feature_new)
+  pred_matrix <-
+    BART::mc.wbart(
+      x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
+      y.train = theObject@yobs_train,
+      x.test = cbind(rbind(feature_new, feature_new),
+                     tr = c(
+                       rep(0, n_feature_new), rep(1, n_feature_new)
+                     )),
+      ndpost = ndpost,
+      ntree = theObject@ntree,
+      mc.cores = nthread,
+      sparse =    theObject@mu.BART$sparse,
+      theta =     theObject@mu.BART$theta,
+      omega =     theObject@mu.BART$omega,
+      a =         theObject@mu.BART$a,
+      b =         theObject@mu.BART$b,
+      augment =   theObject@mu.BART$augment,
+      rho =       theObject@mu.BART$rho,
+      usequants = theObject@mu.BART$usequants,
+      cont =      theObject@mu.BART$cont,
+      sigest =    theObject@mu.BART$sigest,
+      sigdf =     theObject@mu.BART$sigdf,
+      sigquant =  theObject@mu.BART$sigquant,
+      k =         theObject@mu.BART$k,
+      power =     theObject@mu.BART$power,
+      base =      theObject@mu.BART$base,
+      sigmaf =    theObject@mu.BART$sigmaf,
+      lambda =    theObject@mu.BART$lambda,
+      numcut =    theObject@mu.BART$numcut,
+      nskip =     theObject@mu.BART$nskip
+    )$yhat.test
 
-
-
-
-  if (theObject@tree_package == "BayesTree") {
-    pred_matrix <-
-      BayesTree::bart(
-        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
-        y.train = theObject@yobs_train,
-        x.test = cbind(rbind(feature_new, feature_new),
-                       tr = c(
-                         rep(0, n_feature_new), rep(1, n_feature_new)
-                       )),
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-  } else if (theObject@tree_package == "dbarts") {
-    pred_matrix <-
-      dbarts::bart(
-        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
-        y.train = theObject@yobs_train,
-        x.test = cbind(rbind(feature_new, feature_new),
-                       tr = c(
-                         rep(0, n_feature_new), rep(1, n_feature_new)
-                       )),
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-  } else if (theObject@tree_package == "BART"){
-    pred_matrix <-
-      BART::mc.wbart(
-        x.train = cbind(theObject@feature_train, tr = theObject@tr_train),
-        y.train = theObject@yobs_train,
-        x.test = cbind(rbind(feature_new, feature_new),
-                       tr = c(
-                         rep(0, n_feature_new), rep(1, n_feature_new)
-                       )),
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-  } else{
-    stop("tree_package must be either BayesTree or dbarts")
-  }
   return(pred_matrix)
 }
 
 
-
-
-
-
+typeof(as.integer(round(.2)))
+typeof(2L)

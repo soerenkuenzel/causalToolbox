@@ -60,26 +60,16 @@ package for a more detailed documentation of the hyperparamters.
 }}
 }
 \value{
-Object of class \code{X_RF}. It should be used with one of the 
-  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+An object from a class that is derived from the \code{CATE-estimator}
+  class. It should be used with one of the following functions
+  \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
+  and \code{EstimateAllSampleStatistics}. The object has at least the
+  following slots:
   \item{\code{feature_train}}{A copy of feat.}
   \item{\code{tr_train}}{A copy of tr.}
   \item{\code{yobs_train}}{A copy of yobs.}
-  \item{\code{m_0}}{An object of class forestry that is fitted with the 
-     observed outcomes of the control group as the dependent variable.}
-  \item{\code{m_1}}{An object of class forestry that is fitted with the 
-     observed outcomes of the treated group as the dependent variable.}
-  \item{\code{m_tau_0}}{An object of class forestry that is fitted with the 
-     \eqn{D_0} as the dependent variable.}
-  \item{\code{m_tau_1}}{An object of class forestry that is fitted with the 
-     \eqn{D_1} as the dependent variable.}
-  \item{\code{m_prop}}{An object of class forestry that is fitted with tr as 
-     the dependent variable.}
-  \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
-     the three random forest algorithms used}
-  \item{\code{creator}}{Function call of X_RF. This is used for different 
-     bootstrap procedures.}
+  \item{\code{creator}}{Function call that creates the CATE estimator. This
+  is used for different bootstrap procedures.}
 }
 \description{
 This is an implementation of the X-learner with honest random
@@ -171,9 +161,10 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 \seealso{
 \code{\link{X_RF_fully_specified}}
 
-Other metalearners: \code{\link{S_BART}},
-  \code{\link{S_RF}}, \code{\link{T_BART}},
-  \code{\link{T_RF}}
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_BART}}, \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{T_RF}},
+  \code{\link{X_BART}}
 }
 \author{
 Soeren R. Kuenzel

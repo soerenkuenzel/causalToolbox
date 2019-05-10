@@ -29,6 +29,7 @@ setClass(
 #' @param ntree Number of trees to grow. 
 #' @return A `X_BART` object.
 #' @export X_BART
+#' @family metalearners
 #' @import methods
 X_BART <-
   function(feat,

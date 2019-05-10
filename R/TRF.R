@@ -44,16 +44,13 @@ setClass(
 # T_RF generator ---------------------------------------------------------------
 #' @title T-Learner with honest RF for both response functions
 #' @details 
-#' The T-Learner with random forest 
+#' The CATE is estimated using two estimators:
 #' \enumerate{
 #'  \item
-#'     Estimate the response functions 
+#'     First, estimate the response functions 
 #'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
 #'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-#'     using the
-#'     \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-#'     forest version with the hyperparameters specified in \code{mu0.forestry}
-#'     and \code{mu1.forestry} and denote the estimates as \eqn{\hat \mu_0} and
+#'     using the base leaner and denote the estimates as \eqn{\hat \mu_0} and
 #'     \eqn{\hat \mu_1}.
 #'  \item 
 #'     Define the CATE estimate as

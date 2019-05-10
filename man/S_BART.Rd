@@ -4,9 +4,11 @@
 \alias{S_BART}
 \title{S_BART}
 \usage{
-S_BART(feat, tr, yobs, verbose = TRUE, ndpost = 1200,
-  sample_stat = "counterfactuals estimated", tree_package = "dbarts",
-  ntree = 200)
+S_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
+  verbose = FALSE, mu.BART = list(sparse = FALSE, theta = 0, omega = 1,
+  a = 0.5, b = 1, augment = FALSE, rho = NULL, usequants = FALSE, cont =
+  FALSE, sigest = NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base =
+  0.95, sigmaf = NA, lambda = NA, numcut = 100L, nskip = 100L))
 }
 \arguments{
 \item{feat}{A data frame containing the features.}
@@ -15,72 +17,47 @@ S_BART(feat, tr, yobs, verbose = TRUE, ndpost = 1200,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{ndpost}{Number of posterior draws}
 
-\item{ndpost}{The number of posterior draws}
+\item{ntree}{Number of trees}
 
-\item{sample_stat}{TODO: Add description}
+\item{nthread}{Number of threads which should be used to work in parallel.}
 
-\item{tree_package}{Package used to create a tree}
+\item{verbose}{TRUE for detailed output FALSE for no output:}
 
-\item{ntree}{Number of trees to grow}
-
-\item{um.bart}{}
+\item{mu.BART}{hyperparameters of the BART function. Use
+\code{?BART::mc.wbart} for a detailed explanation of their effects.}
 }
 \value{
-Object of class \code{S_RF}. It should be used with one of the 
-  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+An object from a class that is derived from the \code{CATE-estimator}
+  class. It should be used with one of the following functions
+  \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
+  and \code{EstimateAllSampleStatistics}. The object has at least the
+  following slots:
   \item{\code{feature_train}}{A copy of feat.}
   \item{\code{tr_train}}{A copy of tr.}
   \item{\code{yobs_train}}{A copy of yobs.}
-  \item{\code{m_0}}{An object of class forestry that is fitted with the 
-     observed outcomes of the control group as the dependent variable.}
-  \item{\code{m_1}}{An object of class forestry that is fitted with the 
-     observed outcomes of the treated group as the dependent variable.}
-  \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
-     the three random forest algorithms used}
-  \item{\code{creator}}{Function call of S_RF. This is used for different 
-     bootstrap procedures.}
+  \item{\code{creator}}{Function call that creates the CATE estimator. This
+  is used for different bootstrap procedures.}
 }
 \description{
 This is an implementation of S_BART
 }
 \details{
-The X-Learner with random forest estimates the CATE following the following three
-stages.
+In the S-Learner the outcome is estimated using all of the features and the 
+treatment indicator,  without giving the treatment indicator a special role. 
+The predicted CATE for an individual unit is then the difference between the 
+predicted values when the treatment assignment indicator is changed from 
+control to treatment:
 \enumerate{
  \item
-    Estimate the response functions 
-    \deqn{\mu_0(x) = E[Y(0) | X = x]}
-    \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-    using the
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-    forest version with the hyperparameters specified in \code{mu.forestry}
-    and denote the estimates as \eqn{\hat \mu_0} and \eqn{\hat \mu_1}.
- \item
-    Impute the treatment effects for the individuals in the treated group,
-    based on the control outcome estimator, and the treatment effects for the
-    individuals in the control group, based on the treatment outcome
-    estimator, that is,
-    \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
-    \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
-    Now employ the
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-    forest version with the hyperparameters specified in \code{tau.forestry}
-    in two ways: using \eqn{D^1_i} as the dependent variable to obtain
-    \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i} as the dependent variable to
-    obtain \eqn{\hat \tau_0(x)}.
+    Estimate the joint response function \deqn{\mu(x, w) = E[Y | X = x, W =
+    w]} using the
+    base learner.
+    We denote the estimate as \eqn{\hat \mu}.
  \item 
-    Define the CATE estimate by a weighted average of the two estimates at
-    Stage 2: 
-    \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
-    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where
-    \eqn{e(x)} is an estimate of the propensity score using the 
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-    forest version with the hyperparameters specified in \code{e.forestry}.
-    If \code{predmode = "control"}, then \eqn{g(x) = 1} and if 
-    \code{predmode = "treated"}, then \eqn{g(x) = 0}.
+    Define the CATE estimate as
+    \deqn{\tau(x) = \hat \mu_1(x, 1) - \hat \mu_0(x, 0).}
 }
 }
 \examples{
@@ -130,8 +107,9 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{S_RF}},
-  \code{\link{T_BART}}, \code{\link{T_RF}},
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_RF}}, \code{\link{T_BART}},
+  \code{\link{T_RF}}, \code{\link{X_BART}},
   \code{\link{X_RF}}
 }
 \concept{metalearners}

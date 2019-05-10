@@ -28,3 +28,10 @@ A `X_BART` object.
 \description{
 This is an implementation of X_BART
 }
+\seealso{
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_BART}}, \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{T_RF}},
+  \code{\link{X_RF}}
+}
+\concept{metalearners}

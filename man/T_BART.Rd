@@ -34,29 +34,30 @@ control and treated group. Use \code{?BART::mc.wbart} for a detailed
 explanation of their effects.}
 }
 \value{
-Object of class \code{T_BART}. It should be used with one of the 
-  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+An object from a class that is derived from the \code{CATE-estimator}
+  class. It should be used with one of the following functions
+  \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
+  and \code{EstimateAllSampleStatistics}. The object has at least the
+  following slots:
   \item{\code{feature_train}}{A copy of feat.}
   \item{\code{tr_train}}{A copy of tr.}
   \item{\code{yobs_train}}{A copy of yobs.}
-  \item{\code{ntree}}{Number of trees.}
-  \item{\code{nthread}}{Number of threads to use in parallel.}
-  \item{\code{creator}}{Function that creates another T-BART estimator.}
+  \item{\code{creator}}{Function call that creates the CATE estimator. This
+  is used for different bootstrap procedures.}
 }
 \description{
-This is an implementation of the T-learner combined with BART
+This is an implementation of the T-learner combined with BART as
+  base learner.
 }
 \details{
-The T-Learner with BART 
+The CATE is estimated using two estimators:
 \enumerate{
  \item
-    Estimate the response functions 
+    First, estimate the response functions 
     \deqn{\mu_0(x) = E[Y(0) | X = x]}
     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
-    using the BART package with the hyperparameters specified in
-    \code{mu0.BART} and \code{mu1.BART} and denote the estimates as \eqn{\hat
-    \mu_0} and \eqn{\hat \mu_1}.
+    using the base leaner and denote the estimates as \eqn{\hat \mu_0} and
+    \eqn{\hat \mu_1}.
  \item 
     Define the CATE estimate as
     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
@@ -109,8 +110,9 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{S_BART}},
-  \code{\link{S_RF}}, \code{\link{T_RF}},
+Other metalearners: \code{\link{MO_BART}},
+  \code{\link{S_BART}}, \code{\link{S_RF}},
+  \code{\link{T_RF}}, \code{\link{X_BART}},
   \code{\link{X_RF}}
 }
 \concept{metalearners}
