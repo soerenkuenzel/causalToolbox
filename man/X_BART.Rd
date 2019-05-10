@@ -4,11 +4,11 @@
 \alias{X_BART}
 \title{X_BART}
 \usage{
-X_BART(feat, tr, yobs, predmode = "pscore", ndpost = 1200,
-  ntree = 200, mu.BART = list(sparse = FALSE, theta = 0, omega = 1, a =
-  0.5, b = 1, augment = FALSE, rho = NULL, usequants = FALSE, cont = FALSE,
-  sigest = NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base = 0.95,
-  sigmaf = NA, lambda = NA, numcut = 100L, nskip = 100L),
+X_BART(feat, tr, yobs, predmode = "pscore", nthread = 1,
+  ndpost = 1200, ntree = 200, mu.BART = list(sparse = FALSE, theta =
+  0, omega = 1, a = 0.5, b = 1, augment = FALSE, rho = NULL, usequants =
+  FALSE, cont = FALSE, sigest = NA, sigdf = 3, sigquant = 0.9, k = 2, power
+  = 2, base = 0.95, sigmaf = NA, lambda = NA, numcut = 100L, nskip = 100L),
   tau.BART = list(sparse = FALSE, theta = 0, omega = 1, a = 0.5, b = 1,
   augment = FALSE, rho = NULL, usequants = FALSE, cont = FALSE, sigest =
   NA, sigdf = 3, sigquant = 0.9, k = 2, power = 2, base = 0.95, sigmaf =
@@ -28,6 +28,8 @@ X_BART(feat, tr, yobs, predmode = "pscore", ndpost = 1200,
 \item{predmode}{Specifies how the two estimators of the second stage should 
 be aggregated. Possible types are "propmean", "control" and "treated". 
 The default is "propmean" which refers to propensity score weighting.}
+
+\item{nthread}{Number of threads which should be used to work in parallel.}
 
 \item{ndpost}{Number of posterior draws}
 
@@ -101,8 +103,10 @@ feature_test <- simulated_experiment$feat_te
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+xl_bt <- X_BART(feat = feat, tr = tr, yobs = yobs)
 tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
-
+sl_bt <- S_BART(feat = feat, tr = tr, yobs = yobs)
+  
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
 # evaluate the performance
@@ -130,11 +134,6 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{MO_BART}},
-  \code{\link{S_BART}}, \code{\link{S_RF}},
-  \code{\link{T_BART}}, \code{\link{T_RF}},
-  \code{\link{X_RF}}
-
 Other metalearners: \code{\link{MO_BART}},
   \code{\link{S_BART}}, \code{\link{S_RF}},
   \code{\link{T_BART}}, \code{\link{T_RF}},

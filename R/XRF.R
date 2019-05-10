@@ -153,8 +153,10 @@ setClass(
 #' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 #' tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 #' sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+#' xl_bt <- X_BART(feat = feat, tr = tr, yobs = yobs)
 #' tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
-#' 
+#' sl_bt <- S_BART(feat = feat, tr = tr, yobs = yobs)
+#'   
 #' cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 #'
 #' # evaluate the performance

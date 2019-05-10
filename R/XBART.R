@@ -1,4 +1,5 @@
 #' @include CATE_estimators.R
+#' @include helper_functions.R
 #' @import dbarts
 
 ## the standard Xlearner object with random forest
@@ -31,14 +32,13 @@ setClass(
 #' @inherit X_RF
 #' @inheritParams T_BART
 #' @family metalearners
-#' @import methods
-#' @family metalearners
 #' @export 
 X_BART <-
   function(feat,
            tr,
            yobs,
            predmode = "pscore",
+           nthread = 1,
            ndpost = 1200,
            ntree = 200,
            mu.BART = list(
@@ -152,7 +152,6 @@ setMethod(
                         verbose = FALSE,
                         return_CI = FALSE)
   {
-    # theObject = xb;  verbose = TRUE; ndpost = 100; return_CI = TRUE; feature_new = feat[1:5,]; predmode = "pscore"
     yobs <- theObject@yobs_train
     feat <- theObject@feature_train
     tr <- theObject@tr_train
@@ -164,14 +163,12 @@ setMethod(
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
 
-    ############################################################################
-    # First stage ##############################################################
-    ############################################################################
+    # First stage --------------------------------------------------------------
 
     n_1 <- sum(tr)
     n_0 <- sum(1 - tr)
 
-    if(return_CI){
+    if (return_CI) {
       # if CI should be returned, we also need to estimate the uncertainty, we
       # had in the first stage.
       f_0_test_set <- rbind(X_1, feature_new)
@@ -182,97 +179,91 @@ setMethod(
     }
 
 
-    pred_matrix_f_0 <- theObject@bart_function(
-      x.train = X_0,
-      y.train = yobs_0,
-      x.test =  f_0_test_set,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_f_0 <- get_BART_pred(x.train = X_0, 
+                                     y.train = yobs_0, 
+                                     x.test = f_0_test_set, 
+                                     ndpost = theObject@ndpost, 
+                                     ntree = theObject@ntree, 
+                                     nthread = theObject@nthread, 
+                                     hyperparam = theObject@mu0.BART)
+
 
     mu_hat_1 <- apply(pred_matrix_f_0[ ,1:n_1], 2, mean)
 
-    pred_matrix_f_1 <- theObject@bart_function(
-      x.train = X_1,
-      y.train = yobs_1,
-      x.test =  f_1_test_set,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_f_1  <- get_BART_pred(x.train = X_1, 
+                                      y.train = yobs_1, 
+                                      x.test = f_1_test_set, 
+                                      ndpost = theObject@ndpost, 
+                                      ntree = theObject@ntree, 
+                                      nthread = theObject@nthread, 
+                                      hyperparam = theObject@mu1.BART)
 
     mu_hat_0 <- apply(pred_matrix_f_1[ ,1:n_0], 2, mean)
 
     if (verbose)
       print("Done with the first stage.")
 
-    ############################################################################
-    # second stage #############################################################
-    ############################################################################
+    
+    # second stage -------------------------------------------------------------
+    
     D_1 <- yobs_1 - mu_hat_1
     D_0 <- mu_hat_0 - yobs_0
 
-    pred_matrix_s_1 <- theObject@bart_function(
-      x.train = X_1,
-      y.train = D_1,
-      x.test =  feature_new,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_s_1 <- get_BART_pred(x.train = X_1, 
+                                     y.train = D_1, 
+                                     x.test = feature_new, 
+                                     ndpost = theObject@ndpost, 
+                                     ntree = theObject@ntree, 
+                                     nthread = theObject@nthread, 
+                                     hyperparam = theObject@tau1.BART)
 
     tau_hat_1 <- apply(pred_matrix_s_1, 2, mean)
 
-    pred_matrix_s_0 <- theObject@bart_function(
-      x.train = X_0,
-      y.train = D_0,
-      x.test =  feature_new,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_s_0  <- get_BART_pred(x.train = X_0, 
+                                      y.train = D_0, 
+                                      x.test = feature_new, 
+                                      ndpost = theObject@ndpost, 
+                                      ntree = theObject@ntree, 
+                                      nthread = theObject@nthread, 
+                                      hyperparam = theObject@tau0.BART)
 
     tau_hat_0 <- apply(pred_matrix_s_0, 2, mean)
 
     if (verbose)
       print("Done with the second stage.")
-    ############################################################################
-    ### Combining the two ######################################################
-    ############################################################################
-
-    if(predmode == "pscore"){
-      prop_matrix <- theObject@bart_function(
+    
+    # Combining the two --------------------------------------------------------
+    if (predmode == "pscore") {
+      prop_matrix   <- get_BART_pred(
         x.train = feat,
-        y.train = factor(tr),
-        x.test =  feature_new,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
-
+        y.train = as.numeric(factor(tr)),
+        x.test = feature_new,
+        ndpost = theObject@ndpost,
+        ntree = theObject@ntree,
+        nthread = theObject@nthread,
+        hyperparam = theObject@e.BART
+      )
+      
       g_weights <- pnorm(apply(prop_matrix, 2, mean))
       if (verbose)
         print("Done with the propensity score estimation.")
-    }else if(predmode == "1/2"){
-      g_weights <- 1/2
-    }else if(predmode == "constant p-score"){
+    } else if (predmode == "1/2") {
+      g_weights <- 1 / 2
+    } else if (predmode == "constant p-score") {
       g_weights <- sum(tr) / length(tr)
-    }else if(predmode == "only control"){
+    } else if (predmode == "only control") {
       g_weights <- 0
-    }else if(predmode == "only treated"){
+    } else if (predmode == "only treated") {
       g_weights <- 1
-    }else if(predmode == "variance"){
+    } else if (predmode == "variance") {
       var_s_0 <- apply(pred_matrix_s_0, 2, var) / ndpost
       var_s_1 <- apply(pred_matrix_s_1, 2, var) / ndpost
       g_weights <- var_s_1 / (var_s_1 + var_s_0)
     }
-    ############################################################################
-    ### Combining the two ######################################################
-    ############################################################################
 
-    pred <- g_weights * tau_hat_0 +
-      (1 - g_weights) * tau_hat_1
+    # Combining the two --------------------------------------------------------
+
+    pred <- g_weights * tau_hat_0 + (1 - g_weights) * tau_hat_1
 
 
     if (return_CI) {
@@ -363,9 +354,7 @@ setMethod(
     yobs_1 <- yobs[tr == 1]
     X_1 <- feat[tr == 1, ]
 
-    ############################################################################
-    # First stage ##############################################################
-    ############################################################################
+    # First stage --------------------------------------------------------------
 
     n_1 <- sum(tr)
     n_0 <- sum(1 - tr)
@@ -376,100 +365,89 @@ setMethod(
     f_1_test_set <- rbind(X_0, feat)
 
 
-    pred_matrix_f_0 <- theObject@bart_function(
-      x.train = X_0,
-      y.train = yobs_0,
-      x.test =  f_0_test_set,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_f_0 <- get_BART_pred(x.train = X_0, 
+                                     y.train = yobs_0,
+                                     x.test = f_0_test_set,
+                                     ndpost = theObject@ndpost,
+                                     ntree = theObject@ntree,
+                                     nthread = theObject@nthread,
+                                     hyperparam = theObject@mu0.BART)
 
     mu_hat_1 <- apply(pred_matrix_f_0[ ,1:n_1], 2, mean)
 
-    pred_matrix_f_1 <- theObject@bart_function(
-      x.train = X_1,
-      y.train = yobs_1,
-      x.test =  f_1_test_set,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
-
+    pred_matrix_f_1 <- get_BART_pred(x.train = X_1, 
+                                     y.train = yobs_1,
+                                     x.test = f_1_test_set,
+                                     ndpost = theObject@ndpost,
+                                     ntree = theObject@ntree,
+                                     nthread = theObject@nthread,
+                                     hyperparam = theObject@mu1.BART) 
+    
     mu_hat_0 <- apply(pred_matrix_f_1[ ,1:n_0], 2, mean)
 
     if (verbose)
       print("Done with the first stage.")
 
-    ############################################################################
-    # second stage #############################################################
-    ############################################################################
+    # second stage -------------------------------------------------------------
+    
     D_1 <- yobs_1 - mu_hat_1
     D_0 <- mu_hat_0 - yobs_0
 
-    pred_matrix_s_1 <- theObject@bart_function(
-      x.train = X_1,
-      y.train = D_1,
-      x.test =  feat,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
+    pred_matrix_s_1 <- get_BART_pred(x.train = X_1, 
+                                     y.train = D_1,
+                                     x.test = feat,
+                                     ndpost = theObject@ndpost,
+                                     ntree = theObject@ntree,
+                                     nthread = theObject@nthread,
+                                     hyperparam = theObject@tau1.BART) 
 
     tau_hat_1 <- apply(pred_matrix_s_1, 2, mean)
 
-    pred_matrix_s_0 <- theObject@bart_function(
-      x.train = X_0,
-      y.train = D_0,
-      x.test =  feat,
-      verbose = verbose,
-      ndpost = ndpost,
-      ntree = theObject@ntree
-    )$yhat.test
-
+    pred_matrix_s_0 <- get_BART_pred(x.train = X_0, 
+                                     y.train = D_0,
+                                     x.test = feat,
+                                     ndpost = theObject@ndpost,
+                                     ntree = theObject@ntree,
+                                     nthread = theObject@nthread,
+                                     hyperparam = theObject@tau0.BART) 
+    
     tau_hat_0 <- apply(pred_matrix_s_0, 2, mean)
 
     if (verbose)
       print("Done with the second stage.")
-    ############################################################################
-    ### Combining the two ######################################################
-    ############################################################################
 
-    if(predmode == "pscore"){
-      prop_matrix <- theObject@bart_function(
-        x.train = feat,
-        y.train = factor(tr),
-        x.test =  feat,
-        verbose = verbose,
-        ndpost = ndpost,
-        ntree = theObject@ntree
-      )$yhat.test
+    # Combining the two --------------------------------------------------------
+
+    if (predmode == "pscore") {
+      prop_matrix  <- get_BART_pred(x.train = feat, 
+                                    y.train = as.numeric(factor(tr)),
+                                    x.test = feat,
+                                    ndpost = theObject@ndpost,
+                                    ntree = theObject@ntree,
+                                    nthread = theObject@nthread,
+                                    hyperparam = theObject@e.BART) 
 
       g_weights <- pnorm(apply(prop_matrix, 2, mean))
       if (verbose)
         print("Done with the propensity score estimation.")
-    }else if(predmode == "1/2"){
-      g_weights <- 1/2
-    }else if(predmode == "constant p-score"){
+    } else if (predmode == "1/2") {
+      g_weights <- 1 / 2
+    } else if (predmode == "constant p-score") {
       g_weights <- sum(tr) / length(tr)
-    }else if(predmode == "only control"){
+    } else if (predmode == "only control") {
       g_weights <- 0
-    }else if(predmode == "only treated"){
+    } else if (predmode == "only treated") {
       g_weights <- 1
-    }else if(predmode == "variance"){
+    } else if (predmode == "variance") {
       var_s_0 <- apply(pred_matrix_s_0, 2, var) / ndpost
       var_s_1 <- apply(pred_matrix_s_1, 2, var) / ndpost
       g_weights <- var_s_1 / (var_s_1 + var_s_0)
     }
-
-
-
-    # Compute CATE =============================================================
+    
+    # Compute CATE -------------------------------------------------------------
 
     pred <- g_weights * tau_hat_0 +
       (1 - g_weights) * tau_hat_1
-
-
 
       # Variance from the first stage:
 
@@ -510,19 +488,21 @@ setMethod(
           )
         )
 
-      # COMPUTE ATT etc=========================================================
-
+      # COMPUTE ATT etc --------------------------------------------------------
 
       # the following matrices are just used to compute the variablitity of the
       # two learners:
-      matrix_to_compute_var_0 <- pred_matrix_f_1[, (n_0 + 1):(n_0 + n_new)] + pred_matrix_s_0
-      matrix_to_compute_var_1 <- pred_matrix_f_0[, (n_1 + 1):(n_1 + n_new)] + pred_matrix_s_1
+      matrix_to_compute_var_0 <- pred_matrix_f_1[, (n_0 + 1):(n_0 + n_new)] + 
+        pred_matrix_s_0
+      matrix_to_compute_var_1 <- pred_matrix_f_0[, (n_1 + 1):(n_1 + n_new)] + 
+        pred_matrix_s_1
 
       matrix_to_compute_var_total <- g_weights * matrix_to_compute_var_0 +
            (1 - g_weights) * matrix_to_compute_var_1
 
 
-      pred_MCMC_matrix <- g_weights * pred_matrix_s_0 + (1 - g_weights) * pred_matrix_s_1
+      pred_MCMC_matrix <- g_weights * pred_matrix_s_0 + (1 - g_weights) * 
+        pred_matrix_s_1
 
 
       SATE_MCMC_samples_alle <- apply(pred_MCMC_matrix, 1, mean)
@@ -586,3 +566,4 @@ setMethod(
       ))
   }
 )
+
