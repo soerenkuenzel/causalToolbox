@@ -1,6 +1,6 @@
 #' @include CATE_estimators.R
 #' @include helper_functions.R
-#' @import dbarts
+#' @import BART
 
 ## the standard Xlearner object with random forest
 setClass(

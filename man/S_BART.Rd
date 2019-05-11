@@ -109,9 +109,9 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-Other metalearners: \code{\link{MO_BART}},
-  \code{\link{S_RF}}, \code{\link{T_BART}},
-  \code{\link{T_RF}}, \code{\link{X_BART}},
-  \code{\link{X_RF}}
+Other metalearners: \code{\link{M_BART}},
+  \code{\link{M_RF}}, \code{\link{S_RF}},
+  \code{\link{T_BART}}, \code{\link{T_RF}},
+  \code{\link{X_BART}}, \code{\link{X_RF}}
 }
 \concept{metalearners}

@@ -154,7 +154,7 @@ X_RF <-
            yobs,
            predmode = "propmean",
            nthread = 0,
-           verbose = TRUE,
+           verbose = FALSE,
            mu.forestry =
              list(
                relevant.Variable = 1:ncol(feat),
@@ -273,7 +273,6 @@ X_RF <-
 #' @seealso \code{\link{X_RF}}
 #' @inherit X_RF
 #' @import methods
-#' @export
 X_RF_fully_specified <-
   function(feat,
            tr,
