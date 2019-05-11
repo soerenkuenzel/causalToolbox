@@ -45,9 +45,6 @@ the seed of the main session is used.}
 
 \item{trainseed}{The seed used to generate the training data, if NULL,
 then the seed of the main session is used.}
-
-\item{setupseed}{Some of the setups are random. This seed is per default
-chosen, but can be changed here to generate more setups.}
 }
 \value{
 A list with the following elements 

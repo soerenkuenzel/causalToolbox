@@ -82,7 +82,6 @@ MO_BART <-
 
 #' EstimateCate-MO_BART
 #' EstimateCate-M_BART
-#' @name EstimateCate-M_BART
 #' @rdname EstimateCate
 #' @inherit EstimateCate
 #' @exportMethod EstimateCate

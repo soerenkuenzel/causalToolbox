@@ -78,8 +78,6 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   the seed of the main session is used.
 #' @param trainseed The seed used to generate the training data, if NULL,
 #'   then the seed of the main session is used.
-#' @param setupseed Some of the setups are random. This seed is per default
-#'   chosen, but can be changed here to generate more setups.
 #' @return A list with the following elements 
 #'   \item{\code{setup_name}}{Name of the setup} 
 #'   \item{\code{m_t_truth}}{Function contraining the response function of the
@@ -333,7 +331,18 @@ simulate_causal_experiment <- function(ntrain = nrow(given_features),
 }
 
 
+#' @rdname SimulationLists
+#' @name Lists Of Simulation Functions 
+#' @title Lists Of Simulation Functions
+#' @details These lists contain the example setups that can be used in
+#'   \code{simulate_causal_experiment}. Run for example
+#'   \code{tau.simulate_causal_experiment} to see the definition of the
+#'   available functions
+#' export 
+NULL
+
 # Propensity score functions ---------------------------------------------------
+#' @rdname SimulationLists
 #' @export 
 pscores.simulate_causal_experiment <- list(
   rct5 = function(feat) {.5}, 
@@ -344,12 +353,13 @@ pscores.simulate_causal_experiment <- list(
 
 
 # mu0 functions ----------------------------------------------------------------
+#' @rdname SimulationLists
 #' @export
 mu0.simulate_causal_experiment <- list(
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
   sparseLinearStrong = function(feat) {30 * feat$x1 + 50 * feat$x2},
   fullLinearWeak = function(feat) {
-    oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
+    oldSeed <- .Random.seed; on.exit( {.Random.seed <<- oldSeed} )
     set.seed(5397936)
     d <- ncol(feat)
     
@@ -401,6 +411,7 @@ mu0.simulate_causal_experiment <- list(
 )
 
 # tau functions ----------------------------------------------------------------
+#' @rdname SimulationLists
 #' @export 
 tau.simulate_causal_experiment <- list(
   no = function(feat) {0},
@@ -436,4 +447,27 @@ tau.simulate_causal_experiment <- list(
       (1 + 1 / (1 + exp(-20 * (feat$x2 - 1 / 3))))
   })
 
+# Real data --------------------------------------------------------------------
+#' @title Get Out To Vote
+#' @description 
+#' This is only an example data set and it has been created by looking at a
+#' certain subset of the "Social Pressure and Voter Turnout: Evidence from a
+#' Large-Scale Field Experiment" study that tested the impact of social pressure
+#' on voter turnout. A precise description and the full data set can be found at
+#' \url{https://isps.yale.edu/research/data/d001}. 
+#' 
+#' The study consists of seven key individual-level covariates, most of which
+#' are discrete: gender, age, and whether the registered individual voted in the
+#' primary elections in 2000, 2002, and 2004 or the general election in 2000 and
+#' 2002. The sample was restricted to voters who had voted in the 2004 general
+#' election. The outcome of interest is turnout in the 2006 primary election,
+#' which is an indicator variable and the treatment was whether or not the
+#' subject were elected to receive a mailer.
+#' @references
+#' \itemize{
+#'   \item Gerber AS, Green DP, Larimer CW (2008) Social pressure and voter
+#'   turnout: Evidence from a large-scale field experiment. Am Polit Sci Rev
+#'   102:33–48. \url{https://isps.yale.edu/research/publications/isps08-001}
+#'  }
+"gotv"
 

@@ -2,13 +2,11 @@
 % Please edit documentation in R/CATE_estimators.R, R/SBART.R, R/TBART.R,
 %   R/XBART.R
 \docType{methods}
-\name{CateCI-Meta-learner}
-\alias{CateCI-Meta-learner}
+\name{CateCI,CATE-estimator-method}
+\alias{CateCI,CATE-estimator-method}
 \alias{CateCI,Meta-learner-method}
 \alias{CateCI,S_BART-method}
-\alias{CateCI-T_BART}
 \alias{CateCI,T_BART-method}
-\alias{CateCI-X_BART}
 \alias{CateCI,X_BART-method}
 \title{CateCI-Meta-learner}
 \usage{

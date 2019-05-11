@@ -4,11 +4,10 @@
 \alias{S_RF}
 \title{S-Learner with honest RF}
 \usage{
-S_RF(feat, tr, yobs, nthread = 0, verbose = TRUE, alwaysTr = FALSE,
-  takeOutATE = FALSE, mu.forestry = list(relevant.Variable =
-  1:ncol(feat), ntree = 1000, replace = TRUE, sample.fraction = 0.9, mtry =
-  ncol(feat), nodesizeSpl = 1, nodesizeAvg = 3, splitratio = 0.5,
-  middleSplit = FALSE))
+S_RF(feat, tr, yobs, nthread = 0, verbose = TRUE,
+  mu.forestry = list(relevant.Variable = 1:ncol(feat), ntree = 1000,
+  replace = TRUE, sample.fraction = 0.9, mtry = ncol(feat), nodesizeSpl =
+  1, nodesizeAvg = 3, splitratio = 0.5, middleSplit = FALSE))
 }
 \arguments{
 \item{feat}{A data frame containing the features.}

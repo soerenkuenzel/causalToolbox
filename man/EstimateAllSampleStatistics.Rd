@@ -4,10 +4,11 @@
 \docType{methods}
 \name{EstimateAllSampleStatistics}
 \alias{EstimateAllSampleStatistics}
+\alias{EstimateAllSampleStatistics,CATE-estimator-method}
 \alias{EstimateAllSampleStatistics,Meta-learner-method}
-\alias{EstimateAllSampleStatistics-S_BART}
-\alias{EstimateAllSampleStatistics-T_BART}
-\alias{EstimateAllSampleStatistics-X_BART}
+\alias{EstimateAllSampleStatistics,S_BART-method}
+\alias{EstimateAllSampleStatistics,T_BART-method}
+\alias{EstimateAllSampleStatistics,X_BART-method}
 \title{Method EstimateAllSampleStatistics}
 \usage{
 EstimateAllSampleStatistics(theObject, feature_new,

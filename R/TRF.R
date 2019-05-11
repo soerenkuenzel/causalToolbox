@@ -238,7 +238,6 @@ T_RF_fully_specified <-
 
 # Estimate CATE Method ---------------------------------------------------------
 #' EstimateCate-T_hRF
-#' @name EstimateCate-T_RF
 #' @rdname EstimateCate
 #' @inherit EstimateCate
 #' @exportMethod EstimateCate

@@ -4,12 +4,13 @@
 \docType{methods}
 \name{EstimateCate}
 \alias{EstimateCate}
-\alias{EstimateCate-M_BART}
-\alias{EstimateCate-S_BART}
-\alias{EstimateCate-S_RF}
-\alias{EstimateCate-X_BART}
-\alias{EstimateCate-X_RF}
-\alias{EstimateCate-T_RF}
+\alias{EstimateCate,MO_BART-method}
+\alias{EstimateCate,S_BART-method}
+\alias{EstimateCate,S_RF-method}
+\alias{EstimateCate,T_BART-method}
+\alias{EstimateCate,X_BART-method}
+\alias{EstimateCate,X_RF-method}
+\alias{EstimateCate,T_RF-method}
 \title{Method EstimateCate}
 \usage{
 EstimateCate(theObject, feature_new, ...)
@@ -41,14 +42,6 @@ EstimateCate(theObject, feature_new, ...)
 \item{verbose}{TRUE for detailed output FALSE for no output}
 
 \item{return_CI}{If TRUE, return predictions and their confidence intervals;}
-
-\item{theObject}{A `X_BART` object.}
-
-\item{feature_new}{A data frame.}
-
-\item{verbose}{TRUE for detailed output FALSE for no output}
-
-\item{return_CI}{TRUE for predictions and confidence intervals FALSE for only}
 }
 \description{
 Returns the estimated CATE.

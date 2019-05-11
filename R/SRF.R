@@ -78,8 +78,6 @@ S_RF <-
            yobs, 
            nthread = 0,
            verbose = TRUE,
-           alwaysTr = FALSE,
-           takeOutATE = FALSE, 
            mu.forestry =
              list(
                relevant.Variable = 1:ncol(feat),
@@ -92,16 +90,6 @@ S_RF <-
                splitratio = .5,
                middleSplit = FALSE
              )) {
-    #TODO
-    if (alwaysTr) {
-      stop(paste("always trying to split on the treatment variable is", 
-                 "currently not implemented."))
-    }
-    #TODO
-    if (takeOutATE) {
-      stop(paste("taking out the ATE before applying the S-learner is", 
-                 "currently not implemented."))
-    }
     
     # Cast input data to a standard format -------------------------------------
     feat <- as.data.frame(feat)
@@ -130,8 +118,7 @@ S_RF <-
     }
     
     # Translate the settings to a feature list ---------------------------------
-    general_hyperpara <- list("nthread" = nthread, alwaysTr = alwaysTr,
-                              takeOutATE = takeOutATE)
+    general_hyperpara <- list("nthread" = nthread)
     
     hyperparameter_list <- list(
       "general" = general_hyperpara,
@@ -202,7 +189,6 @@ S_RF_fully_specified <-
 ### Estimate CATE Method ###
 ############################
 #' EstimateCate-S_hRF
-#' @name EstimateCate-S_RF
 #' @rdname EstimateCate
 #' @inherit EstimateCate
 #' @exportMethod EstimateCate

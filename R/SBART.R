@@ -83,7 +83,6 @@ S_BART <-
   }
 
 #' EstimateCate-S_BART
-#' @name EstimateCate-S_BART
 #' @rdname EstimateCate
 #' @inherit EstimateCate
 #' @exportMethod EstimateCate
@@ -150,7 +149,6 @@ setMethod(
 
 
 #' EstimateAllSampleStatistics-S_BART
-#' @name EstimateAllSampleStatistics-S_BART
 #' @rdname EstimateAllSampleStatistics
 #' @inherit EstimateAllSampleStatistics
 #' @exportMethod EstimateAllSampleStatistics

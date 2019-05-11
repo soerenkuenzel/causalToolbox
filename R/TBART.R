@@ -111,7 +111,6 @@ T_BART <-
   }
 
 
-#' @name EstimateCate-X_BART
 #' @rdname EstimateCate
 #' @inherit EstimateCate
 #' @exportMethod EstimateCate
@@ -244,7 +243,6 @@ setMethod(
 
 
 #' CateCI-T_BART
-#' @name CateCI-T_BART
 #' @rdname CateCI
 #' @inheritParams CateCI
 #' @aliases CateCI,T_BART-method
@@ -364,7 +362,6 @@ setMethod(
   }
 )
 
-#' @name EstimateAllSampleStatistics-T_BART
 #' @rdname EstimateAllSampleStatistics
 #' @inherit EstimateAllSampleStatistics
 #' @exportMethod EstimateAllSampleStatistics

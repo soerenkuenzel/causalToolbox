@@ -113,7 +113,6 @@ setGeneric(
 # Estimating Confidence intervals
 
 #' CateCI-Meta-learner
-#' @name CateCI-Meta-learner
 #' @rdname CateCI
 #' @description Return the estimated confidence intervals for the CATE
 #' @param theObject A `Meta-learner` object
@@ -301,7 +300,6 @@ setMethod(
 
 
 #' EstimateAllSampleStatistics-Meta-learner
-#' @name EstimateAllSampleStatistics
 #' @rdname EstimateAllSampleStatistics
 #' @inheritParams EstimateAll
 #' @description TODO: add description
