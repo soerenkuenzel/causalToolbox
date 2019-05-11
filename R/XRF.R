@@ -6,25 +6,6 @@
 
 
 # X-RF class -------------------------------------------------------------------
-#' @description The `X_RF` object is an X-learner combined with honest random
-#'   forest used for the propensity score estimate, the first stage and the
-#'   second stage.
-#' @slot feature_train A data frame of all training features.
-#' @slot tr_train A vector containing 0 for control and 1 for treated variables.
-#' @slot yobs_train A vector containing the observed outcomes.
-#' @slot m_0 An honest random forest predictor for the control group of
-#'   the first stage.
-#' @slot m_1 An honest random forest predictor for the treated group of
-#'   the first stage.
-#' @slot m_tau_0 An honest random forest predictor for the control
-#'   group of the second stage.
-#' @slot m_tau_1 An honest random forest predictor for the treated
-#'   group of the second stage.
-#' @slot m_prop An honest random forest predictor for the propensity
-#'   score.
-#' @slot hyperparameter_list A list of lists of hyperparameters used for the
-#'   honest random forest algorithm of the forestry package
-#' @noRd
 setClass(
   "X_RF",
   contains = "Meta-learner",

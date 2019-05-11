@@ -2,15 +2,19 @@
 % Please edit documentation in R/CATE_estimators.R, R/SBART.R, R/TBART.R,
 %   R/XBART.R
 \docType{methods}
-\name{CateCI,CATE-estimator-method}
-\alias{CateCI,CATE-estimator-method}
-\alias{CateCI,Meta-learner-method}
+\name{CateCI}
+\alias{CateCI}
+\alias{CateCI,CATEestimator-method}
 \alias{CateCI,S_BART-method}
 \alias{CateCI,T_BART-method}
 \alias{CateCI,X_BART-method}
-\title{CateCI-Meta-learner}
+\title{Method CateCI}
 \usage{
-\S4method{CateCI}{`CATE-estimator`}(theObject, feature_new,
+CateCI(theObject, feature_new, method = "maintain_group_ratios",
+  bootstrapVersion = "normalApprox", B = 2000, nthread = 0,
+  verbose = TRUE)
+
+\S4method{CateCI}{CATEestimator}(theObject, feature_new,
   method = "maintain_group_ratios", bootstrapVersion = "normalApprox",
   B = 2000, nthread = 0, verbose = TRUE)
 

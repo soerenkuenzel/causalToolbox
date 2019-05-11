@@ -1,18 +1,6 @@
 #' @include CATE_estimators.R
 
 # S-RF class -------------------------------------------------------------------
-#' @title ShRF constructor
-#' @name S_RF-class
-#' @rdname S_RF-class
-#' @description The `S_RF` object is a S-learner combined with honest random
-#' forest used for both response functions
-#' @slot feature_train A data frame of all training features.
-#' @slot tr_train A vector containing 0 for control and 1 for treated variables.
-#' @slot yobs_train A vector containing the observed outcomes.
-#' @slot forest A forest object
-#' @slot creator A function which creates a S_RF
-#' @exportClass S_RF
-#' @noRd
 setClass(
   "S_RF",
   contains = "Meta-learner",

@@ -304,6 +304,7 @@ setMethod(
 
 #' CateCI-X_BART
 #' @rdname CateCI
+#' @inheritParams CateCI
 #' @aliases CateCI,X_BART-method
 #' @exportMethod CateCI
 setMethod(

@@ -4,8 +4,7 @@
 \docType{methods}
 \name{EstimateAllSampleStatistics}
 \alias{EstimateAllSampleStatistics}
-\alias{EstimateAllSampleStatistics,CATE-estimator-method}
-\alias{EstimateAllSampleStatistics,Meta-learner-method}
+\alias{EstimateAllSampleStatistics,CATEestimator-method}
 \alias{EstimateAllSampleStatistics,S_BART-method}
 \alias{EstimateAllSampleStatistics,T_BART-method}
 \alias{EstimateAllSampleStatistics,X_BART-method}
@@ -15,8 +14,8 @@ EstimateAllSampleStatistics(theObject, feature_new,
   method = "maintain_group_ratios", B = 2000, nthread = 0,
   verbose = TRUE)
 
-\S4method{EstimateAllSampleStatistics}{`CATE-estimator`}(theObject, method,
-  B, nthread, verbose)
+\S4method{EstimateAllSampleStatistics}{CATEestimator}(theObject, method, B,
+  nthread, verbose)
 
 \S4method{EstimateAllSampleStatistics}{S_BART}(theObject,
   verbose = FALSE)

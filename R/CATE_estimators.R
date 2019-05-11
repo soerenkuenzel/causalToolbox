@@ -2,12 +2,7 @@
 NULL
 
 # Cate estimators --------------------------------------------------------------
-#' Class CATE-estimator 
-#' @name CATE-estimator-class
-#' @rdname CATE-estimator-class
-#' @exportClass CATE-estimator
-#' @noRd
-setClass("CATE-estimator",
+setClass("CATEestimator",
          slots = list(
            feature_train = "data.frame",
            tr_train = "numeric",
@@ -17,14 +12,9 @@ setClass("CATE-estimator",
 setOldClass("forestry::honestRF")
 
 # Meta-learner -----------------------------------------------------------------
-#' Class Meta-learner
-#' @name Meta-learner-class
-#' @rdname Meta-learner-class
-#' @exportClass Meta-learner
-#' @noRd
 setClass(
   "Meta-learner",
-  contains = "CATE-estimator"
+  contains = "CATEestimator"
 )
 #'Method EstimateCate
 #'@name EstimateCate
@@ -33,7 +23,7 @@ setClass(
 #'@param theObject A `Meta-learner` object.
 #'@param feature_new A feature data frame.
 #'@param ... Additional parameters that are specific for some meta-learners
-#'@export EstimateCate
+#'@export
 setGeneric(
   name = "EstimateCate",
   def = function(theObject, feature_new, ...) {
@@ -52,8 +42,7 @@ setGeneric(
 #'@param bootstrapVersion default is normalApprox which will just use the 
 #'bootstrap normal approximation to get CI. smoothed will use use CI around the
 #'smoothed bootstrap as introduced by Efron 2014.
-#'@exportMethod CateCI
-#'@noRd
+#'@export
 setGeneric(
   name = "CateCI",
   def = function(theObject,
@@ -75,7 +64,7 @@ setGeneric(
 #'@param nthread number of threads used in paralle
 #'@param verbose TRUE for detailed output FALSE for no output
 #'@rdname EstimateATT
-#'@exportMethod EstimateATT
+#'@export
 setGeneric(
   name = "EstimateATT",
   def = function(theObject,
@@ -96,7 +85,7 @@ setGeneric(
 #'@param B Number of bootstrap samples.
 #'@param nthread Number of threads to be used.
 #'@param verbose TRUE for detailed output FALSE for no output
-#'@exportMethod EstimateAllSampleStatistics
+#'@export
 setGeneric(
   name = "EstimateAllSampleStatistics",
   def = function(theObject,
@@ -115,22 +104,12 @@ setGeneric(
 #' CateCI-Meta-learner
 #' @rdname CateCI
 #' @description Return the estimated confidence intervals for the CATE
-#' @param theObject A `Meta-learner` object
-#' @param feature_new A feature data frame
-#' @param method Different versions of the bootstrap.
-#' @param B Number of bootstrap samples
-#' @param nthread number of threads to be used in parallel
-#' @param verbose TRUE for detailed output FALSE for no output
-#' @param bootstrapVersion default is normalApprox which will just use the 
-#'bootstrap normal approximation to get CI. smoothed will use use CI around the
-#'smoothed bootstrap as introduced by Efron 2014.
-#'@exportMethod CateCI
 #' @return A data frame of estimated CATE Confidence Intervals
-#' @aliases CateCI,Meta-learner-method
-#' @exportMethod CateCI
+#' @inherit CateCI
+#' @export
 setMethod(
   f = "CateCI",
-  signature = "CATE-estimator",
+  signature = "CATEestimator",
   definition = function(theObject,
                         feature_new,
                         method,
@@ -303,11 +282,10 @@ setMethod(
 #' @rdname EstimateAllSampleStatistics
 #' @inheritParams EstimateAll
 #' @description TODO: add description
-#' @aliases EstimateAllSampleStatistics,Meta-learner-method
 #' @export EstimateAllSampleStatistics
 setMethod(
   f = "EstimateAllSampleStatistics",
-  signature = "CATE-estimator",
+  signature = "CATEestimator",
   definition = function(theObject,
                         method,
                         B,
