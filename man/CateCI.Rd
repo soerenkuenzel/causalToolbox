@@ -28,7 +28,7 @@ CateCI(theObject, feature_new, method = "maintain_group_ratios",
 \S4method{CateCI}{M_BART}(theObject, feature_new, verbose = FALSE)
 }
 \arguments{
-\item{theObject}{A `Meta-learner` object}
+\item{theObject}{A `MetaLearner` object}
 
 \item{feature_new}{A feature data frame}
 

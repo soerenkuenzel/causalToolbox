@@ -9,7 +9,7 @@
 # T-RF class -------------------------------------------------------------------
 setClass(
   "T_RF",
-  contains = "Meta-learner",
+  contains = "MetaLearner",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",

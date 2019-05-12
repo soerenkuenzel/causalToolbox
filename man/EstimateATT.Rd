@@ -8,7 +8,7 @@ EstimateATT(theObject, feature_new, method = "maintain_group_ratios",
   B = 2000, nthread = 0, verbose = TRUE)
 }
 \arguments{
-\item{theObject}{A `Meta-learner` object.}
+\item{theObject}{A `MetaLearner` object.}
 
 \item{feature_new}{A feature data frame}
 

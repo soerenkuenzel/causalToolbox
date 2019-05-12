@@ -11,18 +11,18 @@ setClass("CATEestimator",
          ))
 setOldClass("forestry::honestRF")
 
-# Meta-learner -----------------------------------------------------------------
+# MetaLearner -----------------------------------------------------------------
 setClass(
-  "Meta-learner",
+  "MetaLearner",
   contains = "CATEestimator"
 )
 #'Method EstimateCate
 #'@name EstimateCate
 #'@rdname EstimateCate
 #'@description Returns the estimated CATE. 
-#'@param theObject A `Meta-learner` object.
+#'@param theObject A `MetaLearner` object.
 #'@param feature_new A feature data frame.
-#'@param ... Additional parameters that are specific for some meta-learners
+#'@param ... Additional parameters that are specific for some MetaLearners
 #'@export
 setGeneric(
   name = "EstimateCate",
@@ -33,7 +33,7 @@ setGeneric(
 #'Method CateCI
 #'@name CateCI
 #'@rdname CateCI
-#'@param theObject A `Meta-learner` object
+#'@param theObject A `MetaLearner` object
 #'@param feature_new A feature data frame
 #'@param method Different versions of the bootstrap.
 #'@param B Number of bootstrap samples
@@ -57,7 +57,7 @@ setGeneric(
 )
 #'Method EstimateATT
 #'@name EstimateATT
-#'@param theObject A `Meta-learner` object.
+#'@param theObject A `MetaLearner` object.
 #'@param feature_new A feature data frame
 #'@param method different versions of the bootstrap.
 #'@param B number of bootstrap samples.
@@ -79,7 +79,7 @@ setGeneric(
 #'Method EstimateAllSampleStatistics
 #'@name EstimateAllSampleStatistics
 #'@rdname EstimateAllSampleStatistics
-#'@param theObject A `Meta-learner` object.
+#'@param theObject A `MetaLearner` object.
 #'@param feature_new A feature data frame
 #'@param method different versions of the bootstrap.
 #'@param B Number of bootstrap samples.
@@ -101,7 +101,7 @@ setGeneric(
 # Confidence Interval Estimation -----------------------------------------------
 # Estimating Confidence intervals
 
-#' CateCI-Meta-learner
+#' CateCI-MetaLearner
 #' @rdname CateCI
 #' @description Return the estimated confidence intervals for the CATE
 #' @return A data frame of estimated CATE Confidence Intervals
@@ -278,7 +278,7 @@ setMethod(
 )
 
 
-#' EstimateAllSampleStatistics-Meta-learner
+#' EstimateAllSampleStatistics-MetaLearner
 #' @rdname EstimateAllSampleStatistics
 #' @inheritParams EstimateAll
 #' @description TODO: add description

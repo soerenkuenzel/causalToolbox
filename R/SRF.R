@@ -3,7 +3,7 @@
 # S-RF class -------------------------------------------------------------------
 setClass(
   "S_RF",
-  contains = "Meta-learner",
+  contains = "MetaLearner",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",

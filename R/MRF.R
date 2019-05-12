@@ -3,7 +3,7 @@
 # M-RF class -------------------------------------------------------------------
 setClass(
   "M_RF",
-  contains = "Meta-learner",
+  contains = "MetaLearner",
   slots = list(
     m_0 = "forestry",
     m_1 = "forestry",
@@ -69,7 +69,7 @@ setClass(
 #' @references
 #' \itemize{
 #'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-#'     Meta-learners for estimating heterogeneous treatment effects using
+#'     MetaLearners for estimating heterogeneous treatment effects using
 #'     machine learning. 
 #'     \url{https://www.pnas.org/content/116/10/4156}
 #'   \item 

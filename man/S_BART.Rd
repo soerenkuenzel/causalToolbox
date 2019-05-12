@@ -97,7 +97,7 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 \references{
 \itemize{
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-    Meta-learners for estimating heterogeneous treatment effects using
+    MetaLearners for estimating heterogeneous treatment effects using
     machine learning. 
     \url{https://www.pnas.org/content/116/10/4156}
   \item 

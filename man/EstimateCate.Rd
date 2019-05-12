@@ -36,11 +36,11 @@ EstimateCate(theObject, feature_new, ...)
   return_CI = FALSE)
 }
 \arguments{
-\item{theObject}{A `Meta-learner` object.}
+\item{theObject}{A `MetaLearner` object.}
 
 \item{feature_new}{A feature data frame.}
 
-\item{...}{Additional parameters that are specific for some meta-learners}
+\item{...}{Additional parameters that are specific for some MetaLearners}
 
 \item{verbose}{TRUE for detailed output FALSE for no output}
 

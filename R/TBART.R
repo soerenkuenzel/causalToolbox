@@ -7,7 +7,7 @@
 ## the standard Xlearner object with random forest
 setClass(
   "T_BART",
-  contains = "Meta-learner",
+  contains = "MetaLearner",
   slots = list(
     feature_train = "data.frame",
     tr_train = "numeric",

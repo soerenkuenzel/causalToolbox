@@ -27,7 +27,7 @@ EstimateAllSampleStatistics(theObject, feature_new,
   verbose = FALSE)
 }
 \arguments{
-\item{theObject}{A `Meta-learner` object.}
+\item{theObject}{A `MetaLearner` object.}
 
 \item{feature_new}{A feature data frame}
 
