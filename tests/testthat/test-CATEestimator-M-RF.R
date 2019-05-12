@@ -21,7 +21,7 @@ test_that(
   
   expect_known_value(EstimateCate(morf, feat),
                       file = "knownTestValues/testvalues-M_RF1", 
-                     tolerance = 1e-2)
+                     tolerance = 1e-1)
   
   CI <- CateCI(theObject = morf,
          feature_new = feat, 

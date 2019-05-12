@@ -4,7 +4,7 @@
 \alias{M_RF}
 \title{M-Learner with RF}
 \usage{
-M_RF(feat, tr, yobs, nthread = 0, verbose = TRUE,
+M_RF(feat, tr, yobs, nthread = 0, verbose = FALSE,
   mu.forestry = list(relevant.Variable = 1:ncol(feat), ntree = 1000,
   replace = TRUE, sample.fraction = 0.8, mtry = round(ncol(feat) * 13/20),
   nodesizeSpl = 2, nodesizeAvg = 1, splitratio = 1, middleSplit = TRUE),
@@ -107,9 +107,11 @@ feature_test <- simulated_experiment$feat_te
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+ml_rf <- M_RF(feat = feat, tr = tr, yobs = yobs)
 xl_bt <- X_BART(feat = feat, tr = tr, yobs = yobs)
 tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
 sl_bt <- S_BART(feat = feat, tr = tr, yobs = yobs)
+ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
@@ -126,15 +128,14 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
     Meta-learners for estimating heterogeneous treatment effects using
     machine learning. 
-    \url{https://arxiv.org/pdf/1706.03461.pdf}
+    \url{https://www.pnas.org/content/116/10/4156}
   \item 
     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
     Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
     \url{https://arxiv.org/pdf/1811.02833.pdf}
-  \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
-    Jasjeet Sekhon, and Pieter Abbeel (2018). 
-    Transfer learning for estimating causal effects using neural networks. 
-    \url{https://arxiv.org/pdf/1808.07804.pdf}
+  \item Daniel Rubin and Mark J van der Laan (2007). A doubly robust
+  censoring unbiased transformation.
+    \url{https://www.ncbi.nlm.nih.gov/pubmed/22550646}
   }
 }
 \seealso{

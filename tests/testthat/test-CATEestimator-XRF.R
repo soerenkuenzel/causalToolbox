@@ -9,7 +9,8 @@ test_that("Tests that XhRF is working correctly", {
 
   expect_output(xl <- X_RF(feat = feat,
                            tr = tr,
-                           yobs = yobs))
+                           yobs = yobs,
+                           verbose = TRUE))
   EstimateCate(xl, feat)[1]
   expect_equal(EstimateCate(xl, feat)[1], 0.07867132, tolerance = 1e-2)
 
@@ -26,7 +27,8 @@ test_that("Tests that XhRF is working correctly", {
 
   expect_output(xl <- X_RF(feat = cate_problem$feat_tr,
                            yobs = cate_problem$Yobs_tr,
-                           tr = cate_problem$W_tr))
+                           tr = cate_problem$W_tr, 
+                           verbose = TRUE))
   
   expect_equal(mean((
     EstimateCate(xl, cate_problem$feat_te) - cate_problem$tau_te

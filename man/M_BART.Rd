@@ -87,9 +87,11 @@ feature_test <- simulated_experiment$feat_te
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
+ml_rf <- M_RF(feat = feat, tr = tr, yobs = yobs)
 xl_bt <- X_BART(feat = feat, tr = tr, yobs = yobs)
 tl_bt <- T_BART(feat = feat, tr = tr, yobs = yobs)
 sl_bt <- S_BART(feat = feat, tr = tr, yobs = yobs)
+ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
@@ -106,7 +108,7 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
     Meta-learners for estimating heterogeneous treatment effects using
     machine learning. 
-    \url{https://arxiv.org/pdf/1706.03461.pdf}
+    \url{https://www.pnas.org/content/116/10/4156}
   \item 
     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
     Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.

@@ -66,6 +66,20 @@ setClass(
 #'            middle between two observations. Otherwise, it will take a point 
 #'            based on a uniform distribution between the two observations. 
 #'   }
+#' @references
+#' \itemize{
+#'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
+#'     Meta-learners for estimating heterogeneous treatment effects using
+#'     machine learning. 
+#'     \url{https://www.pnas.org/content/116/10/4156}
+#'   \item 
+#'     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
+#'     Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
+#'     \url{https://arxiv.org/pdf/1811.02833.pdf}
+#'   \item Daniel Rubin and Mark J van der Laan (2007). A doubly robust
+#'   censoring unbiased transformation.
+#'     \url{https://www.ncbi.nlm.nih.gov/pubmed/22550646}
+#'   }
 #' @inherit X_RF
 #' @family metalearners
 #' @export
