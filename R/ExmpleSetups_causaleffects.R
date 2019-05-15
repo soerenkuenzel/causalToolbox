@@ -81,7 +81,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' @return A list with the following elements 
 #'   \item{\code{setup_name}}{Name of the setup} 
 #'   \item{\code{m_t_truth}}{Function contraining the response function of the
-#'   treated units}
+#'   treated units.}
 #'   \item{\code{m_c_truth}}{Function contraining the response function of the
 #'   control units}
 #'   \item{\code{propscore}}{Propensity score function} 
