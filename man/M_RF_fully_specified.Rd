@@ -15,7 +15,7 @@ M_RF_fully_specified(feat, tr, yobs, hyperparameter_list, verbose)
 
 \item{hyperparameter_list}{A list of lists of hyper parameters}
 
-\item{verbose}{TRUE for detailed output FALSE for no output:}
+\item{verbose}{TRUE for detailed output, FALSE for no output.}
 }
 \value{
 An object from a class that is derived from the \code{CATE-estimator}
@@ -52,17 +52,17 @@ The X-Learner estimates the CATE in three steps:
     \deqn{D^1_i = Y_i(1) - \hat \mu_0(X_i)}
     \deqn{D^0_i = \hat \mu_1(X_i) - Y_i(0).}
     Now employ the base learner in two ways: using \eqn{D^1_i} as the
-    dependent variable to obtain \eqn{\hat \tau_1(x)}, and using \eqn{D^1_i}
+    dependent variable to obtain \eqn{\hat \tau_1(x)}, and using \eqn{D^0_i}
     as the dependent variable to obtain \eqn{\hat \tau_0(x)}.
  \item 
     Define the CATE estimate by a weighted average of the two estimates at
     Stage 2: 
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
-    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)} where
+    If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)}, where
     \eqn{e(x)} is an estimate of the propensity score using the 
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} random
-    forest version with the hyperparameters specified in \code{e.forestry}.
-    If \code{predmode = "control"}, then \eqn{g(x) = 1} and if 
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} RF
+    version with the hyperparameters specified in \code{e.forestry}.
+    If \code{predmode = "control"}, then \eqn{g(x) = 1}, and if 
     \code{predmode = "treated"}, then \eqn{g(x) = 0}.
 }
 }
@@ -80,7 +80,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using honest Random Forests (RF)
+# create the hte object using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -96,15 +96,15 @@ cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{
-# Create confidence intervals via bootstrapping. 
+# create confidence intervals via bootstrapping. 
 xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 }
 }
 \references{
 \itemize{
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-    MetaLearners for estimating heterogeneous treatment effects using
-    machine learning. 
+    MetaLearners for Estimating Heterogeneous Treatment Effects using
+    Machine Learning. 
     \url{https://www.pnas.org/content/116/10/4156}
   \item 
     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
@@ -112,7 +112,7 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
     \url{https://arxiv.org/pdf/1811.02833.pdf}
   \item Sören Künzel, Bradly Stadie, Nikita Vemuri, Varsha Ramakrishnan, 
     Jasjeet Sekhon, and Pieter Abbeel (2018). 
-    Transfer learning for estimating causal effects using neural networks. 
+    Transfer Learning for Estimating Causal Effects using Neural Networks. 
     \url{https://arxiv.org/pdf/1808.07804.pdf}
   }
 }

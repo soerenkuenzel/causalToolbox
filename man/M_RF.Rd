@@ -24,7 +24,7 @@ M_RF(feat, tr, yobs, nthread = 0, verbose = FALSE,
 
 \item{nthread}{Number of threads which should be used to work in parallel.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output:}
+\item{verbose}{TRUE for detailed output, FALSE for no output.}
 
 \item{mu.forestry, tau.forestry, e.forestry}{A list containing the
 hyperparameters for the \code{forestry} package that are used for
@@ -67,8 +67,8 @@ An object from a class that is derived from the \code{CATE-estimator}
   is used for different bootstrap procedures.}
 }
 \description{
-This is an implementation of the X-learner with honest random
-forest at the first and second stage. The function returns an X-RF object.
+This is an implementation of the X-learner with Random
+Forests (Breiman 2001) at the first and second stage. The function returns an X-RF object.
 }
 \details{
 The M-Learner estimates the CATE in two steps:
@@ -103,7 +103,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using honest Random Forests (RF)
+# create the hte object using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -119,7 +119,7 @@ cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{
-# Create confidence intervals via bootstrapping. 
+# create confidence intervals via bootstrapping. 
 xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 }
 }
