@@ -20,7 +20,10 @@ setClass(
 )
 
 # X_RF generator ---------------------------------------------------------------
-#' @title X-Learner with Random Forests
+#' @title X-Learners
+#' @rdname xleaner
+#' @description X_RF is an implementation of the X-learner with Random Forests
+#'   (Breiman 2001) at the first and second stage.
 #' @details 
 #' The X-Learner estimates the CATE in three steps:
 #' \enumerate{
@@ -51,8 +54,6 @@ setClass(
 #'     If \code{predmode = "control"}, then \eqn{g(x) = 1}, and if 
 #'     \code{predmode = "treated"}, then \eqn{g(x) = 0}.
 #' }
-#' @description This is an implementation of the X-learner with Random
-#' Forests (Breiman 2001) at the first and second stage. The function returns an X-RF object.
 #' @param feat A data frame containing the features.
 #' @param tr A numeric vector with 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.

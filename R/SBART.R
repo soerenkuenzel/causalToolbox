@@ -18,9 +18,9 @@ setClass(
   )
 )
 
-#' @title S_BART
-#' @rdname S_BART
-#' @description This is an implementation of S_BART
+#' @rdname slearners
+#' @description S_BART is an implementation of the S-Learner with Bayesian
+#'   Additive Regression Trees (Chipman et al. 2010).
 #' @param mu.BART hyperparameters of the BART function. Use
 #'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
 #' @import methods

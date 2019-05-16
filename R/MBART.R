@@ -22,10 +22,9 @@ setClass(
   )
 )
 
-#' @title Modified Outcome estimator with BART
-#' @rdname M_BART
-#' @description This is an implementation of the Modified Outcome Estimator with
-#'   BART as base learner.
+#' @rdname Mlearners
+#' @description M_BART is an implementation of the Modified Outcome Estimator with
+#'   Bayesian Additive Regression Trees (Chipman et al. 2010) as base learner.
 #' @param mu.BART,e.BART,tau.BART hyperparameters of the BART functions for the
 #'   control and treated group. Use \code{?BART::mc.wbart} for a detailed
 #'   explanation of their effects.

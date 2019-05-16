@@ -23,9 +23,10 @@ setClass(
 
 
 # T_BART generator -------------------------------------------------------------
-#' @title T-Learner with BART
-#' @description This is an implementation of the T-learner combined with BART as
-#'   base learner.
+#' @rdname Tlearners
+#' @description T_BART is an implementation of the T-learner with Bayesian
+#'   Additive Regression Trees (Chipman et al. 2010) for both response
+#'   functions.
 #' @param ndpost Number of posterior draws
 #' @param ntree Number of trees
 #' @param mu0.BART,mu1.BART hyperparameters of the BART functions for the

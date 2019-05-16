@@ -22,7 +22,10 @@ setClass(
 )
 
 # S_RF generator ---------------------------------------------------------------
-#' @title S-Learner with honest RF
+#' @title S-Learners
+#' @description S_RF is an implementation of the S-Learner combined with
+#'   Random Forests (Breiman 2001)
+#' @rdname slearners
 #' @details 
 #' In the S-Learner the outcome is estimated using all of the features and the 
 #' treatment indicator,  without giving the treatment indicator a special role. 
@@ -39,7 +42,6 @@ setClass(
 #'     Define the CATE estimate as
 #'     \deqn{\tau(x) = \hat \mu_1(x, 1) - \hat \mu_0(x, 0).}
 #' }
-#' @description This is an implementation of the S-learner combined with honest
 #' @param mu.forestry A list containing the hyperparameters for the
 #'   \code{forestry} package that are used in \eqn{\hat \mu_0}.
 #'   These hyperparameters are passed to the \code{forestry} package. 

@@ -20,7 +20,10 @@ setClass(
   }
 )
 
-#' @title M-Learner with RF
+#' @title M-Learners
+#' @rdname Mlearners
+#' @description M_RF is an implementation of the Modified Outcome Estimator with
+#'   Random Forest (Breiman 2001) as base learner.
 #' @details 
 #' The M-Learner estimates the CATE in two steps:
 #' \enumerate{

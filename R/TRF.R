@@ -29,7 +29,10 @@ setClass(
 )
 
 # T_RF generator ---------------------------------------------------------------
-#' @title T-Learner with honest RF for both response functions
+#' @title T-Learners
+#' @rdname Tlearners
+#' @description T_RF is an implementation of the T-learner combined with Random
+#'   Forest (Breiman 2001) for both response functions.
 #' @details 
 #' The CATE is estimated using two estimators:
 #' \enumerate{
@@ -43,8 +46,6 @@ setClass(
 #'     Define the CATE estimate as
 #'     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
 #' }
-#' @description This is an implementation of the T-learner combined with honest
-#'   random forest for both response functions
 #' @param mu0.forestry,mu1.forestry Lists containing the hyperparameters for the
 #'   \code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
 #'   \mu_1}, respectively. These hyperparameters are passed to the

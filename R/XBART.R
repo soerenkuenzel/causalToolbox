@@ -23,9 +23,9 @@ setClass(
   )
 )
 
-#' @title X_BART
-#' @rdname X_BART
-#' @description This is an implementation of X_BART
+#' @rdname xleaner
+#' @description X_BART is an implementation of the X-learner with Bayesian
+#'   Additive Regression Trees (Chipman et al. 2010) at the first and second stage
 #' @param mu.BART,tau.BART,e.BART hyperparameters of the BART functions for the
 #'   estimates of the first and second stage and the propensity score. Use
 #'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
