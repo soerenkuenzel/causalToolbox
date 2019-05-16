@@ -113,7 +113,6 @@ setClass(
 #'     Transfer Learning for Estimating Causal Effects using Neural Networks. 
 #'     \url{https://arxiv.org/pdf/1808.07804.pdf}
 #'   }
-#' @seealso \code{\link{X_RF_fully_specified}}
 #' @family metalearners
 #' @examples
 #' require(causalToolbox)
@@ -264,16 +263,6 @@ X_RF <-
   }
 
 # X-RF basic constructor -------------------------------------------------------
-#' @title X_RF fully specified constructor
-#' @description This is the most basic X-learner with honest random forest
-#'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead call the simpler version X_RF or one of the
-#'   self tuning versions should be called. This function mainly exists to be
-#'   called from other functions.
-#' @param hyperparameter_list A list of lists of hyper parameters
-#' @seealso \code{\link{X_RF}}
-#' @inherit X_RF
-#' @import methods
 X_RF_fully_specified <-
   function(feat,
            tr,

@@ -156,8 +156,6 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
   }
 }
 \seealso{
-\code{\link{X_RF_fully_specified}}
-
 Other metalearners: \code{\link{M_BART}},
   \code{\link{M_RF}}, \code{\link{S_BART}},
   \code{\link{S_RF}}, \code{\link{T_BART}},

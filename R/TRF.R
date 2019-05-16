@@ -153,15 +153,6 @@ T_RF <-
   }
 
 # T-RF basic constructor -------------------------------------------------------
-#' @title T_RF fully specified constructor
-#' @description This is the most basic T-learner with honest random forest
-#'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead, call the simpler version T_RF or one of the
-#'   self tuning versions. This function exists mainly to be called from other
-#'   functions.
-#' @inherit X_RF_fully_specified
-#' @seealso \code{\link{T_RF}}
-#' @export
 T_RF_fully_specified <-
   function(feat,
            tr,

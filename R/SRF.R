@@ -125,15 +125,6 @@ S_RF <-
   }
     
 # S-RF basic constructor -------------------------------------------------------
-#' @title S_RF fully specified constructor
-#' @description This is the most basic S-learner with honest random forest
-#'   constructor. It should not be called directly, since the list of
-#'   parameters is too big. Instead, call the simpler version S_RF or one of the
-#'   self tuning versions. This function exists mainly to be called from other
-#'   functions.
-#' @inherit X_RF_fully_specified
-#' @seealso \code{\link{S_RF}}
-#' @export
 S_RF_fully_specified <-
   function(feat,
            tr,

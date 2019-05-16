@@ -191,15 +191,6 @@ M_RF <-
   }
     
 # M-RF basic constructor -------------------------------------------------------
-#' @title M_RF fully specified constructor
-#' @description This is the most basic M-learner with random forest constructor.
-#'   It should not be called by the user, since the list of parameters is too
-#'   big. Instead call the simpler version M_RF. This function mainly exists to
-#'   be called from other functions.
-#' @param hyperparameter_list A list of lists of hyper parameters
-#' @seealso \code{\link{X_RF}}
-#' @inherit X_RF
-#' @import methods
 M_RF_fully_specified <-
   function(feat,
            tr,
