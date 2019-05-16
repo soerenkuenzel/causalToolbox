@@ -2,7 +2,7 @@
 % Please edit documentation in R/XRF.R
 \name{X_RF}
 \alias{X_RF}
-\title{X-Learner with honest RF}
+\title{X-Learner with Random Forests}
 \usage{
 X_RF(feat, tr, yobs, predmode = "propmean", nthread = 0,
   verbose = FALSE, mu.forestry = list(relevant.Variable = 1:ncol(feat),

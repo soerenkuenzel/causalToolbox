@@ -20,7 +20,7 @@ setClass(
 )
 
 # X_RF generator ---------------------------------------------------------------
-#' @title X-Learner with honest RF
+#' @title X-Learner with Random Forests
 #' @details 
 #' The X-Learner estimates the CATE in three steps:
 #' \enumerate{
