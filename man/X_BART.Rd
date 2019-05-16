@@ -41,7 +41,7 @@ estimates of the first and second stage and the propensity score. Use
 }
 \value{
 An object from a class that is derived from the \code{CATE-estimator}
-  class. It should be used with one of the following functions
+  class. It should be used with one of the following functions;
   \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
   and \code{EstimateAllSampleStatistics}. The object has at least the
   following slots:

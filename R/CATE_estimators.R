@@ -33,16 +33,35 @@ setGeneric(
 #'Method CateCI
 #'@name CateCI
 #'@rdname CateCI
-#'@param theObject A `MetaLearner` object
-#'@param feature_new A feature data frame
+#'@param theObject A `MetaLearner` object.
+#'@param feature_new A feature data frame.
 #'@param method Different versions of the bootstrap.
-#'@param B Number of bootstrap samples
-#'@param nthread number of threads to be used in parallel
-#'@param verbose TRUE for detailed output FALSE for no output
-#'@param bootstrapVersion default is normalApprox which will just use the 
-#'bootstrap normal approximation to get CI. smoothed will use use CI around the
+#'@param B Number of bootstrap samples.
+#'@param nthread Number of threads to be used in parallel.
+#'@param verbose TRUE for detailed output FALSE for no output.
+#'@param bootstrapVersion Default is normalApprox, which will just use the 
+#'bootstrap normal approximation to get CI. Smoothed will use use CI around the
 #'smoothed bootstrap as introduced by Efron 2014.
 #'@export
+#' @examples
+#' \dontrun{
+#' require(causalToolbox)
+#' 
+#' # create example data set
+#' simulated_experiment <- simulate_causal_experiment(
+#'   ntrain = 1000,
+#'   ntest = 1000,
+#'   dim = 10
+#' )
+#' feat <- simulated_experiment$feat_tr
+#' tr <- simulated_experiment$W_tr
+#' yobs <- simulated_experiment$Yobs_tr
+#' feature_test <- simulated_experiment$feat_te
+#' 
+#' # create the hte object using Random Forests (RF)
+#' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+#' CateCI(xl_rf, feature_test, B = 500)
+#' }
 setGeneric(
   name = "CateCI",
   def = function(theObject,
@@ -103,8 +122,8 @@ setGeneric(
 
 #' CateCI-MetaLearner
 #' @rdname CateCI
-#' @description Return the estimated confidence intervals for the CATE
-#' @return A data frame of estimated CATE Confidence Intervals
+#' @description Returns the estimated confidence intervals for the CATE.
+#' @return A data frame of estimated CATE confidence intervals.
 #' @inherit CateCI
 #' @export
 setMethod(

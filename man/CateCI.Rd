@@ -28,25 +28,45 @@ CateCI(theObject, feature_new, method = "maintain_group_ratios",
 \S4method{CateCI}{M_BART}(theObject, feature_new, verbose = FALSE)
 }
 \arguments{
-\item{theObject}{A `MetaLearner` object}
+\item{theObject}{A `MetaLearner` object.}
 
-\item{feature_new}{A feature data frame}
+\item{feature_new}{A feature data frame.}
 
 \item{method}{Different versions of the bootstrap.}
 
-\item{bootstrapVersion}{default is normalApprox which will just use the 
-bootstrap normal approximation to get CI. smoothed will use use CI around the
+\item{bootstrapVersion}{Default is normalApprox, which will just use the 
+bootstrap normal approximation to get CI. Smoothed will use use CI around the
 smoothed bootstrap as introduced by Efron 2014.}
 
-\item{B}{Number of bootstrap samples}
+\item{B}{Number of bootstrap samples.}
 
-\item{nthread}{number of threads to be used in parallel}
+\item{nthread}{Number of threads to be used in parallel.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{verbose}{TRUE for detailed output FALSE for no output.}
 }
 \value{
-A data frame of estimated CATE Confidence Intervals
+A data frame of estimated CATE confidence intervals.
 }
 \description{
-Return the estimated confidence intervals for the CATE
+Returns the estimated confidence intervals for the CATE.
+}
+\examples{
+\dontrun{
+require(causalToolbox)
+
+# create example data set
+simulated_experiment <- simulate_causal_experiment(
+  ntrain = 1000,
+  ntest = 1000,
+  dim = 10
+)
+feat <- simulated_experiment$feat_tr
+tr <- simulated_experiment$W_tr
+yobs <- simulated_experiment$Yobs_tr
+feature_test <- simulated_experiment$feat_te
+
+# create the hte object using Random Forests (RF)
+xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
+CateCI(xl_rf, feature_test, B = 500)
+}
 }
