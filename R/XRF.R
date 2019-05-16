@@ -1,9 +1,9 @@
-#' This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
-#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
-#' as base learner.
+# This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+# with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+# as base learner.
 #' @include CATE_estimators.R
 #' @include helper_functions.R
-
+NULL
 
 # X-RF class -------------------------------------------------------------------
 setClass(
@@ -21,7 +21,7 @@ setClass(
 
 # X_RF generator ---------------------------------------------------------------
 #' @title X-Learners
-#' @rdname xleaner
+#' @rdname Xleaners
 #' @description X_RF is an implementation of the X-learner with Random Forests
 #'   (Breiman 2001) at the first and second stage.
 #' @details 

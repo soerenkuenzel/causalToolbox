@@ -1,10 +1,10 @@
-#' This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
-#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
-#' as base learner.
+# This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+# with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+# as base learner.
 #' @include CATE_estimators.R
 #' @include helper_functions.R
 #' @include XRF.R
-
+NULL
 
 # T-RF class -------------------------------------------------------------------
 setClass(

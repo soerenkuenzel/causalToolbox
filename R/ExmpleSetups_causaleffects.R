@@ -2,19 +2,10 @@
 # problems
 
 # Correlation Matrix Simulator -------------------------------------------------
-#' @title Simulate a Correlation Matrix
-#' @name simulate_correlation_matrix
-#' @description This function uses the C-vine method for simulating correlation
-#'   matrixes. Refer to the referenced paper for details.
-#' @param dim dimension of the correlation matrix.
-#' @param alpha level of random correlation beteween the features. Choose 0 for
-#'   independent featues. The bigger alpha the bigger the correlation. For the
-#'   partial correlations the coefficients are created according to
-#'   beta(1/alpha, 1/alpha)
+#' @rdname causalExp
+#' @description \code{simulate_correlation_matrix} uses the C-vine method for
+#'   simulating correlation matrixes. Refer to the referenced paper for details.
 #' @return A correlation matrix
-#' @references \itemize{\item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe
-#'   (2009). Generating random correlation matrices based on vines and extended
-#'   onion method.}
 simulate_correlation_matrix <- function(dim, alpha) {
 
   betaparam <- 1 / alpha
@@ -49,7 +40,8 @@ simulate_correlation_matrix <- function(dim, alpha) {
 
 # Causal Experiment Simulator --------------------------------------------------
 #' @title Simulate a Causal Experiment
-#' @description This function simulates a RCT or observational data for causal
+#' @rdname causalExp
+#' @description \code{simulate_causal_experiment} simulates a RCT or observational data for causal
 #'   effect estimation. It is mainly used to test different heterogenuous
 #'   treatment effect estimation strategies.
 #' @param ntrain Number of training examples.
@@ -131,12 +123,12 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' 
 #' \dontrun{
 #' estimators <- list(
-#' S_RF = S_RF, 
-#' T_RF = T_RF, 
-#' X_RF = X_RF, 
-#' S_BART = S_BART,
-#' T_BART = T_BART, 
-#' X_BARTT = X_BART)
+#'   S_RF = S_RF, 
+#'   T_RF = T_RF, 
+#'   X_RF = X_RF, 
+#'   S_BART = S_BART,
+#'   T_BART = T_BART, 
+#'   X_BARTT = X_BART)
 #' 
 #' performance <- data.frame()
 #' for(tau_n in names(tau.simulate_causal_experiment)){
@@ -330,19 +322,9 @@ simulate_causal_experiment <- function(ntrain = nrow(given_features),
         given_features)))
 }
 
-
-#' @rdname SimulationLists
-#' @name Lists Of Simulation Functions 
-#' @title Lists Of Simulation Functions
-#' @details These lists contain the example setups that can be used in
-#'   \code{simulate_causal_experiment}. Run for example
-#'   \code{tau.simulate_causal_experiment} to see the definition of the
-#'   available functions
-#' export 
-NULL
-
 # Propensity score functions ---------------------------------------------------
-#' @rdname SimulationLists
+#' @rdname causalExp
+#' @format NULL
 #' @export 
 pscores.simulate_causal_experiment <- list(
   rct5 = function(feat) {.5}, 
@@ -353,7 +335,8 @@ pscores.simulate_causal_experiment <- list(
 
 
 # mu0 functions ----------------------------------------------------------------
-#' @rdname SimulationLists
+#' @rdname causalExp
+#' @format NULL
 #' @export
 mu0.simulate_causal_experiment <- list(
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
@@ -411,7 +394,8 @@ mu0.simulate_causal_experiment <- list(
 )
 
 # tau functions ----------------------------------------------------------------
-#' @rdname SimulationLists
+#' @rdname causalExp
+#' @format NULL
 #' @export 
 tau.simulate_causal_experiment <- list(
   no = function(feat) {0},

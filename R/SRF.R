@@ -25,7 +25,7 @@ setClass(
 #' @title S-Learners
 #' @description S_RF is an implementation of the S-Learner combined with
 #'   Random Forests (Breiman 2001)
-#' @rdname slearners
+#' @rdname Slearners
 #' @details 
 #' In the S-Learner the outcome is estimated using all of the features and the 
 #' treatment indicator,  without giving the treatment indicator a special role. 

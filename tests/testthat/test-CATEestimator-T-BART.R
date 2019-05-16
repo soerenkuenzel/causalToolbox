@@ -22,5 +22,11 @@ test_that("Tests that T-BART is working correctly", {
   feat <- ce$feat_tr
   tr <- ce$W_tr
   yobs <- ce$Yobs_tr
+  
+  tb <- T_BART(feat, tr, yobs, ndpost = 100)
+  
+  expect_known_output(CateCI(tb, feature_new = feat[5 - 9,]), 
+                      file = "knownTestValues/TBART1")
+  
 
 })
