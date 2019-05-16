@@ -56,9 +56,9 @@ setClass(
 #' @param feat A data frame containing the features.
 #' @param tr A numeric vector with 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
-#' @param predmode Specifies how the two estimators of the second stage should 
-#' be aggregated. Possible types are "propmean", "control" and "treated". 
-#' The default is "propmean" which refers to propensity score weighting.
+#' @param predmode Specifies how the two estimators of the second stage should
+#'   be aggregated. Possible types are "propmean", "control" and "treated". The
+#'   default is "propmean" which refers to propensity score weighting.
 #' @param nthread Number of threads which should be used to work in parallel.
 #' @param verbose TRUE for detailed output FALSE for no output:
 #' @param mu.forestry,tau.forestry,e.forestry A list containing the

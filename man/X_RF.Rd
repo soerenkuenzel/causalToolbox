@@ -23,9 +23,9 @@ X_RF(feat, tr, yobs, predmode = "propmean", nthread = 0,
 
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
-\item{predmode}{Specifies how the two estimators of the second stage should 
-be aggregated. Possible types are "propmean", "control" and "treated". 
-The default is "propmean" which refers to propensity score weighting.}
+\item{predmode}{Specifies how the two estimators of the second stage should
+be aggregated. Possible types are "propmean", "control" and "treated". The
+default is "propmean" which refers to propensity score weighting.}
 
 \item{nthread}{Number of threads which should be used to work in parallel.}
 
