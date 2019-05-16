@@ -60,10 +60,4 @@ test_that("Tests that ShRF is working correctly", {
   31.19558,
   tolerance = 1)
 
-
-  expect_output(smp_stats <- EstimateAllSampleStatistics(sl, B = 2))
-  expect_equal(sum(smp_stats$CATE[, 3]),
-               -0.002551624,
-               tolerance = 1e-2)
-
 })

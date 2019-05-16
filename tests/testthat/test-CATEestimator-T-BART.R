@@ -23,27 +23,4 @@ test_that("Tests that T-BART is working correctly", {
   tr <- ce$W_tr
   yobs <- ce$Yobs_tr
 
-
-  set.seed(1111)
-  tb <- T_BART(
-    feat,
-    tr,
-    yobs,
-    ndpost = 10,
-    ntree = 200)
-  expect_silent(smpleStats <- EstimateAllSampleStatistics(tb))
-
-  expect_known_output(smpleStats$SATE[1, 2], 
-                      file = "knownTestValues/testvalues-T_BART5")
-
-  set.seed(1111)
-  tb <- T_BART(
-    feat,
-    tr,
-    yobs,
-    ndpost = 10,
-    ntree = 100)
-  expect_silent(smpleStats <- EstimateAllSampleStatistics(tb))
-  expect_known_output(smpleStats$SATE[1, 2], file = "knownTestValues/testvalues-T_BART6")
-
 })

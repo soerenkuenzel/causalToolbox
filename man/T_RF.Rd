@@ -31,9 +31,9 @@ T_RF(feat, tr, yobs, nthread = 0, verbose = TRUE,
 for a more detailed documentation of the hyperparamters.}
 }
 \value{
-Object of class \code{T_RF}. It should be used with one of the 
-  following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-  and \code{EstimateAllSampleStatistics}. The object has the following slots:
+Object of class \code{T_RF}. It should be used with one of the
+  following functions \code{EstimateCATE}, \code{CateCI}, and
+  \code{CateBIAS}. The object has the following slots:
   \item{\code{feature_train}}{A copy of feat.}
   \item{\code{tr_train}}{A copy of tr.}
   \item{\code{yobs_train}}{A copy of yobs.}

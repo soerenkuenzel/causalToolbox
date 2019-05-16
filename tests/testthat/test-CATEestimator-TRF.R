@@ -35,8 +35,4 @@ test_that("Tests that TRF is working correctly", {
   70.08503,
   tolerance = 1)
 
-  expect_output(smp_stats <- EstimateAllSampleStatistics(tl, B = 2))
-  # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
-  # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 1.252301, tolerance = 1e-1)
 })

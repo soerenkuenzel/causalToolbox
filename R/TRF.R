@@ -51,9 +51,9 @@ setClass(
 #'   \code{forestry} package. Please refer to the
 #'   \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
 #'   for a more detailed documentation of the hyperparamters.
-#' @return Object of class \code{T_RF}. It should be used with one of the 
-#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#' @return Object of class \code{T_RF}. It should be used with one of the
+#'   following functions \code{EstimateCATE}, \code{CateCI}, and
+#'   \code{CateBIAS}. The object has the following slots:
 #'   \item{\code{feature_train}}{A copy of feat.}
 #'   \item{\code{tr_train}}{A copy of tr.}
 #'   \item{\code{yobs_train}}{A copy of yobs.}

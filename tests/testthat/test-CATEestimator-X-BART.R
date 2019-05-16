@@ -13,9 +13,6 @@ test_that("Tests that X-BART is working correctly", {
   
   xb <- X_BART(feat, tr, yobs, ndpost = 100)
   
-  expect_known_output(EstimateCate(xb, feature_new = feat[5 - 9,]), file = tmp)
-  
   expect_known_output(CateCI(xb, feature_new = feat[5 - 9,]), file = tmp)
   
-  expect_known_output(EstimateAllSampleStatistics(xb), file = tmp)
 })
