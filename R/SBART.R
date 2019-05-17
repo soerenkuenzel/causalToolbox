@@ -18,9 +18,9 @@ setClass(
   )
 )
 
-#' @title S_BART
-#' @rdname S_BART
-#' @description This is an implementation of S_BART
+#' @rdname Slearners
+#' @description S_BART is an implementation of the S-Learner with Bayesian
+#'   Additive Regression Trees (Chipman et al. 2010).
 #' @param mu.BART hyperparameters of the BART function. Use
 #'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
 #' @import methods
@@ -147,47 +147,6 @@ setMethod(
   }
 )
 
-
-#' EstimateAllSampleStatistics-S_BART
-#' @rdname EstimateAllSampleStatistics
-#' @inherit EstimateAllSampleStatistics
-#' @exportMethod EstimateAllSampleStatistics
-#' @import stats
-setMethod(
-  f = "EstimateAllSampleStatistics",
-  signature = "S_BART",
-  definition = function(theObject, verbose = FALSE)
-  {
-    ndpost <- theObject@ndpost
-    feat <- theObject@feature_train
-    tr <- theObject@tr_train
-    yobs <- theObject@yobs_train
-
-    pred_matrix <- get_pred_mat(
-      theObject = theObject,
-      feature_new = feat,
-      ndpost = ndpost, 
-      nthread = theObject@nthread)
-
-    n_feat <- nrow(feat)
-
-
-    mu_hat_0_MCMC_samples <- pred_matrix[, 1:n_feat]
-    mu_hat_1_MCMC_samples <- pred_matrix[, (n_feat + 1):(2 * n_feat)]
-
-    return(
-      compute_sample_statistics(
-        mu_hat_0_MCMC_samples = mu_hat_0_MCMC_samples,
-        mu_hat_1_MCMC_samples = mu_hat_1_MCMC_samples,
-        ndpost = ndpost,
-        feat = feat,
-        tr = tr,
-        yobs = yobs,
-        sample_stat = "counterfactuals estimated"
-      )
-    )
-  }
-)
 
 # Helper Functions -------------------------------------------------------------
 

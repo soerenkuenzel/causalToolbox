@@ -23,9 +23,10 @@ setClass(
 
 
 # T_BART generator -------------------------------------------------------------
-#' @title T-Learner with BART
-#' @description This is an implementation of the T-learner combined with BART as
-#'   base learner.
+#' @rdname Tlearners
+#' @description T_BART is an implementation of the T-learner with Bayesian
+#'   Additive Regression Trees (Chipman et al. 2010) for both response
+#'   functions.
 #' @param ndpost Number of posterior draws
 #' @param ntree Number of trees
 #' @param mu0.BART,mu1.BART hyperparameters of the BART functions for the
@@ -361,112 +362,3 @@ setMethod(
     return(to_return)
   }
 )
-
-#' @rdname EstimateAllSampleStatistics
-#' @inherit EstimateAllSampleStatistics
-#' @exportMethod EstimateAllSampleStatistics
-#' @import stats
-setMethod(
-  f = "EstimateAllSampleStatistics",
-  signature = "T_BART",
-  definition = function(theObject, verbose = FALSE)
-  {
-    ndpost <- theObject@ndpost
-    feat <- theObject@feature_train
-    tr <- theObject@tr_train
-    yobs <- theObject@yobs_train
-    nthread <- theObject@nthread
-    # feat_subset <- split(feat, rep(x = 1:nthread,
-    #                                times = get_CV_sizes(nrow(feat), nthread)))
-    yobs_0 <- yobs[tr == 0]
-    X_0 <- feat[tr == 0, ]
-    yobs_1 <- yobs[tr == 1]
-    X_1 <- feat[tr == 1, ]
-    
-    # mu_hat_0_MCMC_samples <- BART::mc.wbart(
-    #     x.train = X_0,
-    #     y.train = yobs_0,
-    #     x.test =  feat,
-    #     ndpost = ndpost,
-    #     ntree = theObject@ntree,
-    #     mc.cores = nthread
-    #   )$yhat.test
-    # 
-    # mu_hat_1_MCMC_samples <- BART::mc.wbart(
-    #     x.train = X_1,
-    #     y.train = yobs_1,
-    #     x.test =  feat,
-    #     ndpost = ndpost,
-    #     ntree = theObject@ntree,
-    #     mc.cores = nthread
-    #   )$yhat.test
-    mu_hat_0_MCMC_samples <- BART::mc.wbart(
-      x.train = X_0,
-      y.train = yobs_0,
-      x.test =  feat,
-      ndpost = ndpost,
-      ntree = theObject@ntree,
-      mc.cores = nthread, 
-      sparse =    theObject@mu0.BART$sparse,
-      theta =     theObject@mu0.BART$theta,
-      omega =     theObject@mu0.BART$omega,
-      a =         theObject@mu0.BART$a,
-      b =         theObject@mu0.BART$b,
-      augment =   theObject@mu0.BART$augment,
-      rho =       theObject@mu0.BART$rho,
-      usequants = theObject@mu0.BART$usequants,
-      cont =      theObject@mu0.BART$cont,
-      sigest =    theObject@mu0.BART$sigest,
-      sigdf =     theObject@mu0.BART$sigdf,
-      sigquant =  theObject@mu0.BART$sigquant,
-      k =         theObject@mu0.BART$k,
-      power =     theObject@mu0.BART$power,
-      base =      theObject@mu0.BART$base,
-      sigmaf =    theObject@mu0.BART$sigmaf,
-      lambda =    theObject@mu0.BART$lambda,
-      numcut =    theObject@mu0.BART$numcut,
-      nskip =     theObject@mu0.BART$nskip
-    )$yhat.test
-    
-    mu_hat_1_MCMC_samples <- BART::mc.wbart(
-      x.train = X_1,
-      y.train = yobs_1,
-      x.test =  feat,
-      ndpost = ndpost,
-      ntree = theObject@ntree,
-      mc.cores = nthread, 
-      sparse =    theObject@mu1.BART$sparse,
-      theta =     theObject@mu1.BART$theta,
-      omega =     theObject@mu1.BART$omega,
-      a =         theObject@mu1.BART$a,
-      b =         theObject@mu1.BART$b,
-      augment =   theObject@mu1.BART$augment,
-      rho =       theObject@mu1.BART$rho,
-      usequants = theObject@mu1.BART$usequants,
-      cont =      theObject@mu1.BART$cont,
-      sigest =    theObject@mu1.BART$sigest,
-      sigdf =     theObject@mu1.BART$sigdf,
-      sigquant =  theObject@mu1.BART$sigquant,
-      k =         theObject@mu1.BART$k,
-      power =     theObject@mu1.BART$power,
-      base =      theObject@mu1.BART$base,
-      sigmaf =    theObject@mu1.BART$sigmaf,
-      lambda =    theObject@mu1.BART$lambda,
-      numcut =    theObject@mu1.BART$numcut,
-      nskip =     theObject@mu1.BART$nskip
-    )$yhat.test
-    
-    return(
-      compute_sample_statistics(
-        mu_hat_0_MCMC_samples = mu_hat_0_MCMC_samples,
-        mu_hat_1_MCMC_samples = mu_hat_1_MCMC_samples,
-        ndpost = ndpost,
-        feat = feat,
-        tr = tr,
-        yobs = yobs,
-        sample_stat = "counterfactuals estimated"
-      )
-    )
-  }
-)
-

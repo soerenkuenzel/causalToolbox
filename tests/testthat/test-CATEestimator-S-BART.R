@@ -36,9 +36,4 @@ test_that(
 
     expect_silent(CIs <- CateCI(sb, feat, verbose = FALSE))
 
-    expect_silent(smpleStats <- EstimateAllSampleStatistics(sb))
-    expect_known_output(smpleStats$SATE[1,2], file = tmp)
-    expect_known_output(smpleStats$SATT[1,2], file = tmp)
-    expect_known_output(smpleStats$SATC[1,2], file = tmp)
-    expect_known_output(smpleStats$CATE[1,2], file = tmp)
 })

@@ -36,9 +36,5 @@ test_that("Tests that XhRF is working correctly", {
   10.20051,
   tolerance = 1)
 
-  expect_output(smp_stats <- EstimateAllSampleStatistics(xl, B = 2))
-  # theObject = xl; method = "maintain_group_ratios"; B = 200; nthread = 0;
-  # verbose = TRUE
-  expect_equal(smp_stats$SATE[1, 2], 0.929466, tolerance = 1e-1)
 })
 

@@ -1,9 +1,9 @@
-#' This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
-#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
-#' as base learner.
+# This file implements the X-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+# with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+# as base learner.
 #' @include CATE_estimators.R
 #' @include helper_functions.R
-
+NULL
 
 # X-RF class -------------------------------------------------------------------
 setClass(
@@ -20,7 +20,10 @@ setClass(
 )
 
 # X_RF generator ---------------------------------------------------------------
-#' @title X-Learner with Random Forests
+#' @title X-Learners
+#' @rdname Xleaners
+#' @description X_RF is an implementation of the X-learner with Random Forests
+#'   (Breiman 2001) at the first and second stage.
 #' @details 
 #' The X-Learner estimates the CATE in three steps:
 #' \enumerate{
@@ -51,8 +54,6 @@ setClass(
 #'     If \code{predmode = "control"}, then \eqn{g(x) = 1}, and if 
 #'     \code{predmode = "treated"}, then \eqn{g(x) = 0}.
 #' }
-#' @description This is an implementation of the X-learner with Random
-#' Forests (Breiman 2001) at the first and second stage. The function returns an X-RF object.
 #' @param feat A data frame containing the features.
 #' @param tr A numeric vector with 0 for control and 1 for treated variables.
 #' @param yobs A numeric vector containing the observed outcomes.
@@ -90,8 +91,7 @@ setClass(
 #'   }
 #' @return An object from a class that is derived from the \code{CATE-estimator}
 #'   class. It should be used with one of the following functions;
-#'   \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS},
-#'   and \code{EstimateAllSampleStatistics}. The object has at least the
+#'   \code{EstimateCATE}, \code{CateCI}, and \code{CateBIAS}. The object has at least the
 #'   following slots:
 #'   \item{\code{feature_train}}{A copy of feat.}
 #'   \item{\code{tr_train}}{A copy of tr.}
@@ -114,7 +114,6 @@ setClass(
 #'     Transfer Learning for Estimating Causal Effects using Neural Networks. 
 #'     \url{https://arxiv.org/pdf/1808.07804.pdf}
 #'   }
-#' @seealso \code{\link{X_RF_fully_specified}}
 #' @family metalearners
 #' @examples
 #' require(causalToolbox)
@@ -265,16 +264,6 @@ X_RF <-
   }
 
 # X-RF basic constructor -------------------------------------------------------
-#' @title X_RF fully specified constructor
-#' @description This is the most basic X-learner with honest random forest
-#'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead call the simpler version X_RF or one of the
-#'   self tuning versions should be called. This function mainly exists to be
-#'   called from other functions.
-#' @param hyperparameter_list A list of lists of hyper parameters
-#' @seealso \code{\link{X_RF}}
-#' @inherit X_RF
-#' @import methods
 X_RF_fully_specified <-
   function(feat,
            tr,

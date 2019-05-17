@@ -1,10 +1,10 @@
-#' This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
-#' with the forestry implementation (https://github.com/soerenkuenzel/forestry)
-#' as base learner.
+# This file implements the T-Learner (https://arxiv.org/pdf/1706.03461.pdf)
+# with the forestry implementation (https://github.com/soerenkuenzel/forestry)
+# as base learner.
 #' @include CATE_estimators.R
 #' @include helper_functions.R
 #' @include XRF.R
-
+NULL
 
 # T-RF class -------------------------------------------------------------------
 setClass(
@@ -29,7 +29,10 @@ setClass(
 )
 
 # T_RF generator ---------------------------------------------------------------
-#' @title T-Learner with honest RF for both response functions
+#' @title T-Learners
+#' @rdname Tlearners
+#' @description T_RF is an implementation of the T-learner combined with Random
+#'   Forest (Breiman 2001) for both response functions.
 #' @details 
 #' The CATE is estimated using two estimators:
 #' \enumerate{
@@ -43,17 +46,15 @@ setClass(
 #'     Define the CATE estimate as
 #'     \deqn{\tau(x) = \hat \mu_1 - \hat \mu_0.}
 #' }
-#' @description This is an implementation of the T-learner combined with honest
-#'   random forest for both response functions
 #' @param mu0.forestry,mu1.forestry Lists containing the hyperparameters for the
 #'   \code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
 #'   \mu_1}, respectively. These hyperparameters are passed to the
 #'   \code{forestry} package. Please refer to the
 #'   \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
 #'   for a more detailed documentation of the hyperparamters.
-#' @return Object of class \code{T_RF}. It should be used with one of the 
-#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#' @return Object of class \code{T_RF}. It should be used with one of the
+#'   following functions \code{EstimateCATE}, \code{CateCI}, and
+#'   \code{CateBIAS}. The object has the following slots:
 #'   \item{\code{feature_train}}{A copy of feat.}
 #'   \item{\code{tr_train}}{A copy of tr.}
 #'   \item{\code{yobs_train}}{A copy of yobs.}
@@ -153,15 +154,6 @@ T_RF <-
   }
 
 # T-RF basic constructor -------------------------------------------------------
-#' @title T_RF fully specified constructor
-#' @description This is the most basic T-learner with honest random forest
-#'   constructor. It should not be called by the user, since the list of
-#'   parameters is too big. Instead, call the simpler version T_RF or one of the
-#'   self tuning versions. This function exists mainly to be called from other
-#'   functions.
-#' @inherit X_RF_fully_specified
-#' @seealso \code{\link{T_RF}}
-#' @export
 T_RF_fully_specified <-
   function(feat,
            tr,

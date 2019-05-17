@@ -22,7 +22,10 @@ setClass(
 )
 
 # S_RF generator ---------------------------------------------------------------
-#' @title S-Learner with honest RF
+#' @title S-Learners
+#' @description S_RF is an implementation of the S-Learner combined with
+#'   Random Forests (Breiman 2001)
+#' @rdname Slearners
 #' @details 
 #' In the S-Learner the outcome is estimated using all of the features and the 
 #' treatment indicator,  without giving the treatment indicator a special role. 
@@ -39,13 +42,12 @@ setClass(
 #'     Define the CATE estimate as
 #'     \deqn{\tau(x) = \hat \mu_1(x, 1) - \hat \mu_0(x, 0).}
 #' }
-#' @description This is an implementation of the S-learner combined with honest
 #' @param mu.forestry A list containing the hyperparameters for the
 #'   \code{forestry} package that are used in \eqn{\hat \mu_0}.
 #'   These hyperparameters are passed to the \code{forestry} package. 
-#' @return Object of class \code{S_RF}. It should be used with one of the 
-#'   following functions \code{EstimateCATE}, \code{CateCI}, \code{CateBIAS}, 
-#'   and \code{EstimateAllSampleStatistics}. The object has the following slots:
+#' @return Object of class \code{S_RF}. It should be used with one of the
+#'   following functions \code{EstimateCATE}, \code{CateCI}, and
+#'   \code{CateBIAS}. The object has the following slots:
 #'   \item{\code{feature_train}}{A copy of feat.}
 #'   \item{\code{tr_train}}{A copy of tr.}
 #'   \item{\code{yobs_train}}{A copy of yobs.}
@@ -125,15 +127,6 @@ S_RF <-
   }
     
 # S-RF basic constructor -------------------------------------------------------
-#' @title S_RF fully specified constructor
-#' @description This is the most basic S-learner with honest random forest
-#'   constructor. It should not be called directly, since the list of
-#'   parameters is too big. Instead, call the simpler version S_RF or one of the
-#'   self tuning versions. This function exists mainly to be called from other
-#'   functions.
-#' @inherit X_RF_fully_specified
-#' @seealso \code{\link{S_RF}}
-#' @export
 S_RF_fully_specified <-
   function(feat,
            tr,
