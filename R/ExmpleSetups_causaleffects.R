@@ -4,8 +4,8 @@
 # Correlation Matrix Simulator -------------------------------------------------
 #' @rdname causalExp
 #' @description \code{simulate_correlation_matrix} uses the C-vine method for
-#'   simulating correlation matrixes. Refer to the referenced paper for details.
-#' @return A correlation matrix
+#'   simulating correlation matrices. (Refer to the referenced paper for details.)
+#' @return A correlation matrix.
 simulate_correlation_matrix <- function(dim, alpha) {
 
   betaparam <- 1 / alpha
@@ -41,61 +41,61 @@ simulate_correlation_matrix <- function(dim, alpha) {
 # Causal Experiment Simulator --------------------------------------------------
 #' @title Simulate a Causal Experiment
 #' @rdname causalExp
-#' @description \code{simulate_causal_experiment} simulates a RCT or observational data for causal
+#' @description \code{simulate_causal_experiment} simulates an RCT or observational data for causal
 #'   effect estimation. It is mainly used to test different heterogenuous
 #'   treatment effect estimation strategies.
 #' @param ntrain Number of training examples.
 #' @param ntest Number of test examples.
 #' @param dim Dimension of the data set.
-#' @param alpha Only used if given_features is not set and feat_distribution is
+#' @param alpha Only used if \code{given_features} is not set and \code{feat_distribution} is
 #'   chosen to be normal. It specifies how correlated the features can be. If
-#'   alpha = 0, then the features are independent if alpha is very large, then
+#'   alpha = 0, then the features are independent. If alpha is very large, then
 #'   the features can be very correlated. Use the
 #'   \code{simulate_correlation_matrix} function to get a better understanding
 #'   of the impact of alpha.
-#' @param feat_distribution Only used if given_features is not specified. Either
-#'   "normal" or "unif". It specifies the distribution of the features.
-#' @param given_features This is used, if we already have features and want to
+#' @param feat_distribution Only used if \code{given_features} is not specified. Either
+#'   "normal" or "unif." It specifies the distribution of the features.
+#' @param given_features This is used if we already have features and want to
 #'   test the performance of different estimators for a particular set of
 #'   features.
-#' @param pscore,mu0,tau parameters that determine the propensity score, the
+#' @param pscore,mu0,tau Parameters that determine the propensity score, the
 #'   response function for the control units, and tau, respectively. The
 #'   different options can be seen using
 #'   \code{names(pscores.simulate_causal_experiment)},
 #'   \code{names(mu0.simulate_causal_experiment)}, and
-#'   \code{names(tau.simulate_causal_experiment)}. This is implemented this way,
+#'   \code{names(tau.simulate_causal_experiment)}. This is implemented in this manner,
 #'   because it enables the user to easily loop through the different
 #'   estimators.
-#' @param testseed The seed used to generate the testing data, if NULL, then
+#' @param testseed The seed used to generate the test data. If NULL, then
 #'   the seed of the main session is used.
-#' @param trainseed The seed used to generate the training data, if NULL,
+#' @param trainseed The seed used to generate the training data. If NULL,
 #'   then the seed of the main session is used.
-#' @return A list with the following elements 
-#'   \item{\code{setup_name}}{Name of the setup} 
-#'   \item{\code{m_t_truth}}{Function contraining the response function of the
+#' @return A list with the following elements: 
+#'   \item{\code{setup_name}}{Name of the setup.} 
+#'   \item{\code{m_t_truth}}{Function containing the response function of the
 #'   treated units.}
-#'   \item{\code{m_c_truth}}{Function contraining the response function of the
-#'   control units}
-#'   \item{\code{propscore}}{Propensity score function} 
-#'   \item{\code{alpha}}{Chosen alpha} 
+#'   \item{\code{m_c_truth}}{Function containing the response function of the
+#'   control units.}
+#'   \item{\code{propscore}}{Propensity score function.} 
+#'   \item{\code{alpha}}{Chosen alpha.} 
 #'   \item{\code{feat_te}}{Data.frame containing the features of the test
-#'   samples}
+#'   samples.}
 #'   \item{\code{W_te}}{Numeric vector containing the treatment assignment of
-#'   the test samples}
+#'   the test samples.}
 #'   \item{\code{tau_te}}{Numeric vector containing the true conditional average
-#'   treatment effects of the test samples}
+#'   treatment effects of the test samples.}
 #'   \item{\code{Yobs_te}}{Numeric vector containing the observed Y values of
-#'   the test samples}
+#'   the test samples.}
 #'   \item{\code{feat_tr}}{Data.frame containing the features of the training 
-#'   samples}
+#'   samples.}
 #'   \item{\code{W_tr}}{Numeric vector containing the treatment assignment of
-#'   the training samples}
+#'   the training samples.}
 #'   \item{\code{tau_tr}}{Numeric vector containing the true conditional average
-#'   treatment effects of the training samples}
+#'   treatment effects of the training samples.}
 #'   \item{\code{Yobs_tr}}{Numeric vector containing the observed Y values of
-#'   the training samples}
+#'   the training samples.}
 #' @details The function simulates causal experiments by generating the
-#'   features, the treatment assignment, the observed Y values, and the CATE for
+#'   features, treatment assignment, observed Y values, and CATE for
 #'   a test set and a training set. pscore, mu0, and tau define the response
 #'   functions and the propensity score. For example, \code{pscore =
 #'   "osSparse1Linear"} specifies that \deqn{e(x) = max(0.05, min(.95, x1 / 2 +
@@ -105,10 +105,10 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #' @seealso \code{\link{X_RF}}
 #' @references \itemize{
 #'   \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
-#'   random correlation matrices based on vines and extended onion method.
+#'   Random Correlation Matrices Based on Vines and Extended Onion Method.
 #'   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-#'     Meta-learners for estimating heterogeneous treatment effects using
-#'     machine learning.
+#'     Meta-learners for Estimating Heterogeneous Treatment Effects Using
+#'     Machine Learning.
 #'     }
 #' @examples
 #' require(causalToolbox)
@@ -434,23 +434,23 @@ tau.simulate_causal_experiment <- list(
 # Real data --------------------------------------------------------------------
 #' @title Get Out To Vote
 #' @description 
-#' This is only an example data set and it has been created by looking at a
+#' This is an example data set, and it has been created by looking at a
 #' certain subset of the "Social Pressure and Voter Turnout: Evidence from a
 #' Large-Scale Field Experiment" study that tested the impact of social pressure
 #' on voter turnout. A precise description and the full data set can be found at
 #' \url{https://isps.yale.edu/research/data/d001}. 
 #' 
-#' The study consists of seven key individual-level covariates, most of which
+#' The study consists of seven key, individual-level covariates, most of which
 #' are discrete: gender, age, and whether the registered individual voted in the
-#' primary elections in 2000, 2002, and 2004 or the general election in 2000 and
+#' primary elections in 2000, 2002, and 2004 or the general elections in 2000 and
 #' 2002. The sample was restricted to voters who had voted in the 2004 general
-#' election. The outcome of interest is turnout in the 2006 primary election,
-#' which is an indicator variable and the treatment was whether or not the
-#' subject were elected to receive a mailer.
+#' election. The outcome of interest was the turnout in the 2006 primary election,
+#' which was an indicator variable, and the treatment was whether or not the
+#' subjects were elected to receive a mailer.
 #' @references
 #' \itemize{
-#'   \item Gerber AS, Green DP, Larimer CW (2008) Social pressure and voter
-#'   turnout: Evidence from a large-scale field experiment. Am Polit Sci Rev
+#'   \item Gerber AS, Green DP, Larimer CW (2008) Social Pressure and Voter
+#'   Turnout: Evidence from a Large-Scale Field Experiment. Am Polit Sci Rev
 #'   102:33–48. \url{https://isps.yale.edu/research/publications/isps08-001}
 #'  }
 "gotv"

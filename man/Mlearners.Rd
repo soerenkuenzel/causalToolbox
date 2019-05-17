@@ -43,28 +43,28 @@ M_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
 \item{mu.forestry, tau.forestry, e.forestry}{A list containing the
 hyperparameters for the \code{forestry} package that are used for
 estimating the response functions, the CATE, and the propensity score.
-These hyperparameters are passed to the \code{forestry} package. Please
+These hyperparameters are passed to the \code{forestry} package. (Please
 refer to the \href{https://github.com/soerenkuenzel/forestry}{forestry}
-package for a more detailed documentation of the hyperparamters.
+package for a more detailed documentation of the hyperparamters.)
 \itemize{
-   \item \code{relevant.Variable} Variables that are only used at the first 
+   \item \code{relevant.Variable} Variables that are only used in the first 
          stage.
-   \item \code{ntree} Numbers of trees used at the first stage.
-   \item \code{replace} Sample with or without replacement at the first 
+   \item \code{ntree} Numbers of trees used in the first stage.
+   \item \code{replace} Sample with or without replacement in the first 
          stage.
-   \item \code{sample.fraction} The size of total samples to draw for the 
+   \item \code{sample.fraction} Size of total samples drawn for the 
          training data in the first stage.
-   \item \code{mtry} The number of variables randomly selected at each 
+   \item \code{mtry} Number of variables randomly selected in each 
          splitting point.
-   \item \code{nodesizeSpl} minimum nodesize at the first stage for 
-         the observations in the splitting set. (see the details of the 
+   \item \code{nodesizeSpl} Minimum nodesize in the first stage for 
+         the observations in the splitting set. (See the details of the 
          \code{forestry} package)
-   \item \code{nodesizeAvg} minimum nodesize at the first stage for 
+   \item \code{nodesizeAvg} Minimum nodesize in the first stage for 
          the observations in the averaging set.
    \item \code{splitratio} Proportion of the training data used as the 
-         splitting dataset at the first stage.
+         splitting dataset in the first stage.
    \item \code{middleSplit} If true, the split value will be exactly in the 
-         middle between two observations. Otherwise, it will take a point 
+         middle of two observations. Otherwise, it will take a point 
          based on a uniform distribution between the two observations. 
 }}
 
@@ -72,13 +72,13 @@ package for a more detailed documentation of the hyperparamters.
 
 \item{ntree}{Number of trees}
 
-\item{mu.BART, e.BART, tau.BART}{hyperparameters of the BART functions for the
-control and treated group. Use \code{?BART::mc.wbart} for a detailed
-explanation of their effects.}
+\item{mu.BART, e.BART, tau.BART}{Hyperparameters of the BART functions for the
+control and treated group. (Use \code{?BART::mc.wbart} for a detailed
+explanation of their effects.)}
 }
 \value{
-An object from a class that is derived from the \code{CATE-estimator}
-  class. It should be used with one of the following functions;
+An object from a class that is derived from the \code{CATEestimator}
+  class. It should be used with one of the following functions:
   \code{EstimateCATE}, \code{CateCI}, and \code{CateBIAS}. The object has at least the
   following slots:
   \item{\code{feature_train}}{A copy of feat.}
@@ -88,17 +88,17 @@ An object from a class that is derived from the \code{CATE-estimator}
   is used for different bootstrap procedures.}
 }
 \description{
-M_RF is an implementation of the Modified Outcome Estimator with
-  Random Forest (Breiman 2001) as base learner.
+\code{M_RF} is an implementation of the Modified Outcome Estimator with
+  Random Forest (Breiman 2001) as the base learner.
 
-M_BART is an implementation of the Modified Outcome Estimator with
-  Bayesian Additive Regression Trees (Chipman et al. 2010) as base learner.
+\code{M_BART} is an implementation of the Modified Outcome Estimator with
+  Bayesian Additive Regression Trees (Chipman et al. 2010) as the base learner.
 }
 \details{
 The M-Learner estimates the CATE in two steps:
 \enumerate{
  \item
-    Estimate the response functions and the propensity score:
+    Estimate the response functions and the propensity score,
     \deqn{\mu_0(x) = E[Y(0) | X = x]}
     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
     \deqn{e(x) = E[W | X = x]} 
@@ -127,7 +127,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using Random Forests (RF)
+# create the CATE estimator using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -139,7 +139,7 @@ ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
-# evaluate the performance
+# evaluate the performance.
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{
@@ -150,15 +150,15 @@ xl_ci_rf <- CateCI(xl_rf, feature_test, B = 500)
 \references{
 \itemize{
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-    MetaLearners for estimating heterogeneous treatment effects using
-    machine learning. 
+    MetaLearners for Estimating Heterogeneous Treatment Effects Using
+    Machine Learning. 
     \url{https://www.pnas.org/content/116/10/4156}
   \item 
     Sören Künzel, Simon Walter, and Jasjeet Sekhon (2018).
     Causaltoolbox---Estimator Stability for Heterogeneous Treatment Effects.
     \url{https://arxiv.org/pdf/1811.02833.pdf}
-  \item Daniel Rubin and Mark J van der Laan (2007). A doubly robust
-  censoring unbiased transformation.
+  \item Daniel Rubin and Mark J van der Laan (2007). A Doubly Robust
+  Censoring Unbiased Transformation.
     \url{https://www.ncbi.nlm.nih.gov/pubmed/22550646}
   }
 }

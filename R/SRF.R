@@ -23,12 +23,12 @@ setClass(
 
 # S_RF generator ---------------------------------------------------------------
 #' @title S-Learners
-#' @description S_RF is an implementation of the S-Learner combined with
-#'   Random Forests (Breiman 2001)
+#' @description \code{S_RF} is an implementation of the S-Learner combined with
+#'   Random Forests (Breiman 2001).
 #' @rdname Slearners
 #' @details 
-#' In the S-Learner the outcome is estimated using all of the features and the 
-#' treatment indicator,  without giving the treatment indicator a special role. 
+#' In the S-Learner, the outcome is estimated using all of the features and the 
+#' treatment indicator without giving the treatment indicator a special role. 
 #' The predicted CATE for an individual unit is then the difference between the 
 #' predicted values when the treatment assignment indicator is changed from 
 #' control to treatment:
@@ -56,8 +56,8 @@ setClass(
 #'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
 #'      observed outcomes of the treated group as the dependent variable.}
 #'   \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
-#'      the three random forest algorithms used}
-#'   \item{\code{creator}}{Function call of S_RF. This is used for different 
+#'      the three random forest algorithms used.}
+#'   \item{\code{creator}}{Function call of \code{S_RF}. This is used for different 
 #'      bootstrap procedures.}
 #' @inherit X_RF
 #' @family metalearners

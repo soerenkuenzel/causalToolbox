@@ -9,24 +9,24 @@
 gotv
 }
 \description{
-This is only an example data set and it has been created by looking at a
+This is an example data set, and it has been created by looking at a
 certain subset of the "Social Pressure and Voter Turnout: Evidence from a
 Large-Scale Field Experiment" study that tested the impact of social pressure
 on voter turnout. A precise description and the full data set can be found at
 \url{https://isps.yale.edu/research/data/d001}. 
 
-The study consists of seven key individual-level covariates, most of which
+The study consists of seven key, individual-level covariates, most of which
 are discrete: gender, age, and whether the registered individual voted in the
-primary elections in 2000, 2002, and 2004 or the general election in 2000 and
+primary elections in 2000, 2002, and 2004 or the general elections in 2000 and
 2002. The sample was restricted to voters who had voted in the 2004 general
-election. The outcome of interest is turnout in the 2006 primary election,
-which is an indicator variable and the treatment was whether or not the
-subject were elected to receive a mailer.
+election. The outcome of interest was the turnout in the 2006 primary election,
+which was an indicator variable, and the treatment was whether or not the
+subjects were elected to receive a mailer.
 }
 \references{
 \itemize{
-  \item Gerber AS, Green DP, Larimer CW (2008) Social pressure and voter
-  turnout: Evidence from a large-scale field experiment. Am Polit Sci Rev
+  \item Gerber AS, Green DP, Larimer CW (2008) Social Pressure and Voter
+  Turnout: Evidence from a Large-Scale Field Experiment. Am Polit Sci Rev
   102:33–48. \url{https://isps.yale.edu/research/publications/isps08-001}
  }
 }

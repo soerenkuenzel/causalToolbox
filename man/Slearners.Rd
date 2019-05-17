@@ -50,20 +50,20 @@ Object of class \code{S_RF}. It should be used with one of the
   \item{\code{m_1}}{An object of class forestry that is fitted with the 
      observed outcomes of the treated group as the dependent variable.}
   \item{\code{hyperparameter_list}}{A list containting the hyperparameters of 
-     the three random forest algorithms used}
-  \item{\code{creator}}{Function call of S_RF. This is used for different 
+     the three random forest algorithms used.}
+  \item{\code{creator}}{Function call of \code{S_RF}. This is used for different 
      bootstrap procedures.}
 }
 \description{
-S_RF is an implementation of the S-Learner combined with
-  Random Forests (Breiman 2001)
+\code{S_RF} is an implementation of the S-Learner combined with
+  Random Forests (Breiman 2001).
 
-S_BART is an implementation of the S-Learner with Bayesian
+\code{S_BART} is an implementation of the S-Learner with Bayesian
   Additive Regression Trees (Chipman et al. 2010).
 }
 \details{
-In the S-Learner the outcome is estimated using all of the features and the 
-treatment indicator,  without giving the treatment indicator a special role. 
+In the S-Learner, the outcome is estimated using all of the features and the 
+treatment indicator without giving the treatment indicator a special role. 
 The predicted CATE for an individual unit is then the difference between the 
 predicted values when the treatment assignment indicator is changed from 
 control to treatment:
@@ -92,7 +92,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using Random Forests (RF)
+# create the CATE estimator using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -104,7 +104,7 @@ ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
-# evaluate the performance
+# evaluate the performance.
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{

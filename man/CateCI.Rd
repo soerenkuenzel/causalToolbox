@@ -34,15 +34,15 @@ CateCI(theObject, feature_new, method = "maintain_group_ratios",
 
 \item{method}{Different versions of the bootstrap.}
 
-\item{bootstrapVersion}{Default is normalApprox, which will just use the 
-bootstrap normal approximation to get CI. Smoothed will use use CI around the
+\item{bootstrapVersion}{Default is normalApprox, which will use the 
+bootstrap normal approximation to get CI. Smoothed will use CI around the
 smoothed bootstrap as introduced by Efron 2014.}
 
 \item{B}{Number of bootstrap samples.}
 
 \item{nthread}{Number of threads to be used in parallel.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output.}
+\item{verbose}{TRUE for detailed output, FALSE for no output.}
 }
 \value{
 A data frame of estimated CATE confidence intervals.
@@ -65,7 +65,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using Random Forests (RF)
+# create the CATE estimator using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 CateCI(xl_rf, feature_test, B = 500)
 }

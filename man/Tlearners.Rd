@@ -37,9 +37,9 @@ T_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
 \item{mu0.forestry, mu1.forestry}{Lists containing the hyperparameters for the
 \code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
 \mu_1}, respectively. These hyperparameters are passed to the
-\code{forestry} package. Please refer to the
+\code{forestry} package. (Please refer to the
 \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
-for a more detailed documentation of the hyperparamters.}
+for a more detailed documentation of the hyperparamters.)}
 
 \item{ndpost}{Number of posterior draws}
 
@@ -61,12 +61,12 @@ Object of class \code{T_RF}. It should be used with one of the
   \item{\code{m_1}}{An object of class forestry that is fitted with the 
      observed outcomes of the treated group as the dependent variable.}
   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
-     the three random forest algorithms used}
+     the three random forest algorithms used.}
   \item{\code{creator}}{Function call of T_RF. This is used for different 
      bootstrap procedures.}
 }
 \description{
-T_RF is an implementation of the T-learner combined with Random
+\code{T_RF} is an implementation of the T-learner combined with Random
   Forest (Breiman 2001) for both response functions.
 
 T_BART is an implementation of the T-learner with Bayesian
@@ -77,7 +77,7 @@ T_BART is an implementation of the T-learner with Bayesian
 The CATE is estimated using two estimators:
 \enumerate{
  \item
-    First, estimate the response functions 
+    Estimate the response functions 
     \deqn{\mu_0(x) = E[Y(0) | X = x]}
     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
     using the base leaner and denote the estimates as \eqn{\hat \mu_0} and
@@ -101,7 +101,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using Random Forests (RF)
+# create the CATE estimator using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -113,7 +113,7 @@ ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
-# evaluate the performance
+# evaluate the performance.
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{

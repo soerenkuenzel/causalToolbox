@@ -38,9 +38,9 @@ setGeneric(
 #'@param method Different versions of the bootstrap.
 #'@param B Number of bootstrap samples.
 #'@param nthread Number of threads to be used in parallel.
-#'@param verbose TRUE for detailed output FALSE for no output.
-#'@param bootstrapVersion Default is normalApprox, which will just use the 
-#'bootstrap normal approximation to get CI. Smoothed will use use CI around the
+#'@param verbose TRUE for detailed output, FALSE for no output.
+#'@param bootstrapVersion Default is normalApprox, which will use the 
+#'bootstrap normal approximation to get CI. Smoothed will use CI around the
 #'smoothed bootstrap as introduced by Efron 2014.
 #'@export
 #' @examples
@@ -58,7 +58,7 @@ setGeneric(
 #' yobs <- simulated_experiment$Yobs_tr
 #' feature_test <- simulated_experiment$feat_te
 #' 
-#' # create the hte object using Random Forests (RF)
+#' # create the CATE estimator using Random Forests (RF)
 #' xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 #' CateCI(xl_rf, feature_test, B = 500)
 #' }

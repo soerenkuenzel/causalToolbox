@@ -39,7 +39,7 @@ X_BART(feat, tr, yobs, predmode = "pscore", nthread = 1,
 \item{yobs}{A numeric vector containing the observed outcomes.}
 
 \item{predmode}{Specifies how the two estimators of the second stage should
-be aggregated. Possible types are "propmean," "control," and "treated". The
+be aggregated. Possible types are "propmean," "control," and "treated." The
 default is "propmean," which refers to propensity score weighting.}
 
 \item{nthread}{Number of threads which should be used to work in parallel.}
@@ -49,28 +49,28 @@ default is "propmean," which refers to propensity score weighting.}
 \item{mu.forestry, tau.forestry, e.forestry}{A list containing the
 hyperparameters for the \code{forestry} package that are used for
 estimating the response functions, the CATE, and the propensity score.
-These hyperparameters are passed to the \code{forestry} package. Please
+These hyperparameters are passed to the \code{forestry} package. (Please
 refer to the \href{https://github.com/soerenkuenzel/forestry}{forestry}
-package for a more detailed documentation of the hyperparamters.
+package for a more detailed documentation of the hyperparamters.)
 \itemize{
-   \item \code{relevant.Variable} Variables that are only used at the first 
+   \item \code{relevant.Variable} Variables that are only used in the first 
          stage.
-   \item \code{ntree} Numbers of trees used at the first stage.
-   \item \code{replace} Sample with or without replacement at the first 
+   \item \code{ntree} Numbers of trees used in the first stage.
+   \item \code{replace} Sample with or without replacement in the first 
          stage.
    \item \code{sample.fraction} The size of total samples to draw for the 
          training data in the first stage.
-   \item \code{mtry} The number of variables randomly selected at each 
+   \item \code{mtry} The number of variables randomly selected in each 
          splitting point.
-   \item \code{nodesizeSpl} Minimum nodesize at the first stage for 
-         the observations in the splitting set. (see the details of the 
+   \item \code{nodesizeSpl} Minimum nodesize in the first stage for 
+         the observations in the splitting set. (See the details of the 
          \code{forestry} package)
-   \item \code{nodesizeAvg} Minimum nodesize at the first stage for 
+   \item \code{nodesizeAvg} Minimum nodesize in the first stage for 
          the observations in the averaging set.
    \item \code{splitratio} Proportion of the training data used as the 
-         splitting dataset at the first stage.
+         splitting dataset in the first stage.
    \item \code{middleSplit} If true, the split value will be exactly in the 
-         middle between two observations. Otherwise, it will take a point 
+         middle of two observations. Otherwise, it will take a point 
          based on a uniform distribution between the two observations. 
 }}
 
@@ -83,8 +83,8 @@ estimates of the first and second stage and the propensity score. Use
 \code{?BART::mc.wbart} for a detailed explanation of their effects.}
 }
 \value{
-An object from a class that is derived from the \code{CATE-estimator}
-  class. It should be used with one of the following functions;
+An object from a class that is derived from the \code{CATEestimator}
+  class. It should be used with one of the following functions:
   \code{EstimateCATE}, \code{CateCI}, and \code{CateBIAS}. The object has at least the
   following slots:
   \item{\code{feature_train}}{A copy of feat.}
@@ -95,7 +95,7 @@ An object from a class that is derived from the \code{CATE-estimator}
 }
 \description{
 X_RF is an implementation of the X-learner with Random Forests
-  (Breiman 2001) at the first and second stage.
+  (Breiman 2001) in the first and second stage.
 
 X_BART is an implementation of the X-learner with Bayesian
   Additive Regression Trees (Chipman et al. 2010) at the first and second stage
@@ -125,7 +125,7 @@ The X-Learner estimates the CATE in three steps:
     \deqn{\tau(x) = g(x) \hat \tau_0(x) + (1 - g(x)) \hat \tau_1(x).} 
     If \code{predmode = "propmean"}, then \eqn{g(x) = e(x)}, where
     \eqn{e(x)} is an estimate of the propensity score using the 
-    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} RF
+    \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} Random Forests
     version with the hyperparameters specified in \code{e.forestry}.
     If \code{predmode = "control"}, then \eqn{g(x) = 1}, and if 
     \code{predmode = "treated"}, then \eqn{g(x) = 0}.
@@ -145,7 +145,7 @@ tr <- simulated_experiment$W_tr
 yobs <- simulated_experiment$Yobs_tr
 feature_test <- simulated_experiment$feat_te
 
-# create the hte object using Random Forests (RF)
+# create the CATE estimator using Random Forests (RF)
 xl_rf <- X_RF(feat = feat, tr = tr, yobs = yobs)
 tl_rf <- T_RF(feat = feat, tr = tr, yobs = yobs)
 sl_rf <- S_RF(feat = feat, tr = tr, yobs = yobs)
@@ -157,7 +157,7 @@ ml_bt <- M_BART(feat = feat, tr = tr, yobs = yobs)
   
 cate_esti_xrf <- EstimateCate(xl_rf, feature_test)
 
-# evaluate the performance
+# evaluate the performance.
 cate_true <- simulated_experiment$tau_te
 mean((cate_esti_xrf - cate_true) ^ 2)
 \dontrun{

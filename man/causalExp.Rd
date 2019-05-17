@@ -26,9 +26,9 @@ tau.simulate_causal_experiment
 \arguments{
 \item{dim}{Dimension of the data set.}
 
-\item{alpha}{Only used if given_features is not set and feat_distribution is
+\item{alpha}{Only used if \code{given_features} is not set and \code{feat_distribution} is
 chosen to be normal. It specifies how correlated the features can be. If
-alpha = 0, then the features are independent if alpha is very large, then
+alpha = 0, then the features are independent. If alpha is very large, then
 the features can be very correlated. Use the
 \code{simulate_correlation_matrix} function to get a better understanding
 of the impact of alpha.}
@@ -37,67 +37,67 @@ of the impact of alpha.}
 
 \item{ntest}{Number of test examples.}
 
-\item{feat_distribution}{Only used if given_features is not specified. Either
-"normal" or "unif". It specifies the distribution of the features.}
+\item{feat_distribution}{Only used if \code{given_features} is not specified. Either
+"normal" or "unif." It specifies the distribution of the features.}
 
-\item{given_features}{This is used, if we already have features and want to
+\item{given_features}{This is used if we already have features and want to
 test the performance of different estimators for a particular set of
 features.}
 
-\item{pscore, mu0, tau}{parameters that determine the propensity score, the
+\item{pscore, mu0, tau}{Parameters that determine the propensity score, the
 response function for the control units, and tau, respectively. The
 different options can be seen using
 \code{names(pscores.simulate_causal_experiment)},
 \code{names(mu0.simulate_causal_experiment)}, and
-\code{names(tau.simulate_causal_experiment)}. This is implemented this way,
+\code{names(tau.simulate_causal_experiment)}. This is implemented in this manner,
 because it enables the user to easily loop through the different
 estimators.}
 
-\item{testseed}{The seed used to generate the testing data, if NULL, then
+\item{testseed}{The seed used to generate the test data. If NULL, then
 the seed of the main session is used.}
 
-\item{trainseed}{The seed used to generate the training data, if NULL,
+\item{trainseed}{The seed used to generate the training data. If NULL,
 then the seed of the main session is used.}
 }
 \value{
-A correlation matrix
+A correlation matrix.
 
-A list with the following elements 
-  \item{\code{setup_name}}{Name of the setup} 
-  \item{\code{m_t_truth}}{Function contraining the response function of the
+A list with the following elements: 
+  \item{\code{setup_name}}{Name of the setup.} 
+  \item{\code{m_t_truth}}{Function containing the response function of the
   treated units.}
-  \item{\code{m_c_truth}}{Function contraining the response function of the
-  control units}
-  \item{\code{propscore}}{Propensity score function} 
-  \item{\code{alpha}}{Chosen alpha} 
+  \item{\code{m_c_truth}}{Function containing the response function of the
+  control units.}
+  \item{\code{propscore}}{Propensity score function.} 
+  \item{\code{alpha}}{Chosen alpha.} 
   \item{\code{feat_te}}{Data.frame containing the features of the test
-  samples}
+  samples.}
   \item{\code{W_te}}{Numeric vector containing the treatment assignment of
-  the test samples}
+  the test samples.}
   \item{\code{tau_te}}{Numeric vector containing the true conditional average
-  treatment effects of the test samples}
+  treatment effects of the test samples.}
   \item{\code{Yobs_te}}{Numeric vector containing the observed Y values of
-  the test samples}
+  the test samples.}
   \item{\code{feat_tr}}{Data.frame containing the features of the training 
-  samples}
+  samples.}
   \item{\code{W_tr}}{Numeric vector containing the treatment assignment of
-  the training samples}
+  the training samples.}
   \item{\code{tau_tr}}{Numeric vector containing the true conditional average
-  treatment effects of the training samples}
+  treatment effects of the training samples.}
   \item{\code{Yobs_tr}}{Numeric vector containing the observed Y values of
-  the training samples}
+  the training samples.}
 }
 \description{
 \code{simulate_correlation_matrix} uses the C-vine method for
-  simulating correlation matrixes. Refer to the referenced paper for details.
+  simulating correlation matrices. (Refer to the referenced paper for details.)
 
-\code{simulate_causal_experiment} simulates a RCT or observational data for causal
+\code{simulate_causal_experiment} simulates an RCT or observational data for causal
   effect estimation. It is mainly used to test different heterogenuous
   treatment effect estimation strategies.
 }
 \details{
 The function simulates causal experiments by generating the
-  features, the treatment assignment, the observed Y values, and the CATE for
+  features, treatment assignment, observed Y values, and CATE for
   a test set and a training set. pscore, mu0, and tau define the response
   functions and the propensity score. For example, \code{pscore =
   "osSparse1Linear"} specifies that \deqn{e(x) = max(0.05, min(.95, x1 / 2 +
@@ -156,10 +156,10 @@ reshape2::dcast(data = performance, mu0 + tau ~ estimator)
 \references{
 \itemize{
   \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
-  random correlation matrices based on vines and extended onion method.
+  Random Correlation Matrices Based on Vines and Extended Onion Method.
   \item Sören Künzel, Jasjeet Sekhon, Peter Bickel, and Bin Yu (2017). 
-    Meta-learners for estimating heterogeneous treatment effects using
-    machine learning.
+    Meta-learners for Estimating Heterogeneous Treatment Effects Using
+    Machine Learning.
     }
 }
 \seealso{

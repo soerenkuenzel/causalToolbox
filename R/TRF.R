@@ -31,13 +31,13 @@ setClass(
 # T_RF generator ---------------------------------------------------------------
 #' @title T-Learners
 #' @rdname Tlearners
-#' @description T_RF is an implementation of the T-learner combined with Random
+#' @description \code{T_RF} is an implementation of the T-learner combined with Random
 #'   Forest (Breiman 2001) for both response functions.
 #' @details 
 #' The CATE is estimated using two estimators:
 #' \enumerate{
 #'  \item
-#'     First, estimate the response functions 
+#'     Estimate the response functions 
 #'     \deqn{\mu_0(x) = E[Y(0) | X = x]}
 #'     \deqn{\mu_1(x) = E[Y(1) | X = x]} 
 #'     using the base leaner and denote the estimates as \eqn{\hat \mu_0} and
@@ -49,9 +49,9 @@ setClass(
 #' @param mu0.forestry,mu1.forestry Lists containing the hyperparameters for the
 #'   \code{forestry} package that are used in \eqn{\hat \mu_0} and \eqn{\hat
 #'   \mu_1}, respectively. These hyperparameters are passed to the
-#'   \code{forestry} package. Please refer to the
+#'   \code{forestry} package. (Please refer to the
 #'   \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
-#'   for a more detailed documentation of the hyperparamters.
+#'   for a more detailed documentation of the hyperparamters.)
 #' @return Object of class \code{T_RF}. It should be used with one of the
 #'   following functions \code{EstimateCATE}, \code{CateCI}, and
 #'   \code{CateBIAS}. The object has the following slots:
@@ -63,7 +63,7 @@ setClass(
 #'   \item{\code{m_1}}{An object of class forestry that is fitted with the 
 #'      observed outcomes of the treated group as the dependent variable.}
 #'   \item{\code{hyperparameter_list}}{List containting the hyperparameters of 
-#'      the three random forest algorithms used}
+#'      the three random forest algorithms used.}
 #'   \item{\code{creator}}{Function call of T_RF. This is used for different 
 #'      bootstrap procedures.}
 #' @inherit X_RF
