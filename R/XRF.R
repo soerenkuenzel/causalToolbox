@@ -89,7 +89,7 @@ setClass(
 #'            middle of two observations. Otherwise, it will take a point 
 #'            based on a uniform distribution between the two observations. 
 #'   }
-#' @return An object from a class that is derived from the \code{CATEestimator}
+#' @return An object from a class that contains the \code{CATEestimator}
 #'   class. It should be used with one of the following functions:
 #'   \code{EstimateCATE}, \code{CateCI}, and \code{CateBIAS}. The object has at least the
 #'   following slots:

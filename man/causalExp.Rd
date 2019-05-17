@@ -102,7 +102,7 @@ The function simulates causal experiments by generating the
   functions and the propensity score. For example, \code{pscore =
   "osSparse1Linear"} specifies that \deqn{e(x) = max(0.05, min(.95, x1 / 2 +
   1 / 4))} and \code{mu0 ="sparseLinearWeak"} specifies that the response
-  function for the control units is given by a simple linear function,
+  function for the control units is given by the simple linear function,
   \deqn{mu0(x) = 3 x1 + 5 x2.}
 }
 \examples{

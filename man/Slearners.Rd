@@ -31,9 +31,9 @@ S_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
 \code{forestry} package that are used in \eqn{\hat \mu_0}.
 These hyperparameters are passed to the \code{forestry} package.}
 
-\item{ndpost}{Number of posterior draws}
+\item{ndpost}{Number of posterior draws.}
 
-\item{ntree}{Number of trees}
+\item{ntree}{Number of trees.}
 
 \item{mu.BART}{hyperparameters of the BART function. Use
 \code{?BART::mc.wbart} for a detailed explanation of their effects.}

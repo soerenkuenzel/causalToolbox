@@ -24,14 +24,14 @@ setClass(
 
 # T_BART generator -------------------------------------------------------------
 #' @rdname Tlearners
-#' @description T_BART is an implementation of the T-learner with Bayesian
+#' @description \code{T_BART} is an implementation of the T-learner with Bayesian
 #'   Additive Regression Trees (Chipman et al. 2010) for both response
 #'   functions.
-#' @param ndpost Number of posterior draws
-#' @param ntree Number of trees
-#' @param mu0.BART,mu1.BART hyperparameters of the BART functions for the
-#'   control and treated group. Use \code{?BART::mc.wbart} for a detailed 
-#'   explanation of their effects.
+#' @param ndpost Number of posterior draws.
+#' @param ntree Number of trees.
+#' @param mu0.BART,mu1.BART Hyperparameters of the BART functions for the
+#'   control and treated group. (Use \code{?BART::mc.wbart} for a detailed 
+#'   explanation of their effects.)
 #' @inherit T_RF details
 #' @inherit X_RF
 #' @family metalearners

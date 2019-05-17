@@ -100,7 +100,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   functions and the propensity score. For example, \code{pscore =
 #'   "osSparse1Linear"} specifies that \deqn{e(x) = max(0.05, min(.95, x1 / 2 +
 #'   1 / 4))} and \code{mu0 ="sparseLinearWeak"} specifies that the response
-#'   function for the control units is given by a simple linear function,
+#'   function for the control units is given by the simple linear function,
 #'   \deqn{mu0(x) = 3 x1 + 5 x2.}
 #' @seealso \code{\link{X_RF}}
 #' @references \itemize{

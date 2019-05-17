@@ -74,16 +74,16 @@ package for a more detailed documentation of the hyperparamters.)
          based on a uniform distribution between the two observations. 
 }}
 
-\item{ndpost}{Number of posterior draws}
+\item{ndpost}{Number of posterior draws.}
 
-\item{ntree}{Number of trees}
+\item{ntree}{Number of trees.}
 
 \item{mu.BART, tau.BART, e.BART}{hyperparameters of the BART functions for the
 estimates of the first and second stage and the propensity score. Use
 \code{?BART::mc.wbart} for a detailed explanation of their effects.}
 }
 \value{
-An object from a class that is derived from the \code{CATEestimator}
+An object from a class that contains the \code{CATEestimator}
   class. It should be used with one of the following functions:
   \code{EstimateCATE}, \code{CateCI}, and \code{CateBIAS}. The object has at least the
   following slots:

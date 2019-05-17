@@ -41,13 +41,13 @@ T_BART(feat, tr, yobs, ndpost = 1200, ntree = 200, nthread = 1,
 \href{https://github.com/soerenkuenzel/forestry}{\code{forestry}} package
 for a more detailed documentation of the hyperparamters.)}
 
-\item{ndpost}{Number of posterior draws}
+\item{ndpost}{Number of posterior draws.}
 
-\item{ntree}{Number of trees}
+\item{ntree}{Number of trees.}
 
-\item{mu0.BART, mu1.BART}{hyperparameters of the BART functions for the
-control and treated group. Use \code{?BART::mc.wbart} for a detailed 
-explanation of their effects.}
+\item{mu0.BART, mu1.BART}{Hyperparameters of the BART functions for the
+control and treated group. (Use \code{?BART::mc.wbart} for a detailed 
+explanation of their effects.)}
 }
 \value{
 Object of class \code{T_RF}. It should be used with one of the
@@ -69,7 +69,7 @@ Object of class \code{T_RF}. It should be used with one of the
 \code{T_RF} is an implementation of the T-learner combined with Random
   Forest (Breiman 2001) for both response functions.
 
-T_BART is an implementation of the T-learner with Bayesian
+\code{T_BART} is an implementation of the T-learner with Bayesian
   Additive Regression Trees (Chipman et al. 2010) for both response
   functions.
 }
