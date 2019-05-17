@@ -77,11 +77,11 @@ setGeneric(
 #'Method EstimateATT
 #'@name EstimateATT
 #'@param theObject A `MetaLearner` object.
-#'@param feature_new A feature data frame
-#'@param method different versions of the bootstrap.
-#'@param B number of bootstrap samples.
-#'@param nthread number of threads used in paralle
-#'@param verbose TRUE for detailed output FALSE for no output
+#'@param feature_new A feature data frame.
+#'@param method Different versions of the bootstrap.
+#'@param B Number of bootstrap samples.
+#'@param nthread Number of threads used in parallel.
+#'@param verbose TRUE for detailed output, FALSE for no output.
 #'@rdname EstimateATT
 #'@export
 setGeneric(

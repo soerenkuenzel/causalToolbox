@@ -10,15 +10,15 @@ EstimateATT(theObject, feature_new, method = "maintain_group_ratios",
 \arguments{
 \item{theObject}{A `MetaLearner` object.}
 
-\item{feature_new}{A feature data frame}
+\item{feature_new}{A feature data frame.}
 
-\item{method}{different versions of the bootstrap.}
+\item{method}{Different versions of the bootstrap.}
 
-\item{B}{number of bootstrap samples.}
+\item{B}{Number of bootstrap samples.}
 
-\item{nthread}{number of threads used in paralle}
+\item{nthread}{Number of threads used in parallel.}
 
-\item{verbose}{TRUE for detailed output FALSE for no output}
+\item{verbose}{TRUE for detailed output, FALSE for no output.}
 }
 \description{
 Method EstimateATT

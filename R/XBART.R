@@ -25,8 +25,8 @@ setClass(
 
 #' @title X_BART
 #' @rdname X_BART
-#' @description This is an implementation of X_BART
-#' @param mu.BART,tau.BART,e.BART hyperparameters of the BART functions for the
+#' @description This is an implementation of X_BART.
+#' @param mu.BART,tau.BART,e.BART Hyperparameters of the BART functions for the
 #'   estimates of the first and second stage and the propensity score. Use
 #'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
 #' @inherit X_RF

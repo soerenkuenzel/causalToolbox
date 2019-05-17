@@ -35,7 +35,7 @@ default is "propmean," which refers to propensity score weighting.}
 
 \item{ntree}{Number of trees}
 
-\item{mu.BART, tau.BART, e.BART}{hyperparameters of the BART functions for the
+\item{mu.BART, tau.BART, e.BART}{Hyperparameters of the BART functions for the
 estimates of the first and second stage and the propensity score. Use
 \code{?BART::mc.wbart} for a detailed explanation of their effects.}
 }
@@ -52,7 +52,7 @@ An object from a class that is derived from the \code{CATE-estimator}
   is used for different bootstrap procedures.}
 }
 \description{
-This is an implementation of X_BART
+This is an implementation of X_BART.
 }
 \details{
 The X-Learner estimates the CATE in three steps:
