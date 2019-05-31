@@ -431,7 +431,7 @@ tau.simulate_causal_experiment <- list(
   }, 
   fullLocallyLinear = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
-    set.seed(6482480)
+    set.seed(6482481)
     d <- ncol(feat)
     
     beta1 <- runif(d, -5, 5)
