@@ -30,9 +30,8 @@ setClass(
 #' @param mu.BART,tau.BART,e.BART hyperparameters of the BART functions for the
 #'   estimates of the first and second stage and the propensity score. Use
 #'   \code{?BART::mc.wbart} for a detailed explanation of their effects.
-#' @inherit X_RF
+#' @inherit X-Learner
 #' @inheritParams T_BART
-#' @family metalearners
 #' @export 
 X_BART <-
   function(feat,

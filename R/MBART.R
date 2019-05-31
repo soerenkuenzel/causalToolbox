@@ -29,7 +29,6 @@ setClass(
 #'   control and treated group. (Use \code{?BART::mc.wbart} for a detailed
 #'   explanation of their effects.)
 #' @export M_BART
-#' @family metalearners
 #' @inherit M_RF details
 #' @inherit T_BART
 #' @export

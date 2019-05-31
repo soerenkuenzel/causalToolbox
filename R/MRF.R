@@ -22,6 +22,7 @@ setClass(
 
 #' @title M-Learners
 #' @rdname Mlearners
+#' @name M-Learner
 #' @description \code{M_RF} is an implementation of the Modified Outcome Estimator with
 #'   Random Forest (Breiman 2001) as the base learner.
 #' @details 
@@ -83,7 +84,7 @@ setClass(
 #'   Censoring Unbiased Transformation.
 #'     \url{https://www.ncbi.nlm.nih.gov/pubmed/22550646}
 #'   }
-#' @inherit X_RF
+#' @inherit X-Learner
 #' @family metalearners
 #' @export
 M_RF <-

@@ -33,8 +33,8 @@ setClass(
 #'   control and treated group. (Use \code{?BART::mc.wbart} for a detailed 
 #'   explanation of their effects.)
 #' @inherit T_RF details
-#' @inherit X_RF
-#' @family metalearners
+#' @inherit X-Learner
+#' @family NULL
 #' @export
 T_BART <-
   function(feat,

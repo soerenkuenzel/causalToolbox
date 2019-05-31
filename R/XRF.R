@@ -22,6 +22,7 @@ setClass(
 # X_RF generator ---------------------------------------------------------------
 #' @title X-Learners
 #' @rdname Xleaners
+#' @name X-Learner
 #' @description X_RF is an implementation of the X-learner with Random Forests
 #'   (Breiman 2001) in the first and second stage.
 #' @details 

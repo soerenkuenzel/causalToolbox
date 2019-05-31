@@ -31,6 +31,7 @@ setClass(
 # T_RF generator ---------------------------------------------------------------
 #' @title T-Learners
 #' @rdname Tlearners
+#' @name T-Learner
 #' @description \code{T_RF} is an implementation of the T-learner combined with Random
 #'   Forest (Breiman 2001) for both response functions.
 #' @details 
@@ -66,7 +67,7 @@ setClass(
 #'      the three random forest algorithms used.}
 #'   \item{\code{creator}}{Function call of T_RF. This is used for different 
 #'      bootstrap procedures.}
-#' @inherit X_RF
+#' @inherit X-Learner
 #' @family metalearners
 #' @export
 T_RF <-

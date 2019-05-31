@@ -3,6 +3,7 @@
 
 # Correlation Matrix Simulator -------------------------------------------------
 #' @rdname causalExp
+#' @name simulate Experiments
 #' @description \code{simulate_correlation_matrix} uses the C-vine method for
 #'   simulating correlation matrices. (Refer to the referenced paper for details.)
 #' @return A correlation matrix.
@@ -102,7 +103,7 @@ simulate_correlation_matrix <- function(dim, alpha) {
 #'   1 / 4))} and \code{mu0 ="sparseLinearWeak"} specifies that the response
 #'   function for the control units is given by the simple linear function,
 #'   \deqn{mu0(x) = 3 x1 + 5 x2.}
-#' @seealso \code{\link{X_RF}}
+#' @seealso \code{\link{X-Learner}}
 #' @references \itemize{
 #'   \item Daniel Lewandowskia, Dorota Kurowickaa, Harry Joe (2009). Generating
 #'   Random Correlation Matrices Based on Vines and Extended Onion Method.
@@ -330,9 +331,11 @@ pscores.simulate_causal_experiment <- list(
   rct5 = function(feat) {.5}, 
   rct1 = function(feat) {.1}, 
   rct01 = function(feat) {.01},
-  osSparse1Linear = function(feat) {max(0.05, min(.95, feat$x1 / 2 + 1 / 4))},
+  osSparse1Linear = function(feat) {
+    apply(feat, 1, function(x)
+      max(0.05, min(.95, x[1] / 2 + 1 / 4)))
+  },
   osSparse1Beta = function(feat) {0.25 + dbeta(feat$x1, 2, 4) / 4})
-
 
 # mu0 functions ----------------------------------------------------------------
 #' @rdname causalExp
@@ -394,7 +397,7 @@ mu0.simulate_causal_experiment <- list(
 )
 
 # tau functions ----------------------------------------------------------------
-#' @rdname causalExp
+#' @rdname causalExpÎ
 #' @format NULL
 #' @export 
 tau.simulate_causal_experiment <- list(
@@ -407,6 +410,15 @@ tau.simulate_causal_experiment <- list(
     d <- ncol(feat)
     
     beta <- runif(d, -5, 5)
+    as.matrix(feat) %*% beta   
+  }, 
+  sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
+  fullLinearStrong = function(feat) {
+    oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
+    set.seed(5397936)
+    d <- ncol(feat)
+    
+    beta <- runif(d, -50, 50)
     as.matrix(feat) %*% beta   
   }, 
   fullLocallyLinear = function(feat) {

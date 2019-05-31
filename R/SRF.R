@@ -26,6 +26,7 @@ setClass(
 #' @description \code{S_RF} is an implementation of the S-Learner combined with
 #'   Random Forests (Breiman 2001).
 #' @rdname Slearners
+#' @name S-Learner
 #' @details 
 #' In the S-Learner, the outcome is estimated using all of the features and the 
 #' treatment indicator without giving the treatment indicator a special role. 
@@ -59,7 +60,7 @@ setClass(
 #'      the three random forest algorithms used.}
 #'   \item{\code{creator}}{Function call of \code{S_RF}. This is used for different 
 #'      bootstrap procedures.}
-#' @inherit X_RF
+#' @inherit X-Learner
 #' @family metalearners
 #' @export
 S_RF <-
