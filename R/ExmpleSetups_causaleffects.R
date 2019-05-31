@@ -346,12 +346,20 @@ mu0.simulate_causal_experiment <- list(
   sparseLinearStrong = function(feat) {30 * feat$x1 + 50 * feat$x2},
   fullLinearWeak = function(feat) {
     oldSeed <- .Random.seed; on.exit( {.Random.seed <<- oldSeed} )
-    set.seed(5397936)
+    set.seed(53979361)
     d <- ncol(feat)
     
     beta <- runif(d, -5, 5)
     as.matrix(feat) %*% beta   
   },
+  fullLinearStrong = function(feat) {
+    oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
+    set.seed(53979361)
+    d <- ncol(feat)
+    
+    beta <- runif(d, -50, 50)
+    as.matrix(feat) %*% beta   
+  }, 
   fullLocallyLinear = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
     set.seed(7020829)
@@ -397,7 +405,7 @@ mu0.simulate_causal_experiment <- list(
 )
 
 # tau functions ----------------------------------------------------------------
-#' @rdname causalExpÎ
+#' @rdname causalExp
 #' @format NULL
 #' @export 
 tau.simulate_causal_experiment <- list(
@@ -406,7 +414,7 @@ tau.simulate_causal_experiment <- list(
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
   fullLinearWeak = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
-    set.seed(5397936)
+    set.seed(53979361)
     d <- ncol(feat)
     
     beta <- runif(d, -5, 5)
@@ -415,7 +423,7 @@ tau.simulate_causal_experiment <- list(
   sparseLinearWeak = function(feat) {3 * feat$x1 + 5 * feat$x2},
   fullLinearStrong = function(feat) {
     oldSeed <- .Random.seed; on.exit({.Random.seed <<- oldSeed})
-    set.seed(5397936)
+    set.seed(53979361)
     d <- ncol(feat)
     
     beta <- runif(d, -50, 50)
