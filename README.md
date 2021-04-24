@@ -1,3 +1,8 @@
+
+## This package has been moved to https://github.com/forestry-labs/causalToolbox
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
 `causalToolbox` provides functions for estimating heterogenous treatment effects.
 
 ## How to install
